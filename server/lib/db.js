@@ -372,6 +372,213 @@ function matchesCondition(fieldValue, condition) {
     return equalsMongoLike(fieldValue, condition);
 }
 
+
+// ============================================================================
+// SQL Query Builder Helpers
+// ============================================================================
+
+function buildWhereClause(query, paramOffset = 1) {
+    if (!query || Object.keys(query).length === 0) {
+        return { sql: 'TRUE', values: [] };
+    }
+
+    const conditions = [];
+    const values = [];
+    let p = paramOffset;
+
+    for (const [key, value] of Object.entries(query)) {
+        if (key === '$or' || key === '$and' || key === '$nor') {
+            const subConditions = [];
+            const subList = Array.isArray(value) ? value : [value];
+
+            for (const subQuery of subList) {
+                const subResult = buildWhereClause(subQuery, p);
+                subConditions.push(`(${subResult.sql})`);
+                values.push(...subResult.values);
+                p += subResult.values.length;
+            }
+
+            const joiner = key === '$or' ? ' OR ' : ' AND ';
+            const clause = subConditions.join(joiner);
+
+            if (key === '$nor') {
+                conditions.push(`NOT (${clause})`);
+            } else {
+                conditions.push(`(${clause})`);
+            }
+            continue;
+        }
+
+        // Handle regular fields
+        const fieldPath = key === '_id' ? "id" : `doc->>'${key.replace(/\./g, "'->>'")}'`;
+
+        // Handle primitives and simple objects
+        if (value === null) {
+            conditions.push(`${fieldPath} IS NULL`);
+            continue;
+        }
+
+        if (typeof value !== 'object' || value instanceof ObjectId || value instanceof Date) {
+            // Exact match
+            if (key === '_id') {
+                conditions.push(`id = $${p++}`);
+                values.push(normalizeId(value));
+            } else {
+                conditions.push(`${fieldPath} = $${p++}`);
+                values.push(value.toString()); // JSONB values are strings in ->> operators unless casted
+            }
+            continue;
+        }
+
+        // Handle operators: $gt, $lt, $in, etc.
+        const ops = value;
+        for (const [op, opVal] of Object.entries(ops)) {
+            // Helper for casting
+            const isNumber = typeof opVal === 'number';
+            const cast = isNumber ? '::numeric' : '';
+
+            if (op === '$eq') {
+                conditions.push(`${fieldPath} = $${p++}`);
+                values.push(opVal);
+            } else if (op === '$ne') {
+                conditions.push(`${fieldPath} != $${p++}`);
+                values.push(opVal);
+            } else if (op === '$gt') {
+                conditions.push(`(${fieldPath})${cast} > $${p++}`);
+                values.push(opVal);
+            } else if (op === '$gte') {
+                conditions.push(`(${fieldPath})${cast} >= $${p++}`);
+                values.push(opVal);
+            } else if (op === '$lt') {
+                conditions.push(`(${fieldPath})${cast} < $${p++}`);
+                values.push(opVal);
+            } else if (op === '$lte') {
+                conditions.push(`(${fieldPath})${cast} <= $${p++}`);
+                values.push(opVal);
+            } else if (op === '$in') {
+                // For 'id', use simple IN
+                if (key === '_id') {
+                    const ids = (Array.isArray(opVal) ? opVal : []).map(normalizeId);
+                    if (ids.length === 0) {
+                        conditions.push('FALSE');
+                    } else {
+                        // $ANY format
+                        conditions.push(`id = ANY($${p++})`);
+                        values.push(ids);
+                    }
+                } else {
+                    // For JSONB fields, we simulate IN using OR or specific JSONB ops if installed, 
+                    // but standard postgres: Use ANY on a text array
+                    const arr = (Array.isArray(opVal) ? opVal : []).map(v => String(v));
+                    if (arr.length === 0) {
+                        conditions.push('FALSE');
+                    } else {
+                        conditions.push(`${fieldPath} = ANY($${p++})`);
+                        values.push(arr);
+                    }
+                }
+            } else if (op === '$nin') {
+                if (key === '_id') {
+                    const ids = (Array.isArray(opVal) ? opVal : []).map(normalizeId);
+                    if (ids.length > 0) {
+                        conditions.push(`id != ALL($${p++})`);
+                        values.push(ids);
+                    }
+                } else {
+                    const arr = (Array.isArray(opVal) ? opVal : []).map(v => String(v));
+                    if (arr.length > 0) {
+                        conditions.push(`${fieldPath} != ALL($${p++})`);
+                        values.push(arr);
+                    }
+                }
+            } else if (op === '$exists') {
+                const shouldExist = Boolean(opVal);
+                // For JSONB, checking keys existence
+                // doc ? 'key' for top level, but for nested path we need checks.
+                // Simplified: check if value is not null (since we use ->>)
+                if (shouldExist) {
+                    conditions.push(`${fieldPath} IS NOT NULL`);
+                } else {
+                    conditions.push(`${fieldPath} IS NULL`);
+                }
+            } else if (op === '$regex') {
+                // Postgres POSIX regex: ~ for case sensitive, ~* for insensitive
+                const flags = ops.$options || '';
+                const operator = flags.includes('i') ? '~*' : '~';
+                conditions.push(`${fieldPath} ${operator} $${p++}`);
+                values.push(opVal.toString());
+            } else if (op === '$elemMatch') {
+                // @> operator for simple containment could work, but complex elemMatch is hard in pure SQL/JSONB without jsonb_path_query (PG12+)
+                // Fallback: This is complex. For now, simple containment or skip.
+                // We'll support simple object containment: doc->'field' @> '[{...}]'
+                conditions.push(`doc->'${key}' @> $${p++}::jsonb`);
+                values.push(JSON.stringify([opVal]));
+            }
+        }
+    }
+
+    if (conditions.length === 0) return { sql: 'TRUE', values: [] };
+    return { sql: conditions.join(' AND '), values };
+}
+
+function buildSortClause(sortSpec) {
+    if (!sortSpec || Object.keys(sortSpec).length === 0) return '';
+
+    const clauses = [];
+    for (const [key, dir] of Object.entries(sortSpec)) {
+        const direction = dir >= 0 ? 'ASC' : 'DESC';
+        if (key === '_id') {
+            clauses.push(`id ${direction}`);
+        } else {
+            // Try to guess if numeric sorting is needed? 
+            // For now default to text sorting to be safe or maybe no cast.
+            // A safer bet for generic "mongo" style is sorting as text unless we know better.
+            clauses.push(`doc->>'${key}' ${direction}`);
+        }
+    }
+    return `ORDER BY ${clauses.join(', ')}`;
+}
+
+class Cursor {
+    constructor(collection, query, projection) {
+        this.collection = collection;
+        this.query = query || {};
+        this.projection = projection;
+        this.sortSpec = undefined;
+        this.limitCount = undefined;
+        this.skipCount = 0;
+    }
+
+    sort(spec) {
+        this.sortSpec = spec;
+        return this;
+    }
+
+    limit(n) {
+        this.limitCount = n;
+        return this;
+    }
+
+    skip(n) {
+        this.skipCount = n;
+        return this;
+    }
+
+    project(spec) {
+        this.projection = spec;
+        return this;
+    }
+
+    async toArray() {
+        return await this.collection._findSql(this.query, {
+            sort: this.sortSpec,
+            limit: this.limitCount,
+            skip: this.skipCount,
+            projection: this.projection
+        });
+    }
+}
+
 function matchesQuery(doc, query) {
     if (!query || Object.keys(query).length === 0) return true;
 
@@ -445,55 +652,6 @@ function compareBySort(a, b, sortSpec) {
     return 0;
 }
 
-class Cursor {
-    constructor(collection, query, projection) {
-        this.collection = collection;
-        this.query = query || {};
-        this.projection = projection;
-        this.sortSpec = undefined;
-        this.limitCount = undefined;
-        this.skipCount = 0;
-    }
-
-    sort(spec) {
-        this.sortSpec = spec;
-        return this;
-    }
-
-    limit(n) {
-        this.limitCount = n;
-        return this;
-    }
-
-    skip(n) {
-        this.skipCount = n;
-        return this;
-    }
-
-    project(spec) {
-        this.projection = spec;
-        return this;
-    }
-
-    async toArray() {
-        const docs = await this.collection._loadAll();
-        let result = docs.filter((d) => matchesQuery(d, this.query));
-
-        if (this.sortSpec) {
-            result = result.sort((a, b) => compareBySort(a, b, this.sortSpec));
-        }
-
-        if (this.skipCount) result = result.slice(this.skipCount);
-        if (this.limitCount !== undefined) result = result.slice(0, this.limitCount);
-
-        if (this.projection) {
-            result = result.map((d) => applyProjection(d, this.projection));
-        }
-
-        return result;
-    }
-}
-
 function evalExpr(doc, expr, vars = {}) {
     if (expr == null) return expr;
 
@@ -562,7 +720,6 @@ function evalExpr(doc, expr, vars = {}) {
             return values.reduce((m, v) => (m === undefined || v > m ? v : m), undefined);
         }
         case '$cond': {
-            // Support array form: [if, then, else]
             const arr = Array.isArray(expr.$cond) ? expr.$cond : null;
             if (arr) {
                 const [ifExpr, thenExpr, elseExpr] = arr;
@@ -570,7 +727,6 @@ function evalExpr(doc, expr, vars = {}) {
                     ? evalExpr(doc, thenExpr, vars)
                     : evalExpr(doc, elseExpr, vars);
             }
-            // Support object form: { if, then, else }
             const ifExpr = expr.$cond?.if;
             const thenExpr = expr.$cond?.then;
             const elseExpr = expr.$cond?.else;
@@ -640,9 +796,19 @@ class AggCursor {
     }
 
     async toArray() {
-        let docs = await this.collection._loadAll();
+        let docs;
+        const pipeline = [...this.pipeline];
 
-        for (const stage of this.pipeline) {
+        // Optimization: If first stage is $match, use SQL query
+        if (pipeline.length > 0 && pipeline[0].$match) {
+            const matchQuery = pipeline[0].$match;
+            pipeline.shift();
+            docs = await this.collection._findSql(matchQuery);
+        } else {
+            docs = await this.collection._loadAll();
+        }
+
+        for (const stage of pipeline) {
             const [op, spec] = Object.entries(stage)[0] || [];
             if (!op) continue;
 
@@ -742,22 +908,283 @@ class AggCursor {
         return docs;
     }
 }
-
 class Collection {
     constructor(name) {
         this.name = name;
     }
 
-    _isIdOnlyQuery(query) {
-        if (!query || typeof query !== 'object' || Array.isArray(query)) return false;
-        const keys = Object.keys(query);
-        if (keys.length !== 1 || keys[0] !== '_id') return false;
-        const id = query._id;
-        if (id && typeof id === 'object' && !(id instanceof ObjectId) && !(id instanceof Date) && !(id instanceof RegExp)) {
-            return false;
+    async _findSql(query, { sort, limit, skip, projection } = {}) {
+        await connectToDatabase();
+
+        const { sql: whereSql, values } = buildWhereClause(query, 2); // $1 is collection name
+        const sortSql = buildSortClause(sort);
+
+        let limitSql = '';
+        if (limit !== undefined) limitSql = `LIMIT ${limit}`;
+
+        let skipSql = '';
+        if (skip !== undefined) skipSql = `OFFSET ${skip}`;
+
+        // Projection mainly happens in app layer for now to support complex exclusions,
+        // unless we want to use query string construction for projection.
+        // Selecting just 'doc' is safe.
+
+        const fullSql = `
+            SELECT doc 
+            FROM documents 
+            WHERE collection = $1 AND (${whereSql})
+            ${sortSql}
+            ${limitSql}
+            ${skipSql}
+        `;
+
+        const startTime = Date.now();
+        try {
+            const result = await pool.query(fullSql, [this.name, ...values]);
+
+            // Apply projection in memory if needed (lightweight compared to full scan)
+            let docs = result.rows.map(r => r.doc);
+            if (projection) {
+                docs = docs.map(d => applyProjection(d, projection));
+            }
+            return docs;
+        } catch (err) {
+            console.error(`❌ SQL Query failed: ${fullSql}`, err);
+            throw err;
         }
-        return true;
     }
+
+    _isIdOnlyQuery(query) {
+        // Legacy check, still useful for shortcut optimization
+        if (!query || typeof query !== 'object') return false;
+        const keys = Object.keys(query);
+        return keys.length === 1 && keys[0] === '_id' && typeof query._id === 'string';
+    }
+
+    find(query = {}, options = {}) {
+        return new Cursor(this, query, options?.projection);
+    }
+
+    async findOne(query = {}, options = {}) {
+        // Optimized findOne with LIMIT 1
+        const docs = await this._findSql(query, {
+            projection: options?.projection,
+            limit: 1
+        });
+        return docs[0] || null;
+    }
+
+    async countDocuments(query = {}) {
+        await connectToDatabase();
+
+        const { sql: whereSql, values } = buildWhereClause(query, 2);
+
+        const sql = `SELECT COUNT(*) as count FROM documents WHERE collection = $1 AND (${whereSql})`;
+
+        try {
+            const result = await pool.query(sql, [this.name, ...values]);
+            return parseInt(result.rows[0].count, 10);
+        } catch (err) {
+            console.error("Count failed", err);
+            throw err;
+        }
+    }
+
+    // CRUD Methods - mostly reusing existing logic but avoiding full loads where possible
+    // insertOne, insertMany: unchanged (they are already efficient single INSERTs)
+
+    async insertOne(doc) {
+        await connectToDatabase();
+        const startTime = Date.now();
+        try {
+            const out = deepCloneJson(doc || {});
+            if (!out._id) out._id = new ObjectId().toString();
+            const id = normalizeId(out._id);
+            out._id = id;
+
+            // UpdatedAt handled in DB default now() but let's be explicit
+            if (!out.created_at) out.created_at = new Date();
+            if (!out.updated_at) out.updated_at = new Date();
+
+            await pool.query(
+                'INSERT INTO documents(collection, id, doc, updated_at) VALUES ($1, $2, $3, now())',
+                [this.name, id, out]
+            );
+
+            const duration = Date.now() - startTime;
+            if (duration > 500) console.warn(`⚠️ SLOW INSERT [${this.name}]: ${duration}ms`);
+
+            return { insertedId: id, acknowledged: true };
+        } catch (err) {
+            console.error(`❌ Insert failed [${this.name}]:`, err.message);
+            throw err;
+        }
+    }
+
+    async insertMany(docs = []) {
+        await connectToDatabase();
+        const list = Array.isArray(docs) ? docs : [];
+        if (list.length === 0) return { insertedCount: 0, acknowledged: true };
+
+        const insertedIds = {};
+        let insertedCount = 0;
+        const chunkSize = 100;
+
+        for (let start = 0; start < list.length; start += chunkSize) {
+            const chunk = list.slice(start, start + chunkSize).map(d => {
+                const out = deepCloneJson(d);
+                if (!out._id) out._id = new ObjectId().toString();
+                return { id: normalizeId(out._id), doc: out };
+            });
+
+            const values = [];
+            const params = [];
+            let p = 1;
+            for (const item of chunk) {
+                params.push(this.name, item.id, item.doc);
+                values.push(`($${p++}, $${p++}, $${p++})`);
+            }
+
+            await pool.query(
+                `INSERT INTO documents(collection, id, doc) VALUES ${values.join(', ')} 
+                 ON CONFLICT (collection, id) DO UPDATE SET doc = EXCLUDED.doc, updated_at = now()`,
+                params
+            );
+
+            chunk.forEach((item, i) => insertedIds[start + i] = item.id);
+            insertedCount += chunk.length;
+        }
+        return { insertedCount, insertedIds, acknowledged: true };
+    }
+
+    async updateOne(filter, update, options = {}) {
+        // fetch ONLY matching document (limit 1)
+        const doc = await this.findOne(filter);
+        if (!doc) {
+            if (options?.upsert) {
+                // Upsert logic
+                const newDoc = { ...filter, ...deepCloneJson(doc || {}) }; // wait doc is null here
+                // Reconstruct from filter is hard for complex filters.
+                // Simplified upsert:
+                const seed = deepCloneJson(filter);
+                const toInsert = this._applyUpdateOperators(seed, update, { isInsert: true });
+                return this.insertOne(toInsert);
+            }
+            return { matchedCount: 0, modifiedCount: 0, acknowledged: true };
+        }
+
+        // Apply helper logic (requires recreating those helper methods inside or outside class)
+        // Since I replaced the class, I need to make sure _applyUpdateOperators is available.
+        // It was a method on the class. I will make it a standalone function or method.
+
+        this._applyUpdateOperators(doc, update);
+
+        await pool.query(
+            `UPDATE documents SET doc = $1, updated_at = now() WHERE collection = $2 AND id = $3`,
+            [doc, this.name, doc._id]
+        );
+
+        return { matchedCount: 1, modifiedCount: 1, acknowledged: true };
+    }
+
+    async updateMany(filter, update, options = {}) {
+        // Fetch ALL matching docs (but only matching ones)
+        const docs = await this.find(filter).toArray();
+        if (docs.length === 0) return { matchedCount: 0, modifiedCount: 0, acknowledged: true };
+
+        let modified = 0;
+        // Batch update? For now loop is safer for complex logic
+        for (const doc of docs) {
+            this._applyUpdateOperators(doc, update);
+            await pool.query(
+                `UPDATE documents SET doc = $1, updated_at = now() WHERE collection = $2 AND id = $3`,
+                [doc, this.name, doc._id]
+            );
+            modified++;
+        }
+        return { matchedCount: docs.length, modifiedCount: modified, acknowledged: true };
+    }
+
+    async deleteOne(filter) {
+        await connectToDatabase();
+        // We need ID to delete exactly one safely (or use ctid, but ID is best)
+        const doc = await this.findOne(filter);
+        if (!doc) return { deletedCount: 0, acknowledged: true };
+
+        const result = await pool.query(
+            'DELETE FROM documents WHERE collection = $1 AND id = $2',
+            [this.name, doc._id]
+        );
+        return { deletedCount: result.rowCount, acknowledged: true };
+    }
+
+    async deleteMany(filter = {}) {
+        await connectToDatabase();
+        const { sql: whereSql, values } = buildWhereClause(filter, 2);
+
+        const result = await pool.query(
+            `DELETE FROM documents WHERE collection = $1 AND (${whereSql})`,
+            [this.name, ...values]
+        );
+        return { deletedCount: result.rowCount, acknowledged: true };
+    }
+
+    // Legacy support
+    async findOneAndUpdate(filter, update, options = {}) {
+        const doc = await this.findOne(filter);
+        if (!doc && options?.upsert) {
+            const seed = deepCloneJson(filter);
+            const res = await this.insertOne(this._applyUpdateOperators(seed, update, { isInsert: true }));
+            return { value: seed, ok: 1 };
+        }
+        if (!doc) return { value: null, ok: 1 };
+
+        const before = deepCloneJson(doc);
+        this._applyUpdateOperators(doc, update);
+
+        await pool.query(
+            `UPDATE documents SET doc = $1, updated_at = now() WHERE collection = $2 AND id = $3`,
+            [doc, this.name, doc._id]
+        );
+
+        const returnAfter = options?.returnDocument === 'after';
+        return { value: returnAfter ? doc : before, ok: 1 };
+    }
+
+    aggregate(pipeline) {
+        // Aggregate is hard to fully map to SQL.
+        // For now, we fallback to "fetch matching" if possible, or sadly fetch all if no $match first.
+        // But usually pipeline starts with $match.
+
+        if (pipeline.length > 0 && pipeline[0]['$match']) {
+            const matchStage = pipeline[0]['$match'];
+            // We can optimize this!
+            return new AggCursor(this, pipeline);
+        }
+        // Fallback
+        return new AggCursor(this, pipeline);
+    }
+
+    async distinct(field, query = {}) {
+        // Optimization: SELECT DISTINCT doc->>'field' 
+        await connectToDatabase();
+        const { sql: whereSql, values } = buildWhereClause(query, 2);
+
+        // This is tricky for arrays, but for simple fields:
+        // SELECT DISTINCT doc->>field ...
+        // We'll trust the existing JS implementation for edge cases unless query is efficient.
+        // Let's implement basic optimization:
+        const docs = await this._findSql(query); // Only fetch matches
+        const set = new Set();
+        for (const d of docs) {
+            const v = getByPath(d, field);
+            if (Array.isArray(v)) v.forEach(x => set.add(JSON.stringify(x)));
+            else if (v !== undefined) set.add(JSON.stringify(v));
+        }
+        return Array.from(set).map(s => JSON.parse(s));
+    }
+
+    async createIndex() { return undefined; }
 
     _applyUpdateOperators(doc, update, { isInsert = false } = {}) {
         const operators = update && typeof update === 'object' ? update : {};
@@ -804,368 +1231,7 @@ class Collection {
                 );
             }
         }
-    }
-
-    _applyUpdatePipeline(doc, pipeline) {
-        let current = doc;
-
-        for (const stage of pipeline || []) {
-            const [op, spec] = Object.entries(stage || {})[0] || [];
-            if (!op) continue;
-
-            if (op === '$set') {
-                const stageInput = deepCloneJson(current);
-                const values = {};
-                for (const [k, v] of Object.entries(spec || {})) {
-                    values[k] = evalExpr(stageInput, v);
-                }
-                for (const [k, v] of Object.entries(values)) setByPath(current, k, v);
-                continue;
-            }
-
-            if (op === '$unset') {
-                const fields = Array.isArray(spec)
-                    ? spec
-                    : typeof spec === 'string'
-                        ? [spec]
-                        : Object.keys(spec || {});
-                for (const field of fields) unsetByPath(current, field);
-                continue;
-            }
-        }
-
-        return current;
-    }
-
-    async _loadAll() {
-        await connectToDatabase();
-        const startTime = Date.now();
-        try {
-            const result = await pool.query('SELECT doc FROM documents WHERE collection = $1', [this.name]);
-            const duration = Date.now() - startTime;
-
-            if (duration > 1000) {
-                console.warn(`⚠️ SLOW QUERY [${this.name}._loadAll]: ${duration}ms (${result.rowCount} rows)`);
-            }
-
-            return result.rows.map((r) => r.doc);
-        } catch (err) {
-            const duration = Date.now() - startTime;
-            console.error(`❌ Query failed [${this.name}._loadAll]: ${duration}ms`, err.message);
-            throw err;
-        }
-    }
-
-    find(query = {}, options = {}) {
-        return new Cursor(this, query, options?.projection);
-    }
-
-    async findOne(query = {}, options = {}) {
-        if (this._isIdOnlyQuery(query)) {
-            await connectToDatabase();
-            const id = normalizeId(query._id);
-            const result = await pool.query(
-                'SELECT doc FROM documents WHERE collection = $1 AND id = $2 LIMIT 1',
-                [this.name, id]
-            );
-            const doc = result.rows[0]?.doc || null;
-            return doc && options?.projection ? applyProjection(doc, options.projection) : doc;
-        }
-
-        const docs = await this.find(query, options).limit(1).toArray();
-        return docs[0] || null;
-    }
-
-    async countDocuments(query = {}) {
-        const startTime = Date.now();
-        try {
-            const docs = await this._loadAll();
-            const count = docs.filter((d) => matchesQuery(d, query)).length;
-            const duration = Date.now() - startTime;
-
-            if (duration > 1000) {
-                console.warn(`⚠️ SLOW QUERY [${this.name}.countDocuments]: ${duration}ms (query: ${JSON.stringify(query).substring(0, 100)})`);
-            }
-
-            return count;
-        } catch (err) {
-            const duration = Date.now() - startTime;
-            console.error(`❌ Query failed [${this.name}.countDocuments]: ${duration}ms`, err.message);
-            throw err;
-        }
-    }
-
-    async insertOne(doc) {
-        await connectToDatabase();
-        const startTime = Date.now();
-        try {
-            const out = deepCloneJson(doc || {});
-            if (!out._id) out._id = new ObjectId().toString();
-            const id = normalizeId(out._id);
-            out._id = id;
-
-            await pool.query(
-                'INSERT INTO documents(collection, id, doc) VALUES ($1, $2, $3)',
-                [this.name, id, out]
-            );
-
-            const duration = Date.now() - startTime;
-            if (duration > 500) {
-                console.warn(`⚠️ SLOW INSERT [${this.name}.insertOne]: ${duration}ms`);
-            }
-
-            return { insertedId: id, acknowledged: true };
-        } catch (err) {
-            const duration = Date.now() - startTime;
-            console.error(`❌ Insert failed [${this.name}.insertOne]: ${duration}ms`, err.message);
-            throw err;
-        }
-    }
-
-    async insertMany(docs = []) {
-        await connectToDatabase();
-
-        const list = Array.isArray(docs) ? docs : [];
-        const insertedIds = {};
-        let insertedCount = 0;
-
-        const chunkSize = 100;
-        for (let start = 0; start < list.length; start += chunkSize) {
-            const chunk = list.slice(start, start + chunkSize).map((d) => {
-                const out = deepCloneJson(d || {});
-                if (!out._id) out._id = new ObjectId().toString();
-                const id = normalizeId(out._id);
-                out._id = id;
-                return { id, doc: out };
-            });
-
-            const values = [];
-            const params = [];
-            let p = 1;
-            for (const item of chunk) {
-                params.push(this.name, item.id, item.doc);
-                values.push(`($${p++}, $${p++}, $${p++})`);
-            }
-
-            if (values.length > 0) {
-                await pool.query(
-                    `INSERT INTO documents(collection, id, doc)
-                     VALUES ${values.join(', ')}
-                     ON CONFLICT (collection, id)
-                     DO UPDATE SET doc = EXCLUDED.doc, updated_at = now()`,
-                    params
-                );
-            }
-
-            for (let i = 0; i < chunk.length; i++) {
-                insertedIds[start + i] = chunk[i].id;
-            }
-            insertedCount += chunk.length;
-        }
-
-        return { insertedCount, insertedIds, acknowledged: true };
-    }
-
-    async updateOne(filter, update, options = {}) {
-        await connectToDatabase();
-        if (this._isIdOnlyQuery(filter)) {
-            const id = normalizeId(filter._id);
-            const result = await pool.query(
-                'SELECT doc FROM documents WHERE collection = $1 AND id = $2 LIMIT 1',
-                [this.name, id]
-            );
-            const existing = result.rows[0]?.doc ? deepCloneJson(result.rows[0].doc) : null;
-
-            if (!existing && !options?.upsert) {
-                return { matchedCount: 0, modifiedCount: 0, upsertedCount: 0, acknowledged: true };
-            }
-
-            let doc = existing || { _id: id };
-
-            if (Array.isArray(update)) {
-                doc = this._applyUpdatePipeline(doc, update);
-            } else {
-                this._applyUpdateOperators(doc, update, { isInsert: !existing });
-            }
-
-            doc._id = normalizeId(doc._id);
-
-            await pool.query(
-                `INSERT INTO documents(collection, id, doc, updated_at)
-                 VALUES ($1, $2, $3, now())
-                 ON CONFLICT (collection, id)
-                 DO UPDATE SET doc = EXCLUDED.doc, updated_at = now()`,
-                [this.name, doc._id, doc]
-            );
-
-            return {
-                matchedCount: existing ? 1 : 0,
-                modifiedCount: 1,
-                upsertedCount: existing ? 0 : 1,
-                upsertedId: existing ? undefined : doc._id,
-                acknowledged: true,
-            };
-        }
-
-        const docs = await this.find(filter).limit(1).toArray();
-        let doc = docs[0];
-
-        if (!doc) {
-            if (!options?.upsert) {
-                return { matchedCount: 0, modifiedCount: 0, upsertedCount: 0, acknowledged: true };
-            }
-            doc = { ...deepCloneJson(filter) };
-            if (!doc._id) doc._id = new ObjectId().toString();
-        } else {
-            doc = deepCloneJson(doc);
-        }
-
-        if (Array.isArray(update)) {
-            doc = this._applyUpdatePipeline(doc, update);
-        } else {
-            this._applyUpdateOperators(doc, update, { isInsert: !docs[0] });
-        }
-
-        const id = normalizeId(doc._id);
-        doc._id = id;
-
-        await pool.query(
-            `INSERT INTO documents(collection, id, doc, updated_at)
-             VALUES ($1, $2, $3, now())
-             ON CONFLICT (collection, id)
-             DO UPDATE SET doc = EXCLUDED.doc, updated_at = now()`,
-            [this.name, id, doc]
-        );
-
-        return {
-            matchedCount: docs[0] ? 1 : 0,
-            modifiedCount: 1,
-            upsertedCount: docs[0] ? 0 : 1,
-            upsertedId: docs[0] ? undefined : id,
-            acknowledged: true,
-        };
-    }
-
-    async updateMany(filter, update, options = {}) {
-        await connectToDatabase();
-        const docs = await this.find(filter).toArray();
-        const matchedCount = docs.length;
-        if (matchedCount === 0 && !options?.upsert) {
-            return { matchedCount: 0, modifiedCount: 0, acknowledged: true };
-        }
-
-        const targets = matchedCount > 0 ? docs : [deepCloneJson(filter || {})];
-        let modifiedCount = 0;
-        const isInsert = matchedCount === 0;
-
-        for (const original of targets) {
-            let doc = deepCloneJson(original);
-            if (!doc._id) doc._id = new ObjectId().toString();
-
-            if (Array.isArray(update)) {
-                doc = this._applyUpdatePipeline(doc, update);
-            } else {
-                this._applyUpdateOperators(doc, update, { isInsert });
-            }
-
-            const id = normalizeId(doc._id);
-            doc._id = id;
-
-            await pool.query(
-                `INSERT INTO documents(collection, id, doc, updated_at)
-                 VALUES ($1, $2, $3, now())
-                 ON CONFLICT (collection, id)
-                 DO UPDATE SET doc = EXCLUDED.doc, updated_at = now()`,
-                [this.name, id, doc]
-            );
-            modifiedCount++;
-        }
-
-        return { matchedCount, modifiedCount, acknowledged: true };
-    }
-
-    async deleteOne(filter) {
-        await connectToDatabase();
-        const docs = await this.find(filter).limit(1).toArray();
-        const doc = docs[0];
-        if (!doc) return { deletedCount: 0, acknowledged: true };
-        const id = normalizeId(doc._id);
-        const result = await pool.query('DELETE FROM documents WHERE collection=$1 AND id=$2', [this.name, id]);
-        return { deletedCount: result.rowCount || 0, acknowledged: true };
-    }
-
-    async deleteMany(filter = {}) {
-        await connectToDatabase();
-        const docs = await this.find(filter).toArray();
-        const ids = docs.map((d) => normalizeId(d._id)).filter(Boolean);
-        if (ids.length === 0) return { deletedCount: 0, acknowledged: true };
-        const result = await pool.query(
-            'DELETE FROM documents WHERE collection=$1 AND id = ANY($2)',
-            [this.name, ids]
-        );
-        return { deletedCount: result.rowCount || 0, acknowledged: true };
-    }
-
-    async findOneAndUpdate(filter, update, options = {}) {
-        await connectToDatabase();
-
-        const docs = await this.find(filter).limit(1).toArray();
-        const existing = docs[0] || null;
-        const before = existing ? deepCloneJson(existing) : null;
-
-        if (!existing && !options?.upsert) {
-            return { value: null, ok: 1, lastErrorObject: { updatedExisting: false } };
-        }
-
-        let doc = existing ? deepCloneJson(existing) : deepCloneJson(filter || {});
-        if (!doc._id) doc._id = new ObjectId().toString();
-
-        if (Array.isArray(update)) {
-            doc = this._applyUpdatePipeline(doc, update);
-        } else {
-            this._applyUpdateOperators(doc, update, { isInsert: !existing });
-        }
-
-        const id = normalizeId(doc._id);
-        doc._id = id;
-
-        await pool.query(
-            `INSERT INTO documents(collection, id, doc, updated_at)
-             VALUES ($1, $2, $3, now())
-             ON CONFLICT (collection, id)
-             DO UPDATE SET doc = EXCLUDED.doc, updated_at = now()`,
-            [this.name, id, doc]
-        );
-
-        const returnAfter = String(options?.returnDocument || 'before').toLowerCase() === 'after';
-        return {
-            value: returnAfter ? doc : before,
-            ok: 1,
-            lastErrorObject: {
-                updatedExisting: Boolean(existing),
-                upserted: existing ? undefined : id,
-            },
-        };
-    }
-
-    aggregate(pipeline = []) {
-        return new AggCursor(this, pipeline);
-    }
-
-    async distinct(field, query = {}) {
-        const docs = await this.find(query).toArray();
-        const set = new Set();
-        for (const d of docs) {
-            const v = getByPath(d, field);
-            if (Array.isArray(v)) v.forEach((x) => set.add(JSON.stringify(x)));
-            else if (v !== undefined) set.add(JSON.stringify(v));
-        }
-        return Array.from(set).map((s) => JSON.parse(s));
-    }
-
-    // No-op compatibility with legacy code paths.
-    async createIndex() {
-        return undefined;
+        return doc;
     }
 }
 
