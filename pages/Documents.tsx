@@ -7,27 +7,88 @@ import { useDebounce, useDocuments } from '../lib/hooks';
 import { api } from '../lib/api';
 import { Document, DocumentCategory } from '../types';
 import { LIBRARY_FIELDS, LibraryFieldValue } from '../constants/libraryFields';
+import { useI18n } from '../contexts/I18nContext';
 
 type DocumentSortValue = 'newest' | 'downloads' | 'titleAsc' | 'titleDesc';
-
-const SORT_OPTIONS: DropdownOption[] = [
-  { value: 'newest', label: 'Mới nhất' },
-  { value: 'downloads', label: 'Tải nhiều nhất' },
-  { value: 'titleAsc', label: 'Tên A → Z' },
-  { value: 'titleDesc', label: 'Tên Z → A' },
-];
-
-const CATEGORY_PILLS: Array<{ value: '' | DocumentCategory; label: string }> = [
-  { value: '', label: 'Tất cả' },
-  { value: 'Tutorial', label: 'Tutorial' },
-  { value: 'Reference', label: 'Reference' },
-  { value: 'Guide', label: 'Guide' },
-  { value: 'Research', label: 'Research' },
-];
 
 const ITEMS_PER_PAGE = 12;
 
 const Documents: React.FC = () => {
+  const { locale } = useI18n();
+  const isEn = locale === 'en';
+
+  const SORT_OPTIONS: DropdownOption[] = [
+    { value: 'newest', label: isEn ? 'Newest' : 'Mới nhất' },
+    { value: 'downloads', label: isEn ? 'Most downloaded' : 'Tải nhiều nhất' },
+    { value: 'titleAsc', label: isEn ? 'Name A → Z' : 'Tên A → Z' },
+    { value: 'titleDesc', label: isEn ? 'Name Z → A' : 'Tên Z → A' },
+  ];
+
+  const CATEGORY_PILLS: Array<{ value: '' | DocumentCategory; label: string }> = [
+    { value: '', label: isEn ? 'All' : 'Tất cả' },
+    { value: 'Tutorial', label: 'Tutorial' },
+    { value: 'Reference', label: 'Reference' },
+    { value: 'Guide', label: 'Guide' },
+    { value: 'Research', label: 'Research' },
+  ];
+
+  const copy = useMemo(() => isEn ? {
+    badge: 'Document library',
+    heroTitle: 'Curated documents, learn fast and effectively',
+    heroDesc: 'Collection of guides, references, and research by field. Search and open documents with just one click.',
+    searchByKeyword: 'Search by keyword',
+    diverseCategories: 'Diverse categories',
+    filterByField: 'Filter by field',
+    matchingResults: 'Matching results',
+    totalDocs: 'Total documents',
+    documents: 'documents',
+    updatedContinuously: 'Continuously updated, prioritizing new documents.',
+    displaying: 'Displaying',
+    fields: 'Fields',
+    pages: 'Pages',
+    searchPlaceholder: 'Search documents, authors...',
+    clearSearch: 'Clear search',
+    docType: 'Document type',
+    fieldLabel: 'Fields',
+    collapse: 'Show less',
+    showMore: 'Show more',
+    loading: 'Loading...',
+    docsCount: 'documents',
+    sortLabel: 'Sort by',
+    retry: 'Retry',
+    openDoc: 'Open document',
+    noResults: 'No matching documents found',
+    noResultsHint: 'Try different keywords or change the category.',
+    clearFilters: 'Clear filters',
+  } : {
+    badge: 'Thư viện tài liệu',
+    heroTitle: 'Tài liệu chọn lọc, học nhanh và hiệu quả',
+    heroDesc: 'Tổng hợp hướng dẫn, tham khảo và nghiên cứu theo lĩnh vực. Tìm kiếm và mở tài liệu chỉ với một lần nhấn.',
+    searchByKeyword: 'Tìm theo từ khóa',
+    diverseCategories: 'Danh mục đa dạng',
+    filterByField: 'Lọc theo lĩnh vực',
+    matchingResults: 'Kết quả phù hợp',
+    totalDocs: 'Tổng tài liệu',
+    documents: 'tài liệu',
+    updatedContinuously: 'Cập nhật liên tục, ưu tiên tài liệu mới.',
+    displaying: 'Đang hiển thị',
+    fields: 'Lĩnh vực',
+    pages: 'Trang',
+    searchPlaceholder: 'Tìm tài liệu, tác giả...',
+    clearSearch: 'Xóa tìm kiếm',
+    docType: 'Loại tài liệu',
+    fieldLabel: 'Lĩnh vực',
+    collapse: 'Thu gọn',
+    showMore: 'Xem thêm',
+    loading: 'Đang tải...',
+    docsCount: 'tài liệu',
+    sortLabel: 'Sắp xếp',
+    retry: 'Thử lại',
+    openDoc: 'Mở tài liệu',
+    noResults: 'Không tìm thấy tài liệu phù hợp',
+    noResultsHint: 'Hãy thử từ khóa khác hoặc đổi danh mục.',
+    clearFilters: 'Xóa bộ lọc',
+  }, [isEn]);
   const [activeCategory, setActiveCategory] = useState<'' | DocumentCategory>('');
   const [activeField, setActiveField] = useState<LibraryFieldValue>('');
   const [showAllFields, setShowAllFields] = useState(false);
@@ -84,24 +145,24 @@ const Documents: React.FC = () => {
             <div className="space-y-4 animate-fade-in-up">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-white/70 text-xs font-semibold text-sky-700 shadow-sm">
                 <FileText className="w-3.5 h-3.5" />
-                Thư viện tài liệu
+                {copy.badge}
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
-                Tài liệu chọn lọc, học nhanh và hiệu quả
+                {copy.heroTitle}
               </h2>
               <p className="text-sm md:text-base text-slate-600 leading-relaxed max-w-xl md:max-w-none">
-                Tổng hợp hướng dẫn, tham khảo và nghiên cứu theo lĩnh vực. Tìm kiếm và mở tài liệu chỉ với một lần nhấn.
+                {copy.heroDesc}
               </p>
               <div className="flex flex-wrap gap-3">
                 <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
                   <Search className="w-4 h-4 text-sky-500" />
-                  Tìm theo từ khóa
+                  {copy.searchByKeyword}
                 </div>
                 <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
-                  Danh mục đa dạng
+                  {copy.diverseCategories}
                 </div>
                 <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
-                  Lọc theo lĩnh vực
+                  {copy.filterByField}
                 </div>
               </div>
             </div>
@@ -110,29 +171,29 @@ const Documents: React.FC = () => {
               const fieldCount = LIBRARY_FIELDS.length;
               const visibleCount = documents.length;
               const pageCount = meta.totalPages;
-              const resultLabel = debouncedSearch || activeCategory || activeField ? 'Kết quả phù hợp' : 'Tổng tài liệu';
+              const resultLabel = debouncedSearch || activeCategory || activeField ? copy.matchingResults : copy.totalDocs;
               return (
                 <div className="space-y-4 animate-fade-in-up">
                   <div className="rounded-2xl border border-white/80 bg-white/80 p-5 shadow-md">
                     <div className="text-xs font-semibold uppercase tracking-widest text-slate-400">{resultLabel}</div>
                     <div className="mt-3 flex items-end gap-2">
                       <span className="text-3xl font-bold text-slate-900">{isLoading ? '--' : meta.total}</span>
-                      <span className="text-sm text-slate-500">tài liệu</span>
+                      <span className="text-sm text-slate-500">{copy.documents}</span>
                     </div>
-                    <p className="mt-2 text-xs text-slate-500">Cập nhật liên tục, ưu tiên tài liệu mới.</p>
+                    <p className="mt-2 text-xs text-slate-500">{copy.updatedContinuously}</p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
                     <div className="rounded-xl border border-sky-100 bg-sky-50/80 px-4 py-3">
-                      <div className="text-xs font-semibold text-sky-700">Đang hiển thị</div>
+                      <div className="text-xs font-semibold text-sky-700">{copy.displaying}</div>
                       <div className="mt-1 text-2xl font-bold text-sky-800">{isLoading ? '--' : visibleCount}</div>
                     </div>
                     <div className="rounded-xl border border-emerald-100 bg-emerald-50/80 px-4 py-3">
-                      <div className="text-xs font-semibold text-emerald-700">Lĩnh vực</div>
+                      <div className="text-xs font-semibold text-emerald-700">{copy.fields}</div>
                       <div className="mt-1 text-2xl font-bold text-emerald-800">{fieldCount}</div>
                     </div>
                     <div className="rounded-xl border border-amber-100 bg-amber-50/80 px-4 py-3">
-                      <div className="text-xs font-semibold text-amber-700">Trang</div>
+                      <div className="text-xs font-semibold text-amber-700">{copy.pages}</div>
                       <div className="mt-1 text-2xl font-bold text-amber-800">{isLoading ? '--' : pageCount}</div>
                     </div>
                   </div>
@@ -141,15 +202,15 @@ const Documents: React.FC = () => {
             })()}
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Search */}
-      <div className="max-w-md mx-auto mb-8">
+      < div className="max-w-md mx-auto mb-8" >
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
           <input
             type="text"
-            placeholder="Tìm tài liệu, tác giả..."
+            placeholder={copy.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full h-12 pl-12 pr-10 rounded-full border border-slate-200 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
@@ -157,16 +218,16 @@ const Documents: React.FC = () => {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              title="Xóa tìm kiếm"
+              title={copy.clearSearch}
               className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
             >
               <X className="w-5 h-5" />
             </button>
           )}
         </div>
-      </div>
+      </div >
 
-      <p className="text-sm text-slate-500 text-center mb-3">Loại tài liệu</p>
+      <p className="text-sm text-slate-500 text-center mb-3">{copy.docType}</p>
       {/* Category pills */}
       <div className="flex flex-wrap justify-center gap-2 mb-8">
         {CATEGORY_PILLS.map((cat) => (
@@ -183,7 +244,7 @@ const Documents: React.FC = () => {
         ))}
       </div>
 
-      <p className="text-sm text-slate-500 text-center mb-3">Lĩnh vực</p>
+      <p className="text-sm text-slate-500 text-center mb-3">{copy.fieldLabel}</p>
       {/* Field pills */}
       <div className="flex flex-wrap justify-center gap-2 mb-3">
         {(showAllFields ? LIBRARY_FIELDS : LIBRARY_FIELDS.slice(0, 6)).map((field) => (
@@ -199,27 +260,29 @@ const Documents: React.FC = () => {
           </button>
         ))}
       </div>
-      {LIBRARY_FIELDS.length > 6 && (
-        <div className="flex justify-center mb-8">
-          <button
-            type="button"
-            onClick={() => setShowAllFields((prev) => !prev)}
-            className="text-sm font-medium text-primary-700 hover:text-primary-800"
-          >
-            {showAllFields ? 'Thu gọn' : 'Xem thêm'}
-          </button>
-        </div>
-      )}
+      {
+        LIBRARY_FIELDS.length > 6 && (
+          <div className="flex justify-center mb-8">
+            <button
+              type="button"
+              onClick={() => setShowAllFields((prev) => !prev)}
+              className="text-sm font-medium text-primary-700 hover:text-primary-800"
+            >
+              {showAllFields ? copy.collapse : copy.showMore}
+            </button>
+          </div>
+        )
+      }
 
       {/* Results + sort */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
         <p className="text-sm text-slate-500 text-center sm:text-left">
-          {isLoading ? 'Đang tải...' : `${meta.total} tài liệu`}
+          {isLoading ? copy.loading : `${meta.total} ${copy.docsCount}`}
         </p>
         <div className="w-full sm:w-72">
           <Dropdown
-            label="Sắp xếp"
-            headerText="Sắp xếp"
+            label={copy.sortLabel}
+            headerText={copy.sortLabel}
             value={sortValue}
             onChange={(value) => setSortValue(value as DocumentSortValue)}
             options={SORT_OPTIONS}
@@ -244,7 +307,7 @@ const Documents: React.FC = () => {
         ) : error ? (
           <div className="col-span-full text-center py-12">
             <p className="text-red-500 mb-4">{error}</p>
-            <Button onClick={refetch}>Thử lại</Button>
+            <Button onClick={refetch}>{copy.retry}</Button>
           </div>
         ) : documents.length > 0 ? (
           <>
@@ -281,7 +344,7 @@ const Documents: React.FC = () => {
                       <Download className="w-4 h-4" />
                       {doc.downloads || 0}
                     </span>
-                    <span className="text-slate-400">{doc.createdAt ? new Date(doc.createdAt).toLocaleDateString('vi-VN') : ''}</span>
+                    <span className="text-slate-400">{doc.createdAt ? new Date(doc.createdAt).toLocaleDateString(isEn ? 'en-US' : 'vi-VN') : ''}</span>
                   </div>
 
                   <Button
@@ -290,7 +353,7 @@ const Documents: React.FC = () => {
                     onClick={() => handleOpenDocument(doc)}
                   >
                     <ExternalLink className="w-4 h-4 mr-2" />
-                    Mở tài liệu
+                    {copy.openDoc}
                   </Button>
                 </div>
               </Card>
@@ -305,15 +368,15 @@ const Documents: React.FC = () => {
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-slate-100 mb-4">
               <FileText className="w-7 h-7 text-slate-400" />
             </div>
-            <p className="text-slate-600 font-medium mb-2">Không tìm thấy tài liệu phù hợp</p>
-            <p className="text-sm text-slate-500 mb-4">Hãy thử từ khóa khác hoặc đổi danh mục.</p>
+            <p className="text-slate-600 font-medium mb-2">{copy.noResults}</p>
+            <p className="text-sm text-slate-500 mb-4">{copy.noResultsHint}</p>
             <Button variant="secondary" onClick={() => { setSearchQuery(''); setActiveCategory(''); setActiveField(''); setCurrentPage(1); setShowAllFields(false); }}>
-              Xóa bộ lọc
+              {copy.clearFilters}
             </Button>
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 };
 

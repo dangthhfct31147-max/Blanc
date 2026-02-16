@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Input, Card } from '../components/ui/Common';
 import OtpInput from '../components/OtpInput';
 import { api } from '../lib/api';
 import { ArrowLeft, Mail, CheckCircle, Lock, KeyRound } from 'lucide-react';
+import { useI18n } from '../contexts/I18nContext';
 
 // Generate session token (UUID-like)
 function generateSessionToken(): string {
@@ -24,6 +25,76 @@ interface OtpResponse {
 
 const ForgotPassword: React.FC = () => {
     const navigate = useNavigate();
+    const { locale } = useI18n();
+    const isEn = locale === 'en';
+
+    const copy = useMemo(() => isEn ? {
+        backToLogin: 'Back to login',
+        forgotTitle: 'Forgot password?',
+        forgotDescription: 'Enter your registered email to receive an OTP verification code.',
+        sending: 'Sending...',
+        sendOtp: 'Send OTP',
+        rememberPassword: 'Remember your password?',
+        login: 'Log in',
+        setNewTitle: 'Set new password',
+        setNewDescription: 'Create a new password for your account.',
+        newPasswordLabel: 'New password',
+        newPasswordPlaceholder: 'At least 8 characters',
+        confirmPasswordLabel: 'Confirm password',
+        confirmPasswordPlaceholder: 'Re-enter your password',
+        processing: 'Processing...',
+        setNewBtn: 'Set new password',
+        successTitle: 'Password reset successful!',
+        successDescription: 'Your password has been updated. You can log in with your new password.',
+        loginNow: 'Log in now',
+        defaultError: 'An error occurred',
+        passwordMinLength: 'Password must be at least 8 characters.',
+        passwordMismatch: 'Passwords do not match.',
+        requestErrors: {
+            'Email và session token là bắt buộc.': 'Please enter your email address.',
+            'Email không hợp lệ.': 'Invalid email address.',
+            'Email này chưa được đăng ký trong hệ thống.': 'This email is not registered in the system.',
+            'RATE_LIMITED': 'Too many requests. Please try again later.',
+        } as Record<string, string>,
+        resetErrors: {
+            'Token and new password are required.': 'Missing authentication information.',
+            'Password must be at least 8 characters.': 'Password must be at least 8 characters.',
+            'Invalid or expired reset token.': 'Password reset session has expired. Please try again.',
+        } as Record<string, string>,
+    } : {
+        backToLogin: 'Quay lại đăng nhập',
+        forgotTitle: 'Quên mật khẩu?',
+        forgotDescription: 'Nhập email đã đăng ký để nhận mã xác thực OTP.',
+        sending: 'Đang gửi...',
+        sendOtp: 'Gửi mã OTP',
+        rememberPassword: 'Nhớ mật khẩu rồi?',
+        login: 'Đăng nhập',
+        setNewTitle: 'Đặt mật khẩu mới',
+        setNewDescription: 'Tạo mật khẩu mới cho tài khoản của bạn.',
+        newPasswordLabel: 'Mật khẩu mới',
+        newPasswordPlaceholder: 'Ít nhất 8 ký tự',
+        confirmPasswordLabel: 'Xác nhận mật khẩu',
+        confirmPasswordPlaceholder: 'Nhập lại mật khẩu',
+        processing: 'Đang xử lý...',
+        setNewBtn: 'Đặt mật khẩu mới',
+        successTitle: 'Đặt lại mật khẩu thành công!',
+        successDescription: 'Mật khẩu của bạn đã được cập nhật. Bạn có thể đăng nhập với mật khẩu mới.',
+        loginNow: 'Đăng nhập ngay',
+        defaultError: 'Đã xảy ra lỗi',
+        passwordMinLength: 'Mật khẩu phải có ít nhất 8 ký tự.',
+        passwordMismatch: 'Mật khẩu xác nhận không khớp.',
+        requestErrors: {
+            'Email và session token là bắt buộc.': 'Vui lòng nhập địa chỉ email.',
+            'Email không hợp lệ.': 'Địa chỉ email không hợp lệ.',
+            'Email này chưa được đăng ký trong hệ thống.': 'Email này chưa được đăng ký trong hệ thống.',
+            'RATE_LIMITED': 'Bạn đã yêu cầu quá nhiều lần. Vui lòng thử lại sau.',
+        } as Record<string, string>,
+        resetErrors: {
+            'Token and new password are required.': 'Thiếu thông tin xác thực.',
+            'Password must be at least 8 characters.': 'Mật khẩu phải có ít nhất 8 ký tự.',
+            'Invalid or expired reset token.': 'Phiên đặt lại mật khẩu đã hết hạn. Vui lòng thử lại.',
+        } as Record<string, string>,
+    }, [isEn]);
 
     // Form state
     const [email, setEmail] = useState('');
@@ -62,14 +133,8 @@ const ForgotPassword: React.FC = () => {
             setStep('otp');
 
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Đã xảy ra lỗi';
-            const vietnameseErrors: Record<string, string> = {
-                'Email và session token là bắt buộc.': 'Vui lòng nhập địa chỉ email.',
-                'Email không hợp lệ.': 'Địa chỉ email không hợp lệ.',
-                'Email này chưa được đăng ký trong hệ thống.': 'Email này chưa được đăng ký trong hệ thống.',
-                'RATE_LIMITED': 'Bạn đã yêu cầu quá nhiều lần. Vui lòng thử lại sau.',
-            };
-            setError(vietnameseErrors[errorMessage] || errorMessage);
+            const errorMessage = err instanceof Error ? err.message : copy.defaultError;
+            setError(copy.requestErrors[errorMessage] || errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -103,12 +168,12 @@ const ForgotPassword: React.FC = () => {
         e.preventDefault();
 
         if (newPassword.length < 8) {
-            setError('Mật khẩu phải có ít nhất 8 ký tự.');
+            setError(copy.passwordMinLength);
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            setError('Mật khẩu xác nhận không khớp.');
+            setError(copy.passwordMismatch);
             return;
         }
 
@@ -124,13 +189,8 @@ const ForgotPassword: React.FC = () => {
             setStep('success');
 
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Đã xảy ra lỗi';
-            const vietnameseErrors: Record<string, string> = {
-                'Token and new password are required.': 'Thiếu thông tin xác thực.',
-                'Password must be at least 8 characters.': 'Mật khẩu phải có ít nhất 8 ký tự.',
-                'Invalid or expired reset token.': 'Phiên đặt lại mật khẩu đã hết hạn. Vui lòng thử lại.',
-            };
-            setError(vietnameseErrors[errorMessage] || errorMessage);
+            const errorMessage = err instanceof Error ? err.message : copy.defaultError;
+            setError(copy.resetErrors[errorMessage] || errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -148,7 +208,7 @@ const ForgotPassword: React.FC = () => {
                             className="flex items-center text-slate-500 hover:text-slate-700 mb-6 text-sm"
                         >
                             <ArrowLeft className="w-4 h-4 mr-1" />
-                            Quay lại đăng nhập
+                            {copy.backToLogin}
                         </button>
 
                         <div className="mb-8">
@@ -156,10 +216,10 @@ const ForgotPassword: React.FC = () => {
                                 <Mail className="w-6 h-6 text-primary-600" />
                             </div>
                             <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                                Quên mật khẩu?
+                                {copy.forgotTitle}
                             </h2>
                             <p className="text-slate-500 text-sm">
-                                Nhập email đã đăng ký để nhận mã xác thực OTP.
+                                {copy.forgotDescription}
                             </p>
                         </div>
 
@@ -184,17 +244,17 @@ const ForgotPassword: React.FC = () => {
                             />
 
                             <Button type="submit" className="w-full h-12" disabled={isLoading}>
-                                {isLoading ? 'Đang gửi...' : 'Gửi mã OTP'}
+                                {isLoading ? copy.sending : copy.sendOtp}
                             </Button>
                         </form>
 
                         <div className="mt-6 text-center text-sm text-slate-500">
-                            Nhớ mật khẩu rồi?{' '}
+                            {copy.rememberPassword}{' '}
                             <span
                                 onClick={() => navigate('/login')}
                                 className="text-primary-600 hover:text-primary-700 font-bold cursor-pointer"
                             >
-                                Đăng nhập
+                                {copy.login}
                             </span>
                         </div>
                     </>
@@ -224,10 +284,10 @@ const ForgotPassword: React.FC = () => {
                                 <Lock className="w-6 h-6 text-primary-600" />
                             </div>
                             <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                                Đặt mật khẩu mới
+                                {copy.setNewTitle}
                             </h2>
                             <p className="text-slate-500 text-sm">
-                                Tạo mật khẩu mới cho tài khoản của bạn.
+                                {copy.setNewDescription}
                             </p>
                         </div>
 
@@ -239,10 +299,10 @@ const ForgotPassword: React.FC = () => {
                             )}
 
                             <Input
-                                label="Mật khẩu mới"
+                                label={copy.newPasswordLabel}
                                 type="password"
                                 name="newPassword"
-                                placeholder="Ít nhất 8 ký tự"
+                                placeholder={copy.newPasswordPlaceholder}
                                 value={newPassword}
                                 onChange={(e) => {
                                     setNewPassword(e.target.value);
@@ -253,10 +313,10 @@ const ForgotPassword: React.FC = () => {
                             />
 
                             <Input
-                                label="Xác nhận mật khẩu"
+                                label={copy.confirmPasswordLabel}
                                 type="password"
                                 name="confirmPassword"
-                                placeholder="Nhập lại mật khẩu"
+                                placeholder={copy.confirmPasswordPlaceholder}
                                 value={confirmPassword}
                                 onChange={(e) => {
                                     setConfirmPassword(e.target.value);
@@ -267,7 +327,7 @@ const ForgotPassword: React.FC = () => {
                             />
 
                             <Button type="submit" className="w-full h-12" disabled={isLoading}>
-                                {isLoading ? 'Đang xử lý...' : 'Đặt mật khẩu mới'}
+                                {isLoading ? copy.processing : copy.setNewBtn}
                             </Button>
                         </form>
                     </>
@@ -280,17 +340,17 @@ const ForgotPassword: React.FC = () => {
                             <CheckCircle className="w-8 h-8 text-green-600" />
                         </div>
                         <h2 className="text-2xl font-bold text-slate-900 mb-3">
-                            Đặt lại mật khẩu thành công!
+                            {copy.successTitle}
                         </h2>
                         <p className="text-slate-500 text-sm mb-6">
-                            Mật khẩu của bạn đã được cập nhật. Bạn có thể đăng nhập với mật khẩu mới.
+                            {copy.successDescription}
                         </p>
                         <Button
                             className="w-full"
                             onClick={() => navigate('/login')}
                         >
                             <KeyRound className="w-4 h-4 mr-2" />
-                            Đăng nhập ngay
+                            {copy.loginNow}
                         </Button>
                     </div>
                 )}
@@ -301,3 +361,4 @@ const ForgotPassword: React.FC = () => {
 };
 
 export default ForgotPassword;
+

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Search, Users, Filter, Plus, Loader2, RefreshCw, ChevronRight, ChevronDown, Check, X, Sparkles, MessageCircle, UsersRound } from 'lucide-react';
 import { Button, Card, Badge } from '../components/ui/Common';
 import CreateTeamPostModal from '../components/CreateTeamPostModal';
@@ -8,6 +8,7 @@ import TeammateRecommendations from '../components/TeammateRecommendations';
 import UserAvatar from '../components/UserAvatar';
 import { api } from '../lib/api';
 import { TeamPost } from '../types';
+import { useI18n } from '../contexts/I18nContext';
 
 const ROLES = [
    'Frontend Dev',
@@ -56,6 +57,85 @@ interface TeamPostsResponse {
 }
 
 const Community: React.FC = () => {
+   const { locale } = useI18n();
+   const isEn = locale === 'en';
+
+   const copy = useMemo(() => isEn ? {
+      badge: 'ContestHub Community',
+      heroTitle: 'Team up for contests, find the right teammates',
+      heroDesc: 'Find perfect teammates for upcoming contests. Connect, share ideas, and win together.',
+      quickTeam: 'Quick team matching',
+      discussIdeas: 'Discuss ideas',
+      connectMentor: 'Connect with mentors',
+      openPosts: 'Open posts',
+      posts: 'posts',
+      updatedDaily: 'Updated daily to help you find the right teammates.',
+      popularRoles: 'Popular roles',
+      connectionSpeed: 'Connection speed',
+      fast: 'Fast',
+      searchPlaceholder: 'Search by team name, contest...',
+      allRoles: 'All roles',
+      selectRole: 'Select a role',
+      filter: 'Filter',
+      postTeam: 'Post team search',
+      found: 'Found',
+      postsCount: 'posts',
+      refresh: 'Refresh',
+      loading: 'Loading list...',
+      errorTitle: 'An error occurred',
+      retry: 'Retry',
+      noPosts: 'No posts yet',
+      noPostsFiltered: 'No posts matching your filters. Try changing your search criteria.',
+      noPostsEmpty: 'Be the first to post a team search for an upcoming contest!',
+      freeTeam: 'Open team search',
+      lookingFor: 'Looking for:',
+      viewMore: 'View more',
+      prev: 'Previous',
+      next: 'Next',
+      pageOf: 'Page',
+      today: 'Today',
+      yesterday: 'Yesterday',
+      daysAgo: 'days ago',
+      loadError: 'Could not load list',
+   } : {
+      badge: 'Cộng đồng ContestHub',
+      heroTitle: 'Ghép đội thi đấu, kết nối đúng đồng đội',
+      heroDesc: 'Tìm kiếm đồng đội hoàn hảo cho các cuộc thi sắp tới. Kết nối, chia sẻ ý tưởng và cùng nhau chiến thắng.',
+      quickTeam: 'Ghép đội nhanh',
+      discussIdeas: 'Thảo luận ý tưởng',
+      connectMentor: 'Kết nối mentor',
+      openPosts: 'Bài đăng đang mở',
+      posts: 'bài đăng',
+      updatedDaily: 'Cập nhật mới mỗi ngày để bạn tìm đúng đồng đội.',
+      popularRoles: 'Vai trò phổ biến',
+      connectionSpeed: 'Tốc độ kết nối',
+      fast: 'Nhanh',
+      searchPlaceholder: 'Tìm theo tên đội, cuộc thi...',
+      allRoles: 'Mọi vai trò',
+      selectRole: 'Chọn vai trò',
+      filter: 'Lọc',
+      postTeam: 'Đăng tin tìm đội',
+      found: 'Tìm thấy',
+      postsCount: 'bài đăng',
+      refresh: 'Làm mới',
+      loading: 'Đang tải danh sách...',
+      errorTitle: 'Có lỗi xảy ra',
+      retry: 'Thử lại',
+      noPosts: 'Chưa có bài đăng nào',
+      noPostsFiltered: 'Không tìm thấy bài đăng phù hợp với bộ lọc của bạn. Thử thay đổi điều kiện tìm kiếm.',
+      noPostsEmpty: 'Hãy là người đầu tiên đăng tin tìm đội cho cuộc thi sắp tới!',
+      freeTeam: 'Tìm đội tự do',
+      lookingFor: 'Cần tìm:',
+      viewMore: 'Xem thêm',
+      prev: 'Trước',
+      next: 'Sau',
+      pageOf: 'Trang',
+      today: 'Hôm nay',
+      yesterday: 'Hôm qua',
+      daysAgo: 'ngày trước',
+      loadError: 'Không thể tải danh sách',
+   }, [isEn]);
+
    const [posts, setPosts] = useState<TeamPost[]>([]);
    const [isLoading, setIsLoading] = useState(true);
    const [error, setError] = useState<string | null>(null);
@@ -121,7 +201,7 @@ const Community: React.FC = () => {
             total: data.pagination.total
          });
       } catch (err) {
-         setError(err instanceof Error ? err.message : 'Không thể tải danh sách');
+         setError(err instanceof Error ? err.message : copy.loadError);
       } finally {
          setIsLoading(false);
       }
@@ -164,10 +244,10 @@ const Community: React.FC = () => {
       const diffMs = now.getTime() - date.getTime();
       const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-      if (diffDays === 0) return 'Hôm nay';
-      if (diffDays === 1) return 'Hôm qua';
-      if (diffDays < 7) return `${diffDays} ngày trước`;
-      return date.toLocaleDateString('vi-VN');
+      if (diffDays === 0) return copy.today;
+      if (diffDays === 1) return copy.yesterday;
+      if (diffDays < 7) return `${diffDays} ${copy.daysAgo}`;
+      return date.toLocaleDateString(isEn ? 'en-US' : 'vi-VN');
    };
 
    return (
@@ -182,52 +262,52 @@ const Community: React.FC = () => {
                   <div className="space-y-4 animate-fade-in-up">
                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-white/70 text-xs font-semibold text-emerald-700 shadow-sm">
                         <Sparkles className="w-3.5 h-3.5" />
-                        Cộng đồng ContestHub
+                        {copy.badge}
                      </div>
                      <h1 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
-                        Ghép đội thi đấu, kết nối đúng đồng đội
+                        {copy.heroTitle}
                      </h1>
                      <p className="text-sm md:text-base text-slate-600 leading-relaxed max-w-xl">
-                        Tìm kiếm đồng đội hoàn hảo cho các cuộc thi sắp tới. Kết nối, chia sẻ ý tưởng và cùng nhau chiến thắng.
+                        {copy.heroDesc}
                      </p>
                      <div className="flex flex-wrap gap-3">
                         <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
                            <UsersRound className="w-4 h-4 text-emerald-500" />
-                           Ghép đội nhanh
+                           {copy.quickTeam}
                         </div>
                         <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
                            <MessageCircle className="w-4 h-4 text-sky-500" />
-                           Thảo luận ý tưởng
+                           {copy.discussIdeas}
                         </div>
                         <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
                            <Users className="w-4 h-4 text-amber-500" />
-                           Kết nối mentor
+                           {copy.connectMentor}
                         </div>
                      </div>
                   </div>
 
                   <div className="space-y-4 animate-fade-in-up">
                      <div className="rounded-2xl border border-white/80 bg-white/80 p-5 shadow-md">
-                        <div className="text-xs font-semibold uppercase tracking-widest text-slate-400">Bài đăng đang mở</div>
+                        <div className="text-xs font-semibold uppercase tracking-widest text-slate-400">{copy.openPosts}</div>
                         <div className="mt-3 flex items-end gap-2">
                            <span className="text-3xl font-bold text-slate-900">{isLoading ? '--' : pagination.total}</span>
-                           <span className="text-sm text-slate-500">bài đăng</span>
+                           <span className="text-sm text-slate-500">{copy.posts}</span>
                         </div>
                         <p className="mt-2 text-xs text-slate-500">
-                           Cập nhật mới mỗi ngày để bạn tìm đúng đồng đội.
+                           {copy.updatedDaily}
                         </p>
                      </div>
 
                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
                         <div className="rounded-xl border border-emerald-100 bg-emerald-50/80 px-4 py-3">
-                           <div className="text-xs font-semibold text-emerald-700">Vai trò phổ biến</div>
+                           <div className="text-xs font-semibold text-emerald-700">{copy.popularRoles}</div>
                            <div className="mt-1 text-2xl font-bold text-emerald-800">
                               {isLoading ? '--' : ROLES.length}
                            </div>
                         </div>
                         <div className="rounded-xl border border-sky-100 bg-sky-50/80 px-4 py-3">
-                           <div className="text-xs font-semibold text-sky-700">Tốc độ kết nối</div>
-                           <div className="mt-1 text-2xl font-bold text-sky-800">Nhanh</div>
+                           <div className="text-xs font-semibold text-sky-700">{copy.connectionSpeed}</div>
+                           <div className="mt-1 text-2xl font-bold text-sky-800">{copy.fast}</div>
                         </div>
                      </div>
                   </div>
@@ -259,7 +339,7 @@ const Community: React.FC = () => {
                   type="text"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Tìm theo tên đội, cuộc thi..."
+                  placeholder={copy.searchPlaceholder}
                   className="w-full pl-9 pr-4 py-2.5 bg-slate-50 rounded-lg text-sm border border-slate-200 focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none"
                />
             </div>
@@ -272,7 +352,7 @@ const Community: React.FC = () => {
                      className={`min-w-[180px] px-4 py-2.5 bg-slate-50 rounded-xl text-sm border border-slate-200 outline-none cursor-pointer transition-all flex items-center justify-between gap-2 hover:bg-slate-100 ${isRoleDropdownOpen ? 'ring-2 ring-primary-500 border-primary-500 bg-white' : ''
                         } ${selectedRole ? 'text-slate-900' : 'text-slate-500'}`}
                   >
-                     <span className="truncate">{selectedRole || 'Mọi vai trò'}</span>
+                     <span className="truncate">{selectedRole || copy.allRoles}</span>
                      <div className="flex items-center gap-1">
                         {selectedRole && (
                            <span
@@ -293,7 +373,7 @@ const Community: React.FC = () => {
                   {isRoleDropdownOpen && (
                      <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl border border-slate-200 shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                         <div className="p-2 border-b border-slate-100">
-                           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-2">Chọn vai trò</p>
+                           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-2">{copy.selectRole}</p>
                         </div>
                         <div className="max-h-[280px] overflow-y-auto p-2">
                            <button
@@ -307,7 +387,7 @@ const Community: React.FC = () => {
                                  : 'text-slate-600 hover:bg-slate-50'
                                  }`}
                            >
-                              <span>Mọi vai trò</span>
+                              <span>{copy.allRoles}</span>
                               {!selectedRole && <Check className="w-4 h-4 text-primary-600" />}
                            </button>
                            {ROLES.map(role => {
@@ -354,7 +434,7 @@ const Community: React.FC = () => {
          {!isLoading && !error && (
             <div className="flex items-center justify-between mb-6">
                <p className="text-sm text-slate-500">
-                  Tìm thấy <span className="font-semibold text-slate-900">{pagination.total}</span> bài đăng
+                  {copy.found} <span className="font-semibold text-slate-900">{pagination.total}</span> bài đăng
                </p>
                <button
                   onClick={() => fetchPosts(pagination.page)}
@@ -370,7 +450,7 @@ const Community: React.FC = () => {
          {isLoading && (
             <div className="flex flex-col items-center justify-center py-16">
                <Loader2 className="w-8 h-8 text-primary-600 animate-spin mb-4" />
-               <p className="text-slate-500">Đang tải danh sách...</p>
+               <p className="text-slate-500">{copy.loading}</p>
             </div>
          )}
 
@@ -380,9 +460,9 @@ const Community: React.FC = () => {
                <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
                   <Users className="w-8 h-8 text-red-500" />
                </div>
-               <h3 className="text-lg font-semibold text-slate-900 mb-2">Có lỗi xảy ra</h3>
+               <h3 className="text-lg font-semibold text-slate-900 mb-2">{copy.errorTitle}</h3>
                <p className="text-slate-500 mb-4">{error}</p>
-               <Button onClick={() => fetchPosts(1)}>Thử lại</Button>
+               <Button onClick={() => fetchPosts(1)}>{copy.retry}</Button>
             </Card>
          )}
 
@@ -392,11 +472,11 @@ const Community: React.FC = () => {
                <div className="w-20 h-20 mx-auto mb-6 bg-slate-100 rounded-full flex items-center justify-center">
                   <Users className="w-10 h-10 text-slate-400" />
                </div>
-               <h3 className="text-xl font-semibold text-slate-900 mb-2">Chưa có bài đăng nào</h3>
+               <h3 className="text-xl font-semibold text-slate-900 mb-2">{copy.noPosts}</h3>
                <p className="text-slate-500 mb-6 max-w-md mx-auto">
                   {searchQuery || selectedRole
-                     ? 'Không tìm thấy bài đăng phù hợp với bộ lọc của bạn. Thử thay đổi điều kiện tìm kiếm.'
-                     : 'Hãy là người đầu tiên đăng tin tìm đội cho cuộc thi sắp tới!'}
+                     ? copy.noPostsFiltered
+                     : copy.noPostsEmpty}
                </p>
                <Button onClick={handleCreateClick}>
                   <Plus className="w-4 h-4 mr-2" />
@@ -426,7 +506,7 @@ const Community: React.FC = () => {
                               {post.contestTitle ? (
                                  <div className="text-xs text-slate-500 line-clamp-1">{post.contestTitle}</div>
                               ) : (
-                                 <div className="text-xs text-slate-400">Tìm đội tự do</div>
+                                 <div className="text-xs text-slate-400">{copy.freeTeam}</div>
                               )}
                            </div>
                         </div>
@@ -438,7 +518,7 @@ const Community: React.FC = () => {
 
                         {/* Roles Needed */}
                         <div className="mb-4">
-                           <span className="text-xs font-semibold text-slate-900 block mb-2">Cần tìm:</span>
+                           <span className="text-xs font-semibold text-slate-900 block mb-2">{copy.lookingFor}</span>
                            <div className="flex flex-wrap gap-1.5">
                               {post.rolesNeeded.slice(0, 3).map(role => (
                                  <Badge key={role} className={ROLE_COLORS[role] || ROLE_COLORS['Other']}>
@@ -513,7 +593,7 @@ const Community: React.FC = () => {
                         Trước
                      </Button>
                      <span className="flex items-center px-4 text-sm text-slate-600">
-                        Trang {pagination.page} / {pagination.totalPages}
+                        {copy.pageOf} {pagination.page} / {pagination.totalPages}
                      </span>
                      <Button
                         variant="secondary"
