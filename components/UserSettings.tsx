@@ -835,8 +835,7 @@ const UserSettings: React.FC = () => {
 
     useEffect(() => {
         fetchProfile();
-        fetchTwoFactorStatus();
-    }, [fetchProfile, fetchTwoFactorStatus]);
+    }, [fetchProfile]);
 
     useEffect(() => {
         return () => {
@@ -1993,249 +1992,23 @@ const UserSettings: React.FC = () => {
                             <Lock className="w-5 h-5 mr-2 text-primary-600" />
                             {t('settings.security.title')}
                         </h3>
-
-                        <div className="mb-8 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                        <div className="rounded-lg border border-slate-200 bg-slate-50 p-5">
                             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
-                                    <p className="font-medium text-slate-900">{t('settings.security.twoFactor.title')}</p>
-                                    <p className="text-sm text-slate-500">{t('settings.security.twoFactor.description')}</p>
+                                    <p className="font-medium text-slate-900">Clerk-managed security</p>
+                                    <p className="mt-1 text-sm text-slate-500">
+                                        Password changes, multi-factor authentication, and sign-in methods are now managed in your Clerk account portal.
+                                    </p>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    {isTwoFactorLoading && (
-                                        <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-                                    )}
-                                    <ToggleSwitch
-                                        checked={twoFactorEnabled}
-                                        onChange={(checked) => {
-                                            setTwoFactorEnabled(checked);
-                                            setTwoFactorSetup(null);
-                                            setTwoFactorCode('');
-                                            if (!checked) {
-                                                setTwoFactorPassword('');
-                                                setShowTwoFactorPassword(false);
-                                            }
-                                        }}
-                                        disabled={isTwoFactorLoading || isTwoFactorSaving}
-                                        label={t('settings.security.twoFactor.toggleLabel')}
-                                        id="two-factor-toggle"
-                                    />
-                                </div>
-                            </div>
-                            {twoFactorEnabled !== twoFactorInitial && (
-                                <div className="mt-4 space-y-3">
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">
-                                            {t('settings.security.twoFactor.confirmPassword')} <span className="text-red-500">*</span>
-                                        </label>
-                                        <div className="relative">
-                                            <Input
-                                                type={showTwoFactorPassword ? 'text' : 'password'}
-                                                value={twoFactorPassword}
-                                                onChange={(e) => setTwoFactorPassword(e.target.value)}
-                                                placeholder={t('settings.security.twoFactor.confirmPasswordPlaceholder')}
-                                                autoComplete="current-password"
-                                                disabled={isTwoFactorSaving}
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowTwoFactorPassword(prev => !prev)}
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                                                disabled={isTwoFactorSaving}
-                                            >
-                                                {showTwoFactorPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {twoFactorSetup && (
-                                        <div className="rounded-lg border border-slate-200 bg-white p-4">
-                                            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                                                <div className="shrink-0">
-                                                    <QrCode data={twoFactorSetup.otpauthUrl} />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <p className="text-sm text-slate-700 whitespace-pre-line">{t('settings.security.twoFactor.instructions')}</p>
-                                                    <div className="text-xs text-slate-500">
-                                                        <div className="font-medium text-slate-700 mb-1">{t('settings.security.twoFactor.backupCode')}</div>
-                                                        <div className="flex items-center gap-2">
-                                                            <code className="font-mono text-slate-700 bg-slate-50 border border-slate-200 rounded px-2 py-1 break-all">
-                                                                {twoFactorSetup.secret}
-                                                            </code>
-                                                            <Button
-                                                                type="button"
-                                                                variant="secondary"
-                                                                size="sm"
-                                                                onClick={async () => {
-                                                                    try {
-                                                                        await navigator.clipboard.writeText(twoFactorSetup.secret);
-                                                                        showToast(t('settings.security.twoFactor.copySuccess'), 'success');
-                                                                    } catch {
-                                                                        showToast(t('settings.security.twoFactor.copyFailed'), 'error');
-                                                                    }
-                                                                }}
-                                                            >
-                                                                {t('common.copy')}
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {twoFactorNeedsCode && (
-                                        <div>
-                                            <label className="block text-sm font-medium text-slate-700 mb-1">
-                                                {t('settings.security.twoFactor.authCodeLabel')} <span className="text-red-500">*</span>
-                                            </label>
-                                            <Input
-                                                value={twoFactorCode}
-                                                onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                                placeholder="123456"
-                                                inputMode="numeric"
-                                                autoComplete="one-time-code"
-                                                disabled={isTwoFactorSaving}
-                                            />
-                                        </div>
-                                    )}
-
-                                    <div className="flex justify-end">
-                                        <Button
-                                            type="button"
-                                            onClick={handleSaveTwoFactor}
-                                            disabled={isTwoFactorSaving || (twoFactorNeedsPassword && !twoFactorPassword) || (twoFactorNeedsCode && !twoFactorCodeOk)}
-                                        >
-                                            {isTwoFactorSaving ? (
-                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                            ) : (
-                                                <Shield className="w-4 h-4 mr-2" />
-                                            )}
-                                            {t('settings.security.twoFactor.updateButton')}
-                                        </Button>
-                                    </div>
-                                </div>
-                            )}
-                            <p className="text-xs text-slate-500 mt-3">
-                                {t('settings.security.twoFactor.note')}
-                            </p>
-                        </div>
-
-                        <form onSubmit={handleChangePassword} className="space-y-6">
-                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-                                <p className="text-sm text-amber-800">
-                                    <Shield className="w-4 h-4 inline mr-1" />
-                                    {t('settings.security.passwordTip')}
-                                </p>
-                            </div>
-
-                            {/* Current Password */}
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    {t('settings.security.currentPassword')} <span className="text-red-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <Input
-                                        type={showPasswords.current ? 'text' : 'password'}
-                                        value={passwordForm.currentPassword}
-                                        onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
-                                        placeholder={t('settings.security.currentPasswordPlaceholder')}
-                                        autoComplete="current-password"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPasswords(prev => ({ ...prev, current: !prev.current }))}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                                    >
-                                        {showPasswords.current ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* New Password */}
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    {t('settings.security.newPassword')} <span className="text-red-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <Input
-                                        type={showPasswords.new ? 'text' : 'password'}
-                                        value={passwordForm.newPassword}
-                                        onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                                        placeholder={t('settings.security.newPasswordPlaceholder')}
-                                        autoComplete="new-password"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPasswords(prev => ({ ...prev, new: !prev.new }))}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                                    >
-                                        {showPasswords.new ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                    </button>
-                                </div>
-                                {/* Password strength indicator */}
-                                {passwordForm.newPassword && (
-                                    <div className="mt-2">
-                                        <div className="flex gap-1">
-                                            {[1, 2, 3, 4].map((level) => {
-                                                const strength = calculatePasswordStrength(passwordForm.newPassword);
-                                                return (
-                                                    <div
-                                                        key={level}
-                                                        className={`h-1 flex-1 rounded-full ${level <= strength
-                                                            ? strength <= 1 ? 'bg-red-500'
-                                                                : strength <= 2 ? 'bg-orange-500'
-                                                                    : strength <= 3 ? 'bg-yellow-500'
-                                                                        : 'bg-green-500'
-                                                            : 'bg-slate-200'
-                                                            }`}
-                                                    />
-                                                );
-                                            })}
-                                        </div>
-                                        <p className="text-xs text-slate-500 mt-1">
-                                            {getPasswordStrengthText(t, calculatePasswordStrength(passwordForm.newPassword))}
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Confirm Password */}
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    {t('settings.security.confirmPassword')} <span className="text-red-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <Input
-                                        type={showPasswords.confirm ? 'text' : 'password'}
-                                        value={passwordForm.confirmPassword}
-                                        onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                                        placeholder={t('settings.security.confirmPasswordPlaceholder')}
-                                        autoComplete="new-password"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPasswords(prev => ({ ...prev, confirm: !prev.confirm }))}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                                    >
-                                        {showPasswords.confirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                    </button>
-                                </div>
-                                {passwordForm.confirmPassword && passwordForm.newPassword !== passwordForm.confirmPassword && (
-                                    <p className="text-xs text-red-500 mt-1">{t('settings.security.confirmMismatch')}</p>
-                                )}
-                            </div>
-
-                            <div className="flex justify-end">
-                                <Button type="submit" disabled={isSaving}>
-                                    {isSaving ? (
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    ) : (
-                                        <Lock className="w-4 h-4 mr-2" />
-                                    )}
-                                    {t('settings.security.changePassword')}
+                                <Button
+                                    type="button"
+                                    onClick={() => navigate('/account/security')}
+                                >
+                                    <Shield className="w-4 h-4 mr-2" />
+                                    Manage account security
                                 </Button>
                             </div>
-                        </form>
+                        </div>
                     </Card>
                 );
 

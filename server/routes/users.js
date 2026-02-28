@@ -678,6 +678,10 @@ router.patch('/me/locale', authGuard, async (req, res, next) => {
  */
 router.post('/me/change-password', authGuard, async (req, res, next) => {
     try {
+        if (req.user?.clerkUserId) {
+            return res.status(410).json({ error: 'Password changes are managed by Clerk for this account.' });
+        }
+
         await connectToDatabase();
         const userId = req.user.id;
         const { currentPassword, newPassword } = req.body || {};

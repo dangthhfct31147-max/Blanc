@@ -1,32 +1,60 @@
 import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
-// Layout
 import Layout from './components/Layout';
 import ScrollToTop from './components/ScrollToTop';
 import LoadingSpinner from './components/LoadingSpinner';
-
-// Components
 import ChatBubble from './components/ChatBubble';
 
-// Pages - Direct imports for critical pages
 import Home from './pages/Home';
 import Auth from './pages/Auth';
 import ForgotPassword from './pages/ForgotPassword';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
+import AccountSecurity from './pages/AccountSecurity';
 
-// Lazy-loaded pages for better code splitting
-const ContestList = lazyWithRetry(() => import('./pages/Contests').then(m => ({ default: m.ContestList })));
-const ContestDetail = lazyWithRetry(() => import('./pages/Contests').then(m => ({ default: m.ContestDetail })));
-const Marketplace = lazyWithRetry(() => import('./pages/Marketplace').then(m => ({ default: m.Marketplace })));
-const CourseDetail = lazyWithRetry(() => import('./pages/Marketplace').then(m => ({ default: m.CourseDetail })));
+import { api } from './lib/api';
+import { clientStorage } from './lib/cache';
+import { useAppAuth } from './contexts/AppAuthContext';
+
+interface AuthModalDetail {
+  mode: 'login' | 'register';
+}
+
+function lazyWithRetry<T extends React.ComponentType<any>>(
+  factory: () => Promise<{ default: T }>
+) {
+  return lazy(() =>
+    factory().catch((error) => {
+      if (import.meta.env.PROD && typeof window !== 'undefined') {
+        try {
+          const key = clientStorage.buildKey('ui', 'lazy_reload_attempted');
+          if (!sessionStorage.getItem(key)) {
+            sessionStorage.setItem(key, '1');
+            const url = new URL(window.location.href);
+            url.searchParams.set('__reload', String(Date.now()));
+            window.location.replace(url.toString());
+            return new Promise<{ default: T }>(() => { /* noop */ });
+          }
+        } catch {
+          // Ignore storage/location failures.
+        }
+      }
+      throw error;
+    })
+  );
+}
+
+const ContestList = lazyWithRetry(() => import('./pages/Contests').then((m) => ({ default: m.ContestList })));
+const ContestDetail = lazyWithRetry(() => import('./pages/Contests').then((m) => ({ default: m.ContestDetail })));
+const Marketplace = lazyWithRetry(() => import('./pages/Marketplace').then((m) => ({ default: m.Marketplace })));
+const CourseDetail = lazyWithRetry(() => import('./pages/Marketplace').then((m) => ({ default: m.CourseDetail })));
 const Documents = lazyWithRetry(() => import('./pages/Documents'));
 const Community = lazyWithRetry(() => import('./pages/Community'));
 const News = lazyWithRetry(() => import('./pages/News'));
-const MentorList = lazyWithRetry(() => import('./pages/Mentors').then(m => ({ default: m.MentorList })));
-const MentorDetail = lazyWithRetry(() => import('./pages/Mentors').then(m => ({ default: m.MentorDetail })));
+const MentorList = lazyWithRetry(() => import('./pages/Mentors').then((m) => ({ default: m.MentorList })));
+const MentorDetail = lazyWithRetry(() => import('./pages/Mentors').then((m) => ({ default: m.MentorDetail })));
 const Profile = lazyWithRetry(() => import('./pages/Profile'));
 const UserProfile = lazyWithRetry(() => import('./pages/UserProfile'));
 const MyTeamPosts = lazyWithRetry(() => import('./pages/MyTeamPosts'));
@@ -34,448 +62,371 @@ const Reports = lazyWithRetry(() => import('./pages/Reports'));
 const ReportTemplates = lazyWithRetry(() => import('./pages/ReportTemplates'));
 const Contact = lazyWithRetry(() => import('./pages/Contact'));
 
-// Types
-import { User } from './types';
-import { api, authToken, invalidateCache } from './lib/api';
-import { clientStorage, localDrafts } from './lib/cache';
-
-// Auth modal event listener type
-interface AuthModalDetail {
-    mode: 'login' | 'register';
-}
-
-function lazyWithRetry<T extends React.ComponentType<any>>(
-    factory: () => Promise<{ default: T }>
-) {
-    return lazy(() =>
-        factory().catch((error) => {
-            // Production-only: recover from stale cached index.html pointing to missing chunks.
-            if (import.meta.env.PROD && typeof window !== 'undefined') {
-                try {
-                    const key = clientStorage.buildKey('ui', 'lazy_reload_attempted');
-                    if (!sessionStorage.getItem(key)) {
-                        sessionStorage.setItem(key, '1');
-                        const url = new URL(window.location.href);
-                        url.searchParams.set('__reload', String(Date.now()));
-                        window.location.replace(url.toString());
-                        return new Promise<{ default: T }>(() => { });
-                    }
-                } catch {
-                    // ignore storage/location errors and fall through
-                }
-            }
-            throw error;
-        })
-    );
-}
-
 const DEFAULT_SESSION_TIMEOUT_MINUTES = 30;
 const IDLE_ACTIVITY_KEY = clientStorage.buildKey('session', 'last_activity');
 const IDLE_USER_KEY = clientStorage.buildKey('session', 'last_activity_user');
 const IDLE_ACTIVITY_THROTTLE_MS = 5000;
 
+const RequireAppAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isBootstrapping } = useAppAuth();
+  const location = useLocation();
+
+  if (isBootstrapping) {
+    return <LoadingSpinner fullScreen />;
+  }
+
+  if (!user) {
+    const redirectTarget = `${location.pathname}${location.search}${location.hash}`;
+    return <Navigate to={`/login?redirect=${encodeURIComponent(redirectTarget)}`} replace />;
+  }
+
+  return <>{children}</>;
+};
+
 const App: React.FC = () => {
-    const isChatEnabled = import.meta.env.VITE_CHAT_ENABLED === 'true';
-    const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [sessionTimeoutMs, setSessionTimeoutMs] = useState(DEFAULT_SESSION_TIMEOUT_MINUTES * 60 * 1000);
-    const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const lastActivityRef = useRef<number>(Date.now());
-    const lastPersistedActivityRef = useRef<number>(0);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user, logout } = useAppAuth();
+  const isChatEnabled = import.meta.env.VITE_CHAT_ENABLED === 'true';
+  const [sessionTimeoutMs, setSessionTimeoutMs] = useState(DEFAULT_SESSION_TIMEOUT_MINUTES * 60 * 1000);
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastActivityRef = useRef<number>(Date.now());
+  const lastPersistedActivityRef = useRef<number>(0);
 
-    // Initialize user from localStorage
-    useEffect(() => {
-        const initAuth = async () => {
-            const hasCookie = (name: string) => {
-                if (typeof document === 'undefined') return false;
-                const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                return new RegExp(`(?:^|; )${escaped}=`).test(document.cookie);
-            };
+  useEffect(() => {
+    let isMounted = true;
 
-            try {
-                const userStr = localStorage.getItem('user');
-                let hasLocalUser = false;
-
-                if (userStr) {
-                    try {
-                        const userData = JSON.parse(userStr);
-                        setUser(userData);
-                        hasLocalUser = true;
-                    } catch (err) {
-                        console.error('Failed to parse user data:', err);
-                        authToken.clear();
-                        localStorage.removeItem('user');
-                        localStorage.removeItem(IDLE_ACTIVITY_KEY);
-                        localStorage.removeItem(IDLE_USER_KEY);
-                        setUser(null);
-                        invalidateCache.all();
-                        localDrafts.clear();
-                    }
-                }
-
-                const hasSessionCookie = hasCookie('csrf_token');
-                const hasStoredToken = Boolean(authToken.get());
-
-                // Only re-sync user when we likely have an existing session (avoids noisy 401s on fresh/guest visits)
-                if (hasLocalUser || hasSessionCookie || hasStoredToken) {
-                    try {
-                        const me = await api.get<{ user: User }>('/auth/me');
-                        if (me?.user) {
-                            localStorage.setItem('user', JSON.stringify(me.user));
-                            setUser(me.user);
-                        }
-                    } catch (err) {
-                        const message = err instanceof Error ? err.message : String(err || '');
-                        const looksUnauthorized =
-                            message.includes('Unauthorized') ||
-                            message.includes('Invalid or expired token') ||
-                            message.includes('HTTP error! status: 401');
-
-                        if (looksUnauthorized) {
-                            authToken.clear();
-                            localStorage.removeItem('user');
-                            localStorage.removeItem(IDLE_ACTIVITY_KEY);
-                            localStorage.removeItem(IDLE_USER_KEY);
-                            setUser(null);
-                            invalidateCache.all();
-                            localDrafts.clear();
-
-                            try {
-                                await api.post('/auth/logout');
-                            } catch {
-                                // ignore
-                            }
-                        }
-                    }
-                }
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        initAuth();
-
-        // Listen for auth changes from other components
-        const handleAuthChange = () => {
-            const userStr = localStorage.getItem('user');
-            if (userStr) {
-                try {
-                    setUser(JSON.parse(userStr));
-                } catch {
-                    setUser(null);
-                }
-            } else {
-                authToken.clear();
-                localStorage.removeItem(IDLE_ACTIVITY_KEY);
-                localStorage.removeItem(IDLE_USER_KEY);
-                setUser(null);
-            }
-        };
-
-        window.addEventListener('auth-change', handleAuthChange);
-        window.addEventListener('storage', handleAuthChange);
-
-        return () => {
-            window.removeEventListener('auth-change', handleAuthChange);
-            window.removeEventListener('storage', handleAuthChange);
-        };
-    }, []);
-
-    useEffect(() => {
-        let isMounted = true;
-
-        const loadSessionTimeout = async () => {
-            try {
-                const status = await api.get<{ sessionTimeout?: number }>('/admin/status');
-                const timeoutMinutes = Number(status?.sessionTimeout);
-                if (isMounted && Number.isFinite(timeoutMinutes) && timeoutMinutes > 0) {
-                    setSessionTimeoutMs(timeoutMinutes * 60 * 1000);
-                }
-            } catch {
-                // Ignore failures and keep the default timeout
-            }
-        };
-
-        loadSessionTimeout();
-
-        return () => {
-            isMounted = false;
-        };
-    }, []);
-
-    // Logout handler
-    const handleLogout = useCallback(() => {
-        (async () => {
-            try {
-                await api.post('/auth/logout');
-            } catch {
-                // Ignore logout errors - we still clear local state
-            }
-
-            invalidateCache.all();
-            localDrafts.clear();
-            authToken.clear();
-            localStorage.removeItem('user');
-            localStorage.removeItem(IDLE_ACTIVITY_KEY);
-            localStorage.removeItem(IDLE_USER_KEY);
-            setUser(null);
-            window.dispatchEvent(new Event('auth-change'));
-        })();
-    }, []);
-
-    useEffect(() => {
-        if (!user) {
-            if (idleTimerRef.current) {
-                clearTimeout(idleTimerRef.current);
-                idleTimerRef.current = null;
-            }
-            return;
+    const loadSessionTimeout = async () => {
+      try {
+        const status = await api.get<{ sessionTimeout?: number }>('/admin/status');
+        const timeoutMinutes = Number(status?.sessionTimeout);
+        if (isMounted && Number.isFinite(timeoutMinutes) && timeoutMinutes > 0) {
+          setSessionTimeoutMs(timeoutMinutes * 60 * 1000);
         }
+      } catch {
+        // Ignore failures and keep the default timeout.
+      }
+    };
 
-        const timeoutMs = Number(sessionTimeoutMs);
-        if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
-            return;
-        }
+    void loadSessionTimeout();
 
-        const now = Date.now();
-        const storedUserId = localStorage.getItem(IDLE_USER_KEY);
-        const storedActivity = Number(localStorage.getItem(IDLE_ACTIVITY_KEY));
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-        if (storedUserId !== user.id || !Number.isFinite(storedActivity) || storedActivity <= 0) {
-            lastActivityRef.current = now;
-            lastPersistedActivityRef.current = now;
-            localStorage.setItem(IDLE_USER_KEY, user.id);
-            localStorage.setItem(IDLE_ACTIVITY_KEY, String(now));
-        } else {
-            lastActivityRef.current = storedActivity;
-        }
+  const handleLogout = useCallback(() => {
+    void logout();
+  }, [logout]);
 
-        const scheduleLogoutCheck = () => {
-            if (idleTimerRef.current) {
-                clearTimeout(idleTimerRef.current);
-            }
+  useEffect(() => {
+    const handleShowAuth = (event: Event) => {
+      const detail = (event as CustomEvent<AuthModalDetail | undefined>).detail;
+      const mode = detail?.mode === 'register' ? 'register' : 'login';
+      const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+      const redirectTarget = isAuthPage
+        ? '/'
+        : `${location.pathname}${location.search}${location.hash}`;
 
-            const elapsed = Date.now() - lastActivityRef.current;
-            const remaining = timeoutMs - elapsed;
+      navigate(`/${mode}?redirect=${encodeURIComponent(redirectTarget)}`);
+    };
 
-            if (remaining <= 0) {
-                handleLogout();
-                return;
-            }
+    window.addEventListener('show-auth-modal', handleShowAuth as EventListener);
 
-            idleTimerRef.current = setTimeout(() => {
-                const elapsedNow = Date.now() - lastActivityRef.current;
-                if (elapsedNow >= timeoutMs) {
-                    handleLogout();
-                    return;
-                }
-                scheduleLogoutCheck();
-            }, remaining);
-        };
+    return () => {
+      window.removeEventListener('show-auth-modal', handleShowAuth as EventListener);
+    };
+  }, [location.hash, location.pathname, location.search, navigate]);
 
-        const recordActivity = () => {
-            const timestamp = Date.now();
-            lastActivityRef.current = timestamp;
-
-            if (timestamp - lastPersistedActivityRef.current < IDLE_ACTIVITY_THROTTLE_MS) {
-                return;
-            }
-
-            lastPersistedActivityRef.current = timestamp;
-            localStorage.setItem(IDLE_ACTIVITY_KEY, String(timestamp));
-            scheduleLogoutCheck();
-        };
-
-        const handleStorage = (event: StorageEvent) => {
-            if (event.key !== IDLE_ACTIVITY_KEY || !event.newValue) return;
-            const next = Number(event.newValue);
-            if (!Number.isFinite(next) || next <= lastActivityRef.current) return;
-            lastActivityRef.current = next;
-            scheduleLogoutCheck();
-        };
-
-        const handleVisibility = () => {
-            if (!document.hidden) {
-                recordActivity();
-            }
-        };
-
-        const eventOptions: AddEventListenerOptions = { passive: true };
-        const activityEvents: Array<keyof WindowEventMap> = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'];
-
-        activityEvents.forEach((eventName) => {
-            window.addEventListener(eventName, recordActivity, eventOptions);
-        });
-        window.addEventListener('focus', recordActivity);
-        window.addEventListener('storage', handleStorage);
-        document.addEventListener('visibilitychange', handleVisibility);
-
-        scheduleLogoutCheck();
-
-        return () => {
-            if (idleTimerRef.current) {
-                clearTimeout(idleTimerRef.current);
-                idleTimerRef.current = null;
-            }
-            activityEvents.forEach((eventName) => {
-                window.removeEventListener(eventName, recordActivity, eventOptions);
-            });
-            window.removeEventListener('focus', recordActivity);
-            window.removeEventListener('storage', handleStorage);
-            document.removeEventListener('visibilitychange', handleVisibility);
-        };
-    }, [handleLogout, sessionTimeoutMs, user]);
-
-    // Loading state
-    if (isLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-            </div>
-        );
+  useEffect(() => {
+    if (!user) {
+      if (idleTimerRef.current) {
+        clearTimeout(idleTimerRef.current);
+        idleTimerRef.current = null;
+      }
+      localStorage.removeItem(IDLE_ACTIVITY_KEY);
+      localStorage.removeItem(IDLE_USER_KEY);
+      return;
     }
 
-    return (
-        <BrowserRouter>
-            <ScrollToTop />
-            <Toaster
-                position="top-center"
-                toastOptions={{
-                    duration: 4000,
-                    style: {
-                        background: '#fff',
-                        color: '#1e293b',
-                        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                        borderRadius: '12px',
-                        padding: '12px 16px',
-                    },
-                    success: {
-                        iconTheme: {
-                            primary: '#10b981',
-                            secondary: '#fff',
-                        },
-                    },
-                    error: {
-                        iconTheme: {
-                            primary: '#ef4444',
-                            secondary: '#fff',
-                        },
-                    },
-                }}
-            />
+    const timeoutMs = Number(sessionTimeoutMs);
+    if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+      return;
+    }
 
-            {/* Chatbot */}
-            {isChatEnabled && <ChatBubble />}
+    const now = Date.now();
+    const storedUserId = localStorage.getItem(IDLE_USER_KEY);
+    const storedActivity = Number(localStorage.getItem(IDLE_ACTIVITY_KEY));
 
-            <Routes>
-                {/* Auth routes - no layout */}
-                <Route path="/login" element={user ? <Navigate to="/" replace /> : <Auth type="login" />} />
-                <Route path="/register" element={user ? <Navigate to="/" replace /> : <Auth type="register" />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
+    if (storedUserId !== user.id || !Number.isFinite(storedActivity) || storedActivity <= 0) {
+      lastActivityRef.current = now;
+      lastPersistedActivityRef.current = now;
+      localStorage.setItem(IDLE_USER_KEY, user.id);
+      localStorage.setItem(IDLE_ACTIVITY_KEY, String(now));
+    } else {
+      lastActivityRef.current = storedActivity;
+    }
 
-                {/* Main routes with layout */}
-                <Route element={<Layout user={user} onLogout={handleLogout} />}>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/contests" element={
-                        <Suspense fallback={<LoadingSpinner fullScreen />}>
-                            <ContestList />
-                        </Suspense>
-                    } />
-                    <Route path="/contests/:id" element={
-                        <Suspense fallback={<LoadingSpinner fullScreen />}>
-                            <ContestDetail />
-                        </Suspense>
-                    } />
-                    <Route path="/marketplace" element={
-                        <Suspense fallback={<LoadingSpinner fullScreen />}>
-                            <Marketplace />
-                        </Suspense>
-                    } />
-                    <Route path="/courses/:id" element={
-                        <Suspense fallback={<LoadingSpinner fullScreen />}>
-                            <CourseDetail />
-                        </Suspense>
-                    } />
-                    <Route path="/documents" element={
-                        <Suspense fallback={<LoadingSpinner fullScreen />}>
-                            <Documents />
-                        </Suspense>
-                    } />
-                    <Route path="/community" element={
-                        <Suspense fallback={<LoadingSpinner fullScreen />}>
-                            <Community />
-                        </Suspense>
-                    } />
-                    <Route path="/news" element={
-                        <Suspense fallback={<LoadingSpinner fullScreen />}>
-                            <News />
-                        </Suspense>
-                    } />
-                    <Route path="/mentors" element={
-                        <Suspense fallback={<LoadingSpinner fullScreen />}>
-                            <MentorList />
-                        </Suspense>
-                    } />
-                    <Route path="/mentors/:id" element={
-                        <Suspense fallback={<LoadingSpinner fullScreen />}>
-                            <MentorDetail />
-                        </Suspense>
-                    } />
-                    <Route
-                        path="/reports"
-                        element={
-                            user ? (
-                                <Suspense fallback={<LoadingSpinner fullScreen />}>
-                                    <Reports />
-                                </Suspense>
-                            ) : <Navigate to="/login" replace />
-                        }
-                    />
-                    <Route
-                        path="/reports/new"
-                        element={
-                            user ? (
-                                <Suspense fallback={<LoadingSpinner fullScreen />}>
-                                    <ReportTemplates />
-                                </Suspense>
-                            ) : <Navigate to="/login" replace />
-                        }
-                    />
-                    <Route path="/profile" element={
-                        user ? (
-                            <Suspense fallback={<LoadingSpinner fullScreen />}>
-                                <Profile />
-                            </Suspense>
-                        ) : <Navigate to="/login" replace />
-                    } />
-                    <Route path="/contact" element={
-                        user ? (
-                            <Suspense fallback={<LoadingSpinner fullScreen />}>
-                                <Contact />
-                            </Suspense>
-                        ) : <Navigate to="/login" replace />
-                    } />
-                    <Route path="/user/:id" element={
-                        <Suspense fallback={<LoadingSpinner fullScreen />}>
-                            <UserProfile />
-                        </Suspense>
-                    } />
-                    <Route path="/my-team-posts" element={
-                        user ? (
-                            <Suspense fallback={<LoadingSpinner fullScreen />}>
-                                <MyTeamPosts />
-                            </Suspense>
-                        ) : <Navigate to="/login" replace />
-                    } />
-                    <Route path="/terms" element={<Terms />} />
-                    <Route path="/privacy" element={<Privacy />} />
-                </Route>
+    const scheduleLogoutCheck = () => {
+      if (idleTimerRef.current) {
+        clearTimeout(idleTimerRef.current);
+      }
 
-                {/* Catch all - redirect to home */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-        </BrowserRouter>
-    );
+      const elapsed = Date.now() - lastActivityRef.current;
+      const remaining = timeoutMs - elapsed;
+
+      if (remaining <= 0) {
+        handleLogout();
+        return;
+      }
+
+      idleTimerRef.current = setTimeout(() => {
+        const elapsedNow = Date.now() - lastActivityRef.current;
+        if (elapsedNow >= timeoutMs) {
+          handleLogout();
+          return;
+        }
+        scheduleLogoutCheck();
+      }, remaining);
+    };
+
+    const recordActivity = () => {
+      const timestamp = Date.now();
+      lastActivityRef.current = timestamp;
+
+      if (timestamp - lastPersistedActivityRef.current < IDLE_ACTIVITY_THROTTLE_MS) {
+        return;
+      }
+
+      lastPersistedActivityRef.current = timestamp;
+      localStorage.setItem(IDLE_ACTIVITY_KEY, String(timestamp));
+      scheduleLogoutCheck();
+    };
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== IDLE_ACTIVITY_KEY || !event.newValue) return;
+      const next = Number(event.newValue);
+      if (!Number.isFinite(next) || next <= lastActivityRef.current) return;
+      lastActivityRef.current = next;
+      scheduleLogoutCheck();
+    };
+
+    const handleVisibility = () => {
+      if (!document.hidden) {
+        recordActivity();
+      }
+    };
+
+    const eventOptions: AddEventListenerOptions = { passive: true };
+    const activityEvents: Array<keyof WindowEventMap> = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'];
+
+    activityEvents.forEach((eventName) => {
+      window.addEventListener(eventName, recordActivity, eventOptions);
+    });
+    window.addEventListener('focus', recordActivity);
+    window.addEventListener('storage', handleStorage);
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    scheduleLogoutCheck();
+
+    return () => {
+      if (idleTimerRef.current) {
+        clearTimeout(idleTimerRef.current);
+        idleTimerRef.current = null;
+      }
+      activityEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, recordActivity, eventOptions);
+      });
+      window.removeEventListener('focus', recordActivity);
+      window.removeEventListener('storage', handleStorage);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [handleLogout, sessionTimeoutMs, user]);
+
+  return (
+    <>
+      <ScrollToTop />
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#fff',
+            color: '#1e293b',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            borderRadius: '12px',
+            padding: '12px 16px',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+
+      {isChatEnabled && <ChatBubble />}
+
+      <Routes>
+        <Route path="/login" element={<Auth type="login" />} />
+        <Route path="/register" element={<Auth type="register" />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
+        <Route element={<Layout user={user} onLogout={handleLogout} />}>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/contests"
+            element={(
+              <Suspense fallback={<LoadingSpinner fullScreen />}>
+                <ContestList />
+              </Suspense>
+            )}
+          />
+          <Route
+            path="/contests/:id"
+            element={(
+              <Suspense fallback={<LoadingSpinner fullScreen />}>
+                <ContestDetail />
+              </Suspense>
+            )}
+          />
+          <Route
+            path="/marketplace"
+            element={(
+              <Suspense fallback={<LoadingSpinner fullScreen />}>
+                <Marketplace />
+              </Suspense>
+            )}
+          />
+          <Route
+            path="/courses/:id"
+            element={(
+              <Suspense fallback={<LoadingSpinner fullScreen />}>
+                <CourseDetail />
+              </Suspense>
+            )}
+          />
+          <Route
+            path="/documents"
+            element={(
+              <Suspense fallback={<LoadingSpinner fullScreen />}>
+                <Documents />
+              </Suspense>
+            )}
+          />
+          <Route
+            path="/community"
+            element={(
+              <Suspense fallback={<LoadingSpinner fullScreen />}>
+                <Community />
+              </Suspense>
+            )}
+          />
+          <Route
+            path="/news"
+            element={(
+              <Suspense fallback={<LoadingSpinner fullScreen />}>
+                <News />
+              </Suspense>
+            )}
+          />
+          <Route
+            path="/mentors"
+            element={(
+              <Suspense fallback={<LoadingSpinner fullScreen />}>
+                <MentorList />
+              </Suspense>
+            )}
+          />
+          <Route
+            path="/mentors/:id"
+            element={(
+              <Suspense fallback={<LoadingSpinner fullScreen />}>
+                <MentorDetail />
+              </Suspense>
+            )}
+          />
+          <Route
+            path="/reports"
+            element={(
+              <RequireAppAuth>
+                <Suspense fallback={<LoadingSpinner fullScreen />}>
+                  <Reports />
+                </Suspense>
+              </RequireAppAuth>
+            )}
+          />
+          <Route
+            path="/reports/new"
+            element={(
+              <RequireAppAuth>
+                <Suspense fallback={<LoadingSpinner fullScreen />}>
+                  <ReportTemplates />
+                </Suspense>
+              </RequireAppAuth>
+            )}
+          />
+          <Route
+            path="/profile"
+            element={(
+              <RequireAppAuth>
+                <Suspense fallback={<LoadingSpinner fullScreen />}>
+                  <Profile />
+                </Suspense>
+              </RequireAppAuth>
+            )}
+          />
+          <Route
+            path="/contact"
+            element={(
+              <RequireAppAuth>
+                <Suspense fallback={<LoadingSpinner fullScreen />}>
+                  <Contact />
+                </Suspense>
+              </RequireAppAuth>
+            )}
+          />
+          <Route
+            path="/account/security/*"
+            element={(
+              <RequireAppAuth>
+                <AccountSecurity />
+              </RequireAppAuth>
+            )}
+          />
+          <Route
+            path="/user/:id"
+            element={(
+              <Suspense fallback={<LoadingSpinner fullScreen />}>
+                <UserProfile />
+              </Suspense>
+            )}
+          />
+          <Route
+            path="/my-team-posts"
+            element={(
+              <RequireAppAuth>
+                <Suspense fallback={<LoadingSpinner fullScreen />}>
+                  <MyTeamPosts />
+                </Suspense>
+              </RequireAppAuth>
+            )}
+          />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
+  );
 };
 
 export default App;

@@ -552,7 +552,7 @@ const Reviews: React.FC<ReviewsProps> = ({
             {!isLoggedIn && (
                 <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-slate-600 text-sm text-center">
                     <User className="w-8 h-8 mx-auto mb-2 text-slate-400" />
-                    <p>Vui lòng <a href="#/login" className="text-primary-600 font-medium hover:underline">đăng nhập</a> để viết đánh giá</p>
+                    <p>Vui lòng <a href="/login" className="text-primary-600 font-medium hover:underline">đăng nhập</a> để viết đánh giá</p>
                 </div>
             )}
 

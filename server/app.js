@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { clerkMiddleware } from '@clerk/express';
 import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
@@ -13,6 +14,7 @@ import { requestSanitizer } from './middleware/requestSanitizer.js';
 import adminRouter from './routes/admin.js';
 import authRouter from './routes/auth.js';
 import chatRouter from './routes/chat.js';
+import clerkWebhooksRouter from './routes/clerkWebhooks.js';
 import contestsRouter from './routes/contests.js';
 import coursesRouter from './routes/courses.js';
 import documentsRouter from './routes/documents.js';
@@ -38,6 +40,7 @@ import usersRouter from './routes/users.js';
 
 const app = express();
 app.disable('x-powered-by');
+const clerkEnabled = Boolean(String(process.env.CLERK_SECRET_KEY || '').trim());
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -99,9 +102,13 @@ app.use(ipBlocklist);
 
 app.use(compression());
 const jsonBodyLimit = process.env.JSON_BODY_LIMIT || '10mb';
+app.use('/api/webhooks/clerk', express.raw({ type: 'application/json' }), clerkWebhooksRouter);
 app.use(express.json({ limit: jsonBodyLimit }));
 app.use(express.urlencoded({ extended: true }));
 app.use(requestSanitizer);
+if (clerkEnabled) {
+  app.use(clerkMiddleware());
+}
 
 // Prevent caching of sensitive responses (tokens, OTP flows, admin data)
 function noStore(_req, res, next) {

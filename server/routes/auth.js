@@ -26,6 +26,10 @@ function getClientIp(req) {
     || '-';
 }
 
+function isClerkManagedAccount(req) {
+  return Boolean(req.user?.clerkUserId);
+}
+
 const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME || 'auth_token';
 const CSRF_COOKIE_NAME = process.env.CSRF_COOKIE_NAME || 'csrf_token';
 const AUTH_COOKIE_MAX_AGE_MS =
@@ -708,6 +712,10 @@ router.post('/register/complete', async (req, res, next) => {
         termsAcceptedAt: new Date(),
         privacyAcceptedAt: new Date(),
       },
+      authProvider: 'legacy',
+      clerkUserId: null,
+      clerkEmailVerified: false,
+      lastClerkSyncAt: null,
       membership: {
         tier: 'free',
         status: 'active',
@@ -1081,6 +1089,10 @@ router.post('/login/verify-2fa', async (req, res, next) => {
  */
 router.patch('/settings/2fa', authGuard, async (req, res, next) => {
   try {
+    if (isClerkManagedAccount(req)) {
+      return res.status(410).json({ error: 'Two-factor settings are managed by Clerk for this account.' });
+    }
+
     await connectToDatabase();
     const userId = req.user.id;
     const { enabled, password } = req.body || {};
@@ -1154,6 +1166,10 @@ router.patch('/settings/2fa', authGuard, async (req, res, next) => {
  */
 router.get('/settings/2fa', authGuard, async (req, res, next) => {
   try {
+    if (isClerkManagedAccount(req)) {
+      return res.status(410).json({ error: 'Two-factor settings are managed by Clerk for this account.' });
+    }
+
     await connectToDatabase();
     const userId = req.user.id;
 
@@ -1187,6 +1203,10 @@ router.get('/settings/2fa', authGuard, async (req, res, next) => {
  */
 router.post('/settings/2fa/setup', authGuard, async (req, res, next) => {
   try {
+    if (isClerkManagedAccount(req)) {
+      return res.status(410).json({ error: 'Two-factor settings are managed by Clerk for this account.' });
+    }
+
     if (!isTotpEncryptionConfigured()) {
       return res.status(503).json({
         error: 'Two-factor authentication is not configured.',
@@ -1270,6 +1290,10 @@ router.post('/settings/2fa/setup', authGuard, async (req, res, next) => {
  */
 router.post('/settings/2fa/verify', authGuard, async (req, res, next) => {
   try {
+    if (isClerkManagedAccount(req)) {
+      return res.status(410).json({ error: 'Two-factor settings are managed by Clerk for this account.' });
+    }
+
     if (!isTotpEncryptionConfigured()) {
       return res.status(503).json({
         error: 'Two-factor authentication is not configured.',
@@ -1465,6 +1489,10 @@ router.post('/register', async (req, res, next) => {
       role: 'student',
       avatar: req.body.avatar || '',
       locale: 'vi',
+      authProvider: 'legacy',
+      clerkUserId: null,
+      clerkEmailVerified: false,
+      lastClerkSyncAt: null,
       membership: {
         tier: 'free',
         status: 'active',
@@ -1562,6 +1590,10 @@ router.post('/login', async (req, res, next) => {
 
 router.get('/me', authGuard, async (req, res, next) => {
   try {
+    if (req.localUser) {
+      return res.json({ user: sanitizeUser(req.localUser) });
+    }
+
     await connectToDatabase();
     const userId = req.user.id;
     if (!ObjectId.isValid(userId)) {

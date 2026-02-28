@@ -656,7 +656,7 @@ END:VCALENDAR`;
     const userStr = localStorage.getItem('user');
     if (!userStr) {
       toast.error(t('contests.toast.loginToRegister'));
-      navigate('/auth?redirect=' + encodeURIComponent(window.location.pathname));
+      navigate('/login?redirect=' + encodeURIComponent(window.location.pathname));
       return;
     }
 

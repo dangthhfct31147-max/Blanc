@@ -10,6 +10,8 @@ const API_BASE_URL = apiBaseUrlRaw.replace(/\/+$/, '');
 // Optional Bearer token support (fallback when cookies are blocked in cross-site deployments)
 const ACCESS_TOKEN_KEY = 'access_token';
 const LOCALE_STORAGE_KEY = 'blanc:locale';
+type AccessTokenProvider = (() => Promise<string | null> | string | null) | null;
+let accessTokenProvider: AccessTokenProvider = null;
 
 const API_ERROR_CODE_TO_KEY: Record<string, TranslationKey> = {
   MISSING_PARAMS: 'errors.api.missingParams',
@@ -138,6 +140,13 @@ export const authToken = {
   },
 };
 
+export function setAccessTokenProvider(provider: AccessTokenProvider): void {
+  accessTokenProvider = provider;
+  if (provider) {
+    authToken.clear();
+  }
+}
+
 // Request deduplication - prevent multiple identical requests
 const pendingRequests = new Map<string, Promise<unknown>>();
 
@@ -242,7 +251,20 @@ async function fetchAPI<T>(
   };
   mergeHeaders(headers, fetchOptions?.headers);
 
-  const accessToken = authToken.get();
+  let accessToken: string | null = null;
+  if (accessTokenProvider) {
+    try {
+      const provided = await accessTokenProvider();
+      accessToken = provided ? String(provided).trim() : null;
+    } catch {
+      accessToken = null;
+    }
+  }
+
+  if (!accessToken) {
+    accessToken = authToken.get();
+  }
+
   if (accessToken && !headers.Authorization && !headers.authorization) {
     headers.Authorization = `Bearer ${accessToken}`;
   }
