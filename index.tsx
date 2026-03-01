@@ -6,24 +6,26 @@ import App from './App';
 import './index.css';
 import { I18nProvider } from './contexts/I18nContext';
 import { AppAuthProvider } from './contexts/AppAuthContext';
+import { getClerkPublishableKey, setRuntimeClerkPublishableKey } from './lib/clerkConfig';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error('Could not find root element to mount to');
 }
 
-const clerkPublishableKey = String(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '').trim();
-
-const ClerkProviderWithRouter: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const ClerkProviderWithRouter: React.FC<{ children: React.ReactNode; publishableKey: string }> = ({
+  children,
+  publishableKey,
+}) => {
   const navigate = useNavigate();
 
   return (
     <ClerkProvider
-      publishableKey={clerkPublishableKey}
+      publishableKey={publishableKey}
       signInUrl="/login"
       signUpUrl="/register"
       afterSignOutUrl="/"
-      __internal_bypassMissingPublishableKey={!clerkPublishableKey}
+      __internal_bypassMissingPublishableKey={!publishableKey}
       {...({
         routerPush: (to: string) => navigate(to),
         routerReplace: (to: string) => navigate(to, { replace: true }),
@@ -36,15 +38,72 @@ const ClerkProviderWithRouter: React.FC<{ children: React.ReactNode }> = ({ chil
   );
 };
 
+const AppBootstrap: React.FC = () => {
+  const [clerkPublishableKey, setClerkPublishableKey] = React.useState<string>(() => getClerkPublishableKey());
+  const [isConfigResolved, setIsConfigResolved] = React.useState<boolean>(() => Boolean(getClerkPublishableKey()));
+
+  React.useEffect(() => {
+    if (clerkPublishableKey) {
+      setIsConfigResolved(true);
+      return;
+    }
+
+    let disposed = false;
+
+    const resolveClerkConfig = async () => {
+      try {
+        const response = await fetch('/api/auth/clerk-config', {
+          method: 'GET',
+          credentials: 'include',
+          headers: { Accept: 'application/json' },
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = (await response.json().catch(() => null)) as null | { publishableKey?: string };
+        const runtimeKey = setRuntimeClerkPublishableKey(String(data?.publishableKey || ''));
+
+        if (!disposed && runtimeKey) {
+          setClerkPublishableKey(runtimeKey);
+        }
+      } finally {
+        if (!disposed) {
+          setIsConfigResolved(true);
+        }
+      }
+    };
+
+    void resolveClerkConfig();
+
+    return () => {
+      disposed = true;
+    };
+  }, [clerkPublishableKey]);
+
+  if (!isConfigResolved) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="inline-block h-10 w-10 rounded-full border-[3px] border-primary-600 border-r-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <ClerkProviderWithRouter publishableKey={clerkPublishableKey}>
+      <I18nProvider>
+        <App />
+      </I18nProvider>
+    </ClerkProviderWithRouter>
+  );
+};
+
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <ClerkProviderWithRouter>
-        <I18nProvider>
-          <App />
-        </I18nProvider>
-      </ClerkProviderWithRouter>
+      <AppBootstrap />
     </BrowserRouter>
   </React.StrictMode>
 );

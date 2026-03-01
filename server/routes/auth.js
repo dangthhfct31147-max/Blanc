@@ -7,6 +7,7 @@ import { authGuard, issueToken } from '../middleware/auth.js';
 import { logAuditEvent } from './admin.js';
 import { getMembershipSummary } from '../lib/membership.js';
 import { getPlatformSettings } from '../lib/platformSettings.js';
+import { getClerkPublishableKey } from '../lib/clerkAuth.js';
 import {
   buildOtpAuthUrl,
   decryptTotpSecret,
@@ -120,6 +121,15 @@ router.get('/csrf', (req, res) => {
   }
 
   return res.json({ csrfToken });
+});
+
+// GET /auth/clerk-config - Public runtime config for frontend bootstrap
+router.get('/clerk-config', (_req, res) => {
+  const publishableKey = getClerkPublishableKey();
+  return res.json({
+    publishableKey,
+    configured: Boolean(publishableKey),
+  });
 });
 
 // ============ CONSTANTS ============

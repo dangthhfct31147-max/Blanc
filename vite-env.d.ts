@@ -10,3 +10,7 @@ interface ImportMetaEnv {
 interface ImportMeta {
     readonly env: ImportMetaEnv;
 }
+
+interface Window {
+    __CLERK_PUBLISHABLE_KEY__?: string;
+}

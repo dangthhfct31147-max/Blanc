@@ -2,12 +2,12 @@ import React from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { SignIn, SignUp } from '@clerk/clerk-react';
 import { useAppAuth } from '../contexts/AppAuthContext';
-
-const clerkPublishableKey = String(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '').trim();
+import { getClerkPublishableKey } from '../lib/clerkConfig';
 
 const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
   const [searchParams] = useSearchParams();
   const { user } = useAppAuth();
+  const clerkPublishableKey = getClerkPublishableKey();
 
   const defaultRedirectTarget = type === 'register' ? '/profile' : '/';
   const redirectTarget = searchParams.get('redirect') || defaultRedirectTarget;
