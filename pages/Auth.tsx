@@ -7,18 +7,10 @@ const clerkPublishableKey = String(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ||
 
 const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
   const [searchParams] = useSearchParams();
-  const { user, isBootstrapping } = useAppAuth();
+  const { user } = useAppAuth();
 
   const defaultRedirectTarget = type === 'register' ? '/profile' : '/';
   const redirectTarget = searchParams.get('redirect') || defaultRedirectTarget;
-
-  if (isBootstrapping) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
 
   if (user) {
     return <Navigate to={redirectTarget} replace />;
