@@ -1,4 +1,4 @@
-import { clerkClient } from '@clerk/express';
+import { createClerkClient } from '@clerk/backend';
 import { connectToDatabase, getCollection } from './db.js';
 
 function createHttpError(message, status = 500) {
@@ -178,8 +178,36 @@ function validateLinkTarget(existingUser, clerkUserId) {
   throw createHttpError('This email is already linked to another Clerk account.', 409);
 }
 
+export function getClerkSecretKey() {
+  return String(process.env.CLERK_SECRET_KEY || '').trim();
+}
+
+export function getClerkPublishableKey() {
+  return String(
+    process.env.CLERK_PUBLISHABLE_KEY
+    || process.env.VITE_CLERK_PUBLISHABLE_KEY
+    || ''
+  ).trim();
+}
+
 export function isClerkConfigured() {
-  return Boolean(String(process.env.CLERK_SECRET_KEY || '').trim());
+  return Boolean(getClerkSecretKey() && getClerkPublishableKey());
+}
+
+let cachedClerkClient = null;
+let cachedClerkClientConfig = '';
+
+function getClerkClient() {
+  const secretKey = getClerkSecretKey();
+  const publishableKey = getClerkPublishableKey();
+  const configKey = `${secretKey}:${publishableKey}`;
+
+  if (!cachedClerkClient || cachedClerkClientConfig !== configKey) {
+    cachedClerkClient = createClerkClient({ secretKey, publishableKey });
+    cachedClerkClientConfig = configKey;
+  }
+
+  return cachedClerkClient;
 }
 
 export function buildRequestUser(localUser, clerkUserId) {
@@ -209,7 +237,7 @@ export async function resolveLocalUserFromClerkUserId(clerkUserId) {
     return linkedUser;
   }
 
-  const remoteUser = await clerkClient.users.getUser(normalizedClerkUserId);
+  const remoteUser = await getClerkClient().users.getUser(normalizedClerkUserId);
   const emailInfo = getVerifiedPrimaryEmailFromClerkUser(remoteUser);
 
   if (!emailInfo?.email) {

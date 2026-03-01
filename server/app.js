@@ -7,6 +7,7 @@ import { existsSync } from 'fs';
 import helmet from 'helmet';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { getClerkPublishableKey, getClerkSecretKey } from './lib/clerkAuth.js';
 import { RateLimiters } from './lib/security.js';
 import { trackConcurrentUsers } from './lib/concurrentUsers.js';
 import { ipBlocklist } from './middleware/ipBlocklist.js';
@@ -40,7 +41,9 @@ import usersRouter from './routes/users.js';
 
 const app = express();
 app.disable('x-powered-by');
-const clerkEnabled = Boolean(String(process.env.CLERK_SECRET_KEY || '').trim());
+const clerkSecretKey = getClerkSecretKey();
+const clerkPublishableKey = getClerkPublishableKey();
+const clerkEnabled = Boolean(clerkSecretKey && clerkPublishableKey);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -106,8 +109,17 @@ app.use('/api/webhooks/clerk', express.raw({ type: 'application/json' }), clerkW
 app.use(express.json({ limit: jsonBodyLimit }));
 app.use(express.urlencoded({ extended: true }));
 app.use(requestSanitizer);
+if (clerkSecretKey && !clerkPublishableKey) {
+  console.warn('[clerk] CLERK_SECRET_KEY is set but no publishable key was found. Set CLERK_PUBLISHABLE_KEY (preferred) or VITE_CLERK_PUBLISHABLE_KEY. Clerk middleware disabled.');
+}
+if (!clerkSecretKey && clerkPublishableKey) {
+  console.warn('[clerk] Publishable key is set but CLERK_SECRET_KEY is missing. Clerk middleware disabled.');
+}
 if (clerkEnabled) {
-  app.use(clerkMiddleware());
+  app.use(clerkMiddleware({
+    secretKey: clerkSecretKey,
+    publishableKey: clerkPublishableKey,
+  }));
 }
 
 // Prevent caching of sensitive responses (tokens, OTP flows, admin data)
