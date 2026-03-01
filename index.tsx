@@ -6,7 +6,7 @@ import App from './App';
 import './index.css';
 import { I18nProvider } from './contexts/I18nContext';
 import { AppAuthProvider } from './contexts/AppAuthContext';
-import { getClerkPublishableKey, setRuntimeClerkPublishableKey } from './lib/clerkConfig';
+import { getApiBaseUrl, getClerkPublishableKey, setRuntimeClerkPublishableKey } from './lib/clerkConfig';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -52,7 +52,8 @@ const AppBootstrap: React.FC = () => {
 
     const resolveClerkConfig = async () => {
       try {
-        const response = await fetch('/api/auth/clerk-config', {
+        const apiBaseUrl = getApiBaseUrl();
+        const response = await fetch(`${apiBaseUrl}/auth/clerk-config`, {
           method: 'GET',
           credentials: 'include',
           headers: { Accept: 'application/json' },

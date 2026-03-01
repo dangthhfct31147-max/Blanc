@@ -6,10 +6,12 @@ WORKDIR /app
 # Build arguments for Vite environment variables
 ARG VITE_API_URL
 ARG VITE_GEMINI_API_KEY
+ARG VITE_CLERK_PUBLISHABLE_KEY
 
 # Set environment variables for build
 ENV VITE_API_URL=$VITE_API_URL
 ENV VITE_GEMINI_API_KEY=$VITE_GEMINI_API_KEY
+ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
 
 # Copy package files
 COPY package*.json ./
@@ -42,4 +44,4 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # Expose port
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/bin/sh", "-c", "cat >/usr/share/nginx/html/runtime-config.js <<EOF\nwindow.__APP_RUNTIME_CONFIG__ = {\n  VITE_API_URL: \"${VITE_API_URL:-/api}\",\n  VITE_CLERK_PUBLISHABLE_KEY: \"${VITE_CLERK_PUBLISHABLE_KEY:-}\"\n};\nif (!window.__CLERK_PUBLISHABLE_KEY__ && window.__APP_RUNTIME_CONFIG__.VITE_CLERK_PUBLISHABLE_KEY) {\n  window.__CLERK_PUBLISHABLE_KEY__ = window.__APP_RUNTIME_CONFIG__.VITE_CLERK_PUBLISHABLE_KEY;\n}\nEOF\nexec nginx -g 'daemon off;' "]
