@@ -1,0 +1,15 @@
+#!/bin/sh
+set -eu
+
+API_URL="${VITE_API_URL:-/api}"
+CLERK_PUBLISHABLE_KEY="${VITE_CLERK_PUBLISHABLE_KEY:-}"
+
+cat > /usr/share/nginx/html/runtime-config.js <<EOF
+window.__APP_RUNTIME_CONFIG__ = {
+  VITE_API_URL: "${API_URL}",
+  VITE_CLERK_PUBLISHABLE_KEY: "${CLERK_PUBLISHABLE_KEY}"
+};
+if (!window.__CLERK_PUBLISHABLE_KEY__ && window.__APP_RUNTIME_CONFIG__.VITE_CLERK_PUBLISHABLE_KEY) {
+  window.__CLERK_PUBLISHABLE_KEY__ = window.__APP_RUNTIME_CONFIG__.VITE_CLERK_PUBLISHABLE_KEY;
+}
+EOF
