@@ -30,6 +30,20 @@ const formatPinnedDate = (iso?: string | null): string => {
   return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
+const translateClassByIndex: Record<number, string> = {
+  0: 'translate-x-0',
+  1: '-translate-x-[100%]',
+  2: '-translate-x-[200%]',
+  3: '-translate-x-[300%]',
+  4: '-translate-x-[400%]',
+  5: '-translate-x-[500%]',
+  6: '-translate-x-[600%]',
+  7: '-translate-x-[700%]',
+  8: '-translate-x-[800%]',
+  9: '-translate-x-[900%]',
+  10: '-translate-x-[1000%]',
+};
+
 export const PinnedNewsSlider: React.FC<Props> = ({
   lead,
   leadKey = 'lead',
@@ -79,6 +93,8 @@ export const PinnedNewsSlider: React.FC<Props> = ({
 
   if (slides.length === 0) return null;
 
+  const translateClass = translateClassByIndex[activeIndex] || 'translate-x-0';
+
   return (
     <div
       className={cn('w-full', className)}
@@ -90,15 +106,14 @@ export const PinnedNewsSlider: React.FC<Props> = ({
       <div className="relative">
         <div className="overflow-hidden">
           <div
-            className="flex transition-transform duration-700 ease-in-out"
-            style={{ transform: `translateX(-${activeIndex * 100}%)` }}
-            aria-live={hasMultiple ? 'polite' : 'off'}
+            className={cn('flex transition-transform duration-700 ease-in-out', translateClass)}
+            aria-live="polite"
           >
             {slides.map((slide) => {
               if (slide.type === 'lead') {
                 return (
                   <div key={slide.key} className="w-full shrink-0">
-                    <div className="min-h-[260px] sm:min-h-[300px] md:min-h-[360px] flex items-center justify-center px-4 sm:px-6 lg:px-10">
+                    <div className="min-h-65 sm:min-h-75 md:min-h-90 flex items-center justify-center px-4 sm:px-6 lg:px-10">
                       <div className="w-full">{slide.content}</div>
                     </div>
                   </div>
@@ -114,20 +129,17 @@ export const PinnedNewsSlider: React.FC<Props> = ({
 
               return (
                 <div key={slide.key} className="w-full shrink-0">
-                  <div className="relative min-h-[260px] sm:min-h-[300px] md:min-h-[360px] flex items-center justify-center px-4 sm:px-6 lg:px-10">
+                  <div className="relative min-h-65 sm:min-h-75 md:min-h-90 flex items-center justify-center px-4 sm:px-6 lg:px-10">
                     {coverImage && (
                       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-                        <div
-                          className="absolute inset-0 bg-center bg-cover opacity-20"
-                          style={{ backgroundImage: `url(${coverImage})` }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-b from-white/85 via-white/75 to-white/90" />
+                        <img src={coverImage} alt="" className="absolute inset-0 h-full w-full object-cover opacity-20" />
+                        <div className="absolute inset-0 bg-linear-to-b from-white/85 via-white/75 to-white/90" />
                       </div>
                     )}
 
                     <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
                       <div className="absolute -left-20 top-6 w-72 h-72 bg-primary-200/50 blur-3xl rounded-full" />
-                      <div className="absolute right-[-120px] bottom-[-120px] w-80 h-80 bg-emerald-200/50 blur-3xl rounded-full" />
+                      <div className="absolute -right-30 -bottom-30 w-80 h-80 bg-emerald-200/50 blur-3xl rounded-full" />
                     </div>
 
                     <div className="relative w-full max-w-4xl mx-auto text-center">

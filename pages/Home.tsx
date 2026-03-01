@@ -253,10 +253,10 @@ const Home: React.FC = () => {
           </div>
 
           {/* Stats */}
-          <div className="relative left-1/2 right-1/2 w-screen -ml-[50vw] -mr-[50vw] overflow-hidden mb-[-88px] md:mb-[-104px]">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary-50 via-white to-emerald-50" />
+          <div className="relative left-1/2 right-1/2 w-screen -ml-[50vw] -mr-[50vw] overflow-hidden -mb-22 md:-mb-26">
+              <div className="absolute inset-0 bg-linear-to-r from-primary-50 via-white to-emerald-50" />
             <div className="absolute -left-20 top-0 w-72 h-72 bg-primary-200/60 blur-3xl" />
-            <div className="absolute right-[-120px] bottom-[-120px] w-80 h-80 bg-emerald-200/60 blur-3xl" />
+              <div className="absolute -right-30 -bottom-30 w-80 h-80 bg-emerald-200/60 blur-3xl" />
 
             <div className="relative max-w-6xl mx-auto px-6 md:px-14 py-14 md:py-16">
               <div className="flex flex-col items-center text-center gap-4 md:gap-5">
@@ -311,13 +311,13 @@ const Home: React.FC = () => {
                       key={idx}
                       className="relative overflow-hidden rounded-2xl bg-white/85 backdrop-blur border border-white/60 shadow-lg shadow-primary-100/60 p-6 group transition duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col items-center text-center gap-4"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-primary-50 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute inset-0 bg-linear-to-br from-white via-white to-primary-50 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
                       <div className="absolute -right-10 -top-12 h-32 w-32 bg-primary-100 blur-2xl opacity-70" />
                       <div className="absolute -left-10 bottom-0 h-24 w-24 bg-emerald-100 blur-2xl opacity-80" />
 
                       <div className="relative flex items-center justify-between mb-2 w-full">
                         <div className="flex items-center gap-3">
-                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary-500 to-emerald-400 text-white flex items-center justify-center shadow-md ring-4 ring-primary-100/70">
+                          <div className="h-12 w-12 rounded-full bg-linear-to-br from-primary-500 to-emerald-400 text-white flex items-center justify-center shadow-md ring-4 ring-primary-100/70">
                             <stat.icon className="w-6 h-6" />
                           </div>
                           <div>

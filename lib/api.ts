@@ -1,11 +1,9 @@
 import { apiCache, sessionCache, localCache, CACHE_TTL } from './cache';
 import { DEFAULT_LOCALE, TranslationKey, normalizeLocale, t as translate } from './i18n';
+import { getApiBaseUrl } from './clerkConfig';
 
 // API Configuration
-const apiBaseUrlRaw =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? '/api' : 'http://localhost:4000/api');
-const API_BASE_URL = apiBaseUrlRaw.replace(/\/+$/, '');
+const API_BASE_URL = getApiBaseUrl();
 
 // Optional Bearer token support (fallback when cookies are blocked in cross-site deployments)
 const ACCESS_TOKEN_KEY = 'access_token';
@@ -290,9 +288,43 @@ async function fetchAPI<T>(
   const requestPromise = (async () => {
     try {
       const response = await fetch(url, config);
+      const headerGetter =
+        response &&
+        typeof response === 'object' &&
+        'headers' in response &&
+        (response as { headers?: { get?: (name: string) => string | null } }).headers &&
+        typeof (response as { headers?: { get?: (name: string) => string | null } }).headers?.get === 'function'
+          ? (response as { headers: { get: (name: string) => string | null } }).headers.get.bind(
+            (response as { headers: { get: (name: string) => string | null } }).headers,
+          )
+          : null;
+
+      const contentType = String(headerGetter?.('content-type') || '').toLowerCase();
+      const hasContentTypeHeader = Boolean(contentType);
+      const isJsonResponse =
+        !hasContentTypeHeader
+        || contentType.includes('application/json')
+        || contentType.includes('+json');
+
+      const parseErrorPayload = async () => {
+        if (isJsonResponse) {
+          return response.json().catch(() => ({}));
+        }
+
+        const rawText = await response.text().catch(() => '');
+        const normalizedText = String(rawText || '').trim();
+
+        if (normalizedText.startsWith('<!doctype') || normalizedText.startsWith('<html')) {
+          return {
+            error: `API responded with HTML instead of JSON at ${url}. Check VITE_API_URL/runtime-config.js and API routing.`,
+          };
+        }
+
+        return normalizedText ? { error: normalizedText } : {};
+      };
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await parseErrorPayload();
         const rawMessage =
           errorData &&
             typeof errorData === 'object' &&
@@ -308,6 +340,21 @@ async function fetchAPI<T>(
         if (errorData && typeof errorData === 'object' && 'code' in errorData && typeof (errorData as any).code === 'string') {
           err.code = String((errorData as any).code);
         }
+        throw err;
+      }
+
+      if (!isJsonResponse) {
+        const text = await response.text().catch(() => '');
+        const normalized = String(text || '').trim();
+
+        const message =
+          normalized.startsWith('<!doctype') || normalized.startsWith('<html')
+            ? `API responded with HTML instead of JSON at ${url}. Check VITE_API_URL/runtime-config.js and API routing.`
+            : `API responded with non-JSON content at ${url}.`;
+
+        const err: any = new Error(message);
+        err.status = response.status;
+        err.data = { contentType, preview: normalized.slice(0, 200) };
         throw err;
       }
 
