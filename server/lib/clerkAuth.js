@@ -31,21 +31,27 @@ function buildDisplayName({ firstName, lastName, username, email }) {
   return 'ContestHub User';
 }
 
-function getVerifiedPrimaryEmailFromClerkUser(user) {
+function getPrimaryEmailFromClerkUser(user) {
   const emailAddresses = Array.isArray(user?.emailAddresses) ? user.emailAddresses : [];
   const primaryId = user?.primaryEmailAddressId || null;
 
   const primary =
     emailAddresses.find((item) => item?.id === primaryId)
     || emailAddresses.find((item) => item?.verification?.status === 'verified')
+    || emailAddresses[0]
     || null;
 
-  if (!primary || primary?.verification?.status !== 'verified') {
+  if (!primary) {
     return null;
   }
 
   const email = normalizeEmail(primary.emailAddress);
-  return email ? { email, verified: true } : null;
+  return email
+    ? {
+      email,
+      verified: primary?.verification?.status === 'verified',
+    }
+    : null;
 }
 
 function getPrimaryEmailFromWebhookPayload(data) {
@@ -238,10 +244,10 @@ export async function resolveLocalUserFromClerkUserId(clerkUserId) {
   }
 
   const remoteUser = await getClerkClient().users.getUser(normalizedClerkUserId);
-  const emailInfo = getVerifiedPrimaryEmailFromClerkUser(remoteUser);
+  const emailInfo = getPrimaryEmailFromClerkUser(remoteUser);
 
   if (!emailInfo?.email) {
-    throw createHttpError('A verified primary email is required for this account.', 403);
+    throw createHttpError('A primary email is required for this account.', 403);
   }
 
   const existingUser = await users.findOne({ email: emailInfo.email });

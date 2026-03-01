@@ -114,11 +114,6 @@ function getClerkUserId(req) {
  * Supports both legacy JWT auth and Clerk-authenticated public sessions.
  */
 export async function authGuard(req, res, next) {
-  if (!jwtSecret) {
-    console.error('[Auth] JWT_SECRET is not configured');
-    return res.status(500).json({ error: 'Authentication service is not configured' });
-  }
-
   const header = req.headers.authorization || '';
   const headerToken = header.startsWith('Bearer ') ? header.slice(7).trim() : '';
   let cookieToken = '';
@@ -145,20 +140,29 @@ export async function authGuard(req, res, next) {
   let legacyError = null;
 
   if (legacyToken) {
-    const verified = verifyLegacyJwt(legacyToken);
+    if (!jwtSecret) {
+      legacyError = { status: 500, message: 'Authentication service is not configured' };
+    } else {
+      const verified = verifyLegacyJwt(legacyToken);
 
-    if (verified.payload) {
-      const payload = verified.payload;
-      const invalidBeforeMs = await getTokensInvalidBeforeMs();
+      if (verified.payload) {
+        const payload = verified.payload;
+        const invalidBeforeMs = await getTokensInvalidBeforeMs();
 
-      if (invalidBeforeMs > 0) {
-        const issuedAtMs =
-          payload && typeof payload === 'object' && typeof payload.iat === 'number'
-            ? payload.iat * 1000
-            : 0;
+        if (invalidBeforeMs > 0) {
+          const issuedAtMs =
+            payload && typeof payload === 'object' && typeof payload.iat === 'number'
+              ? payload.iat * 1000
+              : 0;
 
-        if (!issuedAtMs || issuedAtMs < invalidBeforeMs) {
-          legacyError = { status: 401, message: 'Session expired' };
+          if (!issuedAtMs || issuedAtMs < invalidBeforeMs) {
+            legacyError = { status: 401, message: 'Session expired' };
+          } else {
+            req.user = payload;
+            req.clientIp = getClientIp(req);
+            req.authSource = 'legacy';
+            return next();
+          }
         } else {
           req.user = payload;
           req.clientIp = getClientIp(req);
@@ -166,13 +170,8 @@ export async function authGuard(req, res, next) {
           return next();
         }
       } else {
-        req.user = payload;
-        req.clientIp = getClientIp(req);
-        req.authSource = 'legacy';
-        return next();
+        legacyError = verified.error;
       }
-    } else {
-      legacyError = verified.error;
     }
   }
 
