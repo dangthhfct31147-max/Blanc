@@ -9,7 +9,8 @@ const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
   const [searchParams] = useSearchParams();
   const { user, isBootstrapping } = useAppAuth();
 
-  const redirectTarget = searchParams.get('redirect') || '/';
+  const defaultRedirectTarget = type === 'register' ? '/profile' : '/';
+  const redirectTarget = searchParams.get('redirect') || defaultRedirectTarget;
 
   if (isBootstrapping) {
     return (
@@ -45,7 +46,7 @@ const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
             path="/login"
             signUpUrl="/register"
             forceRedirectUrl={redirectTarget}
-            fallbackRedirectUrl="/"
+            fallbackRedirectUrl={defaultRedirectTarget}
           />
         ) : (
           <SignUp
@@ -53,7 +54,7 @@ const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
             path="/register"
             signInUrl="/login"
             forceRedirectUrl={redirectTarget}
-            fallbackRedirectUrl="/"
+            fallbackRedirectUrl={defaultRedirectTarget}
           />
         )}
       </div>
