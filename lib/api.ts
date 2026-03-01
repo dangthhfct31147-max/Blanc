@@ -290,10 +290,10 @@ async function fetchAPI<T>(
       const response = await fetch(url, config);
       const headerGetter =
         response &&
-        typeof response === 'object' &&
-        'headers' in response &&
-        (response as { headers?: { get?: (name: string) => string | null } }).headers &&
-        typeof (response as { headers?: { get?: (name: string) => string | null } }).headers?.get === 'function'
+          typeof response === 'object' &&
+          'headers' in response &&
+          (response as { headers?: { get?: (name: string) => string | null } }).headers &&
+          typeof (response as { headers?: { get?: (name: string) => string | null } }).headers?.get === 'function'
           ? (response as { headers: { get: (name: string) => string | null } }).headers.get.bind(
             (response as { headers: { get: (name: string) => string | null } }).headers,
           )

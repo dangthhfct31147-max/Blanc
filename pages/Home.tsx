@@ -128,33 +128,33 @@ const Home: React.FC = () => {
               intervalMs={10_000}
               items={pinnedNews}
               lead={(
-              <>
-          <Badge className="mb-6 bg-primary-50 text-primary-700 border-primary-100 px-4 py-1.5 text-sm">
-            {t('home.hero.badge')}
-          </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-6">
-            {t('home.hero.titleLine1')} <br className="hidden md:block" />
-            <span className="text-primary-600">{t('home.hero.titleHighlight')}</span>
-          </h1>
-          <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto">
-            {t('home.hero.description')}
-          </p>
-              </>
-            )}
+                <>
+                  <Badge className="mb-6 bg-primary-50 text-primary-700 border-primary-100 px-4 py-1.5 text-sm">
+                    {t('home.hero.badge')}
+                  </Badge>
+                  <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-6">
+                    {t('home.hero.titleLine1')} <br className="hidden md:block" />
+                    <span className="text-primary-600">{t('home.hero.titleHighlight')}</span>
+                  </h1>
+                  <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto">
+                    {t('home.hero.description')}
+                  </p>
+                </>
+              )}
             />
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             {/* Search with dropdown results */}
             <div className="relative w-full max-w-md" ref={searchRef}>
-                <input
-                  type="text"
-                  placeholder={t('home.search.placeholder')}
-                  value={query}
-                  onChange={(e) => {
-                    setQuery(e.target.value);
-                    setShowResults(true);
-                  }}
+              <input
+                type="text"
+                placeholder={t('home.search.placeholder')}
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setShowResults(true);
+                }}
                 onFocus={() => setShowResults(true)}
                 className="w-full h-12 pl-12 pr-10 rounded-full border border-slate-200 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
               />
@@ -254,9 +254,9 @@ const Home: React.FC = () => {
 
           {/* Stats */}
           <div className="relative left-1/2 right-1/2 w-screen -ml-[50vw] -mr-[50vw] overflow-hidden -mb-22 md:-mb-26">
-              <div className="absolute inset-0 bg-linear-to-r from-primary-50 via-white to-emerald-50" />
+            <div className="absolute inset-0 bg-linear-to-r from-primary-50 via-white to-emerald-50" />
             <div className="absolute -left-20 top-0 w-72 h-72 bg-primary-200/60 blur-3xl" />
-              <div className="absolute -right-30 -bottom-30 w-80 h-80 bg-emerald-200/60 blur-3xl" />
+            <div className="absolute -right-30 -bottom-30 w-80 h-80 bg-emerald-200/60 blur-3xl" />
 
             <div className="relative max-w-6xl mx-auto px-6 md:px-14 py-14 md:py-16">
               <div className="flex flex-col items-center text-center gap-4 md:gap-5">

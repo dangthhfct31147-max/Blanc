@@ -12,8 +12,27 @@ const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
   const defaultRedirectTarget = type === 'register' ? '/profile' : '/';
   const redirectTarget = searchParams.get('redirect') || defaultRedirectTarget;
 
+  const clerkErrorPayload = [
+    searchParams.get('error'),
+    searchParams.get('error_code'),
+    searchParams.get('clerk_error'),
+    searchParams.get('clerk_error_code'),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  const shouldTransferToRegister =
+    type === 'login'
+    && clerkErrorPayload.includes('external_account')
+    && clerkErrorPayload.includes('not_found');
+
   if (user) {
     return <Navigate to={redirectTarget} replace />;
+  }
+
+  if (shouldTransferToRegister) {
+    return <Navigate to={`/register?redirect=${encodeURIComponent(redirectTarget)}`} replace />;
   }
 
   if (!clerkPublishableKey) {
