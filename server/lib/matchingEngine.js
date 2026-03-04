@@ -33,12 +33,13 @@ import { ObjectId } from './objectId.js';
 // ============================================================================
 
 const SCORING_WEIGHTS = {
-    roleDiversity: 25,        // Different roles for team diversity
-    skillComplementarity: 20, // Complementary skills (some overlap, some new)
+    roleDiversity: 20,        // Different roles for team diversity
+    skillComplementarity: 15, // Complementary skills (some overlap, some new)
+    radarComplementarity: 15, // Radar skills complementarity
     availability: 15,         // Schedule compatibility
     experienceLevel: 10,      // Experience level proximity
     locationTimezone: 10,     // Location/timezone compatibility
-    communicationTools: 10,   // Shared communication preferences
+    communicationTools: 5,    // Shared communication preferences
     contestPreferences: 5,    // Similar contest interests
     collaborationStyle: 5,    // Compatible working styles
 };
@@ -395,18 +396,65 @@ function scoreCollaborationStyle(userProfile, candidateProfile) {
 }
 
 /**
+ * Score radar skills complementarity
+ */
+function scoreRadarComplementarity(userProfile, candidateProfile, selectedTeamRadar = {}) {
+    const defaultRadar = { code: 5, design: 5, presentation: 5, writing: 5, management: 5 };
+    const userRadar = userProfile?.matchingProfile?.radarSkills || defaultRadar;
+    const candidateRadar = candidateProfile?.matchingProfile?.radarSkills || defaultRadar;
+
+    // Calculate team's current strengths
+    const teamRadar = {
+        code: Math.max(userRadar.code, selectedTeamRadar.code || 0),
+        design: Math.max(userRadar.design, selectedTeamRadar.design || 0),
+        presentation: Math.max(userRadar.presentation, selectedTeamRadar.presentation || 0),
+        writing: Math.max(userRadar.writing, selectedTeamRadar.writing || 0),
+        management: Math.max(userRadar.management, selectedTeamRadar.management || 0)
+    };
+
+    let score = 0;
+
+    // Evaluate candidate on 5 axes
+    for (const skill of ['code', 'design', 'presentation', 'writing', 'management']) {
+        const teamScore = teamRadar[skill];
+        const candidateScore = candidateRadar[skill];
+
+        if (teamScore <= 5) {
+            // Reward candidate for being stronger in team's weak skill
+            if (candidateScore > teamScore) {
+                const fillAmount = candidateScore - teamScore; // max 9
+                score += (fillAmount / 9) * 4; // up to ~4 points per weak skill
+            }
+        } else {
+            // Reward exceptionally strong candidate in a team's decent skill
+            if (candidateScore >= 8 && candidateScore > teamScore) {
+                score += 1;
+            }
+        }
+    }
+
+    const avgScore = Object.values(candidateRadar).reduce((a, b) => a + b, 0) / 5;
+    if (avgScore >= 7.5) score += 3;
+    else if (avgScore >= 6.5) score += 1;
+
+    return Math.max(0, Math.min(15, score));
+}
+
+/**
  * Calculate total match score for a candidate
  */
 function calculateMatchScore(userProfile, candidateProfile, options = {}) {
     const {
         selectedTeamRoles = [],
         selectedTeamSkills = [],
+        selectedTeamRadar = {},
         contestTags = []
     } = options;
 
     const scores = {
         roleDiversity: scoreRoleDiversity(userProfile, candidateProfile, selectedTeamRoles),
         skillComplementarity: scoreSkillComplementarity(userProfile, candidateProfile, selectedTeamSkills),
+        radarComplementarity: scoreRadarComplementarity(userProfile, candidateProfile, selectedTeamRadar),
         availability: scoreAvailability(userProfile, candidateProfile),
         experienceLevel: scoreExperienceLevel(userProfile, candidateProfile),
         locationTimezone: scoreLocationTimezone(userProfile, candidateProfile),
@@ -610,6 +658,7 @@ function selectDiverseTeam(userProfile, scoredCandidates, limit, options = {}) {
     const teamRoles = [userRole];
     const teamSkills = [...userSkills];
     const teamCategories = new Set([getRoleCategory(userRole)]);
+    const teamRadar = { ...(userProfile?.matchingProfile?.radarSkills || { code: 5, design: 5, presentation: 5, writing: 5, management: 5 }) };
 
     // Track which candidates we've considered
     const considered = new Set();
@@ -648,6 +697,16 @@ function selectDiverseTeam(userProfile, scoredCandidates, limit, options = {}) {
             );
             diversityBonus += Math.min(10, newSkills.length * 2);
 
+            // Radar Diversity Bonus (gap fill)
+            const candidateRadar = candidate?.matchingProfile?.radarSkills || { code: 5, design: 5, presentation: 5, writing: 5, management: 5 };
+            let radarBonus = 0;
+            for (const skill of ['code', 'design', 'presentation', 'writing', 'management']) {
+                if (teamRadar[skill] <= 5 && candidateRadar[skill] > teamRadar[skill]) {
+                    radarBonus += (candidateRadar[skill] - teamRadar[skill]);
+                }
+            }
+            diversityBonus += Math.min(10, radarBonus);
+
             const adjustedScore = candidate.matchScore + diversityBonus;
 
             if (adjustedScore > bestAdjustedScore) {
@@ -668,6 +727,11 @@ function selectDiverseTeam(userProfile, scoredCandidates, limit, options = {}) {
         teamCategories.add(getRoleCategory(selectedRole));
         teamSkills.push(...(bestCandidate?.matchingProfile?.skills || []));
         teamSkills.push(...(bestCandidate?.matchingProfile?.techStack || []));
+
+        const candidateRadar = bestCandidate?.matchingProfile?.radarSkills || { code: 5, design: 5, presentation: 5, writing: 5, management: 5 };
+        for (const skill of ['code', 'design', 'presentation', 'writing', 'management']) {
+            teamRadar[skill] = Math.max(teamRadar[skill], candidateRadar[skill]);
+        }
     }
 
     return selected;
@@ -695,6 +759,7 @@ function formatCandidateForResponse(candidate) {
             timeZone: mp.timeZone || '',
             skills: (mp.skills || []).slice(0, 8),
             techStack: (mp.techStack || []).slice(0, 8),
+            radarSkills: mp.radarSkills || { code: 5, design: 5, presentation: 5, writing: 5, management: 5 },
             availability: mp.availability || '',
             collaborationStyle: mp.collaborationStyle || '',
             languages: mp.languages || [],

@@ -79,6 +79,7 @@ const DEFAULT_MATCHING_PROFILE = {
     availability: '',
     collaborationStyle: '',
     communicationTools: [],
+    radarSkills: { code: 5, design: 5, presentation: 5, writing: 5, management: 5 },
     openToNewTeams: true,
     openToMentor: false,
 };
@@ -156,6 +157,7 @@ function sanitizeMatchingProfile(input = {}) {
         availability: sanitizeString(source.availability, 200),
         collaborationStyle: sanitizeString(source.collaborationStyle, 200),
         communicationTools: sanitizeStringArray(source.communicationTools, 10, 50),
+        radarSkills: { code: Math.max(1, Math.min(10, Number(source.radarSkills?.code) || 5)), design: Math.max(1, Math.min(10, Number(source.radarSkills?.design) || 5)), presentation: Math.max(1, Math.min(10, Number(source.radarSkills?.presentation) || 5)), writing: Math.max(1, Math.min(10, Number(source.radarSkills?.writing) || 5)), management: Math.max(1, Math.min(10, Number(source.radarSkills?.management) || 5)) },
         openToNewTeams: typeof source.openToNewTeams === 'boolean' ? source.openToNewTeams : true,
         openToMentor: !!source.openToMentor,
     };
@@ -375,6 +377,7 @@ router.get('/:id/profile', authGuard, async (req, res, next) => {
                 skills: user.matchingProfile?.skills || [],
                 techStack: user.matchingProfile?.techStack || [],
                 languages: user.matchingProfile?.languages || [],
+                radarSkills: user.matchingProfile?.radarSkills || DEFAULT_MATCHING_PROFILE.radarSkills,
                 openToNewTeams: user.matchingProfile?.openToNewTeams,
                 openToMentor: user.matchingProfile?.openToMentor,
             } : null,
