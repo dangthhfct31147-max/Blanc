@@ -2,12 +2,13 @@ import React from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { SignIn, SignUp } from '@clerk/clerk-react';
 import { useAppAuth } from '../contexts/AppAuthContext';
-import { getClerkPublishableKey } from '../lib/clerkConfig';
+import { getClerkPublishableKey, getClerkPublishableKeyIssue } from '../lib/clerkConfig';
 
 const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
   const [searchParams] = useSearchParams();
   const { user } = useAppAuth();
   const clerkPublishableKey = getClerkPublishableKey();
+  const clerkConfigIssue = getClerkPublishableKeyIssue();
 
   const defaultRedirectTarget = type === 'register' ? '/profile' : '/';
   const redirectTarget = searchParams.get('redirect') || defaultRedirectTarget;
@@ -36,12 +37,21 @@ const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
   }
 
   if (!clerkPublishableKey) {
+    const title =
+      clerkConfigIssue === 'development_key_in_production'
+        ? 'Clerk production key is required'
+        : 'Clerk is not configured';
+    const message =
+      clerkConfigIssue === 'development_key_in_production'
+        ? 'This deployment is using a Clerk development publishable key. Replace `VITE_CLERK_PUBLISHABLE_KEY` with your Clerk live key (`pk_live_...`) before using the sign-in flow in production.'
+        : 'Set `VITE_CLERK_PUBLISHABLE_KEY` in your frontend environment before using the new sign-in flow.';
+
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
         <div className="w-full max-w-md rounded-2xl border border-amber-200 bg-white p-8 shadow-sm">
-          <h1 className="text-xl font-semibold text-slate-900">Clerk is not configured</h1>
+          <h1 className="text-xl font-semibold text-slate-900">{title}</h1>
           <p className="mt-3 text-sm text-slate-600">
-            Set `VITE_CLERK_PUBLISHABLE_KEY` in your frontend environment before using the new sign-in flow.
+            {message}
           </p>
         </div>
       </div>
