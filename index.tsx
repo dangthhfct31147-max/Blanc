@@ -6,7 +6,12 @@ import App from './App';
 import './index.css';
 import { I18nProvider } from './contexts/I18nContext';
 import { AppAuthProvider } from './contexts/AppAuthContext';
-import { getApiBaseUrl, getClerkPublishableKey, setRuntimeClerkPublishableKey } from './lib/clerkConfig';
+import {
+  getApiBaseUrl,
+  getClerkPublishableKey,
+  setRuntimeAppEnvironment,
+  setRuntimeClerkPublishableKey,
+} from './lib/clerkConfig';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -63,7 +68,11 @@ const AppBootstrap: React.FC = () => {
           return;
         }
 
-        const data = (await response.json().catch(() => null)) as null | { publishableKey?: string };
+        const data = (await response.json().catch(() => null)) as null | {
+          publishableKey?: string;
+          appEnv?: string;
+        };
+        setRuntimeAppEnvironment(String(data?.appEnv || ''));
         const runtimeKey = setRuntimeClerkPublishableKey(String(data?.publishableKey || ''));
 
         if (!disposed && runtimeKey) {

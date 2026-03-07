@@ -1,17 +1,27 @@
 const RUNTIME_CLERK_KEY_STORAGE = 'clerk:publishable_key';
+const RUNTIME_APP_ENV_STORAGE = 'app:runtime_env';
 let hasWarnedAboutInvalidClerkKey = false;
 
 function normalizeKey(value: unknown): string {
     return String(value || '').trim();
 }
 
+function normalizeRuntimeEnvironment(value: unknown): string {
+    return String(value || '').trim().toLowerCase();
+}
+
 function isDevelopmentPublishableKey(value: string): boolean {
     return value.startsWith('pk_test_');
 }
 
+function isProductionRuntimeEnvironment(): boolean {
+    const runtimeEnvironment = getRuntimeEnvironment();
+    return runtimeEnvironment === 'production' || runtimeEnvironment === 'prod';
+}
+
 function getClerkIssueForKey(value: string): 'development_key_in_production' | null {
     if (!value) return null;
-    if (import.meta.env.PROD && isDevelopmentPublishableKey(value)) {
+    if (isProductionRuntimeEnvironment() && isDevelopmentPublishableKey(value)) {
         return 'development_key_in_production';
     }
     return null;
@@ -29,6 +39,19 @@ function warnAboutClerkKeyIssue(issue: 'development_key_in_production' | null): 
 function getRuntimeConfigValue(key: 'VITE_CLERK_PUBLISHABLE_KEY' | 'VITE_API_URL'): string {
     if (typeof window === 'undefined') return '';
     return normalizeKey(window.__APP_RUNTIME_CONFIG__?.[key]);
+}
+
+function getRuntimeEnvironment(): string {
+    if (typeof window === 'undefined') return '';
+
+    const runtimeEnv = normalizeRuntimeEnvironment(window.__APP_RUNTIME_CONFIG__?.APP_ENV);
+    if (runtimeEnv) return runtimeEnv;
+
+    try {
+        return normalizeRuntimeEnvironment(sessionStorage.getItem(RUNTIME_APP_ENV_STORAGE));
+    } catch {
+        return '';
+    }
 }
 
 function getRawClerkPublishableKey(): string {
@@ -61,6 +84,33 @@ export function getClerkPublishableKey(): string {
     const issue = getClerkIssueForKey(rawKey);
     warnAboutClerkKeyIssue(issue);
     return issue ? '' : rawKey;
+}
+
+export function setRuntimeAppEnvironment(nextEnvironment: string): string {
+    const normalizedEnvironment = normalizeRuntimeEnvironment(nextEnvironment);
+    if (typeof window === 'undefined') {
+        return '';
+    }
+
+    window.__APP_RUNTIME_CONFIG__ = window.__APP_RUNTIME_CONFIG__ || {};
+
+    if (normalizedEnvironment) {
+        window.__APP_RUNTIME_CONFIG__.APP_ENV = normalizedEnvironment;
+    } else {
+        delete window.__APP_RUNTIME_CONFIG__.APP_ENV;
+    }
+
+    try {
+        if (normalizedEnvironment) {
+            sessionStorage.setItem(RUNTIME_APP_ENV_STORAGE, normalizedEnvironment);
+        } else {
+            sessionStorage.removeItem(RUNTIME_APP_ENV_STORAGE);
+        }
+    } catch {
+        // Ignore storage failures.
+    }
+
+    return normalizedEnvironment;
 }
 
 export function setRuntimeClerkPublishableKey(nextKey: string): string {

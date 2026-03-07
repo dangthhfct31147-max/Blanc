@@ -31,6 +31,15 @@ function isClerkManagedAccount(req) {
   return Boolean(req.user?.clerkUserId);
 }
 
+function getRuntimeAppEnvironment() {
+  return String(
+    process.env.APP_ENV
+    || process.env.RAILWAY_ENVIRONMENT_NAME
+    || process.env.NODE_ENV
+    || ''
+  ).trim().toLowerCase();
+}
+
 const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME || 'auth_token';
 const CSRF_COOKIE_NAME = process.env.CSRF_COOKIE_NAME || 'csrf_token';
 const AUTH_COOKIE_MAX_AGE_MS =
@@ -129,6 +138,7 @@ router.get('/clerk-config', (_req, res) => {
   return res.json({
     publishableKey,
     configured: Boolean(publishableKey),
+    appEnv: getRuntimeAppEnvironment(),
   });
 });
 

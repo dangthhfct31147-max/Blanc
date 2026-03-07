@@ -14,6 +14,7 @@ interface ImportMeta {
 interface Window {
     __CLERK_PUBLISHABLE_KEY__?: string;
     __APP_RUNTIME_CONFIG__?: {
+        APP_ENV?: string;
         VITE_CLERK_PUBLISHABLE_KEY?: string;
         VITE_API_URL?: string;
     };
