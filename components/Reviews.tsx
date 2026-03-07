@@ -3,6 +3,7 @@ import { Star, MessageCircle, ThumbsUp, ChevronDown, ChevronUp, Shield, Loader2,
 import { Button } from './ui/Common';
 import { api } from '../lib/api';
 import toast from 'react-hot-toast';
+import { useAppAuth } from '../contexts/AppAuthContext';
 
 // ============ TYPES ============
 
@@ -393,6 +394,7 @@ const Reviews: React.FC<ReviewsProps> = ({
     currentUserId,
     showTitle = true
 }) => {
+    const { authStatus, syncError, user } = useAppAuth();
     const [reviews, setReviews] = useState<Review[]>([]);
     const [stats, setStats] = useState<ReviewStats | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -401,7 +403,7 @@ const Reviews: React.FC<ReviewsProps> = ({
     const [hasUserReviewed, setHasUserReviewed] = useState(false);
 
     // Check if user is logged in
-    const isLoggedIn = !!localStorage.getItem('user');
+    const isLoggedIn = authStatus === 'authenticated' && Boolean(user);
 
     const INITIAL_REVIEWS_COUNT = 3;
 
@@ -549,10 +551,18 @@ const Reviews: React.FC<ReviewsProps> = ({
             )}
 
             {/* Login prompt */}
-            {!isLoggedIn && (
+            {authStatus === 'signed_out' && (
                 <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-slate-600 text-sm text-center">
                     <User className="w-8 h-8 mx-auto mb-2 text-slate-400" />
-                    <p>Vui lòng <a href="#/login" className="text-primary-600 font-medium hover:underline">đăng nhập</a> để viết đánh giá</p>
+                    <p>Vui lòng <a href="/login" className="text-primary-600 font-medium hover:underline">đăng nhập</a> để viết đánh giá</p>
+                </div>
+            )}
+
+            {authStatus === 'sync_error' && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-amber-900 text-sm text-center">
+                    <User className="w-8 h-8 mx-auto mb-2 text-amber-500" />
+                    <p className="font-medium">Tài khoản của bạn chưa đồng bộ xong</p>
+                    <p className="mt-1">{syncError?.message || 'Hãy đồng bộ lại tài khoản trước khi gửi đánh giá.'}</p>
                 </div>
             )}
 

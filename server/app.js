@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { clerkMiddleware } from '@clerk/express';
 import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
@@ -6,6 +7,7 @@ import { existsSync } from 'fs';
 import helmet from 'helmet';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { getClerkPublishableKey, getClerkSecretKey } from './lib/clerkAuth.js';
 import { RateLimiters } from './lib/security.js';
 import { trackConcurrentUsers } from './lib/concurrentUsers.js';
 import { ipBlocklist } from './middleware/ipBlocklist.js';
@@ -13,10 +15,12 @@ import { requestSanitizer } from './middleware/requestSanitizer.js';
 import adminRouter from './routes/admin.js';
 import authRouter from './routes/auth.js';
 import chatRouter from './routes/chat.js';
+import clerkWebhooksRouter from './routes/clerkWebhooks.js';
 import contestsRouter from './routes/contests.js';
 import coursesRouter from './routes/courses.js';
 import documentsRouter from './routes/documents.js';
 import feedbackRouter from './routes/feedback.js';
+import hallOfFameRouter from './routes/hallOfFame.js';
 import healthRouter from './routes/health.js';
 import matchingRouter from './routes/matching.js';
 import mediaRouter from './routes/media.js';
@@ -38,6 +42,9 @@ import usersRouter from './routes/users.js';
 
 const app = express();
 app.disable('x-powered-by');
+const clerkSecretKey = getClerkSecretKey();
+const clerkPublishableKey = getClerkPublishableKey();
+const clerkEnabled = Boolean(clerkSecretKey && clerkPublishableKey);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -99,9 +106,22 @@ app.use(ipBlocklist);
 
 app.use(compression());
 const jsonBodyLimit = process.env.JSON_BODY_LIMIT || '10mb';
+app.use('/api/webhooks/clerk', express.raw({ type: 'application/json' }), clerkWebhooksRouter);
 app.use(express.json({ limit: jsonBodyLimit }));
 app.use(express.urlencoded({ extended: true }));
 app.use(requestSanitizer);
+if (clerkSecretKey && !clerkPublishableKey) {
+  console.warn('[clerk] CLERK_SECRET_KEY is set but no publishable key was found. Set CLERK_PUBLISHABLE_KEY (preferred) or VITE_CLERK_PUBLISHABLE_KEY. Clerk middleware disabled.');
+}
+if (!clerkSecretKey && clerkPublishableKey) {
+  console.warn('[clerk] Publishable key is set but CLERK_SECRET_KEY is missing. Clerk middleware disabled.');
+}
+if (clerkEnabled) {
+  app.use(clerkMiddleware({
+    secretKey: clerkSecretKey,
+    publishableKey: clerkPublishableKey,
+  }));
+}
 
 // Prevent caching of sensitive responses (tokens, OTP flows, admin data)
 function noStore(_req, res, next) {
@@ -154,6 +174,7 @@ app.use('/api/documents', documentsRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/review/reports', reviewReportsRouter);
 app.use('/api/feedback', feedbackRouter);
+app.use('/api/hall-of-fame', hallOfFameRouter);
 app.use('/api/news', newsRouter);
 app.use('/api/recruitments', recruitmentsRouter);
 app.use('/api/membership', membershipRouter);
@@ -171,13 +192,22 @@ if (hasBuiltFrontend) {
   const isProd = process.env.NODE_ENV === 'production';
   app.use(
     express.static(distDir, {
+      index: false,
       maxAge: isProd ? '1y' : 0,
       immutable: isProd,
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.html')) {
+          // Never cache HTML entrypoints; otherwise clients may keep an old
+          // index.html that references chunk files that no longer exist.
+          res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+        }
+      },
     })
   );
 
   app.get('*', (req, res, next) => {
     if (req.path?.startsWith('/api')) return next();
+    res.setHeader('Cache-Control', 'no-cache, must-revalidate');
     return res.sendFile(distIndexHtml);
   });
 }

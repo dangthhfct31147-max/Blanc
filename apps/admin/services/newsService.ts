@@ -9,7 +9,7 @@
 
 import api from './api';
 import { validateAndSanitizeUrl } from './documentService';
-import { NewsArticle, NewsType } from '../types';
+import { NewsArticle, NewsAudience, NewsRelease, NewsType } from '../types';
 
 export interface NewsFilters {
   search?: string;
@@ -44,6 +44,7 @@ export interface CreateNewsData {
   status?: 'draft' | 'published';
   publishAt?: string | null;
   authorName?: string;
+  release?: NewsRelease | null;
 }
 
 export type UpdateNewsData = Partial<CreateNewsData>;
@@ -66,6 +67,12 @@ const normalizeType = (value: unknown): NewsType => {
   const v = String(value || '');
   if (v === 'minigame' || v === 'update' || v === 'event' || v === 'tip') return v;
   return 'announcement';
+};
+
+const normalizeAudience = (value: unknown): NewsAudience => {
+  const v = String(value || '').trim().toLowerCase();
+  if (v === 'students' || v === 'mentors' || v === 'admins') return v;
+  return 'all';
 };
 
 const sanitizeTags = (tags: unknown, maxItems = 10): string[] => {
@@ -102,6 +109,62 @@ const sanitizeOptionalUrl = (value: unknown): string => {
   return validation.sanitizedUrl;
 };
 
+const sanitizeReleaseChanges = (value: unknown, maxItems = 12): string[] => {
+  const raw = Array.isArray(value)
+    ? value
+    : typeof value === 'string'
+      ? value.split('\n')
+      : [];
+
+  const changes: string[] = [];
+  const seen = new Set<string>();
+
+  for (const entry of raw) {
+    const next = sanitizeString(entry, 180);
+    if (!next) continue;
+    const key = next.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    changes.push(next);
+    if (changes.length >= maxItems) break;
+  }
+
+  return changes;
+};
+
+const sanitizeRelease = (value: unknown): NewsRelease | null | undefined => {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  if (typeof value !== 'object') throw new Error('Invalid release payload');
+
+  const input = value as Partial<NewsRelease>;
+  const version = sanitizeString(input.version, 40);
+  const headline = sanitizeString(input.headline, 180);
+  const changes = sanitizeReleaseChanges(input.changes);
+  const notifySubscribers = !!input.notifySubscribers;
+  const audience = normalizeAudience(input.audience);
+
+  const hasContent = version || headline || changes.length > 0 || notifySubscribers || audience !== 'all';
+  if (!hasContent) return null;
+
+  if (notifySubscribers && !version) {
+    throw new Error('Version is required when sending release email');
+  }
+
+  if (notifySubscribers && changes.length === 0) {
+    throw new Error('At least one release change is required when sending release email');
+  }
+
+  return {
+    version,
+    headline,
+    changes,
+    audience,
+    notifySubscribers,
+    lastNotification: input.lastNotification || null,
+  };
+};
+
 const sanitizePublishAt = (value: unknown): string | null | undefined => {
   if (value === null) return null;
   if (value === undefined) return undefined;
@@ -134,6 +197,7 @@ const sanitizeCreatePayload = (data: CreateNewsData) => {
     status: normalizeStatus(data.status),
     publishAt: sanitizePublishAt(data.publishAt),
     authorName: sanitizeString(data.authorName, 120),
+    release: sanitizeRelease(data.release),
   };
 };
 
@@ -160,6 +224,7 @@ const sanitizeUpdatePayload = (data: UpdateNewsData) => {
   if (data.status !== undefined) payload.status = normalizeStatus(data.status);
   if (data.publishAt !== undefined) payload.publishAt = sanitizePublishAt(data.publishAt);
   if (data.authorName !== undefined) payload.authorName = sanitizeString(data.authorName, 120);
+  if (data.release !== undefined) payload.release = sanitizeRelease(data.release);
 
   return payload as UpdateNewsData;
 };

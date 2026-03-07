@@ -3,11 +3,12 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
     User, MapPin, Briefcase, Code, Award, BookOpen, Trophy,
     Calendar, Lock, ArrowLeft, Loader2, ExternalLink,
-    Users, MessageCircle, Globe, Star, CheckCircle, Clock
+    Users, MessageCircle, Globe, Star, CheckCircle, Clock, Target
 } from 'lucide-react';
 import { Card, Button, Badge } from '../components/ui/Common';
 import { api } from '../lib/api';
 import { useI18n } from '../contexts/I18nContext';
+import RadarChart from '../components/ui/RadarChart';
 
 interface PublicProfile {
     id: string;
@@ -32,6 +33,13 @@ interface PublicProfile {
         skills: string[];
         techStack: string[];
         languages: string[];
+        radarSkills?: {
+            code: number;
+            design: number;
+            presentation: number;
+            writing: number;
+            management: number;
+        };
         openToNewTeams: boolean;
         openToMentor: boolean;
     } | null;
@@ -281,6 +289,19 @@ const UserProfile: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left Column */}
                 <div className="lg:col-span-2 space-y-6">
+                    {/* Radar Chart */}
+                    {profile.matchingProfile?.radarSkills && (
+                        <Card className="p-6">
+                            <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                <Target className="w-5 h-5 text-primary-600" />
+                                {locale === 'en' ? 'Core Skills Profiling' : 'Biểu đồ Kỹ năng cốt lõi'}
+                            </h3>
+                            <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 flex justify-center">
+                                <RadarChart data={profile.matchingProfile.radarSkills} size="md" color="#4f46e5" />
+                            </div>
+                        </Card>
+                    )}
+
                     {/* Skills & Tech Stack */}
                     {profile.matchingProfile && (profile.matchingProfile.skills.length > 0 || profile.matchingProfile.techStack.length > 0) && (
                         <Card className="p-6">

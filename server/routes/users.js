@@ -79,6 +79,7 @@ const DEFAULT_MATCHING_PROFILE = {
     availability: '',
     collaborationStyle: '',
     communicationTools: [],
+    radarSkills: { code: 5, design: 5, presentation: 5, writing: 5, management: 5 },
     openToNewTeams: true,
     openToMentor: false,
 };
@@ -156,6 +157,7 @@ function sanitizeMatchingProfile(input = {}) {
         availability: sanitizeString(source.availability, 200),
         collaborationStyle: sanitizeString(source.collaborationStyle, 200),
         communicationTools: sanitizeStringArray(source.communicationTools, 10, 50),
+        radarSkills: { code: Math.max(1, Math.min(10, Number(source.radarSkills?.code) || 5)), design: Math.max(1, Math.min(10, Number(source.radarSkills?.design) || 5)), presentation: Math.max(1, Math.min(10, Number(source.radarSkills?.presentation) || 5)), writing: Math.max(1, Math.min(10, Number(source.radarSkills?.writing) || 5)), management: Math.max(1, Math.min(10, Number(source.radarSkills?.management) || 5)) },
         openToNewTeams: typeof source.openToNewTeams === 'boolean' ? source.openToNewTeams : true,
         openToMentor: !!source.openToMentor,
     };
@@ -375,6 +377,7 @@ router.get('/:id/profile', authGuard, async (req, res, next) => {
                 skills: user.matchingProfile?.skills || [],
                 techStack: user.matchingProfile?.techStack || [],
                 languages: user.matchingProfile?.languages || [],
+                radarSkills: user.matchingProfile?.radarSkills || DEFAULT_MATCHING_PROFILE.radarSkills,
                 openToNewTeams: user.matchingProfile?.openToNewTeams,
                 openToMentor: user.matchingProfile?.openToMentor,
             } : null,
@@ -678,6 +681,10 @@ router.patch('/me/locale', authGuard, async (req, res, next) => {
  */
 router.post('/me/change-password', authGuard, async (req, res, next) => {
     try {
+        if (req.user?.clerkUserId) {
+            return res.status(410).json({ error: 'Password changes are managed by Clerk for this account.' });
+        }
+
         await connectToDatabase();
         const userId = req.user.id;
         const { currentPassword, newPassword } = req.body || {};
@@ -906,7 +913,7 @@ router.get('/me/notifications-history', authGuard, async (req, res, next) => {
         const users = getCollection('users');
         const user = await users.findOne(
             { _id: new ObjectId(userId) },
-            { projection: { email: 1 } }
+            { projection: { email: 1, role: 1 } }
         );
 
         if (!user) {
@@ -915,13 +922,33 @@ router.get('/me/notifications-history', authGuard, async (req, res, next) => {
 
         // Get notifications sent to this user
         const notificationLogs = getCollection('notification_logs');
+        const userAudience = user.role === 'student'
+            ? 'students'
+            : user.role === 'mentor'
+                ? 'mentors'
+                : (user.role === 'admin' || user.role === 'super_admin')
+                    ? 'admins'
+                    : 'all';
+
+        const announcementAudienceQuery = {
+            $and: [
+                { type: 'announcement' },
+                {
+                    $or: [
+                        { targetAudience: { $exists: false } },
+                        { targetAudience: 'all' },
+                        { targetAudience: userAudience },
+                    ],
+                },
+            ],
+        };
 
         // Query for notifications - both individual and bulk
         const notifications = await notificationLogs
             .find({
                 $or: [
                     { recipientEmail: user.email },
-                    { type: 'announcement' }, // System announcements sent to all
+                    announcementAudienceQuery,
                     { type: { $in: ['contestReminder', 'courseUpdate'] } } // User-specific
                 ]
             })
@@ -942,7 +969,7 @@ router.get('/me/notifications-history', authGuard, async (req, res, next) => {
             total: await notificationLogs.countDocuments({
                 $or: [
                     { recipientEmail: user.email },
-                    { type: 'announcement' }
+                    announcementAudienceQuery
                 ]
             })
         });

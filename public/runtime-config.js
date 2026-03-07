@@ -1,0 +1,5 @@
+window.__APP_RUNTIME_CONFIG__ = window.__APP_RUNTIME_CONFIG__ || {};
+
+if (!window.__CLERK_PUBLISHABLE_KEY__ && window.__APP_RUNTIME_CONFIG__.VITE_CLERK_PUBLISHABLE_KEY) {
+    window.__CLERK_PUBLISHABLE_KEY__ = String(window.__APP_RUNTIME_CONFIG__.VITE_CLERK_PUBLISHABLE_KEY || '').trim();
+}

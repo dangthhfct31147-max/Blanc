@@ -17,6 +17,7 @@
     "server": "node server/index.js",
     "server:dev": "nodemon --watch server --ext js,json --exec \"node server/index.js\"",
     "seed": "node server/scripts/migrate.js",
+    "seed:hall-of-fame": "node server/scripts/seed-hall-of-fame.js",
     "seed:large": "node server/scripts/migrate.js && node server/scripts/seed-large.js",
     "seed:large:reset": "node server/scripts/migrate.js && node server/scripts/seed-large.js --reset",
     "db:init": "node server/scripts/setup-db.js",
@@ -26,6 +27,9 @@
     "test:run": "vitest run"
   },
   "dependencies": {
+    "@clerk/backend": "^2.33.0",
+    "@clerk/clerk-react": "^5.61.3",
+    "@clerk/express": "^1.7.76",
     "@google/genai": "^1.30.0",
     "bcryptjs": "^2.4.3",
     "busboy": "^1.6.0",

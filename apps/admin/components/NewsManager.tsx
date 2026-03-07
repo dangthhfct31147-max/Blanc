@@ -15,7 +15,7 @@ import {
   FileText,
   Pin,
 } from 'lucide-react';
-import { NewsArticle, NewsType } from '../types';
+import { NewsArticle, NewsAudience, NewsType } from '../types';
 import { newsService } from '../services/newsService';
 import { useDebounce } from '../hooks/useApi';
 import { Dropdown } from './ui/Dropdown';
@@ -33,6 +33,13 @@ const STATUS_OPTIONS = [
   { value: 'all', label: 'All', color: 'bg-gray-400' },
   { value: 'draft', label: 'Draft', color: 'bg-slate-500' },
   { value: 'published', label: 'Published', color: 'bg-emerald-600' },
+];
+
+const RELEASE_AUDIENCE_OPTIONS: Array<{ value: NewsAudience; label: string; color: string }> = [
+  { value: 'all', label: 'All users', color: 'bg-gray-400' },
+  { value: 'students', label: 'Students', color: 'bg-sky-500' },
+  { value: 'mentors', label: 'Mentors', color: 'bg-violet-500' },
+  { value: 'admins', label: 'Admins', color: 'bg-slate-600' },
 ];
 
 const NEWS_TYPE_LABELS = NEWS_TYPE_OPTIONS.reduce<Record<NewsType, string>>((acc, option) => {
@@ -57,6 +64,8 @@ const toDatetimeLocal = (iso?: string | null) => {
 };
 
 const safeArray = <T,>(value: unknown, fallback: T[] = []): T[] => (Array.isArray(value) ? (value as T[]) : fallback);
+
+const joinReleaseChanges = (value: unknown) => safeArray<string>(value).join('\n');
 
 const NewsManager: React.FC = () => {
   const [items, setItems] = useState<NewsArticle[]>([]);
@@ -91,6 +100,11 @@ const NewsManager: React.FC = () => {
     actionLink: '',
     status: 'draft' as 'draft' | 'published',
     publishAt: '',
+    releaseVersion: '',
+    releaseHeadline: '',
+    releaseChanges: '',
+    releaseAudience: 'all' as NewsAudience,
+    notifySubscribers: false,
   });
 
   const filteredItems = useMemo(() => {
@@ -144,6 +158,11 @@ const NewsManager: React.FC = () => {
       actionLink: '',
       status: 'draft',
       publishAt: '',
+      releaseVersion: '',
+      releaseHeadline: '',
+      releaseChanges: '',
+      releaseAudience: 'all',
+      notifySubscribers: false,
     });
     setIsModalOpen(true);
   };
@@ -166,6 +185,11 @@ const NewsManager: React.FC = () => {
         actionLink: full.actionLink && full.actionLink.startsWith('#') ? '' : (full.actionLink || ''),
         status: full.status || 'draft',
         publishAt: toDatetimeLocal(full.publishAt),
+        releaseVersion: full.release?.version || '',
+        releaseHeadline: full.release?.headline || '',
+        releaseChanges: joinReleaseChanges(full.release?.changes),
+        releaseAudience: full.release?.audience || 'all',
+        notifySubscribers: !!full.release?.notifySubscribers,
       });
       setIsModalOpen(true);
     } catch (e) {
@@ -219,6 +243,33 @@ const NewsManager: React.FC = () => {
     setIsSaving(true);
     setError(null);
     try {
+      const releaseChanges = form.releaseChanges
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      let release: NewsArticle['release'] | null | undefined = undefined;
+      if (form.type === 'update') {
+        const hasReleaseContent = !!form.releaseVersion.trim()
+          || !!form.releaseHeadline.trim()
+          || releaseChanges.length > 0
+          || form.notifySubscribers
+          || !!activeItem?.release;
+
+        if (hasReleaseContent) {
+          release = {
+            version: form.releaseVersion.trim(),
+            headline: form.releaseHeadline.trim(),
+            changes: releaseChanges,
+            audience: form.releaseAudience,
+            notifySubscribers: form.notifySubscribers,
+            lastNotification: activeItem?.release?.lastNotification || null,
+          };
+        }
+      } else if (activeItem?.release) {
+        release = null;
+      }
+
       const payload = {
         title: form.title,
         summary: form.summary,
@@ -231,6 +282,7 @@ const NewsManager: React.FC = () => {
         actionLink: form.actionLink,
         status: form.status,
         publishAt: form.publishAt ? new Date(form.publishAt).toISOString() : undefined,
+        release,
       };
 
       if (activeItem?.id || activeItem?.slug) {
@@ -394,6 +446,92 @@ const NewsManager: React.FC = () => {
                 <p className="text-xs text-gray-500 mt-1">Leave empty to publish immediately (when published)</p>
               </div>
 
+              {form.type === 'update' && (
+                <div className="md:col-span-2 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 space-y-4">
+                  <div>
+                    <h4 className="text-sm font-semibold text-emerald-900">Release update</h4>
+                    <p className="text-xs text-emerald-700 mt-1">
+                      Publish one changelog-style update with version name, what&apos;s new, and optional email broadcast.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Version name</label>
+                      <input
+                        value={form.releaseVersion}
+                        onChange={(e) => setForm((p) => ({ ...p, releaseVersion: e.target.value }))}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                        placeholder="e.g. Blanc v1.8.0"
+                        disabled={isSaving}
+                      />
+                    </div>
+
+                    <div>
+                      <Dropdown
+                        label="Email audience"
+                        value={form.releaseAudience}
+                        onChange={(v) => setForm((p) => ({ ...p, releaseAudience: v as NewsAudience }))}
+                        options={RELEASE_AUDIENCE_OPTIONS}
+                        headerText="Recipients"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Release headline</label>
+                    <input
+                      value={form.releaseHeadline}
+                      onChange={(e) => setForm((p) => ({ ...p, releaseHeadline: e.target.value }))}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                      placeholder="One short line to introduce this version"
+                      disabled={isSaving}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">What&apos;s new</label>
+                    <textarea
+                      value={form.releaseChanges}
+                      onChange={(e) => setForm((p) => ({ ...p, releaseChanges: e.target.value }))}
+                      rows={5}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-y"
+                      placeholder={'One bullet per line\nImproved mentor matching performance\nAdded Hall of Fame library\nFixed preview deployment issues'}
+                      disabled={isSaving}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Each line becomes one changelog item in the email and news detail.</p>
+                  </div>
+
+                  <label className="flex items-start justify-between gap-3 px-4 py-3 rounded-xl border border-emerald-200 bg-white cursor-pointer">
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-gray-900">Send release email when this update is published</p>
+                      <p className="text-xs text-gray-500">
+                        Works like a Railway-style changelog push: publish once, post to news, and email the selected audience.
+                      </p>
+                    </div>
+                    <span className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.notifySubscribers ? 'bg-emerald-600' : 'bg-gray-300'}`}>
+                      <input
+                        type="checkbox"
+                        checked={form.notifySubscribers}
+                        onChange={(e) => setForm((p) => ({ ...p, notifySubscribers: e.target.checked }))}
+                        className="sr-only"
+                        disabled={isSaving}
+                      />
+                      <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${form.notifySubscribers ? 'translate-x-5' : 'translate-x-1'}`} />
+                    </span>
+                  </label>
+
+                  {activeItem?.release?.lastNotification && (
+                    <div className="rounded-xl border border-emerald-100 bg-white px-4 py-3 text-xs text-gray-600">
+                      Last send: {activeItem.release.lastNotification.notifiedAt ? new Date(activeItem.release.lastNotification.notifiedAt).toLocaleString() : '—'}
+                      {' · '}
+                      Sent {activeItem.release.lastNotification.sent}/{activeItem.release.lastNotification.total}
+                      {activeItem.release.lastNotification.failed > 0 ? ` · Failed ${activeItem.release.lastNotification.failed}` : ''}
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Tags</label>
                 <div className="relative">
@@ -507,6 +645,35 @@ const NewsManager: React.FC = () => {
             </div>
             <h2 className="text-2xl font-bold text-gray-900">{activeItem.title}</h2>
             {activeItem.summary && <p className="text-gray-600">{activeItem.summary}</p>}
+            {activeItem.release && (
+              <div className="rounded-xl border border-emerald-100 bg-emerald-50/70 p-4 space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  {activeItem.release.version && (
+                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-600 text-white">
+                      {activeItem.release.version}
+                    </span>
+                  )}
+                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-white text-emerald-700 border border-emerald-200">
+                    audience: {activeItem.release.audience}
+                  </span>
+                  {activeItem.release.notifySubscribers && (
+                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-white text-amber-700 border border-amber-200">
+                      email on publish
+                    </span>
+                  )}
+                </div>
+                {activeItem.release.headline && (
+                  <p className="text-sm text-gray-700">{activeItem.release.headline}</p>
+                )}
+                {safeArray<string>(activeItem.release.changes).length > 0 && (
+                  <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                    {safeArray<string>(activeItem.release.changes).map((change) => (
+                      <li key={change}>{change}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
             {activeItem.body && (
               <pre className="whitespace-pre-wrap text-sm text-gray-800 bg-gray-50 border border-gray-100 rounded-xl p-4">
                 {activeItem.body}
@@ -661,6 +828,9 @@ const NewsManager: React.FC = () => {
                           </span>
                         )}
                       </div>
+                      {item.release?.version && (
+                        <p className="text-[11px] font-semibold text-emerald-700 mt-1">{item.release.version}</p>
+                      )}
                       {item.summary && <p className="text-xs text-gray-500 line-clamp-1 mt-1">{item.summary}</p>}
                     </td>
                     <td className="px-6 py-4">

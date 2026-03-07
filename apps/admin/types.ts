@@ -214,11 +214,28 @@ export interface Document {
 }
 
 export type NewsType = 'announcement' | 'minigame' | 'update' | 'event' | 'tip';
+export type NewsAudience = 'all' | 'students' | 'mentors' | 'admins';
 
 export interface NewsAuthor {
   id?: string | null;
   name?: string | null;
   email?: string | null;
+}
+
+export interface NewsReleaseNotificationStats {
+  total: number;
+  sent: number;
+  failed: number;
+  notifiedAt?: string | null;
+}
+
+export interface NewsRelease {
+  version: string;
+  headline?: string;
+  changes: string[];
+  audience: NewsAudience;
+  notifySubscribers: boolean;
+  lastNotification?: NewsReleaseNotificationStats | null;
 }
 
 export interface NewsArticle {
@@ -239,6 +256,7 @@ export interface NewsArticle {
   createdAt?: string | null;
   updatedAt?: string | null;
   author?: NewsAuthor | null;
+  release?: NewsRelease | null;
 }
 
 export interface Team {

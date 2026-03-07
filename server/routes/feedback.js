@@ -1,12 +1,15 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import { getCollection } from '../lib/db.js';
+import { connectToDatabase, getCollection } from '../lib/db.js';
+import { ObjectId } from '../lib/objectId.js';
 import { sendTelegramMessage } from '../lib/telegram.js';
 import { normalizePagination } from '../lib/pagination.js';
+import { authGuard } from '../middleware/auth.js';
 
 const router = express.Router();
 const jwtSecret = process.env.JWT_SECRET;
 const collectionName = 'news_feedback';
+const contactCollectionName = 'contact_feedback';
 let indexesEnsured = false;
 
 const mapSuggestion = (doc) => ({
@@ -20,8 +23,11 @@ const mapSuggestion = (doc) => ({
 
 const ensureIndexes = async () => {
   if (indexesEnsured) return;
+  await connectToDatabase();
   const collection = getCollection(collectionName);
   await collection.createIndex({ createdAt: -1 });
+  const contact = getCollection(contactCollectionName);
+  await contact.createIndex({ createdAt: -1 });
   indexesEnsured = true;
 };
 
@@ -152,6 +158,95 @@ router.post('/news', async (req, res, next) => {
       message: 'Đã ghi nhận góp ý.',
       suggestion: mapSuggestion({ ...doc, _id: result.insertedId }),
     });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.post('/contact', authGuard, async (req, res, next) => {
+  try {
+    await ensureIndexes();
+    await connectToDatabase();
+
+    const userId = req.user?.id;
+    if (!ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: 'Invalid user id' });
+    }
+
+    const { type, message, version, pageUrl } = req.body || {};
+    const rawType = String(type || '').trim().toLowerCase();
+    const trimmedMessage = String(message || '').trim();
+    const trimmedVersion = String(version || '').trim();
+    const trimmedPageUrl = String(pageUrl || '').trim();
+
+    const allowedTypes = new Set(['bug', 'feature', 'other']);
+    if (!allowedTypes.has(rawType)) {
+      return res.status(400).json({ error: 'Invalid feedback type.' });
+    }
+
+    if (!trimmedMessage || trimmedMessage.length < 10) {
+      return res.status(400).json({ error: 'Nội dung tối thiểu 10 ký tự.' });
+    }
+    if (trimmedMessage.length > 2000) {
+      return res.status(400).json({ error: 'Nội dung tối đa 2000 ký tự.' });
+    }
+    if (trimmedVersion.length > 120) {
+      return res.status(400).json({ error: 'Version tối đa 120 ký tự.' });
+    }
+    if (trimmedPageUrl.length > 500) {
+      return res.status(400).json({ error: 'URL trang tối đa 500 ký tự.' });
+    }
+
+    const users = getCollection('users');
+    const user = await users.findOne({ _id: new ObjectId(userId) });
+
+    const createdAt = new Date();
+    const doc = {
+      type: rawType,
+      message: trimmedMessage,
+      version: trimmedVersion || null,
+      pageUrl: trimmedPageUrl || null,
+      userId,
+      userName: user?.name || null,
+      userEmail: user?.email || req.user?.email || null,
+      userPhone: user?.phone || null,
+      createdAt,
+      status: 'new',
+      source: 'contact',
+    };
+
+    const feedback = getCollection(contactCollectionName);
+    await feedback.insertOne(doc);
+
+    // Best-effort: Telegram alert (icons depend on type)
+    try {
+      const meta = {
+        bug: { icon: '🐞', label: 'Báo lỗi' },
+        feature: { icon: '✨', label: 'Đề xuất tính năng' },
+        other: { icon: '💬', label: 'Khác' },
+      }[rawType] || { icon: '💬', label: 'Khác' };
+
+      const displayName = user?.name || doc.userEmail || userId;
+      const msg = [
+        'Feedback mới',
+        `${meta.icon} Phân loại: ${meta.label} (${rawType})`,
+        `Thời gian: ${createdAt.toISOString()}`,
+        `Version: ${trimmedVersion || 'unknown'}`,
+        `Tài khoản: ${displayName} (${displayName})`,
+        `Email: ${doc.userEmail || 'unknown'}`,
+        `SDT: ${doc.userPhone || 'unknown'}`,
+        `Trang: ${trimmedPageUrl || 'unknown'}`,
+        '',
+        'Nội dung:',
+        trimmedMessage,
+      ].join('\n');
+
+      void sendTelegramMessage(msg);
+    } catch (tgError) {
+      console.error('[feedback/contact] Failed to send Telegram message:', tgError);
+    }
+
+    return res.status(201).json({ ok: true });
   } catch (error) {
     return next(error);
   }

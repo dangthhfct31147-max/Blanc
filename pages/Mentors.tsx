@@ -8,6 +8,7 @@ import { mentorApi } from '../lib/mentorApi';
 import { useDebounce } from '../lib/hooks';
 import { MentorDetail, MentorSummary } from '../types';
 import { CONTEST_CATEGORIES, ContestCategoryValue } from '../constants/contestCategories';
+import { useI18n } from '../contexts/I18nContext';
 
 const ITEMS_PER_PAGE = 12;
 const DAILY_SEED_KEY = 'mentor-list-seed';
@@ -192,7 +193,7 @@ const formatDate = (value?: string | null) => {
   if (!value) return '-';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '-';
-  return date.toLocaleDateString('vi-VN', {
+  return date.toLocaleDateString('en-US', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -201,6 +202,92 @@ const formatDate = (value?: string | null) => {
 
 const MentorList: React.FC = () => {
   const navigate = useNavigate();
+  const { locale } = useI18n();
+  const isEn = locale === 'en';
+
+  const copy = useMemo(() => isEn ? {
+    badge: 'Mentor companions',
+    heroTitle: 'Connect with the right mentor, accelerate your goals',
+    heroDesc: 'Discover mentors by field, optimize your growth path, and get daily recommendations.',
+    searchByExpertise: 'Search by expertise',
+    highQuality: 'High quality',
+    dailySuggestions: 'Daily suggestions',
+    mentorCommunity: 'Mentor community',
+    matchingResults: 'Matching results',
+    totalMentors: 'Total mentors',
+    currentlyShowing: 'Currently showing',
+    fields: 'Fields',
+    pages: 'Pages',
+    updatedNote: 'Continuously updated, prioritizing recently active mentors.',
+    title: 'Mentor',
+    subtitle: 'List of mentors and their journey accompanying learners.',
+    privacyNote: 'This page does not use your personal data for mentor suggestions. This is a curated list of mentors for your reference.',
+    searchPlaceholder: 'Search mentor by name...',
+    fieldLabel: 'Field',
+    selectField: 'Select field',
+    allFields: 'All',
+    sortLabel: 'Sort by',
+    sortPlaceholder: 'Select...',
+    loadingMentors: 'Loading mentors...',
+    noMentors: 'No matching mentors found.',
+    joined: 'Joined:',
+    loadError: 'Could not load mentor list',
+    randomLoadError: 'Could not load mentors',
+    sortRandom: 'Random (daily)',
+    sortNewest: 'Newest',
+    sortOldest: 'Oldest',
+    sortNameAsc: 'Name A-Z',
+    sortNameDesc: 'Name Z-A',
+  } : {
+    badge: 'Mentor đồng hành',
+    heroTitle: 'Kết nối mentor phù hợp, bứt phá mục tiêu học tập',
+    heroDesc: '{copy.heroDesc}',
+    searchByExpertise: 'Tìm theo chuyên môn',
+    highQuality: 'Qui tính cao',
+    dailySuggestions: 'Gợi ý mỗi ngày',
+    mentorCommunity: 'Cộng đồng mentor',
+    matchingResults: 'Kết quả phù hợp',
+    totalMentors: 'Tổng mentor',
+    currentlyShowing: 'Đang hiển thị',
+    fields: 'Lĩnh vực',
+    pages: 'Trang',
+    updatedNote: '{copy.updatedNote}',
+    title: 'Mentor',
+    subtitle: '{copy.subtitle}',
+    privacyNote: '{copy.privacyNote}',
+    searchPlaceholder: 'Tìm mentor theo tên...',
+    fieldLabel: 'Lĩnh vực',
+    selectField: 'Chọn lĩnh vực',
+    allFields: 'Tất cả',
+    sortLabel: 'Sắp xếp',
+    sortPlaceholder: 'Chọn...',
+    loadingMentors: '{copy.loadingMentors}',
+    noMentors: '{copy.noMentors}',
+    joined: 'Tham gia:',
+    loadError: 'Không thể tải danh sách mentor',
+    randomLoadError: 'Không thể tải mentor',
+    sortRandom: 'Ngẫu nhiên (trong ngày)',
+    sortNewest: 'Mới nhất',
+    sortOldest: 'Cũ nhất',
+    sortNameAsc: 'Tên A-Z',
+    sortNameDesc: 'Tên Z-A',
+  }, [isEn]);
+
+  const SORT_OPTIONS_LOCALIZED: DropdownOption[] = useMemo(() => [
+    { value: 'random', label: copy.sortRandom, icon: <Shuffle className="w-4 h-4 text-slate-500" />, color: 'bg-amber-400' },
+    { value: 'newest', label: copy.sortNewest, icon: <CalendarArrowDown className="w-4 h-4 text-slate-500" />, color: 'bg-emerald-500' },
+    { value: 'oldest', label: copy.sortOldest, icon: <CalendarArrowUp className="w-4 h-4 text-slate-500" />, color: 'bg-slate-400' },
+    { value: 'name-asc', label: copy.sortNameAsc, icon: <ArrowDownAZ className="w-4 h-4 text-slate-500" />, color: 'bg-sky-500' },
+    { value: 'name-desc', label: copy.sortNameDesc, icon: <ArrowDownZA className="w-4 h-4 text-slate-500" />, color: 'bg-indigo-500' },
+  ], [copy]);
+
+  const FIELD_OPTIONS_LOCALIZED: DropdownOption[] = useMemo(() => [
+    { value: '', label: copy.allFields },
+    ...CONTEST_CATEGORIES.map((category) => ({
+      value: category.value,
+      label: getCategoryLabel(category.value),
+    })),
+  ], [copy]);
   const [mentors, setMentors] = useState<MentorSummary[]>([]);
   const [randomMentors, setRandomMentors] = useState<MentorSummary[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -232,7 +319,7 @@ const MentorList: React.FC = () => {
       setMentors(data.items || []);
       setTotal(data.total || 0);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Không thể tải danh sách mentor');
+      setError(err instanceof Error ? err.message : copy.loadError);
       setMentors([]);
       setTotal(0);
     } finally {
@@ -276,7 +363,7 @@ const MentorList: React.FC = () => {
       setRandomMentors(shuffled);
       setTotal(shuffled.length);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Không thể tải mentor');
+      setError(err instanceof Error ? err.message : copy.randomLoadError);
       setRandomMentors([]);
       setTotal(0);
     } finally {
@@ -310,7 +397,7 @@ const MentorList: React.FC = () => {
   const fieldCount = CONTEST_CATEGORIES.length;
   const visibleCount = visibleMentors.length;
   const pageCount = total > 0 ? totalPages : 0;
-  const resultLabel = debouncedSearch || field ? 'Kết quả phù hợp' : 'Tổng mentor';
+  const resultLabel = debouncedSearch || field ? copy.matchingResults : copy.totalMentors;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -366,17 +453,17 @@ const MentorList: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
                   <div className="rounded-xl border border-sky-100 bg-sky-50/80 px-4 py-3">
-                    <div className="text-xs font-semibold text-sky-700">Đang hiển thị</div>
+                    <div className="text-xs font-semibold text-sky-700">{copy.currentlyShowing}</div>
                     <div className="mt-1 text-2xl font-bold text-sky-800">
                       {isLoading ? '--' : visibleCount}
                     </div>
                   </div>
                   <div className="rounded-xl border border-emerald-100 bg-emerald-50/80 px-4 py-3">
-                    <div className="text-xs font-semibold text-emerald-700">Lĩnh vực</div>
+                    <div className="text-xs font-semibold text-emerald-700">{copy.fields}</div>
                     <div className="mt-1 text-2xl font-bold text-emerald-800">{fieldCount}</div>
                   </div>
                   <div className="rounded-xl border border-amber-100 bg-amber-50/80 px-4 py-3">
-                    <div className="text-xs font-semibold text-amber-700">Trang</div>
+                    <div className="text-xs font-semibold text-amber-700">{copy.pages}</div>
                     <div className="mt-1 text-2xl font-bold text-amber-800">
                       {isLoading ? '--' : pageCount}
                     </div>
@@ -387,7 +474,7 @@ const MentorList: React.FC = () => {
           </div>
         </section>
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-slate-900">Mentor</h1>
+          <h1 className="text-3xl font-bold text-slate-900">{copy.title}</h1>
           <p className="text-slate-500 text-sm">Danh sách mentor và hành trình đồng hành cùng học viên.</p>
         </div>
 
@@ -402,7 +489,7 @@ const MentorList: React.FC = () => {
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Tìm mentor theo tên..."
+                placeholder={copy.searchPlaceholder}
                 className="pl-10"
               />
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -410,22 +497,22 @@ const MentorList: React.FC = () => {
           </div>
           <div className="w-full lg:w-64">
             <Dropdown
-              label="Lĩnh vực"
-              headerText="Chọn lĩnh vực"
+              label={copy.fieldLabel}
+              headerText={copy.selectField}
               value={field}
               onChange={(value) => setField(value as MentorFieldValue)}
-              options={FIELD_OPTIONS}
-              placeholder="Tất cả"
+              options={FIELD_OPTIONS_LOCALIZED}
+              placeholder={copy.allFields}
             />
           </div>
           <div className="w-full lg:w-60">
             <Dropdown
-              label="Sắp xếp"
-              headerText="Sắp xếp"
+              label={copy.sortLabel}
+              headerText={copy.sortLabel}
               value={sort}
               onChange={(value) => setSort(value as SortValue)}
-              options={SORT_OPTIONS}
-              placeholder="Chọn..."
+              options={SORT_OPTIONS_LOCALIZED}
+              placeholder={copy.sortPlaceholder}
             />
           </div>
         </div>
@@ -468,7 +555,7 @@ const MentorList: React.FC = () => {
                     </h3>
                     <div className="mt-2 flex items-center gap-2 text-xs text-slate-500">
                       <Calendar className="w-4 h-4" />
-                      <span>Tham gia: {formatDate(mentor.joinedAt)}</span>
+                      <span>{copy.joined} {formatDate(mentor.joinedAt)}</span>
                     </div>
                     {fields.length > 0 && (
                       <div className="mt-3 flex flex-wrap gap-2">
@@ -502,6 +589,24 @@ const MentorList: React.FC = () => {
 const MentorDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { locale } = useI18n();
+  const isEn = locale === 'en';
+
+  const copy = useMemo(() => isEn ? {
+    back: 'Back',
+    loadingMentors: 'Loading mentor...',
+    joined: 'Joined:',
+    noBlog: 'Mentor has not updated their blog yet.',
+    invalidId: 'Invalid mentor ID',
+    loadError: 'Could not load mentor',
+  } : {
+    back: 'Quay lại',
+    loadingMentors: 'Đang tải mentor...',
+    joined: 'Tham gia:',
+    noBlog: 'Mentor chưa cập nhật blog.',
+    invalidId: 'ID mentor không hợp lệ',
+    loadError: 'Không thể tải mentor',
+  }, [isEn]);
   const [mentor, setMentor] = useState<MentorDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -509,7 +614,7 @@ const MentorDetailPage: React.FC = () => {
   useEffect(() => {
     const fetchMentor = async () => {
       if (!id) {
-        setError('ID mentor không hợp lệ');
+        setError(copy.invalidId);
         setIsLoading(false);
         return;
       }
@@ -519,7 +624,7 @@ const MentorDetailPage: React.FC = () => {
         const data = await mentorApi.getPublic(id);
         setMentor(data.mentor);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Không thể tải mentor');
+        setError(err instanceof Error ? err.message : copy.loadError);
       } finally {
         setIsLoading(false);
       }
@@ -592,7 +697,7 @@ const MentorDetailPage: React.FC = () => {
             {body ? (
               <p className="whitespace-pre-line text-slate-700">{body}</p>
             ) : (
-              <p className="text-slate-500">Mentor chưa cập nhật blog.</p>
+              <p className="text-slate-500">{copy.noBlog}</p>
             )}
           </div>
         </div>

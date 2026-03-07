@@ -6,15 +6,26 @@ import { Button, cn } from './ui/Common';
 import { User, Notification } from '../types';
 import { api } from '../lib/api';
 import { useI18n } from '../contexts/I18nContext';
+import type { AppAuthStatus, AppAuthSyncError } from '../contexts/AppAuthContext';
 import StreakBadge from './StreakBadge';
 import MentorBlogPrompt from './MentorBlogPrompt';
+import AuthSyncNotice from './AuthSyncNotice';
 
 interface LayoutProps {
   user: User | null;
+  authStatus: AppAuthStatus;
+  authSyncError: AppAuthSyncError | null;
   onLogout: () => void;
+  onRetryAuthSync: () => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
+const Layout: React.FC<LayoutProps> = ({
+  user,
+  authStatus,
+  authSyncError,
+  onLogout,
+  onRetryAuthSync,
+}) => {
   const { t, locale } = useI18n();
   const dateLocale = locale === 'en' ? 'en-US' : 'vi-VN';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -41,6 +52,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
   const learningItems = [
     { name: t('nav.courses'), path: '/marketplace' },
     { name: t('nav.documents'), path: '/documents' },
+    { name: t('nav.hallOfFame'), path: '/hall-of-fame' },
   ];
 
   const communityItems = [
@@ -57,7 +69,9 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
   const leadingNavItems = navItems.slice(0, 2);
   const trailingNavItems = navItems.slice(2);
 
-  const isLearningActive = location.pathname.startsWith('/marketplace') || location.pathname.startsWith('/documents');
+  const isLearningActive = location.pathname.startsWith('/marketplace')
+    || location.pathname.startsWith('/documents')
+    || location.pathname.startsWith('/hall-of-fame');
   const isCommunityActive = location.pathname.startsWith('/community') || location.pathname.startsWith('/news');
 
   const desktopNavLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -574,6 +588,17 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
                     </div>
                   </div>
                 </div>
+              ) : authStatus === 'syncing' ? (
+                <AuthSyncNotice status="syncing" compact />
+              ) : authStatus === 'sync_error' ? (
+                <div className="flex items-center gap-2">
+                  <Button variant="secondary" size="sm" onClick={onRetryAuthSync}>
+                    Thử đồng bộ lại
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={onLogout}>
+                    Đăng xuất
+                  </Button>
+                </div>
               ) : (
                 <div className="flex items-center space-x-3">
                   <NavLink to="/login">
@@ -726,6 +751,25 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
                     {t('layout.userMenu.logout')}
                   </button>
                 </>
+              ) : authStatus === 'sync_error' ? (
+                <div className="pt-4 px-3">
+                  <AuthSyncNotice
+                    status="error"
+                    syncError={authSyncError}
+                    onRetry={() => {
+                      onRetryAuthSync();
+                      setIsMenuOpen(false);
+                    }}
+                    onSignOut={() => {
+                      onLogout();
+                      setIsMenuOpen(false);
+                    }}
+                  />
+                </div>
+              ) : authStatus === 'syncing' ? (
+                <div className="pt-4 px-3">
+                  <AuthSyncNotice status="syncing" />
+                </div>
               ) : (
                 <div className="pt-4 flex flex-col space-y-2 px-3">
                   <NavLink to="/login" onClick={() => setIsMenuOpen(false)}>
@@ -740,6 +784,20 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
           </div>
         )}
       </header>
+
+      {authStatus === 'sync_error' && !user && (
+        <div className="border-b border-amber-100 bg-white/95 backdrop-blur-md">
+          <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+            <AuthSyncNotice
+              status="error"
+              syncError={authSyncError}
+              onRetry={onRetryAuthSync}
+              onSignOut={onLogout}
+              compact
+            />
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="grow">

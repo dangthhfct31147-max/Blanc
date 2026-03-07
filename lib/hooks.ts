@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { api, CACHE_TTL } from './api';
-import { Contest, Course, Document, ScheduleEvent, WorkloadAnalysis, UserRegistration } from '../types';
+import { Contest, Course, Document, HallOfFameEntry, ScheduleEvent, WorkloadAnalysis, UserRegistration } from '../types';
 import { StreakData, checkin, getStreak, clearStreakCache, refreshStreak } from '../services/streakService';
 import { getVietnamDate, VIETNAM_OFFSET_MS } from '../services/streakTime';
 
@@ -361,6 +361,98 @@ export function useDocuments(options: UseDocumentsOptions = {}) {
   }, [autoFetch, fetchDocuments]);
 
   return { documents, meta, isLoading, error, refetch: fetchDocuments };
+}
+
+// ============ HALL OF FAME HOOK ============
+interface HallOfFameResponse {
+  items: HallOfFameEntry[];
+  total?: number;
+  page?: number;
+  limit?: number;
+  totalPages?: number;
+}
+
+interface UseHallOfFameOptions {
+  limit?: number;
+  page?: number;
+  field?: string;
+  year?: number;
+  resourceType?: 'project' | 'slides' | 'video';
+  search?: string;
+  featured?: boolean;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  autoFetch?: boolean;
+}
+
+export function useHallOfFame(options: UseHallOfFameOptions = {}) {
+  const {
+    limit = 12,
+    page = 1,
+    field,
+    year,
+    resourceType,
+    search,
+    featured,
+    sortBy,
+    sortOrder,
+    autoFetch = true,
+  } = options;
+
+  const [items, setItems] = useState<HallOfFameEntry[]>([]);
+  const [meta, setMeta] = useState<{ total: number; page: number; limit: number; totalPages: number }>({
+    total: 0,
+    page,
+    limit,
+    totalPages: 0,
+  });
+  const [isLoading, setIsLoading] = useState(autoFetch);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchHallOfFame = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const params = new URLSearchParams({
+        limit: limit.toString(),
+        page: page.toString(),
+      });
+
+      if (field) params.append('field', field);
+      if (typeof year === 'number' && Number.isFinite(year)) params.append('year', String(year));
+      if (resourceType) params.append('resourceType', resourceType);
+      if (search) params.append('search', search);
+      if (featured !== undefined) params.append('featured', String(featured));
+      if (sortBy) params.append('sortBy', sortBy);
+      if (sortOrder) params.append('sortOrder', sortOrder);
+
+      const data = await api.get<HallOfFameResponse>(`/hall-of-fame?${params}`, {
+        useCache: true,
+        cacheTTL: CACHE_TTL.HALL_OF_FAME,
+      });
+
+      setItems(data.items || []);
+      setMeta({
+        total: data.total ?? 0,
+        page: data.page ?? page,
+        limit: data.limit ?? limit,
+        totalPages: data.totalPages ?? 0,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load Hall of Fame');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [featured, field, limit, page, resourceType, search, sortBy, sortOrder, year]);
+
+  useEffect(() => {
+    if (autoFetch) {
+      fetchHallOfFame();
+    }
+  }, [autoFetch, fetchHallOfFame]);
+
+  return { items, meta, isLoading, error, refetch: fetchHallOfFame };
 }
 
 // ============ USER SCHEDULE HOOK ============

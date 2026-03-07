@@ -7,9 +7,11 @@ import { api } from '../lib/api';
 import { useDebounce } from '../lib/hooks';
 import { newsApi } from '../lib/newsApi';
 import { NewsArticle } from '../types';
+import { useI18n } from '../contexts/I18nContext';
 
 type NewsType = 'announcement' | 'minigame' | 'update' | 'event' | 'tip';
 type NewsGroup = 'all' | 'updates' | 'tips';
+type NewsAudience = 'all' | 'students' | 'mentors' | 'admins';
 
 const safeArray = <T,>(value: unknown, fallback: T[] = []): T[] =>
   Array.isArray(value) ? (value as T[]) : fallback;
@@ -20,6 +22,12 @@ const normalizeType = (value: unknown): NewsType => {
   return 'announcement';
 };
 
+const normalizeAudience = (value: unknown): NewsAudience => {
+  const v = String(value || '').trim().toLowerCase();
+  if (v === 'students' || v === 'mentors' || v === 'admins') return v as NewsAudience;
+  return 'all';
+};
+
 interface Suggestion {
   id: string;
   idea: string;
@@ -28,7 +36,7 @@ interface Suggestion {
   userEmail?: string | null;
 }
 
-const NEWS_TYPE_META: Record<NewsType, { label: string; color: string; Icon: React.ComponentType<{ className?: string }> }> = {
+const NEWS_TYPE_META_VI: Record<NewsType, { label: string; color: string; Icon: React.ComponentType<{ className?: string }> }> = {
   announcement: { label: 'Thông báo', color: 'bg-indigo-50 text-indigo-700 border-indigo-100', Icon: Megaphone },
   minigame: { label: 'Mini game', color: 'bg-amber-50 text-amber-700 border-amber-100', Icon: Trophy },
   update: { label: 'Cập nhật', color: 'bg-emerald-50 text-emerald-700 border-emerald-100', Icon: Sparkles },
@@ -36,14 +44,17 @@ const NEWS_TYPE_META: Record<NewsType, { label: string; color: string; Icon: Rea
   tip: { label: 'Mẹo học tập', color: 'bg-teal-50 text-teal-700 border-teal-100', Icon: Lightbulb },
 };
 
-const UPDATE_TYPES: NewsType[] = ['announcement', 'minigame', 'update', 'event'];
-const GROUP_OPTIONS: Array<{ value: NewsGroup; label: string }> = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'updates', label: 'Tin cập nhật' },
-  { value: 'tips', label: 'Mẹo học tập' },
-];
+const NEWS_TYPE_META_EN: Record<NewsType, { label: string; color: string; Icon: React.ComponentType<{ className?: string }> }> = {
+  announcement: { label: 'Announcement', color: 'bg-indigo-50 text-indigo-700 border-indigo-100', Icon: Megaphone },
+  minigame: { label: 'Mini game', color: 'bg-amber-50 text-amber-700 border-amber-100', Icon: Trophy },
+  update: { label: 'Update', color: 'bg-emerald-50 text-emerald-700 border-emerald-100', Icon: Sparkles },
+  event: { label: 'Event', color: 'bg-sky-50 text-sky-700 border-sky-100', Icon: Calendar },
+  tip: { label: 'Study tips', color: 'bg-teal-50 text-teal-700 border-teal-100', Icon: Lightbulb },
+};
 
-const INITIAL_NEWS = [
+const UPDATE_TYPES: NewsType[] = ['announcement', 'minigame', 'update', 'event'];
+
+const INITIAL_NEWS_VI = [
   {
     id: 'n1',
     title: 'Thông báo bảo trì 12/12',
@@ -76,10 +87,17 @@ const INITIAL_NEWS = [
     createdAt: '2025-12-08T09:00:00Z',
     author: 'Academic Ops',
     tags: ['Lộ trình', 'Mentor'],
+    release: {
+      version: 'Blanc v1.8.0',
+      headline: 'Đợt cập nhật tập trung vào trải nghiệm học tập và discovery cho học sinh mới.',
+      changes: ['Thêm thư viện Hall of Fame', 'Cải thiện mentor directory', 'Tối ưu luồng tìm tài liệu'],
+      audience: 'all',
+      notifySubscribers: false,
+    },
   },
   {
     id: 'n4',
-    title: 'Workshop “Pitch deck trong 10 phút”',
+    title: 'Workshop "Pitch deck trong 10 phút"',
     description: 'Buổi chia sẻ online cùng giám khảo các cuộc thi lớn. Mang theo deck của bạn để được góp ý trực tiếp.',
     type: 'event',
     createdAt: '2025-12-06T11:30:00Z',
@@ -108,9 +126,182 @@ const INITIAL_NEWS = [
   },
 ] as unknown as NewsArticle[];
 
+const INITIAL_NEWS_EN = [
+  {
+    id: 'n1',
+    title: 'Maintenance notice 12/12',
+    description: 'The system will undergo quick maintenance to optimize load speed and add a new security layer. Active sessions will not be affected.',
+    type: 'announcement',
+    createdAt: '2025-12-10T07:00:00Z',
+    author: 'Admin team',
+    tags: ['Maintenance', 'Performance'],
+    actionLabel: 'View details',
+    actionLink: '#',
+    highlight: true,
+  },
+  {
+    id: 'n2',
+    title: 'Mini game: Year-end badge hunt',
+    description: 'Complete 3 mini challenges in the Community to earn rare badges and course discount codes. Total prize value: 3,000,000₫.',
+    type: 'minigame',
+    createdAt: '2025-12-09T13:00:00Z',
+    author: 'Community team',
+    tags: ['Rewards', 'Gamification'],
+    actionLabel: 'Join now',
+    actionLink: '/community',
+    highlight: true,
+  },
+  {
+    id: 'n3',
+    title: 'New learning paths updated',
+    description: 'Added 4 Data/AI learning paths with live mentor guidance. Learners can schedule consultations this week.',
+    type: 'update',
+    createdAt: '2025-12-08T09:00:00Z',
+    author: 'Academic Ops',
+    tags: ['Learning path', 'Mentor'],
+    release: {
+      version: 'Blanc v1.8.0',
+      headline: 'This release focuses on student onboarding and faster discovery across the platform.',
+      changes: ['Added Hall of Fame library', 'Improved mentor directory', 'Streamlined document discovery'],
+      audience: 'all',
+      notifySubscribers: false,
+    },
+  },
+  {
+    id: 'n4',
+    title: 'Workshop "Pitch deck in 10 minutes"',
+    description: 'Online sharing session with judges from major competitions. Bring your deck for live feedback.',
+    type: 'event',
+    createdAt: '2025-12-06T11:30:00Z',
+    author: 'Content team',
+    tags: ['Workshop', 'Online'],
+    actionLabel: 'Reserve a spot',
+    actionLink: '#',
+  },
+  {
+    id: 'n5',
+    title: 'Study notes tip',
+    description: 'Write down 3 key points and 1 unanswered question after each session for quick review.',
+    type: 'tip',
+    createdAt: '2025-12-07T09:30:00Z',
+    author: 'Learning Coach',
+    tags: ['Notes', 'Review'],
+  },
+  {
+    id: 'n6',
+    title: 'Pomodoro technique for long sessions',
+    description: 'Use 25/5 study intervals to maintain focus and avoid fatigue.',
+    type: 'tip',
+    createdAt: '2025-12-05T18:00:00Z',
+    author: 'Study Lab',
+    tags: ['Time management', 'Focus'],
+  },
+] as unknown as NewsArticle[];
+
 const ITEMS_PER_PAGE = 8;
 
 const News: React.FC = () => {
+  const { locale } = useI18n();
+  const isEn = locale === 'en';
+
+  const NEWS_TYPE_META = isEn ? NEWS_TYPE_META_EN : NEWS_TYPE_META_VI;
+  const INITIAL_NEWS = isEn ? INITIAL_NEWS_EN : INITIAL_NEWS_VI;
+  const GROUP_OPTIONS: Array<{ value: NewsGroup; label: string }> = [
+    { value: 'all', label: isEn ? 'All' : 'Tất cả' },
+    { value: 'updates', label: isEn ? 'Updates' : 'Tin cập nhật' },
+    { value: 'tips', label: isEn ? 'Study tips' : 'Mẹo học tập' },
+  ];
+
+  const copy = useMemo(() => isEn ? {
+    badge: 'Blanc News',
+    heroTitle: 'News & important announcements',
+    heroDescription: 'Where admin posts system announcements, mini games, and featured activities. Users can also suggest news topics to keep the community fresh.',
+    suggestBtn: 'Suggest news',
+    overview: 'Overview',
+    runningNews: 'Active news',
+    displayedCount: 'Displayed news',
+    newSuggestions: 'New suggestions',
+    highlighted: 'Featured',
+    pinnedTitle: 'Pinned for the entire community',
+    learnMore: 'Learn more',
+    latestLabel: 'Latest feed',
+    adminNews: 'News from admin',
+    availableCount: 'available news',
+    filterHint: 'Quickly select a news group, filter by type, or search by keyword to find the right article.',
+    searchPlaceholder: 'Search news or tips...',
+    allFilter: 'All',
+    loading: 'Loading news...',
+    noResultsFiltered: 'No matching news found.',
+    noResultsEmpty: 'No news yet.',
+    viewMore: 'View more',
+    detailTitle: 'News content',
+    close: 'Close',
+    loadingContent: 'Loading content...',
+    noContent: 'No content yet.',
+    feedbackTitle: 'News feedback',
+    feedbackDescription: 'Share your ideas for news, mini games, or topics you want to see. Admin will review and respond soon.',
+    feedbackLabel: 'Idea / suggestion',
+    feedbackPlaceholder: 'e.g., Organize a Data mini game, update exam schedules...',
+    contactLabel: 'Contact info (optional)',
+    contactPlaceholder: 'Email, Discord, Facebook...',
+    feedbackNote: 'Your feedback will be recorded immediately.',
+    cancel: 'Cancel',
+    sending: 'Sending...',
+    sendFeedback: 'Send feedback',
+    recentFeedback: 'Recent feedback',
+    loadingFeedback: 'Loading feedback...',
+    noFeedbackYet: 'No feedback yet. Be the first!',
+    toastLoadFailed: 'Failed to load recent feedback.',
+    toastContentFailed: 'Failed to load news content.',
+    toastEmptyIdea: 'Please enter your idea first!',
+    toastFeedbackSuccess: 'Thank you! Your feedback has been recorded.',
+    toastFeedbackFailed: 'Failed to send feedback, please try again.',
+  } : {
+    badge: 'Bản tin Blanc',
+    heroTitle: 'Bản tin & thông báo quan trọng',
+    heroDescription: 'Nơi admin đăng thông báo hệ thống, mini game và các hoạt động nổi bật. Người dùng có thể góp ý thêm tin tức để cộng đồng luôn tươi mới.',
+    suggestBtn: 'Góp ý thêm tin tức',
+    overview: 'Tổng quan',
+    runningNews: 'Bản tin đang chạy',
+    displayedCount: 'Tin đang hiển thị',
+    newSuggestions: 'Góp ý mới',
+    highlighted: 'Nổi bật',
+    pinnedTitle: 'Tin được ghim cho toàn bộ cộng đồng',
+    learnMore: 'Tìm hiểu thêm',
+    latestLabel: 'Dòng tin mới nhất',
+    adminNews: 'Tin tức từ admin',
+    availableCount: 'bản tin khả dụng',
+    filterHint: 'Chọn nhanh nhóm tin, lọc chi tiết theo loại hoặc nhập từ khoá để tìm bài phù hợp.',
+    searchPlaceholder: 'Tìm bản tin hoặc mẹo...',
+    allFilter: 'Tất cả',
+    loading: 'Đang tải bản tin...',
+    noResultsFiltered: 'Không tìm thấy bản tin phù hợp.',
+    noResultsEmpty: 'Chưa có bản tin nào.',
+    viewMore: 'Xem thêm',
+    detailTitle: 'Nội dung bản tin',
+    close: 'Đóng',
+    loadingContent: 'Đang tải nội dung...',
+    noContent: 'Chưa có nội dung.',
+    feedbackTitle: 'Góp ý bản tin',
+    feedbackDescription: 'Gửi ý tưởng tin tức, mini game hoặc chủ đề bạn muốn xuất hiện. Admin sẽ cân nhắc và phản hồi sớm.',
+    feedbackLabel: 'Ý tưởng / góp ý',
+    feedbackPlaceholder: 'Ví dụ: Tổ chức mini game theo chủ đề Data, cập nhật lịch thi học kỳ...',
+    contactLabel: 'Thông tin liên hệ (tuỳ chọn)',
+    contactPlaceholder: 'Email, Discord, Facebook...',
+    feedbackNote: 'Góp ý sẽ được ghi nhận ngay lập tức.',
+    cancel: 'Huỷ',
+    sending: 'Đang gửi...',
+    sendFeedback: 'Gửi góp ý',
+    recentFeedback: 'Góp ý gần đây',
+    loadingFeedback: 'Đang tải góp ý...',
+    noFeedbackYet: 'Chưa có góp ý nào. Hãy là người đầu tiên!',
+    toastLoadFailed: 'Không tải được góp ý gần đây.',
+    toastContentFailed: 'Không tải được nội dung bản tin.',
+    toastEmptyIdea: 'Bạn hãy nhập góp ý trước nhé!',
+    toastFeedbackSuccess: 'Cảm ơn bạn! Chúng mình đã ghi nhận góp ý.',
+    toastFeedbackFailed: 'Gửi góp ý thất bại, thử lại nhé.',
+  }, [isEn]);
+
   const [newsItems, setNewsItems] = useState<NewsArticle[]>([]);
   const [filter, setFilter] = useState<'all' | NewsType>('all');
   const [group, setGroup] = useState<NewsGroup>('all');
@@ -127,6 +318,10 @@ const News: React.FC = () => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [detailItem, setDetailItem] = useState<NewsArticle | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+  const [requestedArticleSlug, setRequestedArticleSlug] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    return new URLSearchParams(window.location.search).get('article') || '';
+  });
 
   const getNewsType = (item: NewsArticle): NewsType =>
     normalizeType(item.type || (item as any).type);
@@ -178,6 +373,19 @@ const News: React.FC = () => {
     const raw = String(item.actionLink || (item as any).actionLink || '').trim();
     if (!raw || raw.startsWith('#')) return '';
     return raw;
+  };
+
+  const getNewsRelease = (item: NewsArticle) => {
+    const release = (item as any).release;
+    if (!release || typeof release !== 'object') return null;
+
+    return {
+      version: String(release.version || '').trim(),
+      headline: String(release.headline || '').trim(),
+      changes: safeArray<string>(release.changes).map((entry) => String(entry || '').trim()).filter(Boolean),
+      audience: normalizeAudience(release.audience),
+      notifySubscribers: !!release.notifySubscribers,
+    };
   };
 
   const isHighlighted = (item: NewsArticle) =>
@@ -235,10 +443,10 @@ const News: React.FC = () => {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffMinutes < 1) return 'Vừa xong';
-    if (diffMinutes < 60) return `${diffMinutes} phút trước`;
-    if (diffHours < 24) return `${diffHours} giờ trước`;
-    if (diffDays < 7) return `${diffDays} ngày trước`;
+    if (diffMinutes < 1) return isEn ? 'Just now' : 'Vừa xong';
+    if (diffMinutes < 60) return isEn ? `${diffMinutes} min ago` : `${diffMinutes} phút trước`;
+    if (diffHours < 24) return isEn ? `${diffHours}h ago` : `${diffHours} giờ trước`;
+    if (diffDays < 7) return isEn ? `${diffDays}d ago` : `${diffDays} ngày trước`;
     return formatDate(dateStr);
   };
 
@@ -268,7 +476,7 @@ const News: React.FC = () => {
       }
     } catch (err) {
       console.error('Failed to load suggestions', err);
-      toast.error('Không tải được góp ý gần đây.');
+      toast.error(copy.toastLoadFailed);
     } finally {
       setIsLoadingSuggestions(false);
     }
@@ -308,12 +516,19 @@ const News: React.FC = () => {
     }
   }, [currentPage, totalPages]);
 
+  const clearRequestedArticleParam = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete('article');
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+  }, []);
+
   const closeDetail = () => {
     setIsDetailOpen(false);
     setDetailItem(null);
   };
 
-  const openDetail = async (item: NewsArticle) => {
+  const openDetail = useCallback(async (item: NewsArticle) => {
     setIsDetailOpen(true);
     setDetailItem(item);
 
@@ -325,17 +540,56 @@ const News: React.FC = () => {
       const data = await newsApi.getPublic(idOrSlug);
       setDetailItem(data.item);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Không tải được nội dung bản tin.';
+      const message = err instanceof Error ? err.message : copy.toastContentFailed;
       toast.error(message);
     } finally {
       setIsLoadingDetail(false);
     }
-  };
+  }, [copy.toastContentFailed]);
+
+  useEffect(() => {
+    if (!requestedArticleSlug || isLoadingNews) return;
+
+    let cancelled = false;
+
+    const run = async () => {
+      try {
+        const matched = newsItems.find((item) => (item.slug || item.id) === requestedArticleSlug);
+        if (matched) {
+          await openDetail(matched);
+        } else {
+          setIsDetailOpen(true);
+          setIsLoadingDetail(true);
+          const data = await newsApi.getPublic(requestedArticleSlug);
+          if (!cancelled) {
+            setDetailItem(data.item);
+          }
+        }
+      } catch (err) {
+        if (!cancelled) {
+          const message = err instanceof Error ? err.message : copy.toastContentFailed;
+          toast.error(message);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingDetail(false);
+          setRequestedArticleSlug('');
+          clearRequestedArticleParam();
+        }
+      }
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [clearRequestedArticleParam, copy.toastContentFailed, isLoadingNews, newsItems, openDetail, requestedArticleSlug]);
 
   const handleFeedbackSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!feedback.idea.trim()) {
-      toast.error('Bạn hãy nhập góp ý trước nhé!');
+      toast.error(copy.toastEmptyIdea);
       return;
     }
 
@@ -347,11 +601,11 @@ const News: React.FC = () => {
       };
       const data = await api.post<{ suggestion: Suggestion }>('/feedback/news', payload);
       setSuggestions(prev => [data.suggestion, ...prev].slice(0, 10));
-      toast.success('Cảm ơn bạn! Chúng mình đã ghi nhận góp ý.');
+      toast.success(copy.toastFeedbackSuccess);
       setFeedback({ idea: '', contact: '' });
       setShowFeedbackForm(false);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Gửi góp ý thất bại, thử lại nhé.';
+      const message = err instanceof Error ? err.message : copy.toastFeedbackFailed;
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -369,18 +623,18 @@ const News: React.FC = () => {
           <div className="space-y-4 max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 text-primary-700 border border-primary-100 shadow-sm">
               <Sparkles className="w-4 h-4" />
-              <span className="text-sm font-semibold">Bản tin Blanc</span>
+              <span className="text-sm font-semibold">{copy.badge}</span>
             </div>
             <div className="space-y-2">
-              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">Bản tin & thông báo quan trọng</h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">{copy.heroTitle}</h1>
               <p className="text-slate-600 text-base md:text-lg">
-                Nơi admin đăng thông báo hệ thống, mini game và các hoạt động nổi bật. Người dùng có thể góp ý thêm tin tức để cộng đồng luôn tươi mới.
+                {copy.heroDescription}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Button variant="secondary" className="gap-2" onClick={() => setShowFeedbackForm(true)}>
                 <MessageCircle className="w-4 h-4" />
-                Góp ý thêm tin tức
+                {copy.suggestBtn}
               </Button>
             </div>
           </div>
@@ -389,18 +643,18 @@ const News: React.FC = () => {
               <div className="flex items-center gap-3 mb-3">
                 <Megaphone className="w-5 h-5 text-primary-600" />
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-primary-600 font-semibold">Tổng quan</p>
-                  <p className="text-sm text-slate-500">Bản tin đang chạy</p>
+                  <p className="text-xs uppercase tracking-wide text-primary-600 font-semibold">{copy.overview}</p>
+                  <p className="text-sm text-slate-500">{copy.runningNews}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div className="rounded-xl bg-primary-50 text-primary-700 px-3 py-2">
                   <p className="text-2xl font-bold">{newsItems.length}</p>
-                  <p className="text-xs font-medium">Tin đang hiển thị</p>
+                  <p className="text-xs font-medium">{copy.displayedCount}</p>
                 </div>
                 <div className="rounded-xl bg-amber-50 text-amber-700 px-3 py-2">
                   <p className="text-2xl font-bold">{suggestionCount}</p>
-                  <p className="text-xs font-medium">Góp ý mới</p>
+                  <p className="text-xs font-medium">{copy.newSuggestions}</p>
                 </div>
               </div>
             </Card>
@@ -412,8 +666,8 @@ const News: React.FC = () => {
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-primary-600 font-semibold">Nổi bật</p>
-              <h2 className="text-xl font-bold text-slate-900">Tin được ghim cho toàn bộ cộng đồng</h2>
+              <p className="text-xs uppercase tracking-[0.2em] text-primary-600 font-semibold">{copy.highlighted}</p>
+              <h2 className="text-xl font-bold text-slate-900">{copy.pinnedTitle}</h2>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -421,6 +675,7 @@ const News: React.FC = () => {
               const meta = NEWS_TYPE_META[getNewsType(item)] || NEWS_TYPE_META.announcement;
               const tags = getNewsTags(item);
               const actionLink = getNewsActionLink(item);
+              const release = getNewsRelease(item);
               return (
                 <Card
                   key={item.id || item.slug}
@@ -439,10 +694,27 @@ const News: React.FC = () => {
                         <meta.Icon className="w-4 h-4" />
                         {meta.label}
                       </div>
+                      {release?.version && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full border border-emerald-200 bg-emerald-100 text-emerald-800 text-xs font-bold">
+                          {release.version}
+                        </span>
+                      )}
                       <span className="text-xs text-slate-500">{timeAgo(getNewsDate(item))}</span>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900">{item.title}</h3>
                     <p className="text-slate-600 text-sm leading-relaxed">{getNewsSummary(item)}</p>
+                    {release?.changes.length ? (
+                      <div className="rounded-2xl border border-emerald-100 bg-white/90 px-4 py-3">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700 mb-2">
+                          {isEn ? "What's new" : 'Điểm mới'}
+                        </p>
+                        <ul className="space-y-1 text-sm text-slate-700">
+                          {release.changes.slice(0, 3).map((change) => (
+                            <li key={change}>• {change}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
                     <div className="flex flex-wrap gap-2">
                       {tags.map(tag => (
                         <span key={tag} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-slate-200 text-xs text-slate-600">
@@ -457,7 +729,7 @@ const News: React.FC = () => {
                         onClick={(e) => e.stopPropagation()}
                         className="inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-800"
                       >
-                        {item.actionLabel || 'Tìm hiểu thêm'} <ArrowRight className="w-4 h-4" />
+                        {item.actionLabel || copy.learnMore} <ArrowRight className="w-4 h-4" />
                       </a>
                     )}
                   </div>
@@ -473,15 +745,15 @@ const News: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="space-y-1">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 font-semibold">Dòng tin mới nhất</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 font-semibold">{copy.latestLabel}</p>
                 <div className="flex items-center gap-3 flex-wrap">
-                  <h2 className="text-xl font-bold text-slate-900">Tin tức từ admin</h2>
+                  <h2 className="text-xl font-bold text-slate-900">{copy.adminNews}</h2>
                   <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 border border-slate-200">
                     <Sparkles className="w-4 h-4 text-primary-600" />
-                    {filteredNews.length} bản tin khả dụng
+                    {filteredNews.length} {copy.availableCount}
                   </span>
                 </div>
-                <p className="text-sm text-slate-600">Chọn nhanh nhóm tin, lọc chi tiết theo loại hoặc nhập từ khoá để tìm bài phù hợp.</p>
+                <p className="text-sm text-slate-600">{copy.filterHint}</p>
               </div>
 
               <div className="flex flex-col gap-2 w-full md:w-auto">
@@ -490,7 +762,7 @@ const News: React.FC = () => {
                   <Input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Tìm bản tin hoặc mẹo..."
+                    placeholder={copy.searchPlaceholder}
                     className="pl-9"
                   />
                 </div>
@@ -517,22 +789,22 @@ const News: React.FC = () => {
 
               {group !== 'tips' && (
                 <div className="flex flex-wrap items-center gap-2 md:gap-3 lg:col-span-2 lg:justify-end">
-                {(['all', ...UPDATE_TYPES] as Array<'all' | NewsType>).map(type => {
-                  const meta = type === 'all' ? { label: 'Tất cả', color: 'bg-slate-100 text-slate-700 border-slate-200' } : NEWS_TYPE_META[type];
-                  const isActive = filter === type;
-                  return (
-                    <button
-                      key={type}
-                      onClick={() => setFilter(type)}
-                      className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-semibold border transition ${isActive
-                        ? 'bg-primary-50 text-primary-700 border-primary-200 shadow-[0_2px_10px_-4px_rgba(59,130,246,0.6)]'
-                        : `${meta.color} hover:border-primary-200`
-                        }`}
-                    >
-                      {meta.label}
-                    </button>
-                  );
-                })}
+                  {(['all', ...UPDATE_TYPES] as Array<'all' | NewsType>).map(type => {
+                    const meta = type === 'all' ? { label: copy.allFilter, color: 'bg-slate-100 text-slate-700 border-slate-200' } : NEWS_TYPE_META[type];
+                    const isActive = filter === type;
+                    return (
+                      <button
+                        key={type}
+                        onClick={() => setFilter(type)}
+                        className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-semibold border transition ${isActive
+                          ? 'bg-primary-50 text-primary-700 border-primary-200 shadow-[0_2px_10px_-4px_rgba(59,130,246,0.6)]'
+                          : `${meta.color} hover:border-primary-200`
+                          }`}
+                      >
+                        {meta.label}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -543,18 +815,19 @@ const News: React.FC = () => {
           {isLoadingNews && (
             <div className="col-span-full flex items-center gap-2 text-sm text-slate-500">
               <Loader2 className="w-4 h-4 animate-spin" />
-              Đang tải bản tin...
+              {copy.loading}
             </div>
           )}
           {!isLoadingNews && filteredNews.length === 0 && (
             <p className="col-span-full text-sm text-slate-500">
-              {hasActiveFilters ? 'Không tìm thấy bản tin phù hợp.' : 'Chưa có bản tin nào.'}
+              {hasActiveFilters ? copy.noResultsFiltered : copy.noResultsEmpty}
             </p>
           )}
           {paginatedNews.map(item => {
             const meta = NEWS_TYPE_META[getNewsType(item)] || NEWS_TYPE_META.announcement;
             const tags = getNewsTags(item);
             const actionLink = getNewsActionLink(item);
+            const release = getNewsRelease(item);
             return (
               <Card
                 key={item.id || item.slug}
@@ -574,8 +847,20 @@ const News: React.FC = () => {
                   <span className="text-xs text-slate-500">{timeAgo(getNewsDate(item))}</span>
                 </div>
                 <div className="mt-3 space-y-2 flex-1">
+                  {release?.version && (
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full border border-emerald-200 bg-emerald-50 text-[11px] font-bold text-emerald-700">
+                      {release.version}
+                    </span>
+                  )}
                   <h3 className="text-lg font-semibold text-slate-900 leading-snug">{item.title}</h3>
                   <p className="text-sm text-slate-600 leading-relaxed">{getNewsSummary(item)}</p>
+                  {release?.changes.length ? (
+                    <ul className="space-y-1 text-xs text-slate-600 pt-1">
+                      {release.changes.slice(0, 2).map((change) => (
+                        <li key={change}>• {change}</li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {tags.map(tag => (
@@ -592,7 +877,7 @@ const News: React.FC = () => {
                       onClick={(e) => e.stopPropagation()}
                       className="inline-flex items-center gap-1 text-primary-700 font-semibold text-sm"
                     >
-                      {item.actionLabel || 'Xem thêm'}
+                      {item.actionLabel || copy.viewMore}
                       <ArrowRight className="w-3 h-3" />
                     </a>
                   )}
@@ -615,13 +900,13 @@ const News: React.FC = () => {
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2 text-slate-900">
                 <Megaphone className="w-5 h-5 text-primary-600" />
-                <span className="font-semibold">Nội dung bản tin</span>
+                <span className="font-semibold">{copy.detailTitle}</span>
               </div>
               <button
                 type="button"
                 onClick={closeDetail}
                 className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg"
-                aria-label="Đóng"
+                aria-label={copy.close}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -631,12 +916,48 @@ const News: React.FC = () => {
               {isLoadingDetail && (
                 <div className="flex items-center gap-2 text-sm text-slate-500">
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Đang tải nội dung...
+                  {copy.loadingContent}
                 </div>
               )}
 
               {detailItem && (
                 <>
+                  {(() => {
+                    const release = getNewsRelease(detailItem);
+                    return release ? (
+                      <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-5 space-y-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {release.version && (
+                            <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-bold">
+                              {release.version}
+                            </span>
+                          )}
+                          <span className="inline-flex items-center px-3 py-1 rounded-full border border-emerald-200 bg-white text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                            {isEn ? 'Release note' : 'Ghi chú phát hành'}
+                          </span>
+                        </div>
+                        {release.headline && (
+                          <p className="text-sm text-slate-700">{release.headline}</p>
+                        )}
+                        {release.changes.length > 0 && (
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 mb-2">
+                              {isEn ? "What's new" : 'Điểm mới'}
+                            </p>
+                            <ul className="space-y-2 text-sm text-slate-700">
+                              {release.changes.map((change) => (
+                                <li key={change} className="flex gap-2">
+                                  <span className="text-emerald-600">•</span>
+                                  <span>{change}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    ) : null;
+                  })()}
+
                   {detailItem.coverImage && (
                     <img
                       src={detailItem.coverImage}
@@ -666,7 +987,7 @@ const News: React.FC = () => {
                       {detailItem.body}
                     </div>
                   ) : (
-                    <p className="text-sm text-slate-500">Chưa có nội dung.</p>
+                    <p className="text-sm text-slate-500">{copy.noContent}</p>
                   )}
 
                   {getNewsTags(detailItem).length > 0 && (
@@ -690,7 +1011,7 @@ const News: React.FC = () => {
                       rel={getNewsActionLink(detailItem).startsWith('http') ? 'noreferrer' : undefined}
                       className="inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-800"
                     >
-                      {getNewsActionLabel(detailItem) || 'Xem thêm'} <ArrowRight className="w-4 h-4" />
+                      {getNewsActionLabel(detailItem) || copy.viewMore} <ArrowRight className="w-4 h-4" />
                     </a>
                   )}
                 </>
@@ -711,70 +1032,70 @@ const News: React.FC = () => {
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2 text-primary-700 font-semibold">
                 <Lightbulb className="w-5 h-5" />
-                <span>Góp ý bản tin</span>
+                <span>{copy.feedbackTitle}</span>
               </div>
               <button
                 type="button"
                 onClick={() => setShowFeedbackForm(false)}
                 className="text-slate-400 hover:text-slate-600"
-                aria-label="Đóng"
+                aria-label={copy.close}
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             <p className="text-sm text-slate-600">
-              Gửi ý tưởng tin tức, mini game hoặc chủ đề bạn muốn xuất hiện. Admin sẽ cân nhắc và phản hồi sớm.
+              {copy.feedbackDescription}
             </p>
             <form className="space-y-4" onSubmit={handleFeedbackSubmit}>
               <div>
-                <label className="text-sm font-medium text-slate-700 block mb-2">Ý tưởng / góp ý</label>
+                <label className="text-sm font-medium text-slate-700 block mb-2">{copy.feedbackLabel}</label>
                 <textarea
                   value={feedback.idea}
                   onChange={e => setFeedback(prev => ({ ...prev, idea: e.target.value }))}
                   rows={4}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition"
-                  placeholder="Ví dụ: Tổ chức mini game theo chủ đề Data, cập nhật lịch thi học kỳ..."
+                  placeholder={copy.feedbackPlaceholder}
                   required
                   disabled={isSubmitting}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700 block mb-2">Thông tin liên hệ (tuỳ chọn)</label>
+                <label className="text-sm font-medium text-slate-700 block mb-2">{copy.contactLabel}</label>
                 <input
                   type="text"
                   value={feedback.contact}
                   onChange={e => setFeedback(prev => ({ ...prev, contact: e.target.value }))}
                   className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary-500 transition"
-                  placeholder="Email, Discord, Facebook..."
+                  placeholder={copy.contactPlaceholder}
                   disabled={isSubmitting}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <p className="text-xs text-slate-500 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  Góp ý sẽ được ghi nhận ngay lập tức.
+                  {copy.feedbackNote}
                 </p>
                 <div className="flex items-center gap-2">
                   <Button variant="secondary" type="button" onClick={() => setShowFeedbackForm(false)} disabled={isSubmitting}>
-                    Huỷ
+                    {copy.cancel}
                   </Button>
                   <Button type="submit" className="gap-2" disabled={isSubmitting}>
                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                    {isSubmitting ? 'Đang gửi...' : 'Gửi góp ý'}
+                    {isSubmitting ? copy.sending : copy.sendFeedback}
                   </Button>
                 </div>
               </div>
               <div className="pt-1 space-y-2">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 font-semibold">Góp ý gần đây</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 font-semibold">{copy.recentFeedback}</p>
                 <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
                   {isLoadingSuggestions && (
                     <div className="flex items-center gap-2 text-sm text-slate-500">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Đang tải góp ý...
+                      {copy.loadingFeedback}
                     </div>
                   )}
                   {!isLoadingSuggestions && suggestions.length === 0 && (
-                    <p className="text-sm text-slate-500">Chưa có góp ý nào. Hãy là người đầu tiên!</p>
+                    <p className="text-sm text-slate-500">{copy.noFeedbackYet}</p>
                   )}
                   {!isLoadingSuggestions &&
                     suggestions.slice(0, 5).map((suggestion) => (

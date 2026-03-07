@@ -26,6 +26,7 @@ import TeamMembersManager from '../components/TeamMembersManager';
 import { api } from '../lib/api';
 import { TeamPost } from '../types';
 import { useI18n } from '../contexts/I18nContext';
+import { useAppAuth } from '../contexts/AppAuthContext';
 
 // Types
 interface MyTeamPostsStats {
@@ -58,6 +59,7 @@ const STATUS_COLORS: Record<string, string> = {
 const MyTeamPosts: React.FC = () => {
   const navigate = useNavigate();
   const { t, locale } = useI18n();
+  const { user } = useAppAuth();
   const dateLocale = locale === 'en' ? 'en-US' : 'vi-VN';
 
   const getStatusLabel = (status: StatusFilter) => {
@@ -74,7 +76,7 @@ const MyTeamPosts: React.FC = () => {
   };
 
   // Check authentication
-  const isLoggedIn = !!localStorage.getItem('user');
+  const isLoggedIn = Boolean(user);
 
   // State
   const [posts, setPosts] = useState<(TeamPost & { pendingRequests: number; isDeleted: boolean })[]>([]);

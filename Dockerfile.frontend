@@ -3,14 +3,6 @@ FROM public.ecr.aws/docker/library/node:20-alpine AS builder
 
 WORKDIR /app
 
-# Build arguments for Vite environment variables
-ARG VITE_API_URL
-ARG VITE_GEMINI_API_KEY
-
-# Set environment variables for build
-ENV VITE_API_URL=$VITE_API_URL
-ENV VITE_GEMINI_API_KEY=$VITE_GEMINI_API_KEY
-
 # Copy package files
 COPY package*.json ./
 
@@ -35,6 +27,10 @@ ENV PORT=80
 
 # Use nginx template so the official nginx entrypoint can envsubst ${PORT}
 COPY nginx.frontend.conf /etc/nginx/templates/default.conf.template
+
+# Generate runtime frontend config on container startup (before nginx starts)
+COPY scripts/frontend-runtime-config.sh /docker-entrypoint.d/40-runtime-config.sh
+RUN chmod +x /docker-entrypoint.d/40-runtime-config.sh
 
 # Copy built assets
 COPY --from=builder /app/dist /usr/share/nginx/html

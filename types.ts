@@ -166,6 +166,54 @@ export interface Document {
   updatedAt?: string;
 }
 
+export type HallOfFameResourceType = 'project' | 'slides' | 'video';
+
+export interface HallOfFameResource {
+  id: string;
+  type: HallOfFameResourceType;
+  title: string;
+  url: string;
+  format?: string;
+  description?: string;
+}
+
+export interface HallOfFameStructureSegment {
+  id: string;
+  order: number;
+  label: string;
+  title: string;
+  description: string;
+  objective?: string;
+}
+
+export interface HallOfFameEntry {
+  id: string;
+  slug: string;
+  title: string;
+  teamName: string;
+  contestName: string;
+  year: number;
+  award: string;
+  field: string;
+  summary: string;
+  problem: string;
+  solution: string;
+  impact: string;
+  whyItWon: string;
+  thumbnail?: string;
+  featured: boolean;
+  isPublic: boolean;
+  tags: string[];
+  hasProject: boolean;
+  hasSlides: boolean;
+  hasVideo: boolean;
+  resources: HallOfFameResource[];
+  structure: HallOfFameStructureSegment[];
+  takeaways: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Team {
   id: string;
   name: string;
@@ -453,6 +501,24 @@ export interface NewsAuthor {
   email?: string | null;
 }
 
+export type NewsAudience = 'all' | 'students' | 'mentors' | 'admins';
+
+export interface NewsReleaseNotificationStats {
+  total: number;
+  sent: number;
+  failed: number;
+  notifiedAt?: string | null;
+}
+
+export interface NewsRelease {
+  version: string;
+  headline?: string;
+  changes: string[];
+  audience: NewsAudience;
+  notifySubscribers: boolean;
+  lastNotification?: NewsReleaseNotificationStats | null;
+}
+
 export interface NewsArticle {
   id: string;
   slug: string;
@@ -471,6 +537,7 @@ export interface NewsArticle {
   createdAt?: string | null;
   updatedAt?: string | null;
   author?: NewsAuthor | null;
+  release?: NewsRelease | null;
 }
 
 export interface RecruitmentRole {

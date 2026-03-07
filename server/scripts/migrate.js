@@ -2,6 +2,7 @@ import 'dotenv/config';
 import bcrypt from 'bcryptjs';
 import crypto from 'node:crypto';
 import { connectToDatabase, disconnectFromDatabase, getCollection } from '../lib/db.js';
+import { seedHallOfFame } from './hall-of-fame-data.js';
 
 const contests = [
   {
@@ -765,6 +766,7 @@ const newsSamples = [
   },
 ];
 
+
 async function seedContests() {
   const collection = getCollection('contests');
   await collection.createIndex({ code: 1 }, { unique: true });
@@ -992,6 +994,7 @@ async function main() {
     await seedContests();
     await seedCourses();
     await seedNews();
+    await seedHallOfFame();
     await seedTeamPosts();
     await setupLoginAttemptsCollection();
     // eslint-disable-next-line no-console

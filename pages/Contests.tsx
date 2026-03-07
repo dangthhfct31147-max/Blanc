@@ -11,6 +11,7 @@ import Reviews from '../components/Reviews';
 import toast from 'react-hot-toast';
 import { CONTEST_CATEGORIES, ContestCategoryValue } from '../constants/contestCategories';
 import { useI18n } from '../contexts/I18nContext';
+import { useAppAuth } from '../contexts/AppAuthContext';
 
 const CATEGORY_LABELS: Record<string, string> = {
   'it': 'IT & Tech',
@@ -523,6 +524,7 @@ type ContestDetailTab = 'overview' | 'prizes' | 'rules' | 'schedule' | 'reviews'
 
 const ContestDetail: React.FC = () => {
   const { t, locale } = useI18n();
+  const { authStatus, syncError, user } = useAppAuth();
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<ContestDetailTab>('overview');
@@ -653,10 +655,13 @@ END:VCALENDAR`;
     if (!id || !contest) return;
 
     // Check if user is logged in
-    const userStr = localStorage.getItem('user');
-    if (!userStr) {
+    if (authStatus === 'signed_out') {
       toast.error(t('contests.toast.loginToRegister'));
-      navigate('/auth?redirect=' + encodeURIComponent(window.location.pathname));
+      navigate('/login?redirect=' + encodeURIComponent(window.location.pathname));
+      return;
+    }
+    if (authStatus !== 'authenticated' || !user) {
+      toast.error(syncError?.message || t('contests.toast.registerFailed'));
       return;
     }
 

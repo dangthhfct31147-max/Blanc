@@ -9,6 +9,8 @@ import {
 import { Button, Card, Badge } from './ui/Common';
 import { api } from '../lib/api';
 import { ROLE_COLORS } from '../constants/profileOptions';
+import RadarChart from './ui/RadarChart';
+import { useAppAuth } from '../contexts/AppAuthContext';
 
 // ============================================================================
 // TYPES
@@ -25,6 +27,13 @@ interface TeammateProfile {
     availability: string;
     collaborationStyle: string;
     languages: string[];
+    radarSkills?: {
+        code: number;
+        design: number;
+        presentation: number;
+        writing: number;
+        management: number;
+    };
     openToMentor: boolean;
 }
 
@@ -36,6 +45,7 @@ interface TeammateRecommendation {
     scoreBreakdown: {
         roleDiversity: number;
         skillComplementarity: number;
+        radarComplementarity?: number;
         availability: number;
         experienceLevel: number;
         locationTimezone: number;
@@ -443,12 +453,13 @@ const TeammateDetailModal: React.FC<{
                         </h4>
                         <div className="grid grid-cols-2 gap-2">
                             {[
-                                { label: 'Vai trò đa dạng', value: teammate.scoreBreakdown.roleDiversity, max: 25 },
-                                { label: 'Kỹ năng bổ sung', value: teammate.scoreBreakdown.skillComplementarity, max: 20 },
+                                { label: 'Vai trò đa dạng', value: teammate.scoreBreakdown.roleDiversity, max: 20 },
+                                { label: 'Kỹ năng bổ sung', value: teammate.scoreBreakdown.skillComplementarity, max: 15 },
+                                { label: 'Kỹ năng Radar', value: teammate.scoreBreakdown.radarComplementarity || 0, max: 15 },
                                 { label: 'Lịch phù hợp', value: teammate.scoreBreakdown.availability, max: 15 },
                                 { label: 'Kinh nghiệm', value: teammate.scoreBreakdown.experienceLevel, max: 10 },
                                 { label: 'Vị trí/Múi giờ', value: teammate.scoreBreakdown.locationTimezone, max: 10 },
-                                { label: 'Phong cách', value: teammate.scoreBreakdown.collaborationStyle, max: 10 },
+                                { label: 'Phong cách', value: teammate.scoreBreakdown.collaborationStyle, max: 15 },
                             ].map(item => (
                                 <div key={item.label} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg">
                                     <span className="text-xs text-slate-600">{item.label}</span>
@@ -475,6 +486,19 @@ const TeammateDetailModal: React.FC<{
                                     <p className="text-blue-600 font-bold">{Math.round(teammate.matchDetails.candidateToUser)}%</p>
                                     <p className="text-xs text-blue-500">Họ → Bạn</p>
                                 </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Radar Chart */}
+                    {teammate.profile.radarSkills && (
+                        <div className="mb-6">
+                            <h4 className="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                                <Target className="w-4 h-4 text-primary-500" />
+                                Biểu đồ Kỹ năng
+                            </h4>
+                            <div className="bg-slate-50 border border-slate-100 rounded-xl p-2">
+                                <RadarChart data={teammate.profile.radarSkills} size="sm" color="#4f46e5" />
                             </div>
                         </div>
                     )}
@@ -584,6 +608,7 @@ const TeammateRecommendations: React.FC<TeammateRecommendationsProps> = ({
     onInvite
 }) => {
     const navigate = useNavigate();
+    const { authStatus, refreshUser, syncError, user } = useAppAuth();
     const [recommendations, setRecommendations] = useState<TeammateRecommendation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -591,7 +616,7 @@ const TeammateRecommendations: React.FC<TeammateRecommendationsProps> = ({
     const [profileCompletion, setProfileCompletion] = useState<ProfileCompletionResponse | null>(null);
     const [selectedTeammate, setSelectedTeammate] = useState<TeammateRecommendation | null>(null);
 
-    const isLoggedIn = !!localStorage.getItem('user');
+    const isLoggedIn = authStatus === 'authenticated' && Boolean(user);
 
     const handleViewDetails = (teammate: TeammateRecommendation) => {
         setSelectedTeammate(teammate);
@@ -667,7 +692,7 @@ const TeammateRecommendations: React.FC<TeammateRecommendationsProps> = ({
     }, [fetchRecommendations, fetchProfileCompletion]);
 
     // Not logged in
-    if (!isLoggedIn) {
+    if (authStatus === 'signed_out') {
         return (
             <Card className={`p-6 ${className}`}>
                 <div className="text-center">
@@ -682,6 +707,25 @@ const TeammateRecommendations: React.FC<TeammateRecommendationsProps> = ({
                         onClick={() => window.dispatchEvent(new CustomEvent('show-auth-modal', { detail: { mode: 'login' } }))}
                     >
                         Đăng nhập ngay
+                    </Button>
+                </div>
+            </Card>
+        );
+    }
+
+    if (authStatus === 'sync_error') {
+        return (
+            <Card className={`p-6 ${className}`}>
+                <div className="text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-amber-100 rounded-full flex items-center justify-center">
+                        <Users className="w-8 h-8 text-amber-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-2">Chưa thể tải gợi ý đồng đội</h3>
+                    <p className="text-slate-500 text-sm mb-4">
+                        {syncError?.message || 'Tài khoản của bạn chưa được đồng bộ với hệ thống nên chưa thể lấy gợi ý.'}
+                    </p>
+                    <Button onClick={() => { void refreshUser(); }}>
+                        Đồng bộ lại
                     </Button>
                 </div>
             </Card>

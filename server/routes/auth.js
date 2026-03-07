@@ -7,6 +7,7 @@ import { authGuard, issueToken } from '../middleware/auth.js';
 import { logAuditEvent } from './admin.js';
 import { getMembershipSummary } from '../lib/membership.js';
 import { getPlatformSettings } from '../lib/platformSettings.js';
+import { getClerkPublishableKey } from '../lib/clerkAuth.js';
 import {
   buildOtpAuthUrl,
   decryptTotpSecret,
@@ -24,6 +25,19 @@ function getClientIp(req) {
     || req.connection?.remoteAddress
     || req.ip
     || '-';
+}
+
+function isClerkManagedAccount(req) {
+  return Boolean(req.user?.clerkUserId);
+}
+
+function getRuntimeAppEnvironment() {
+  return String(
+    process.env.APP_ENV
+    || process.env.RAILWAY_ENVIRONMENT_NAME
+    || process.env.NODE_ENV
+    || ''
+  ).trim().toLowerCase();
 }
 
 const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME || 'auth_token';
@@ -116,6 +130,16 @@ router.get('/csrf', (req, res) => {
   }
 
   return res.json({ csrfToken });
+});
+
+// GET /auth/clerk-config - Public runtime config for frontend bootstrap
+router.get('/clerk-config', (_req, res) => {
+  const publishableKey = getClerkPublishableKey();
+  return res.json({
+    publishableKey,
+    configured: Boolean(publishableKey),
+    appEnv: getRuntimeAppEnvironment(),
+  });
 });
 
 // ============ CONSTANTS ============
@@ -708,6 +732,10 @@ router.post('/register/complete', async (req, res, next) => {
         termsAcceptedAt: new Date(),
         privacyAcceptedAt: new Date(),
       },
+      authProvider: 'legacy',
+      clerkUserId: null,
+      clerkEmailVerified: false,
+      lastClerkSyncAt: null,
       membership: {
         tier: 'free',
         status: 'active',
@@ -1081,6 +1109,10 @@ router.post('/login/verify-2fa', async (req, res, next) => {
  */
 router.patch('/settings/2fa', authGuard, async (req, res, next) => {
   try {
+    if (isClerkManagedAccount(req)) {
+      return res.status(410).json({ error: 'Two-factor settings are managed by Clerk for this account.' });
+    }
+
     await connectToDatabase();
     const userId = req.user.id;
     const { enabled, password } = req.body || {};
@@ -1154,6 +1186,10 @@ router.patch('/settings/2fa', authGuard, async (req, res, next) => {
  */
 router.get('/settings/2fa', authGuard, async (req, res, next) => {
   try {
+    if (isClerkManagedAccount(req)) {
+      return res.status(410).json({ error: 'Two-factor settings are managed by Clerk for this account.' });
+    }
+
     await connectToDatabase();
     const userId = req.user.id;
 
@@ -1187,6 +1223,10 @@ router.get('/settings/2fa', authGuard, async (req, res, next) => {
  */
 router.post('/settings/2fa/setup', authGuard, async (req, res, next) => {
   try {
+    if (isClerkManagedAccount(req)) {
+      return res.status(410).json({ error: 'Two-factor settings are managed by Clerk for this account.' });
+    }
+
     if (!isTotpEncryptionConfigured()) {
       return res.status(503).json({
         error: 'Two-factor authentication is not configured.',
@@ -1270,6 +1310,10 @@ router.post('/settings/2fa/setup', authGuard, async (req, res, next) => {
  */
 router.post('/settings/2fa/verify', authGuard, async (req, res, next) => {
   try {
+    if (isClerkManagedAccount(req)) {
+      return res.status(410).json({ error: 'Two-factor settings are managed by Clerk for this account.' });
+    }
+
     if (!isTotpEncryptionConfigured()) {
       return res.status(503).json({
         error: 'Two-factor authentication is not configured.',
@@ -1465,6 +1509,10 @@ router.post('/register', async (req, res, next) => {
       role: 'student',
       avatar: req.body.avatar || '',
       locale: 'vi',
+      authProvider: 'legacy',
+      clerkUserId: null,
+      clerkEmailVerified: false,
+      lastClerkSyncAt: null,
       membership: {
         tier: 'free',
         status: 'active',
@@ -1562,6 +1610,10 @@ router.post('/login', async (req, res, next) => {
 
 router.get('/me', authGuard, async (req, res, next) => {
   try {
+    if (req.localUser) {
+      return res.json({ user: sanitizeUser(req.localUser) });
+    }
+
     await connectToDatabase();
     const userId = req.user.id;
     if (!ObjectId.isValid(userId)) {

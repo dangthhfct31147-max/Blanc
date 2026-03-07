@@ -1,6 +1,12 @@
 import jwt from 'jsonwebtoken';
+import { getAuth } from '@clerk/express';
 import { getClientIp } from '../lib/security.js';
 import { getPlatformSettings } from '../lib/platformSettings.js';
+import {
+  buildRequestUser,
+  isClerkConfigured,
+  resolveLocalUserFromClerkUserId,
+} from '../lib/clerkAuth.js';
 
 const jwtSecret = process.env.JWT_SECRET;
 const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME || 'auth_token';
@@ -31,8 +37,7 @@ async function getTokensInvalidBeforeMs() {
       const valueMs = Number.isFinite(parsed) ? parsed : 0;
       tokensInvalidBeforeCache = { valueMs, fetchedAtMs: now };
       return valueMs;
-    } catch (err) {
-      // Fail open on settings read issues to preserve availability.
+    } catch {
       tokensInvalidBeforeCache.fetchedAtMs = now;
       return tokensInvalidBeforeCache.valueMs;
     } finally {
@@ -61,42 +66,66 @@ function isSafeMethod(method) {
   return m === 'GET' || m === 'HEAD' || m === 'OPTIONS';
 }
 
-/**
- * Middleware to guard protected routes with JWT authentication
- * Supports both Bearer token and cookie-based authentication
- */
+function verifyLegacyJwt(token) {
+  try {
+    return { payload: jwt.verify(token, jwtSecret) };
+  } catch (error) {
+    return { error };
+  }
+}
 
-export async function authGuard(req, res, next) {
-  if (!jwtSecret) {
-    console.error('[Auth] JWT_SECRET is not configured');
-    return res.status(500).json({ error: 'Authentication service is not configured' });
+function respondWithLegacyAuthError(res, req, error) {
+  const ip = getClientIp(req);
+
+  if (error?.name === 'TokenExpiredError') {
+    console.warn(`[Auth] Expired token from ${ip}: ${req.method} ${req.path}`);
+    return res.status(401).json({ error: 'Token expired' });
   }
 
+  if (error?.name === 'JsonWebTokenError') {
+    console.warn(`[Auth] Invalid token from ${ip}: ${req.method} ${req.path}`);
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+
+  if (error?.status && error?.message) {
+    console.warn(`[Auth] ${error.message} from ${ip}: ${req.method} ${req.path}`);
+    return res.status(error.status).json({ error: error.message });
+  }
+
+  console.error('[Auth] JWT verification error:', error?.message || error);
+  return res.status(401).json({ error: 'Invalid or expired token' });
+}
+
+function getClerkUserId(req) {
+  if (!isClerkConfigured() || typeof req.auth !== 'function') {
+    return '';
+  }
+
+  try {
+    const auth = getAuth(req);
+    return auth?.userId ? String(auth.userId).trim() : '';
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Middleware to guard protected routes with JWT authentication.
+ * Supports both legacy JWT auth and Clerk-authenticated public sessions.
+ */
+export async function authGuard(req, res, next) {
   const header = req.headers.authorization || '';
-  let token = header.startsWith('Bearer ') ? header.slice(7) : null;
-  let tokenFromCookie = false;
+  const headerToken = header.startsWith('Bearer ') ? header.slice(7).trim() : '';
+  let cookieToken = '';
   let cookies = null;
 
-  if (!token) {
+  if (!headerToken) {
     cookies = parseCookies(req.headers.cookie);
-    const cookieToken = cookies[AUTH_COOKIE_NAME];
-    if (cookieToken) {
-      token = cookieToken;
-      tokenFromCookie = true;
-    }
+    cookieToken = String(cookies[AUTH_COOKIE_NAME] || '').trim();
   }
 
-  if (!token) {
-    // Log failed auth attempt
-    const ip = getClientIp(req);
-    console.warn(`[Auth] Unauthorized attempt from ${ip}: ${req.method} ${req.path}`);
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  // CSRF protection for cookie-based auth on state-changing requests
-  if (tokenFromCookie && !isSafeMethod(req.method)) {
-    cookies = cookies || parseCookies(req.headers.cookie);
-    const csrfCookie = cookies[CSRF_COOKIE_NAME];
+  if (cookieToken && !isSafeMethod(req.method)) {
+    const csrfCookie = cookies?.[CSRF_COOKIE_NAME];
     const csrfHeaderRaw = req.headers['x-csrf-token'];
     const csrfHeader = Array.isArray(csrfHeaderRaw) ? csrfHeaderRaw[0] : csrfHeaderRaw;
 
@@ -107,40 +136,70 @@ export async function authGuard(req, res, next) {
     }
   }
 
-  try {
-    const payload = jwt.verify(token, jwtSecret);
+  const legacyToken = headerToken || cookieToken;
+  let legacyError = null;
 
-    // Global session revocation (admin "reset sessions")
-    const invalidBeforeMs = await getTokensInvalidBeforeMs();
-    if (invalidBeforeMs > 0) {
-      const issuedAtMs =
-        payload && typeof payload === 'object' && typeof payload.iat === 'number'
-          ? payload.iat * 1000
-          : 0;
+  if (legacyToken) {
+    if (!jwtSecret) {
+      legacyError = { status: 500, message: 'Authentication service is not configured' };
+    } else {
+      const verified = verifyLegacyJwt(legacyToken);
 
-      if (!issuedAtMs || issuedAtMs < invalidBeforeMs) {
-        const ip = getClientIp(req);
-        console.warn(`[Auth] Token revoked by global reset from ${ip}: ${req.method} ${req.path}`);
-        return res.status(401).json({ error: 'Session expired' });
+      if (verified.payload) {
+        const payload = verified.payload;
+        const invalidBeforeMs = await getTokensInvalidBeforeMs();
+
+        if (invalidBeforeMs > 0) {
+          const issuedAtMs =
+            payload && typeof payload === 'object' && typeof payload.iat === 'number'
+              ? payload.iat * 1000
+              : 0;
+
+          if (!issuedAtMs || issuedAtMs < invalidBeforeMs) {
+            legacyError = { status: 401, message: 'Session expired' };
+          } else {
+            req.user = payload;
+            req.clientIp = getClientIp(req);
+            req.authSource = 'legacy';
+            return next();
+          }
+        } else {
+          req.user = payload;
+          req.clientIp = getClientIp(req);
+          req.authSource = 'legacy';
+          return next();
+        }
+      } else {
+        legacyError = verified.error;
       }
     }
-
-    req.user = payload;
-    req.clientIp = getClientIp(req);
-    return next();
-  } catch (err) {
-    const ip = getClientIp(req);
-    if (err.name === 'TokenExpiredError') {
-      console.warn(`[Auth] Expired token from ${ip}: ${req.method} ${req.path}`);
-      return res.status(401).json({ error: 'Token expired' });
-    }
-    if (err.name === 'JsonWebTokenError') {
-      console.warn(`[Auth] Invalid token from ${ip}: ${req.method} ${req.path}`);
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-    console.error('[Auth] JWT verification error:', err.message);
-    return res.status(401).json({ error: 'Invalid or expired token' });
   }
+
+  const clerkUserId = getClerkUserId(req);
+  if (clerkUserId) {
+    try {
+      const localUser = await resolveLocalUserFromClerkUserId(clerkUserId);
+      req.user = buildRequestUser(localUser, clerkUserId);
+      req.localUser = localUser;
+      req.clientIp = getClientIp(req);
+      req.authSource = 'clerk';
+      return next();
+    } catch (error) {
+      const status = typeof error?.status === 'number' ? error.status : 401;
+      const message = error?.message || 'Unauthorized';
+      const ip = getClientIp(req);
+      console.warn(`[Auth] Clerk auth failed from ${ip}: ${req.method} ${req.path} (${message})`);
+      return res.status(status).json({ error: message });
+    }
+  }
+
+  if (legacyError) {
+    return respondWithLegacyAuthError(res, req, legacyError);
+  }
+
+  const ip = getClientIp(req);
+  console.warn(`[Auth] Unauthorized attempt from ${ip}: ${req.method} ${req.path}`);
+  return res.status(401).json({ error: 'Unauthorized' });
 }
 
 export function requireRole(role) {
@@ -162,9 +221,6 @@ export function requireRole(role) {
   };
 }
 
-/**
- * Middleware to require admin or super_admin role
- */
 export function requireAdmin() {
   return (req, res, next) => {
     if (!req.user) {

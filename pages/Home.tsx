@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Search, ArrowRight, Users, Trophy, BookOpen, Star, Calendar, Loader2, X } from 'lucide-react';
+import { Search, ArrowRight, Users, Trophy, BookOpen, Star, Calendar, Loader2, X, Rocket, Handshake } from 'lucide-react';
 import { Button, Card, Badge } from '../components/ui/Common';
 import { useNavigate } from 'react-router-dom';
 import { useSearch, useStats, useContests, useCourses, useRecommendedContent } from '../lib/hooks';
@@ -8,14 +8,15 @@ import { newsApi } from '../lib/newsApi';
 import { PinnedNewsSlider } from '../components/PinnedNewsSlider';
 import type { NewsArticle } from '../types';
 import { useI18n } from '../contexts/I18nContext';
+import { useAppAuth } from '../contexts/AppAuthContext';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { t, locale } = useI18n();
+  const { authStatus, user } = useAppAuth();
   const numberLocale = locale === 'en' ? 'en-US' : 'vi-VN';
 
-  // Check login status
-  const isLoggedIn = !!localStorage.getItem('user');
+  const isLoggedIn = authStatus === 'authenticated' && Boolean(user);
 
   // Database hooks
   const { stats, isLoading: statsLoading } = useStats();
@@ -128,33 +129,33 @@ const Home: React.FC = () => {
               intervalMs={10_000}
               items={pinnedNews}
               lead={(
-              <>
-          <Badge className="mb-6 bg-primary-50 text-primary-700 border-primary-100 px-4 py-1.5 text-sm">
-            {t('home.hero.badge')}
-          </Badge>
-          <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-6">
-            {t('home.hero.titleLine1')} <br className="hidden md:block" />
-            <span className="text-primary-600">{t('home.hero.titleHighlight')}</span>
-          </h1>
-          <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto">
-            {t('home.hero.description')}
-          </p>
-              </>
-            )}
+                <>
+                  <Badge className="mb-6 bg-primary-50 text-primary-700 border-primary-100 px-4 py-1.5 text-sm">
+                    {t('home.hero.badge')}
+                  </Badge>
+                  <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-6">
+                    {t('home.hero.titleLine1')} <br className="hidden md:block" />
+                    <span className="text-primary-600">{t('home.hero.titleHighlight')}</span>
+                  </h1>
+                  <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto">
+                    {t('home.hero.description')}
+                  </p>
+                </>
+              )}
             />
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             {/* Search with dropdown results */}
             <div className="relative w-full max-w-md" ref={searchRef}>
-                <input
-                  type="text"
-                  placeholder={t('home.search.placeholder')}
-                  value={query}
-                  onChange={(e) => {
-                    setQuery(e.target.value);
-                    setShowResults(true);
-                  }}
+              <input
+                type="text"
+                placeholder={t('home.search.placeholder')}
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setShowResults(true);
+                }}
                 onFocus={() => setShowResults(true)}
                 className="w-full h-12 pl-12 pr-10 rounded-full border border-slate-200 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
               />
@@ -252,11 +253,14 @@ const Home: React.FC = () => {
             </Button>
           </div>
 
+          {/* Why ContestHub? */}
+          <WhyContestHub />
+
           {/* Stats */}
-          <div className="relative left-1/2 right-1/2 w-screen -ml-[50vw] -mr-[50vw] overflow-hidden mb-[-88px] md:mb-[-104px]">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary-50 via-white to-emerald-50" />
+          <div className="relative left-1/2 right-1/2 w-screen -ml-[50vw] -mr-[50vw] overflow-hidden -mb-22 md:-mb-26">
+            <div className="absolute inset-0 bg-linear-to-r from-primary-50 via-white to-emerald-50" />
             <div className="absolute -left-20 top-0 w-72 h-72 bg-primary-200/60 blur-3xl" />
-            <div className="absolute right-[-120px] bottom-[-120px] w-80 h-80 bg-emerald-200/60 blur-3xl" />
+            <div className="absolute -right-30 -bottom-30 w-80 h-80 bg-emerald-200/60 blur-3xl" />
 
             <div className="relative max-w-6xl mx-auto px-6 md:px-14 py-14 md:py-16">
               <div className="flex flex-col items-center text-center gap-4 md:gap-5">
@@ -311,13 +315,13 @@ const Home: React.FC = () => {
                       key={idx}
                       className="relative overflow-hidden rounded-2xl bg-white/85 backdrop-blur border border-white/60 shadow-lg shadow-primary-100/60 p-6 group transition duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col items-center text-center gap-4"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-primary-50 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute inset-0 bg-linear-to-br from-white via-white to-primary-50 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
                       <div className="absolute -right-10 -top-12 h-32 w-32 bg-primary-100 blur-2xl opacity-70" />
                       <div className="absolute -left-10 bottom-0 h-24 w-24 bg-emerald-100 blur-2xl opacity-80" />
 
                       <div className="relative flex items-center justify-between mb-2 w-full">
                         <div className="flex items-center gap-3">
-                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary-500 to-emerald-400 text-white flex items-center justify-center shadow-md ring-4 ring-primary-100/70">
+                          <div className="h-12 w-12 rounded-full bg-linear-to-br from-primary-500 to-emerald-400 text-white flex items-center justify-center shadow-md ring-4 ring-primary-100/70">
                             <stat.icon className="w-6 h-6" />
                           </div>
                           <div>
@@ -540,6 +544,118 @@ const Home: React.FC = () => {
         </section>
       )}
 
+    </div>
+  );
+};
+// ─── Why ContestHub? section ─── //
+const whyUsCards = [
+  {
+    icon: Trophy,
+    color: 'from-amber-400 to-orange-500',
+    bgColor: 'bg-amber-50',
+    statKey: 'home.whyUs.card1.stat' as const,
+    statLabelKey: 'home.whyUs.card1.statLabel' as const,
+    titleKey: 'home.whyUs.card1.title' as const,
+    descKey: 'home.whyUs.card1.description' as const,
+  },
+  {
+    icon: Rocket,
+    color: 'from-primary-500 to-emerald-400',
+    bgColor: 'bg-primary-50',
+    statKey: 'home.whyUs.card2.stat' as const,
+    statLabelKey: 'home.whyUs.card2.statLabel' as const,
+    titleKey: 'home.whyUs.card2.title' as const,
+    descKey: 'home.whyUs.card2.description' as const,
+  },
+  {
+    icon: Handshake,
+    color: 'from-rose-400 to-pink-500',
+    bgColor: 'bg-rose-50',
+    statKey: 'home.whyUs.card3.stat' as const,
+    statLabelKey: 'home.whyUs.card3.statLabel' as const,
+    titleKey: 'home.whyUs.card3.title' as const,
+    descKey: 'home.whyUs.card3.description' as const,
+  },
+];
+
+const WhyContestHub: React.FC = () => {
+  const { t } = useI18n();
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setRevealed(true); observer.disconnect(); } },
+      { threshold: 0.15 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={sectionRef} className="mt-16 mb-8">
+      {/* Section header */}
+      <div
+        className="text-center mb-12 transition-all duration-700"
+        style={{
+          opacity: revealed ? 1 : 0,
+          transform: revealed ? 'translateY(0)' : 'translateY(24px)',
+        }}
+      >
+        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 text-primary-700 text-sm font-medium mb-4 border border-primary-100">
+          ✨ {t('home.whyUs.badge')}
+        </span>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
+          {t('home.whyUs.title')}
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-600 to-emerald-500">
+            {t('home.whyUs.titleHighlight')}
+          </span>
+        </h2>
+        <p className="text-lg text-slate-500 max-w-2xl mx-auto">
+          {t('home.whyUs.subtitle')}
+        </p>
+      </div>
+
+      {/* Benefit cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {whyUsCards.map((card, idx) => {
+          const Icon = card.icon;
+          return (
+            <div
+              key={idx}
+              className={`group p-7 rounded-2xl ${card.bgColor} border border-transparent hover:border-slate-200 hover:bg-white hover:shadow-xl transition-all duration-500`}
+              style={{
+                opacity: revealed ? 1 : 0,
+                transform: revealed ? 'translateY(0)' : 'translateY(32px)',
+                transitionDelay: `${150 + idx * 150}ms`,
+              }}
+            >
+              {/* Icon */}
+              <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-linear-to-br ${card.color} text-white mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                <Icon className="w-7 h-7" />
+              </div>
+
+              {/* Stat */}
+              <div className="mb-4">
+                <span className={`text-3xl font-black bg-linear-to-r ${card.color} bg-clip-text text-transparent`}>
+                  {t(card.statKey)}
+                </span>
+                <span className="block text-sm text-slate-500 mt-1">{t(card.statLabelKey)}</span>
+              </div>
+
+              {/* Title & description */}
+              <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">
+                {t(card.titleKey)}
+              </h3>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                {t(card.descKey)}
+              </p>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

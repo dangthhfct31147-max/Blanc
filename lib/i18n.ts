@@ -10,6 +10,7 @@ const vi = {
   'nav.learning': 'Học tập',
   'nav.courses': 'Khóa học',
   'nav.documents': 'Tài liệu',
+  'nav.hallOfFame': 'Hall of Fame',
   'nav.community': 'Cộng đồng',
   'nav.news': 'Bản tin',
 
@@ -58,6 +59,23 @@ const vi = {
   'home.howItWorks.step3.desc': 'Học tập, thi đấu hết mình và nhận chứng nhận giá trị.',
   'home.cta.title': 'Sẵn sàng để tỏa sáng?',
   'home.cta.description': 'Gia nhập cộng đồng hơn 10.000 sinh viên tài năng và bắt đầu hành trình chinh phục tri thức ngay hôm nay.',
+
+  'home.whyUs.badge': 'Vì sao chọn ContestHub?',
+  'home.whyUs.title': 'Nền tảng giúp bạn ',
+  'home.whyUs.titleHighlight': 'bứt phá giới hạn',
+  'home.whyUs.subtitle': 'ContestHub không chỉ là nơi thi đấu — mà là hệ sinh thái toàn diện giúp bạn phát triển kỹ năng, kết nối cộng đồng và xây dựng hồ sơ ấn tượng.',
+  'home.whyUs.card1.stat': '10+',
+  'home.whyUs.card1.statLabel': 'Cuộc thi chất lượng cao',
+  'home.whyUs.card1.title': 'Cuộc thi chất lượng cao',
+  'home.whyUs.card1.description': 'Tổng hợp các cuộc thi từ các tổ chức hàng đầu, đa lĩnh vực — từ công nghệ, kinh doanh đến sáng tạo. Mỗi cuộc thi là một bước tiến trong hành trình phát triển của bạn.',
+  'home.whyUs.card2.stat': '3x',
+  'home.whyUs.card2.statLabel': 'Tốc độ phát triển',
+  'home.whyUs.card2.title': 'Phát triển toàn diện',
+  'home.whyUs.card2.description': 'Kết hợp thi đấu, khóa học chuyên sâu và mentor hướng dẫn — giúp bạn rèn luyện kỹ năng thực chiến, nhận chứng nhận giá trị và xây dựng portfolio ấn tượng.',
+  'home.whyUs.card3.stat': '10K+',
+  'home.whyUs.card3.statLabel': 'Thành viên cộng đồng',
+  'home.whyUs.card3.title': 'Cộng đồng tri thức',
+  'home.whyUs.card3.description': 'Kết nối với hàng nghìn sinh viên tài năng, tìm đồng đội cùng lĩnh vực, chia sẻ kinh nghiệm và cùng nhau chinh phục các thử thách lớn.',
 
   'marketplace.hero.pill': 'Thư viện khóa học',
   'marketplace.hero.title': 'Học đúng trọng tâm, bứt phá kỹ năng chuyên môn',
@@ -1035,6 +1053,7 @@ const en: typeof vi = {
   'nav.learning': 'Learning',
   'nav.courses': 'Courses',
   'nav.documents': 'Documents',
+  'nav.hallOfFame': 'Hall of Fame',
   'nav.community': 'Community',
   'nav.news': 'News',
 
@@ -1083,6 +1102,23 @@ const en: typeof vi = {
   'home.howItWorks.step3.desc': 'Learn, compete, and earn valuable certificates.',
   'home.cta.title': 'Ready to shine?',
   'home.cta.description': 'Join a community of 10,000+ talented students and start your knowledge journey today.',
+
+  'home.whyUs.badge': 'Why ContestHub?',
+  'home.whyUs.title': 'The platform that helps you ',
+  'home.whyUs.titleHighlight': 'break your limits',
+  'home.whyUs.subtitle': 'ContestHub is more than a competition hub — it\'s a comprehensive ecosystem for skill development, community connection, and building an impressive portfolio.',
+  'home.whyUs.card1.stat': '10+',
+  'home.whyUs.card1.statLabel': 'High-quality contests',
+  'home.whyUs.card1.title': 'High-quality competitions',
+  'home.whyUs.card1.description': 'Curated competitions from leading organizations across tech, business, and creative fields. Each contest is a stepping stone in your growth journey.',
+  'home.whyUs.card2.stat': '3x',
+  'home.whyUs.card2.statLabel': 'Growth speed',
+  'home.whyUs.card2.title': 'Holistic development',
+  'home.whyUs.card2.description': 'Combine competitions, in-depth courses, and mentor guidance — sharpen real-world skills, earn valuable certifications, and build an impressive portfolio.',
+  'home.whyUs.card3.stat': '10K+',
+  'home.whyUs.card3.statLabel': 'Community members',
+  'home.whyUs.card3.title': 'Knowledge community',
+  'home.whyUs.card3.description': 'Connect with thousands of talented students, find teammates in your field, share experiences, and tackle big challenges together.',
 
   'marketplace.hero.pill': 'Course library',
   'marketplace.hero.title': 'Learn with focus, accelerate your skills',
@@ -2074,4 +2110,3 @@ export function t(locale: AppLocale, key: TranslationKey, params?: Record<string
     return v === undefined || v === null ? '' : String(v);
   });
 }
-
