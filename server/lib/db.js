@@ -377,6 +377,39 @@ function matchesCondition(fieldValue, condition) {
 // SQL Query Builder Helpers
 // ============================================================================
 
+function escapeSqlString(value) {
+    return String(value).replace(/'/g, "''");
+}
+
+function buildJsonTextFieldPath(key) {
+    if (key === '_id') return 'id';
+
+    const parts = String(key)
+        .split('.')
+        .map((part) => escapeSqlString(part))
+        .filter(Boolean);
+
+    if (parts.length === 0) return 'doc::text';
+
+    return parts.reduce(
+        (expr, part, index) => expr + (index === parts.length - 1 ? `->>'${part}'` : `->'${part}'`),
+        'doc'
+    );
+}
+
+function buildJsonValueFieldPath(key) {
+    if (key === '_id') return 'to_jsonb(id)';
+
+    const parts = String(key)
+        .split('.')
+        .map((part) => escapeSqlString(part))
+        .filter(Boolean);
+
+    if (parts.length === 0) return 'doc';
+
+    return parts.reduce((expr, part) => `${expr}->'${part}'`, 'doc');
+}
+
 function buildWhereClause(query, paramOffset = 1) {
     if (!query || Object.keys(query).length === 0) {
         return { sql: 'TRUE', values: [] };
@@ -410,7 +443,8 @@ function buildWhereClause(query, paramOffset = 1) {
         }
 
         // Handle regular fields
-        const fieldPath = key === '_id' ? "id" : `doc->>'${key.replace(/\./g, "'->>'")}'`;
+        const fieldPath = buildJsonTextFieldPath(key);
+        const fieldValuePath = buildJsonValueFieldPath(key);
 
         // Handle primitives and simple objects
         if (value === null) {
@@ -441,7 +475,11 @@ function buildWhereClause(query, paramOffset = 1) {
                 conditions.push(`${fieldPath} = $${p++}`);
                 values.push(opVal);
             } else if (op === '$ne') {
-                conditions.push(`${fieldPath} != $${p++}`);
+                if (key === '_id') {
+                    conditions.push(`${fieldPath} != $${p++}`);
+                } else {
+                    conditions.push(`(${fieldPath} IS NULL OR ${fieldPath} != $${p++})`);
+                }
                 values.push(opVal);
             } else if (op === '$gt') {
                 conditions.push(`(${fieldPath})${cast} > $${p++}`);
@@ -487,19 +525,16 @@ function buildWhereClause(query, paramOffset = 1) {
                 } else {
                     const arr = (Array.isArray(opVal) ? opVal : []).map(v => String(v));
                     if (arr.length > 0) {
-                        conditions.push(`${fieldPath} != ALL($${p++})`);
+                        conditions.push(`(${fieldPath} IS NULL OR ${fieldPath} != ALL($${p++}))`);
                         values.push(arr);
                     }
                 }
             } else if (op === '$exists') {
                 const shouldExist = Boolean(opVal);
-                // For JSONB, checking keys existence
-                // doc ? 'key' for top level, but for nested path we need checks.
-                // Simplified: check if value is not null (since we use ->>)
                 if (shouldExist) {
-                    conditions.push(`${fieldPath} IS NOT NULL`);
+                    conditions.push(`${fieldValuePath} IS NOT NULL`);
                 } else {
-                    conditions.push(`${fieldPath} IS NULL`);
+                    conditions.push(`${fieldValuePath} IS NULL`);
                 }
             } else if (op === '$regex') {
                 // Postgres POSIX regex: ~ for case sensitive, ~* for insensitive
@@ -511,7 +546,7 @@ function buildWhereClause(query, paramOffset = 1) {
                 // @> operator for simple containment could work, but complex elemMatch is hard in pure SQL/JSONB without jsonb_path_query (PG12+)
                 // Fallback: This is complex. For now, simple containment or skip.
                 // We'll support simple object containment: doc->'field' @> '[{...}]'
-                conditions.push(`doc->'${key}' @> $${p++}::jsonb`);
+                conditions.push(`${fieldValuePath} @> $${p++}::jsonb`);
                 values.push(JSON.stringify([opVal]));
             }
         }
@@ -530,10 +565,7 @@ function buildSortClause(sortSpec) {
         if (key === '_id') {
             clauses.push(`id ${direction}`);
         } else {
-            // Try to guess if numeric sorting is needed? 
-            // For now default to text sorting to be safe or maybe no cast.
-            // A safer bet for generic "mongo" style is sorting as text unless we know better.
-            clauses.push(`doc->>'${key}' ${direction}`);
+            clauses.push(`${buildJsonTextFieldPath(key)} ${direction}`);
         }
     }
     return `ORDER BY ${clauses.join(', ')}`;
