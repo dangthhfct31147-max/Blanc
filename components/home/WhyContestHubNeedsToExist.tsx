@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import OptimizedImage from '../OptimizedImage';
 import { cn } from '../ui/Common';
+import { useI18n } from '../../contexts/I18nContext';
 
 type StoryTone = {
   badge: string;
@@ -63,7 +64,7 @@ const storyTonePresets: Record<'gold' | 'teal' | 'mint', StoryTone> = {
   },
 };
 
-export const contestHubStories: ContestHubStory[] = [
+const contestHubStoriesEn: ContestHubStory[] = [
   {
     id: 'discovery-gap',
     badge: 'Story 01',
@@ -138,6 +139,81 @@ export const contestHubStories: ContestHubStory[] = [
   },
 ];
 
+const contestHubStoriesVi: ContestHubStory[] = [
+  {
+    id: 'discovery-gap',
+    badge: 'Câu chuyện 01',
+    label: 'Tìm điểm bắt đầu phù hợp',
+    titleLines: [
+      'Nhiều học sinh giỏi vẫn loay hoay',
+      'không biết nên bắt đầu từ đâu.',
+    ],
+    description:
+      'Tại Việt Nam, rất nhiều học sinh có năng lực nhưng không dễ tiếp cận đúng cơ hội cho mình. Vấn đề không nằm ở sự thiếu cố gắng, mà ở việc thông tin về các cuộc thi đang bị phân tán, khiến các em khó xác định đâu là lựa chọn phù hợp với thế mạnh, giai đoạn phát triển và lịch học của mình.',
+    bullets: [
+      'Thông tin cuộc thi bị phân tán qua group lớp, mạng xã hội và truyền miệng.',
+      'Học sinh thiếu bối cảnh để đánh giá độ phù hợp, cấp độ và thời điểm đăng ký.',
+      'Quá nhiều lịch thi chồng chéo dễ dàng biến cảm hứng thành sự quá tải.',
+    ],
+    closing:
+      'ContestHub hướng tới việc trở thành nơi bắt đầu rõ ràng hơn, nơi cơ hội được sắp xếp mạch lạc và dễ lựa chọn hơn.',
+    image:
+      'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80',
+    imageAlt:
+      'Học sinh đang xem ghi chú và tìm hướng đi phù hợp tại bàn học.',
+    imageCaption: 'Việc tìm hướng đi không nên bắt đầu từ sự rời rạc.',
+    tone: storyTonePresets.gold,
+  },
+  {
+    id: 'community-gap',
+    badge: 'Câu chuyện 02',
+    label: 'Đồng hành cùng đúng người',
+    titleLines: [
+      'Nhiều ý tưởng tốt vẫn dừng lại',
+      'khi không tìm được người cùng đi tiếp.',
+    ],
+    description:
+      'Nhiều học sinh muốn làm dự án, lập đội thi hoặc biến ý tưởng thành sản phẩm thật. Điều thường cản trở các em không phải là thiếu động lực, mà là thiếu một môi trường đáng tin cậy để tìm đồng đội, mentor và những người có cùng mức độ nghiêm túc.',
+    bullets: [
+      'Việc tìm đồng đội vẫn chủ yếu dựa vào các kênh không chính thức và rời rạc.',
+      'Rất khó đánh giá sự phù hợp về kỹ năng và mức độ cam kết trước khi bắt đầu.',
+      'Mentor và cộng đồng hỗ trợ hiếm khi được kết nối trong cùng một nơi ổn định.',
+    ],
+    closing:
+      'ContestHub hứa hẹn tạo ra một không gian nghiêm túc hơn để kết nối đồng đội, mentor và những người thật sự muốn xây dựng cùng nhau.',
+    image:
+      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80',
+    imageAlt:
+      'Nhóm học sinh đang thảo luận và làm việc cùng nhau quanh bàn học.',
+    imageCaption: 'Cộng tác tốt bắt đầu từ sự tin tưởng và sự đồng lòng.',
+    tone: storyTonePresets.teal,
+  },
+  {
+    id: 'portfolio-gap',
+    badge: 'Câu chuyện 03',
+    label: 'Biến nỗ lực thành một hành trình rõ ràng',
+    titleLines: [
+      'Học sinh nỗ lực rất nhiều, nhưng thành quả',
+      'vẫn để lại ở những mảnh rời rạc.',
+    ],
+    description:
+      'Cuộc thi, dự án, bài thuyết trình, chứng chỉ và các cột mốc cá nhân thường nằm ở nhiều folder, link và công cụ khác nhau. Nỗ lực là có thật, nhưng câu chuyện phát triển lại khó nhìn thấy. Khi thiếu một nơi lưu giữ mạch lạc, học sinh sẽ khó biến hành trình đó thành portfolio có giá trị và bền vững.',
+    bullets: [
+      'Thành tích nằm rải rác trên quá nhiều công cụ và hồ sơ tách rời nhau.',
+      'Sự trưởng thành khó được kể lại một cách thuyết phục theo thời gian.',
+      'Lộ trình dài hạn trở nên mờ nhạt khi không có nơi cùng nhau lưu giữ và theo dõi.',
+    ],
+    closing:
+      'ContestHub đang được xây dựng để giúp học sinh gom lại hành trình của mình thành một portfolio rõ ràng, bền vững và có định hướng lâu dài.',
+    image:
+      'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
+    imageAlt:
+      'Học sinh đang hoàn thiện bài thuyết trình và sắp xếp tài liệu dự án trên laptop.',
+    imageCaption: 'Nỗ lực sẽ có giá trị hơn khi được nhìn thấy như một câu chuyện liền mạch.',
+    tone: storyTonePresets.mint,
+  },
+];
+
 const getRevealStyle = (
   revealed: boolean,
   reduceMotion: boolean,
@@ -159,9 +235,12 @@ const getRevealStyle = (
 };
 
 const WhyContestHubNeedsToExist: React.FC = () => {
+  const { locale } = useI18n();
   const sectionRef = useRef<HTMLElement>(null);
   const [revealed, setRevealed] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const isEnglish = locale === 'en';
+  const contestHubStories = isEnglish ? contestHubStoriesEn : contestHubStoriesVi;
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -224,7 +303,7 @@ const WhyContestHubNeedsToExist: React.FC = () => {
             contestHubStoryTheme.sectionBadge,
           )}
         >
-          Why ContestHub Needs to Exist
+          {isEnglish ? 'Why ContestHub Needs to Exist' : 'Vì sao ContestHub cần tồn tại'}
         </span>
         <h2
           className={cn(
@@ -233,12 +312,12 @@ const WhyContestHubNeedsToExist: React.FC = () => {
             contestHubStoryTheme.sectionTitle,
           )}
         >
-          The real stories behind every competition.
+          {isEnglish ? 'The real stories behind every competition.' : 'Những câu chuyện phía sau mỗi cuộc thi.'}
         </h2>
         <p className="mx-auto mt-5 max-w-3xl text-base leading-8 text-slate-600 md:text-lg">
-          Across Vietnam, ambitious students still navigate competitions through scattered information,
-          informal networks, and achievements that live in too many places. ContestHub is being built to
-          make that journey clearer, more connected, and more meaningful over time.
+          {isEnglish
+            ? 'Across Vietnam, ambitious students still navigate competitions through scattered information, informal networks, and achievements that live in too many places. ContestHub is being built to make that journey clearer, more connected, and more meaningful over time.'
+            : 'Trên khắp Việt Nam, nhiều học sinh vẫn phải tìm đường đến các cuộc thi qua thông tin rời rạc, các mối quan hệ không chính thức và những thành quả bị cắt nhỏ ở quá nhiều nơi. ContestHub được xây dựng để làm cho hành trình đó rõ ràng hơn, liên kết hơn và có ý nghĩa hơn theo thời gian.'}
         </p>
       </div>
 
