@@ -17,6 +17,7 @@
     "server": "node server/index.js",
     "server:dev": "nodemon --watch server --ext js,json --exec \"node server/index.js\"",
     "seed": "node server/scripts/migrate.js",
+    "seed:hall-of-fame": "node server/scripts/seed-hall-of-fame.js",
     "seed:large": "node server/scripts/migrate.js && node server/scripts/seed-large.js",
     "seed:large:reset": "node server/scripts/migrate.js && node server/scripts/seed-large.js --reset",
     "db:init": "node server/scripts/setup-db.js",
