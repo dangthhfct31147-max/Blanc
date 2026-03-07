@@ -913,7 +913,7 @@ router.get('/me/notifications-history', authGuard, async (req, res, next) => {
         const users = getCollection('users');
         const user = await users.findOne(
             { _id: new ObjectId(userId) },
-            { projection: { email: 1 } }
+            { projection: { email: 1, role: 1 } }
         );
 
         if (!user) {
@@ -922,13 +922,33 @@ router.get('/me/notifications-history', authGuard, async (req, res, next) => {
 
         // Get notifications sent to this user
         const notificationLogs = getCollection('notification_logs');
+        const userAudience = user.role === 'student'
+            ? 'students'
+            : user.role === 'mentor'
+                ? 'mentors'
+                : (user.role === 'admin' || user.role === 'super_admin')
+                    ? 'admins'
+                    : 'all';
+
+        const announcementAudienceQuery = {
+            $and: [
+                { type: 'announcement' },
+                {
+                    $or: [
+                        { targetAudience: { $exists: false } },
+                        { targetAudience: 'all' },
+                        { targetAudience: userAudience },
+                    ],
+                },
+            ],
+        };
 
         // Query for notifications - both individual and bulk
         const notifications = await notificationLogs
             .find({
                 $or: [
                     { recipientEmail: user.email },
-                    { type: 'announcement' }, // System announcements sent to all
+                    announcementAudienceQuery,
                     { type: { $in: ['contestReminder', 'courseUpdate'] } } // User-specific
                 ]
             })
@@ -949,7 +969,7 @@ router.get('/me/notifications-history', authGuard, async (req, res, next) => {
             total: await notificationLogs.countDocuments({
                 $or: [
                     { recipientEmail: user.email },
-                    { type: 'announcement' }
+                    announcementAudienceQuery
                 ]
             })
         });

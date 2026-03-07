@@ -11,6 +11,7 @@ import { useI18n } from '../contexts/I18nContext';
 
 type NewsType = 'announcement' | 'minigame' | 'update' | 'event' | 'tip';
 type NewsGroup = 'all' | 'updates' | 'tips';
+type NewsAudience = 'all' | 'students' | 'mentors' | 'admins';
 
 const safeArray = <T,>(value: unknown, fallback: T[] = []): T[] =>
   Array.isArray(value) ? (value as T[]) : fallback;
@@ -19,6 +20,12 @@ const normalizeType = (value: unknown): NewsType => {
   const v = String(value || '').trim();
   if (v === 'announcement' || v === 'minigame' || v === 'update' || v === 'event' || v === 'tip') return v as NewsType;
   return 'announcement';
+};
+
+const normalizeAudience = (value: unknown): NewsAudience => {
+  const v = String(value || '').trim().toLowerCase();
+  if (v === 'students' || v === 'mentors' || v === 'admins') return v as NewsAudience;
+  return 'all';
 };
 
 interface Suggestion {
@@ -80,6 +87,13 @@ const INITIAL_NEWS_VI = [
     createdAt: '2025-12-08T09:00:00Z',
     author: 'Academic Ops',
     tags: ['Lộ trình', 'Mentor'],
+    release: {
+      version: 'Blanc v1.8.0',
+      headline: 'Đợt cập nhật tập trung vào trải nghiệm học tập và discovery cho học sinh mới.',
+      changes: ['Thêm thư viện Hall of Fame', 'Cải thiện mentor directory', 'Tối ưu luồng tìm tài liệu'],
+      audience: 'all',
+      notifySubscribers: false,
+    },
   },
   {
     id: 'n4',
@@ -145,6 +159,13 @@ const INITIAL_NEWS_EN = [
     createdAt: '2025-12-08T09:00:00Z',
     author: 'Academic Ops',
     tags: ['Learning path', 'Mentor'],
+    release: {
+      version: 'Blanc v1.8.0',
+      headline: 'This release focuses on student onboarding and faster discovery across the platform.',
+      changes: ['Added Hall of Fame library', 'Improved mentor directory', 'Streamlined document discovery'],
+      audience: 'all',
+      notifySubscribers: false,
+    },
   },
   {
     id: 'n4',
@@ -297,6 +318,10 @@ const News: React.FC = () => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [detailItem, setDetailItem] = useState<NewsArticle | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+  const [requestedArticleSlug, setRequestedArticleSlug] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    return new URLSearchParams(window.location.search).get('article') || '';
+  });
 
   const getNewsType = (item: NewsArticle): NewsType =>
     normalizeType(item.type || (item as any).type);
@@ -348,6 +373,19 @@ const News: React.FC = () => {
     const raw = String(item.actionLink || (item as any).actionLink || '').trim();
     if (!raw || raw.startsWith('#')) return '';
     return raw;
+  };
+
+  const getNewsRelease = (item: NewsArticle) => {
+    const release = (item as any).release;
+    if (!release || typeof release !== 'object') return null;
+
+    return {
+      version: String(release.version || '').trim(),
+      headline: String(release.headline || '').trim(),
+      changes: safeArray<string>(release.changes).map((entry) => String(entry || '').trim()).filter(Boolean),
+      audience: normalizeAudience(release.audience),
+      notifySubscribers: !!release.notifySubscribers,
+    };
   };
 
   const isHighlighted = (item: NewsArticle) =>
@@ -478,12 +516,19 @@ const News: React.FC = () => {
     }
   }, [currentPage, totalPages]);
 
+  const clearRequestedArticleParam = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete('article');
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+  }, []);
+
   const closeDetail = () => {
     setIsDetailOpen(false);
     setDetailItem(null);
   };
 
-  const openDetail = async (item: NewsArticle) => {
+  const openDetail = useCallback(async (item: NewsArticle) => {
     setIsDetailOpen(true);
     setDetailItem(item);
 
@@ -500,7 +545,46 @@ const News: React.FC = () => {
     } finally {
       setIsLoadingDetail(false);
     }
-  };
+  }, [copy.toastContentFailed]);
+
+  useEffect(() => {
+    if (!requestedArticleSlug || isLoadingNews) return;
+
+    let cancelled = false;
+
+    const run = async () => {
+      try {
+        const matched = newsItems.find((item) => (item.slug || item.id) === requestedArticleSlug);
+        if (matched) {
+          await openDetail(matched);
+        } else {
+          setIsDetailOpen(true);
+          setIsLoadingDetail(true);
+          const data = await newsApi.getPublic(requestedArticleSlug);
+          if (!cancelled) {
+            setDetailItem(data.item);
+          }
+        }
+      } catch (err) {
+        if (!cancelled) {
+          const message = err instanceof Error ? err.message : copy.toastContentFailed;
+          toast.error(message);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingDetail(false);
+          setRequestedArticleSlug('');
+          clearRequestedArticleParam();
+        }
+      }
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [clearRequestedArticleParam, copy.toastContentFailed, isLoadingNews, newsItems, openDetail, requestedArticleSlug]);
 
   const handleFeedbackSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -591,6 +675,7 @@ const News: React.FC = () => {
               const meta = NEWS_TYPE_META[getNewsType(item)] || NEWS_TYPE_META.announcement;
               const tags = getNewsTags(item);
               const actionLink = getNewsActionLink(item);
+              const release = getNewsRelease(item);
               return (
                 <Card
                   key={item.id || item.slug}
@@ -609,10 +694,27 @@ const News: React.FC = () => {
                         <meta.Icon className="w-4 h-4" />
                         {meta.label}
                       </div>
+                      {release?.version && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full border border-emerald-200 bg-emerald-100 text-emerald-800 text-xs font-bold">
+                          {release.version}
+                        </span>
+                      )}
                       <span className="text-xs text-slate-500">{timeAgo(getNewsDate(item))}</span>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900">{item.title}</h3>
                     <p className="text-slate-600 text-sm leading-relaxed">{getNewsSummary(item)}</p>
+                    {release?.changes.length ? (
+                      <div className="rounded-2xl border border-emerald-100 bg-white/90 px-4 py-3">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700 mb-2">
+                          {isEn ? "What's new" : 'Điểm mới'}
+                        </p>
+                        <ul className="space-y-1 text-sm text-slate-700">
+                          {release.changes.slice(0, 3).map((change) => (
+                            <li key={change}>• {change}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
                     <div className="flex flex-wrap gap-2">
                       {tags.map(tag => (
                         <span key={tag} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-slate-200 text-xs text-slate-600">
@@ -725,6 +827,7 @@ const News: React.FC = () => {
             const meta = NEWS_TYPE_META[getNewsType(item)] || NEWS_TYPE_META.announcement;
             const tags = getNewsTags(item);
             const actionLink = getNewsActionLink(item);
+            const release = getNewsRelease(item);
             return (
               <Card
                 key={item.id || item.slug}
@@ -744,8 +847,20 @@ const News: React.FC = () => {
                   <span className="text-xs text-slate-500">{timeAgo(getNewsDate(item))}</span>
                 </div>
                 <div className="mt-3 space-y-2 flex-1">
+                  {release?.version && (
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full border border-emerald-200 bg-emerald-50 text-[11px] font-bold text-emerald-700">
+                      {release.version}
+                    </span>
+                  )}
                   <h3 className="text-lg font-semibold text-slate-900 leading-snug">{item.title}</h3>
                   <p className="text-sm text-slate-600 leading-relaxed">{getNewsSummary(item)}</p>
+                  {release?.changes.length ? (
+                    <ul className="space-y-1 text-xs text-slate-600 pt-1">
+                      {release.changes.slice(0, 2).map((change) => (
+                        <li key={change}>• {change}</li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {tags.map(tag => (
@@ -807,6 +922,42 @@ const News: React.FC = () => {
 
               {detailItem && (
                 <>
+                  {(() => {
+                    const release = getNewsRelease(detailItem);
+                    return release ? (
+                      <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-5 space-y-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {release.version && (
+                            <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-bold">
+                              {release.version}
+                            </span>
+                          )}
+                          <span className="inline-flex items-center px-3 py-1 rounded-full border border-emerald-200 bg-white text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                            {isEn ? 'Release note' : 'Ghi chú phát hành'}
+                          </span>
+                        </div>
+                        {release.headline && (
+                          <p className="text-sm text-slate-700">{release.headline}</p>
+                        )}
+                        {release.changes.length > 0 && (
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 mb-2">
+                              {isEn ? "What's new" : 'Điểm mới'}
+                            </p>
+                            <ul className="space-y-2 text-sm text-slate-700">
+                              {release.changes.map((change) => (
+                                <li key={change} className="flex gap-2">
+                                  <span className="text-emerald-600">•</span>
+                                  <span>{change}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    ) : null;
+                  })()}
+
                   {detailItem.coverImage && (
                     <img
                       src={detailItem.coverImage}
