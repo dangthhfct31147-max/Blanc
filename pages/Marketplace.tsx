@@ -797,7 +797,7 @@ const CourseDetail: React.FC = () => {
                 </p>
                 {course.contactType === 'phone' && copied && (
                   <p className="text-sm text-emerald-600 mt-1">
-                    {t('marketplace.detail.purchase.copiedPhone', { phone: course.contactInfo })}
+                    {t('marketplace.detail.purchase.copiedPhone', { phone: course.contactInfo ?? '' })}
                   </p>
                 )}
                 {course.contactType === 'link' && (

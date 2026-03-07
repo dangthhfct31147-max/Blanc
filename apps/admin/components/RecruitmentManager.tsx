@@ -726,7 +726,7 @@ const RecruitmentManager: React.FC = () => {
               <div className="flex justify-end gap-2 pt-4 border-t border-gray-100">
                 <button
                   type="button"
-                  onClick={closeModal}
+                  onClick={() => closeModal()}
                   className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-50 text-gray-700 hover:bg-gray-100"
                   disabled={isSaving}
                 >

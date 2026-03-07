@@ -70,7 +70,7 @@ export interface StatCardProps {
   value: string | number;
   trend?: string;
   trendUp?: boolean;
-  icon: React.ComponentType<{ className?: string; size?: number }>;
+  icon: React.ComponentType<{ className?: string; size?: string | number }>;
 }
 
 // Prize structure for contests

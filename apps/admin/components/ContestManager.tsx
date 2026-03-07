@@ -245,13 +245,13 @@ const ContestManager: React.FC = () => {
     const key = String(contestId);
     const buttonEl = actionButtonRefs.current[key];
 
-    if (openActionId === contestId) {
+    if (openActionId === key) {
       setOpenActionId(null);
       setActionMenuPos(null);
       return;
     }
 
-    setOpenActionId(contestId);
+    setOpenActionId(key);
 
     if (!buttonEl) {
       setActionMenuPos(null);
@@ -726,7 +726,7 @@ const ContestManager: React.FC = () => {
                         }}
                         onClick={() => openActionMenu(contest.id)}
                         title="Contest actions"
-                        className={`p-2 rounded-lg border transition-all duration-200 ${openActionId === contest.id
+                        className={`p-2 rounded-lg border transition-all duration-200 ${openActionId === String(contest.id)
                           ? 'border-emerald-500 bg-emerald-50 text-emerald-600 shadow-sm'
                           : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300'
                           }`}
@@ -771,7 +771,7 @@ const ContestManager: React.FC = () => {
 
       {/* Action dropdown menu rendered in a portal to avoid being clipped by scroll/overflow containers */}
       {openActionId != null && actionMenuPos && (() => {
-        const openContest = contests.find((c) => c.id === openActionId);
+        const openContest = contests.find((c) => String(c.id) === openActionId);
         if (!openContest) return null;
 
         return createPortal(
