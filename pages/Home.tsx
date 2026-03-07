@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Search, ArrowRight, Users, Trophy, BookOpen, Star, Calendar, Loader2, X } from 'lucide-react';
+import { Search, ArrowRight, Users, Trophy, BookOpen, Star, Calendar, Loader2, X, Rocket, Handshake } from 'lucide-react';
 import { Button, Card, Badge } from '../components/ui/Common';
 import { useNavigate } from 'react-router-dom';
 import { useSearch, useStats, useContests, useCourses, useRecommendedContent } from '../lib/hooks';
@@ -252,6 +252,9 @@ const Home: React.FC = () => {
               {t('home.hero.cta')}
             </Button>
           </div>
+
+          {/* Why ContestHub? */}
+          <WhyContestHub />
 
           {/* Stats */}
           <div className="relative left-1/2 right-1/2 w-screen -ml-[50vw] -mr-[50vw] overflow-hidden -mb-22 md:-mb-26">
@@ -541,6 +544,118 @@ const Home: React.FC = () => {
         </section>
       )}
 
+    </div>
+  );
+};
+// ─── Why ContestHub? section ─── //
+const whyUsCards = [
+  {
+    icon: Trophy,
+    color: 'from-amber-400 to-orange-500',
+    bgColor: 'bg-amber-50',
+    statKey: 'home.whyUs.card1.stat' as const,
+    statLabelKey: 'home.whyUs.card1.statLabel' as const,
+    titleKey: 'home.whyUs.card1.title' as const,
+    descKey: 'home.whyUs.card1.description' as const,
+  },
+  {
+    icon: Rocket,
+    color: 'from-primary-500 to-emerald-400',
+    bgColor: 'bg-primary-50',
+    statKey: 'home.whyUs.card2.stat' as const,
+    statLabelKey: 'home.whyUs.card2.statLabel' as const,
+    titleKey: 'home.whyUs.card2.title' as const,
+    descKey: 'home.whyUs.card2.description' as const,
+  },
+  {
+    icon: Handshake,
+    color: 'from-rose-400 to-pink-500',
+    bgColor: 'bg-rose-50',
+    statKey: 'home.whyUs.card3.stat' as const,
+    statLabelKey: 'home.whyUs.card3.statLabel' as const,
+    titleKey: 'home.whyUs.card3.title' as const,
+    descKey: 'home.whyUs.card3.description' as const,
+  },
+];
+
+const WhyContestHub: React.FC = () => {
+  const { t } = useI18n();
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setRevealed(true); observer.disconnect(); } },
+      { threshold: 0.15 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={sectionRef} className="mt-16 mb-8">
+      {/* Section header */}
+      <div
+        className="text-center mb-12 transition-all duration-700"
+        style={{
+          opacity: revealed ? 1 : 0,
+          transform: revealed ? 'translateY(0)' : 'translateY(24px)',
+        }}
+      >
+        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 text-primary-700 text-sm font-medium mb-4 border border-primary-100">
+          ✨ {t('home.whyUs.badge')}
+        </span>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
+          {t('home.whyUs.title')}
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-600 to-emerald-500">
+            {t('home.whyUs.titleHighlight')}
+          </span>
+        </h2>
+        <p className="text-lg text-slate-500 max-w-2xl mx-auto">
+          {t('home.whyUs.subtitle')}
+        </p>
+      </div>
+
+      {/* Benefit cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {whyUsCards.map((card, idx) => {
+          const Icon = card.icon;
+          return (
+            <div
+              key={idx}
+              className={`group p-7 rounded-2xl ${card.bgColor} border border-transparent hover:border-slate-200 hover:bg-white hover:shadow-xl transition-all duration-500`}
+              style={{
+                opacity: revealed ? 1 : 0,
+                transform: revealed ? 'translateY(0)' : 'translateY(32px)',
+                transitionDelay: `${150 + idx * 150}ms`,
+              }}
+            >
+              {/* Icon */}
+              <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-linear-to-br ${card.color} text-white mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                <Icon className="w-7 h-7" />
+              </div>
+
+              {/* Stat */}
+              <div className="mb-4">
+                <span className={`text-3xl font-black bg-linear-to-r ${card.color} bg-clip-text text-transparent`}>
+                  {t(card.statKey)}
+                </span>
+                <span className="block text-sm text-slate-500 mt-1">{t(card.statLabelKey)}</span>
+              </div>
+
+              {/* Title & description */}
+              <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">
+                {t(card.titleKey)}
+              </h3>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                {t(card.descKey)}
+              </p>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

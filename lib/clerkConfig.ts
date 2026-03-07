@@ -14,23 +14,9 @@ function isDevelopmentPublishableKey(value: string): boolean {
     return value.startsWith('pk_test_');
 }
 
-function isLocalBrowserHost(): boolean {
-    if (typeof window === 'undefined') return false;
-
-    const host = String(window.location.hostname || '').trim().toLowerCase();
-    return host === 'localhost'
-        || host === '127.0.0.1'
-        || host === '[::1]'
-        || host.endsWith('.local');
-}
-
 function isProductionRuntimeEnvironment(): boolean {
     const runtimeEnvironment = getRuntimeEnvironment();
-    if (runtimeEnvironment === 'production' || runtimeEnvironment === 'prod' || runtimeEnvironment === 'preview' || runtimeEnvironment === 'staging') {
-        return true;
-    }
-
-    return import.meta.env.PROD && !isLocalBrowserHost();
+    return runtimeEnvironment === 'production' || runtimeEnvironment === 'prod';
 }
 
 function getClerkIssueForKey(value: string): 'development_key_in_production' | null {
@@ -47,7 +33,7 @@ function warnAboutClerkKeyIssue(issue: 'development_key_in_production' | null): 
     }
 
     hasWarnedAboutInvalidClerkKey = true;
-    console.warn('[clerk] Ignoring development publishable key in a deployed build. Replace it with a pk_live_ key.');
+    console.warn('[clerk] Ignoring development publishable key in a production build. Replace it with a pk_live_ key.');
 }
 
 function getRuntimeConfigValue(key: 'VITE_CLERK_PUBLISHABLE_KEY' | 'VITE_API_URL'): string {
