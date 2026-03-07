@@ -32,6 +32,8 @@ interface TreeNodeProps {
     locale: Locale;
     onClick: () => void;
     size?: 'sm' | 'md';
+    showLabel?: boolean;
+    showProgressLabel?: boolean;
 }
 
 export default function TreeNode({
@@ -43,6 +45,8 @@ export default function TreeNode({
     locale,
     onClick,
     size = 'md',
+    showLabel = true,
+    showProgressLabel = true,
 }: TreeNodeProps) {
     const { def, state, xpProgress } = node;
     const isLocked = state === 'locked' || state === 'milestone-locked';
@@ -52,6 +56,7 @@ export default function TreeNode({
     const isMilestone = def.isMilestone;
     const IconComponent = ICON_MAP[def.icon] || Star;
     const dimensions = size === 'sm' ? 52 : 62;
+    const frameWidth = showLabel ? dimensions + 32 : dimensions + 14;
 
     const title = locale === 'en' ? def.titleEn : def.title;
 
@@ -59,7 +64,7 @@ export default function TreeNode({
         <motion.button
             onClick={onClick}
             className="group relative flex flex-col items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded-2xl"
-            style={{ width: dimensions + 32, cursor: isLocked ? 'default' : 'pointer' }}
+            style={{ width: frameWidth, cursor: isLocked ? 'default' : 'pointer' }}
             initial={false}
             animate={{
                 opacity: isFocusDimmed ? 0.15 : 1,
@@ -293,23 +298,24 @@ export default function TreeNode({
                 )}
             </div>
 
-            {/* Label */}
-            <span
-                className="mt-2 text-center leading-tight font-medium max-w-full"
-                style={{
-                    fontSize: size === 'sm' ? 10 : 11,
-                    color: isLocked ? '#475569' : isCompleted ? '#e2e8f0' : isActive ? '#f1f5f9' : '#94a3b8',
-                    textShadow: isActive || isCompleted
-                        ? `0 0 10px ${color}20`
-                        : 'none',
-                    transition: 'color 0.3s ease',
-                }}
-            >
-                {title}
-            </span>
+            {showLabel && (
+                <span
+                    className="mt-2 text-center leading-tight font-medium max-w-full"
+                    style={{
+                        fontSize: size === 'sm' ? 10 : 11,
+                        color: isLocked ? '#475569' : isCompleted ? '#e2e8f0' : isActive ? '#f1f5f9' : '#94a3b8',
+                        textShadow: isActive || isCompleted
+                            ? `0 0 10px ${color}20`
+                            : 'none',
+                        transition: 'color 0.3s ease',
+                    }}
+                >
+                    {title}
+                </span>
+            )}
 
             {/* XP label */}
-            {!isLocked && def.xpRequired > 0 && (
+            {showProgressLabel && !isLocked && def.xpRequired > 0 && (
                 <span style={{
                     fontSize: 9,
                     color: isCompleted ? color : colorLight,
