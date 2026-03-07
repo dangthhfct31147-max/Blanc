@@ -83,11 +83,10 @@ export default function DesktopConstellation({
 
     return (
         <div className="relative" style={{ width: '100%', maxWidth: width }}>
-            {/* SVG Overlay — paths and decorations */}
+            {/* SVG — in normal flow, creates the aspect ratio & height */}
             <svg
                 viewBox={`0 0 ${width} ${height}`}
-                preserveAspectRatio="xMidYMid meet"
-                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }}
+                style={{ display: 'block', width: '100%', height: 'auto', pointerEvents: 'none' }}
             >
                 <defs>
                     <radialGradient id="constellation-bg" cx="50%" cy="50%" r="55%">
@@ -311,8 +310,8 @@ export default function DesktopConstellation({
                 })}
             </svg>
 
-            {/* HTML nodes positioned absolutely */}
-            <div className="relative" style={{ width: '100%', paddingTop: `${(height / width) * 100}%` }}>
+            {/* HTML nodes — absolute overlay matching SVG dimensions exactly */}
+            <div className="absolute inset-0">
                 {/* Central Hub */}
                 <div
                     className="absolute z-20"
