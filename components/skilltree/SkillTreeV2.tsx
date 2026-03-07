@@ -35,6 +35,7 @@ function useMediaQuery(query: string): boolean {
 
 export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Props) {
     const isDesktop = useMediaQuery('(min-width: 1024px)');
+    const isWideDesktop = useMediaQuery('(min-width: 1400px)');
     const t = locale === 'en';
 
     // Compute skill tree
@@ -268,8 +269,8 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
                                 locale={locale}
                                 selectedNodeId={selectedNodeId}
                                 focusedBranchId={focusedBranchId}
-                                recommendations={recommendations}
                                 onSelectNode={handleSelectNode}
+                                layoutMode={isWideDesktop ? 'wide' : 'compact'}
                             />
                         </div>
                     ) : (

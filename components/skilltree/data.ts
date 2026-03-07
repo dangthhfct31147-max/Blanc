@@ -485,14 +485,3 @@ export function xpToNextLevel(xp: number): { current: number; next: number; prog
     const progress = (xp - currentThreshold) / (nextThreshold - currentThreshold);
     return { current: currentThreshold, next: nextThreshold, progress: Math.min(1, Math.max(0, progress)) };
 }
-
-// ── Desktop Layout Config ────────────────────────
-export const DESKTOP_LAYOUT = {
-    width: 960,
-    height: 900,
-    centerX: 480,
-    centerY: 450,
-    branchAngles: [-90, -18, 54, 126, 198] as const,
-    tierDistances: [125, 205, 280, 350, 415],
-    centerRadius: 52,
-};

@@ -1,12 +1,15 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Desktop Constellation — Radial skill tree view
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import type { ComputedBranch, BranchId, Locale, Recommendation } from './types';
-import { DESKTOP_LAYOUT } from './data';
+import type { ComputedBranch, BranchId, Locale } from './types';
 import CentralHub from './CentralHub';
 import TreeNode from './TreeNode';
+import {
+    buildDesktopConstellationLayout,
+    type DesktopLayoutMode,
+} from './layout';
 
 interface DesktopConstellationProps {
     branches: ComputedBranch[];
@@ -18,20 +21,16 @@ interface DesktopConstellationProps {
     locale: Locale;
     selectedNodeId: string | null;
     focusedBranchId: BranchId | null;
-    recommendations: Recommendation[];
     onSelectNode: (nodeId: string, branchId: BranchId) => void;
+    layoutMode?: DesktopLayoutMode;
 }
 
-interface NodePos {
+interface BranchNodePosition {
     x: number;
     y: number;
     nodeId: string;
     branchId: BranchId;
-}
-
-function polarToXY(angleDeg: number, distance: number, cx: number, cy: number) {
-    const rad = (angleDeg * Math.PI) / 180;
-    return { x: cx + distance * Math.cos(rad), y: cy + distance * Math.sin(rad) };
+    tier: number;
 }
 
 export default function DesktopConstellation({
@@ -45,20 +44,8 @@ export default function DesktopConstellation({
     selectedNodeId,
     focusedBranchId,
     onSelectNode,
+    layoutMode = 'wide',
 }: DesktopConstellationProps) {
-    const {
-        width: contentWidth,
-        height: contentHeight,
-        centerX: contentCenterX,
-        centerY: contentCenterY,
-        branchAngles,
-        tierDistances,
-    } = DESKTOP_LAYOUT;
-    const canvasPadding = { top: 120, right: 120, bottom: 120, left: 120 };
-    const width = contentWidth + canvasPadding.left + canvasPadding.right;
-    const height = contentHeight + canvasPadding.top + canvasPadding.bottom;
-    const centerX = contentCenterX + canvasPadding.left;
-    const centerY = contentCenterY + canvasPadding.top;
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -66,22 +53,40 @@ export default function DesktopConstellation({
         return () => clearTimeout(timer);
     }, []);
 
-    // Compute node positions
-    const nodePositions = useMemo<NodePos[][]>(() => {
-        return branches.map((branch, branchIdx) => {
-            const angle = branchAngles[branchIdx];
-            return branch.nodes.map((node, tierIdx) => {
-                const pos = polarToXY(angle, tierDistances[tierIdx], centerX, centerY);
-                return { ...pos, nodeId: node.def.id, branchId: branch.def.id };
-            });
-        });
-    }, [branches, branchAngles, tierDistances, centerX, centerY]);
+    const desktopLayout = useMemo(
+        () => buildDesktopConstellationLayout(branches, locale, layoutMode),
+        [branches, locale, layoutMode]
+    );
 
-    // Generate starfield positions (stable across renders)
+    const { artboard, nodePositions, nodeLabels, branchLabels } = desktopLayout;
+    const { width, height, centerX, centerY, guideRings } = artboard;
+
+    const branchNodePositions = useMemo<BranchNodePosition[][]>(
+        () => branches.map((branch) => branch.nodes.map((node) => ({
+            ...nodePositions[node.def.id],
+            nodeId: node.def.id,
+            branchId: branch.def.id,
+            tier: node.def.tier,
+        }))),
+        [branches, nodePositions]
+    );
+
+    const nodeIndexMap = useMemo(
+        () => Object.fromEntries(
+            branches.flatMap((branch, branchIdx) =>
+                branch.nodes.map((node, tierIdx) => [
+                    node.def.id,
+                    { branch, branchIdx, node, tierIdx },
+                ])
+            )
+        ),
+        [branches]
+    );
+
     const stars = useMemo(() => {
         const seed = 42;
         const result: { x: number; y: number; r: number; delay: number; dur: number }[] = [];
-        for (let i = 0; i < 80; i++) {
+        for (let i = 0; i < 80; i += 1) {
             const s = Math.sin(seed + i * 127.1) * 43758.5453;
             const x = (s - Math.floor(s)) * width;
             const s2 = Math.sin(seed + i * 269.5) * 43758.5453;
@@ -94,8 +99,7 @@ export default function DesktopConstellation({
     }, [width, height]);
 
     return (
-        <div className="relative" style={{ width: '100%', maxWidth: width }}>
-            {/* SVG — in normal flow, creates the aspect ratio & height */}
+        <div className="relative mx-auto" style={{ width: '100%', maxWidth: width }}>
             <svg
                 viewBox={`0 0 ${width} ${height}`}
                 style={{ display: 'block', width: '100%', height: 'auto', pointerEvents: 'none' }}
@@ -105,48 +109,45 @@ export default function DesktopConstellation({
                         <stop offset="0%" stopColor="#1e293b" stopOpacity="0.25" />
                         <stop offset="100%" stopColor="#0f172a" stopOpacity="0" />
                     </radialGradient>
-                    {/* Branch path gradients */}
-                    {branches.map(b => (
-                        <React.Fragment key={`defs-${b.def.id}`}>
-                            <linearGradient id={`path-grad-${b.def.id}`} x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stopColor={b.def.accentColor} stopOpacity="0.7" />
-                                <stop offset="100%" stopColor={b.def.accentColor} stopOpacity="0.2" />
+                    {branches.map((branch) => (
+                        <React.Fragment key={`defs-${branch.def.id}`}>
+                            <linearGradient id={`path-grad-${branch.def.id}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stopColor={branch.def.accentColor} stopOpacity="0.7" />
+                                <stop offset="100%" stopColor={branch.def.accentColor} stopOpacity="0.2" />
                             </linearGradient>
-                            <filter id={`glow-${b.def.id}`} x="-50%" y="-50%" width="200%" height="200%">
+                            <filter id={`glow-${branch.def.id}`} x="-50%" y="-50%" width="200%" height="200%">
                                 <feGaussianBlur stdDeviation="3" result="blur" />
                                 <feMerge>
                                     <feMergeNode in="blur" />
                                     <feMergeNode in="SourceGraphic" />
                                 </feMerge>
                             </filter>
-                            <radialGradient id={`nebula-${b.def.id}`} cx="50%" cy="50%" r="50%">
-                                <stop offset="0%" stopColor={b.def.accentColor} stopOpacity="0.08" />
-                                <stop offset="60%" stopColor={b.def.accentColor} stopOpacity="0.03" />
-                                <stop offset="100%" stopColor={b.def.accentColor} stopOpacity="0" />
+                            <radialGradient id={`nebula-${branch.def.id}`} cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stopColor={branch.def.accentColor} stopOpacity="0.08" />
+                                <stop offset="60%" stopColor={branch.def.accentColor} stopOpacity="0.03" />
+                                <stop offset="100%" stopColor={branch.def.accentColor} stopOpacity="0" />
                             </radialGradient>
                         </React.Fragment>
                     ))}
-                    {/* Central glow */}
                     <radialGradient id="hub-glow" cx="50%" cy="50%" r="50%">
                         <stop offset="0%" stopColor="#6366f1" stopOpacity="0.12" />
                         <stop offset="50%" stopColor="#6366f1" stopOpacity="0.04" />
                         <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
                     </radialGradient>
-                    <filter id="star-glow" x="-100%" y="-100%" width="300%" height="300%">
-                        <feGaussianBlur stdDeviation="1.5" />
-                    </filter>
                 </defs>
 
-                {/* Ambient background glow */}
-                <circle cx={centerX} cy={centerY} r={420} fill="url(#constellation-bg)" />
+                <circle
+                    cx={centerX}
+                    cy={centerY}
+                    r={guideRings[guideRings.length - 1] + 96}
+                    fill="url(#constellation-bg)"
+                />
 
-                {/* Central hub radial glow */}
-                <circle cx={centerX} cy={centerY} r={150} fill="url(#hub-glow)">
-                    <animate attributeName="r" values="140;160;140" dur="5s" repeatCount="indefinite" />
+                <circle cx={centerX} cy={centerY} r={166} fill="url(#hub-glow)">
+                    <animate attributeName="r" values="154;172;154" dur="5s" repeatCount="indefinite" />
                     <animate attributeName="opacity" values="0.8;1;0.8" dur="5s" repeatCount="indefinite" />
                 </circle>
 
-                {/* Starfield */}
                 {stars.map((star, i) => (
                     <circle key={`star-${i}`} cx={star.x} cy={star.y} r={star.r} fill="#cbd5e1">
                         <animate
@@ -159,13 +160,12 @@ export default function DesktopConstellation({
                     </circle>
                 ))}
 
-                {/* Concentric guide rings with animation */}
-                {tierDistances.map((r, i) => (
+                {guideRings.map((ring, i) => (
                     <circle
                         key={`ring-${i}`}
                         cx={centerX}
                         cy={centerY}
-                        r={r}
+                        r={ring}
                         fill="none"
                         stroke="#1e293b"
                         strokeWidth={0.6}
@@ -177,78 +177,75 @@ export default function DesktopConstellation({
                     </circle>
                 ))}
 
-                {/* Branch nebula clouds */}
                 {branches.map((branch, branchIdx) => {
-                    const angle = branchAngles[branchIdx];
-                    const nebulaPos = polarToXY(angle, tierDistances[2], centerX, centerY);
+                    const positions = branchNodePositions[branchIdx];
+                    const nebulaNode = positions[Math.min(2, positions.length - 1)];
                     return (
                         <circle
                             key={`nebula-${branch.def.id}`}
-                            cx={nebulaPos.x}
-                            cy={nebulaPos.y}
-                            r={90}
+                            cx={nebulaNode.x}
+                            cy={nebulaNode.y}
+                            r={92}
                             fill={`url(#nebula-${branch.def.id})`}
-                            opacity={branch.totalXP > 0 ? 0.8 : 0.2}
+                            opacity={branch.totalXP > 0 ? 0.82 : 0.2}
                         >
-                            <animate attributeName="r" values="85;95;85" dur="6s" begin={`${branchIdx * 0.7}s`} repeatCount="indefinite" />
+                            <animate attributeName="r" values="88;98;88" dur="6s" begin={`${branchIdx * 0.7}s`} repeatCount="indefinite" />
                         </circle>
                     );
                 })}
 
-                {/* Branch connection paths */}
                 {branches.map((branch, branchIdx) => {
-                    const positions = nodePositions[branchIdx];
+                    const positions = branchNodePositions[branchIdx];
                     const isFocusDimmed = focusedBranchId !== null && focusedBranchId !== branch.def.id;
                     const dimOpacity = isFocusDimmed ? 0.06 : 1;
 
                     return (
                         <g key={`paths-${branch.def.id}`} opacity={dimOpacity} style={{ transition: 'opacity 0.5s ease' }}>
-                            {/* Center → first node */}
                             {(() => {
-                                const firstActive = branch.nodes[0].state !== 'locked';
+                                const firstNode = branch.nodes[0];
+                                const firstPos = positions[0];
+                                const firstActive = firstNode.state !== 'locked' && firstNode.state !== 'milestone-locked';
+
                                 return (
                                     <>
                                         <line
                                             x1={centerX}
                                             y1={centerY}
-                                            x2={positions[0].x}
-                                            y2={positions[0].y}
+                                            x2={firstPos.x}
+                                            y2={firstPos.y}
                                             stroke={firstActive ? branch.def.accentColor : '#1e293b'}
                                             strokeWidth={firstActive ? 1.5 : 0.8}
                                             opacity={mounted ? (firstActive ? 0.5 : 0.15) : 0}
                                             style={{ transition: `opacity 0.8s ease ${0.3 + branchIdx * 0.1}s` }}
                                         />
-                                        {/* Glow line for active paths */}
                                         {firstActive && (
-                                            <line
-                                                x1={centerX}
-                                                y1={centerY}
-                                                x2={positions[0].x}
-                                                y2={positions[0].y}
-                                                stroke={branch.def.accentColor}
-                                                strokeWidth={4}
-                                                opacity={0.08}
-                                                filter={`url(#glow-${branch.def.id})`}
-                                            />
-                                        )}
-                                        {/* Energy particle from center */}
-                                        {firstActive && (
-                                            <circle r={2.5} fill={branch.def.accentColor} opacity={0.8}>
-                                                <animateMotion
-                                                    dur="2.5s"
-                                                    repeatCount="indefinite"
-                                                    begin={`${branchIdx * 0.5}s`}
-                                                    path={`M${centerX},${centerY} L${positions[0].x},${positions[0].y}`}
+                                            <>
+                                                <line
+                                                    x1={centerX}
+                                                    y1={centerY}
+                                                    x2={firstPos.x}
+                                                    y2={firstPos.y}
+                                                    stroke={branch.def.accentColor}
+                                                    strokeWidth={4}
+                                                    opacity={0.08}
+                                                    filter={`url(#glow-${branch.def.id})`}
                                                 />
-                                                <animate attributeName="opacity" values="0;0.8;0.8;0" dur="2.5s" begin={`${branchIdx * 0.5}s`} repeatCount="indefinite" />
-                                                <animate attributeName="r" values="1.5;3;1.5" dur="2.5s" begin={`${branchIdx * 0.5}s`} repeatCount="indefinite" />
-                                            </circle>
+                                                <circle r={2.5} fill={branch.def.accentColor} opacity={0.8}>
+                                                    <animateMotion
+                                                        dur="2.5s"
+                                                        repeatCount="indefinite"
+                                                        begin={`${branchIdx * 0.5}s`}
+                                                        path={`M${centerX},${centerY} L${firstPos.x},${firstPos.y}`}
+                                                    />
+                                                    <animate attributeName="opacity" values="0;0.8;0.8;0" dur="2.5s" begin={`${branchIdx * 0.5}s`} repeatCount="indefinite" />
+                                                    <animate attributeName="r" values="1.5;3;1.5" dur="2.5s" begin={`${branchIdx * 0.5}s`} repeatCount="indefinite" />
+                                                </circle>
+                                            </>
                                         )}
                                     </>
                                 );
                             })()}
 
-                            {/* Between tiers */}
                             {positions.slice(0, -1).map((pos, i) => {
                                 const nextPos = positions[i + 1];
                                 const nextNode = branch.nodes[i + 1];
@@ -257,7 +254,6 @@ export default function DesktopConstellation({
 
                                 return (
                                     <g key={`path-${branch.def.id}-${i}`}>
-                                        {/* Background dash line */}
                                         <line
                                             x1={pos.x}
                                             y1={pos.y}
@@ -267,9 +263,8 @@ export default function DesktopConstellation({
                                             strokeWidth={isPathActive ? 1.5 : 0.8}
                                             opacity={mounted ? (isPathActive ? 0.45 : 0.12) : 0}
                                             strokeDasharray={isPathActive ? 'none' : '3 6'}
-                                            style={{ transition: `opacity 0.8s ease ${0.4 + branchIdx * 0.1 + i * 0.12}s` }}
+                                            style={{ transition: `opacity 0.8s ease ${0.42 + branchIdx * 0.1 + i * 0.12}s` }}
                                         />
-                                        {/* Glow overlay for active paths */}
                                         {isPathActive && (
                                             <line
                                                 x1={pos.x}
@@ -282,7 +277,6 @@ export default function DesktopConstellation({
                                                 filter={`url(#glow-${branch.def.id})`}
                                             />
                                         )}
-                                        {/* Animated energy particles on active paths */}
                                         {isPrevCompleted && isPathActive && (
                                             <>
                                                 <circle r={2} fill={branch.def.accentColor}>
@@ -295,7 +289,6 @@ export default function DesktopConstellation({
                                                     <animate attributeName="opacity" values="0;0.7;0.7;0" dur="3s" begin={`${i * 0.8}s`} repeatCount="indefinite" />
                                                     <animate attributeName="r" values="1;2.5;1" dur="3s" begin={`${i * 0.8}s`} repeatCount="indefinite" />
                                                 </circle>
-                                                {/* Second particle with offset */}
                                                 <circle r={1.5} fill={branch.def.accentLight || branch.def.accentColor}>
                                                     <animateMotion
                                                         dur="3s"
@@ -315,9 +308,7 @@ export default function DesktopConstellation({
                 })}
             </svg>
 
-            {/* HTML nodes — absolute overlay matching SVG dimensions exactly */}
             <div className="absolute inset-0">
-                {/* Central Hub */}
                 <div
                     className="absolute z-20"
                     style={{
@@ -336,9 +327,8 @@ export default function DesktopConstellation({
                     />
                 </div>
 
-                {/* Branch Nodes */}
                 {branches.map((branch, branchIdx) => {
-                    const positions = nodePositions[branchIdx];
+                    const positions = branchNodePositions[branchIdx];
                     const isFocusDimmed = focusedBranchId !== null && focusedBranchId !== branch.def.id;
 
                     return positions.map((pos, tierIdx) => {
@@ -372,50 +362,104 @@ export default function DesktopConstellation({
                                     isFocusDimmed={isFocusDimmed}
                                     locale={locale}
                                     onClick={() => onSelectNode(cnode.def.id, branch.def.id)}
-                                    size="md"
+                                    size={layoutMode === 'compact' ? 'sm' : 'md'}
+                                    showLabel={false}
+                                    showProgressLabel={false}
                                 />
                             </motion.div>
                         );
                     });
                 })}
 
-                {/* Branch labels at the outer edge */}
-                {branches.map((branch, branchIdx) => {
-                    const angle = branchAngles[branchIdx];
-                    const angleRad = (angle * Math.PI) / 180;
-                    const labelDist = tierDistances[tierDistances.length - 1] + 44;
-                    const pos = polarToXY(angle, labelDist, centerX, centerY);
+                {nodeLabels.map((label) => {
+                    const nodeEntry = nodeIndexMap[label.nodeId];
+                    if (!nodeEntry) return null;
+
+                    const { node, branchIdx, tierIdx, branch } = nodeEntry;
                     const isFocusDimmed = focusedBranchId !== null && focusedBranchId !== branch.def.id;
-                    const isTopLabel = Math.sin(angleRad) < -0.75;
-                    const isBottomLabel = Math.sin(angleRad) > 0.75;
-                    const isRightLabel = Math.cos(angleRad) > 0.45;
-                    const isLeftLabel = Math.cos(angleRad) < -0.45;
-                    const textAlign = isLeftLabel ? 'right' : isRightLabel ? 'left' : 'center';
-                    const translateX = isLeftLabel ? '-100%' : isRightLabel ? '0%' : '-50%';
-                    const translateY = isTopLabel ? '-100%' : isBottomLabel ? '0%' : '-50%';
+                    const isCompleted = node.state === 'completed' || node.state === 'milestone-completed';
+                    const isActive = node.state === 'active';
+                    const isLocked = node.state === 'locked' || node.state === 'milestone-locked';
 
                     return (
                         <motion.div
-                            key={`label-${branch.def.id}`}
-                            className="absolute z-[5] pointer-events-none"
+                            key={`label-${label.nodeId}`}
+                            className="absolute z-30 pointer-events-none"
                             style={{
-                                left: `${(pos.x / width) * 100}%`,
-                                top: `${(pos.y / height) * 100}%`,
-                                transform: `translate(${translateX}, ${translateY})`,
-                                textAlign,
+                                left: `${(label.left / width) * 100}%`,
+                                top: `${(label.top / height) * 100}%`,
+                                width: `${(label.maxWidth / width) * 100}%`,
+                                minWidth: label.isOuter ? 76 : 64,
+                                textAlign: label.align,
                             }}
                             initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: isFocusDimmed ? 0.12 : 0.75, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.5 + branchIdx * 0.1 }}
+                            animate={{ opacity: isFocusDimmed ? 0.14 : 1, y: 0 }}
+                            transition={{ duration: 0.45, delay: 0.28 + branchIdx * 0.08 + tierIdx * 0.1 }}
                         >
                             <div
-                                className="text-[11px] font-bold uppercase tracking-[0.15em]"
-                                style={{ color: branch.def.accentLight, textShadow: `0 0 12px ${branch.def.accentColor}40` }}
+                                className={layoutMode === 'compact' ? 'text-[10px] font-medium leading-[1.08]' : 'text-[11px] font-medium leading-[1.08]'}
+                                style={{
+                                    color: isLocked ? '#64748b' : isCompleted ? '#e2e8f0' : isActive ? '#f8fafc' : '#cbd5e1',
+                                    textShadow: isCompleted || isActive
+                                        ? `0 0 10px ${branch.def.accentColor}24, 0 0 16px rgba(2,6,23,0.92)`
+                                        : '0 0 14px rgba(2,6,23,0.92)',
+                                }}
                             >
-                                {locale === 'en' ? branch.def.nameEn : branch.def.name}
+                                {label.title}
                             </div>
-                            <div className="text-[10px] text-slate-400 mt-0.5 font-medium">
-                                {branch.totalXP} XP · T{branch.currentTier}/{branch.maxTier}
+                            {label.subtitle && (
+                                <div
+                                    className="mt-1 text-[9px] leading-[1.15]"
+                                    style={{
+                                        color: `${branch.def.accentLight}cc`,
+                                        textShadow: '0 0 12px rgba(2,6,23,0.9)',
+                                    }}
+                                >
+                                    {label.subtitle}
+                                </div>
+                            )}
+                        </motion.div>
+                    );
+                })}
+
+                {branchLabels.map((label, index) => {
+                    const branch = branches.find((item) => item.def.id === label.branchId);
+                    if (!branch) return null;
+
+                    const isFocusDimmed = focusedBranchId !== null && focusedBranchId !== branch.def.id;
+
+                    return (
+                        <motion.div
+                            key={`branch-label-${label.branchId}`}
+                            className="absolute z-40 pointer-events-none"
+                            style={{
+                                left: `${(label.left / width) * 100}%`,
+                                top: `${(label.top / height) * 100}%`,
+                                width: `${(label.maxWidth / width) * 100}%`,
+                                minWidth: 86,
+                                textAlign: label.align,
+                            }}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: isFocusDimmed ? 0.12 : 0.82, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.45 + index * 0.08 }}
+                        >
+                            <div
+                                className={layoutMode === 'compact' ? 'text-[10px] font-bold uppercase tracking-[0.14em] leading-[1.1]' : 'text-[11px] font-bold uppercase tracking-[0.15em] leading-[1.1]'}
+                                style={{
+                                    color: branch.def.accentLight,
+                                    textShadow: `0 0 12px ${branch.def.accentColor}40, 0 0 18px rgba(2,6,23,0.95)`,
+                                }}
+                            >
+                                {label.title}
+                            </div>
+                            <div
+                                className="mt-1 text-[10px] font-medium leading-none"
+                                style={{
+                                    color: 'rgba(203,213,225,0.84)',
+                                    textShadow: '0 0 14px rgba(2,6,23,0.95)',
+                                }}
+                            >
+                                {label.meta}
                             </div>
                         </motion.div>
                     );
