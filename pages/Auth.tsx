@@ -44,7 +44,7 @@ const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
         : 'Clerk is not configured';
     const message =
       clerkConfigIssue === 'development_key_in_production'
-        ? 'This deployment is using a Clerk development publishable key. Replace `VITE_CLERK_PUBLISHABLE_KEY` with your Clerk live key (`pk_live_...`) before using the sign-in flow in production.'
+        ? 'This deployment is using a Clerk development publishable key. Replace `VITE_CLERK_PUBLISHABLE_KEY` with your Clerk live key (`pk_live_...`) before using the sign-in flow on preview or production.'
         : 'Set `VITE_CLERK_PUBLISHABLE_KEY` in your frontend environment before using the new sign-in flow.';
 
     return (
