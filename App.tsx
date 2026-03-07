@@ -52,6 +52,7 @@ const ContestDetail = lazyWithRetry(() => import('./pages/Contests').then((m) =>
 const Marketplace = lazyWithRetry(() => import('./pages/Marketplace').then((m) => ({ default: m.Marketplace })));
 const CourseDetail = lazyWithRetry(() => import('./pages/Marketplace').then((m) => ({ default: m.CourseDetail })));
 const Documents = lazyWithRetry(() => import('./pages/Documents'));
+const HallOfFame = lazyWithRetry(() => import('./pages/HallOfFame'));
 const Community = lazyWithRetry(() => import('./pages/Community'));
 const News = lazyWithRetry(() => import('./pages/News'));
 const MentorList = lazyWithRetry(() => import('./pages/Mentors').then((m) => ({ default: m.MentorList })));
@@ -345,6 +346,14 @@ const App: React.FC = () => {
             element={(
               <Suspense fallback={<LoadingSpinner fullScreen />}>
                 <Documents />
+              </Suspense>
+            )}
+          />
+          <Route
+            path="/hall-of-fame"
+            element={(
+              <Suspense fallback={<LoadingSpinner fullScreen />}>
+                <HallOfFame />
               </Suspense>
             )}
           />

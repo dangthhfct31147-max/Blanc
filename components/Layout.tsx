@@ -52,6 +52,7 @@ const Layout: React.FC<LayoutProps> = ({
   const learningItems = [
     { name: t('nav.courses'), path: '/marketplace' },
     { name: t('nav.documents'), path: '/documents' },
+    { name: t('nav.hallOfFame'), path: '/hall-of-fame' },
   ];
 
   const communityItems = [
@@ -68,7 +69,9 @@ const Layout: React.FC<LayoutProps> = ({
   const leadingNavItems = navItems.slice(0, 2);
   const trailingNavItems = navItems.slice(2);
 
-  const isLearningActive = location.pathname.startsWith('/marketplace') || location.pathname.startsWith('/documents');
+  const isLearningActive = location.pathname.startsWith('/marketplace')
+    || location.pathname.startsWith('/documents')
+    || location.pathname.startsWith('/hall-of-fame');
   const isCommunityActive = location.pathname.startsWith('/community') || location.pathname.startsWith('/news');
 
   const desktopNavLinkClass = ({ isActive }: { isActive: boolean }) =>

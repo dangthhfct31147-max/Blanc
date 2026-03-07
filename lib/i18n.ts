@@ -10,6 +10,7 @@ const vi = {
   'nav.learning': 'Học tập',
   'nav.courses': 'Khóa học',
   'nav.documents': 'Tài liệu',
+  'nav.hallOfFame': 'Hall of Fame',
   'nav.community': 'Cộng đồng',
   'nav.news': 'Bản tin',
 
@@ -1035,6 +1036,7 @@ const en: typeof vi = {
   'nav.learning': 'Learning',
   'nav.courses': 'Courses',
   'nav.documents': 'Documents',
+  'nav.hallOfFame': 'Hall of Fame',
   'nav.community': 'Community',
   'nav.news': 'News',
 
@@ -2074,4 +2076,3 @@ export function t(locale: AppLocale, key: TranslationKey, params?: Record<string
     return v === undefined || v === null ? '' : String(v);
   });
 }
-

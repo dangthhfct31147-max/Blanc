@@ -97,6 +97,7 @@ export const CACHE_TTL = {
     MENTORS: 2 * 60 * 1000,     // 2 minutes - mentor list
     MENTOR_DETAIL: 5 * 60 * 1000, // 5 minutes - individual mentor profile
     DOCUMENTS: 2 * 60 * 1000,   // 2 minutes
+    HALL_OF_FAME: 5 * 60 * 1000, // 5 minutes - curated sample library
     COURSE_DETAIL: 5 * 60 * 1000, // 5 minutes - individual course
     USER_PROFILE: 1 * 60 * 1000,  // 1 minute - user data
     SEARCH: 30 * 1000,          // 30 seconds - search results
