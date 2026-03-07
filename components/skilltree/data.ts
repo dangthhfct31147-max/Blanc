@@ -489,10 +489,10 @@ export function xpToNextLevel(xp: number): { current: number; next: number; prog
 // ── Desktop Layout Config ────────────────────────
 export const DESKTOP_LAYOUT = {
     width: 960,
-    height: 800,
+    height: 860,
     centerX: 480,
-    centerY: 400,
+    centerY: 420,
     branchAngles: [-90, -18, 54, 126, 198] as const,
-    tierDistances: [100, 175, 250, 320, 385],
+    tierDistances: [110, 190, 265, 335, 400],
     centerRadius: 52,
 };
