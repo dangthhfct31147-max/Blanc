@@ -46,7 +46,19 @@ export default function DesktopConstellation({
     focusedBranchId,
     onSelectNode,
 }: DesktopConstellationProps) {
-    const { width, height, centerX, centerY, branchAngles, tierDistances } = DESKTOP_LAYOUT;
+    const {
+        width: contentWidth,
+        height: contentHeight,
+        centerX: contentCenterX,
+        centerY: contentCenterY,
+        branchAngles,
+        tierDistances,
+    } = DESKTOP_LAYOUT;
+    const canvasPadding = { top: 88, right: 92, bottom: 92, left: 92 };
+    const width = contentWidth + canvasPadding.left + canvasPadding.right;
+    const height = contentHeight + canvasPadding.top + canvasPadding.bottom;
+    const centerX = contentCenterX + canvasPadding.left;
+    const centerY = contentCenterY + canvasPadding.top;
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -188,16 +200,12 @@ export default function DesktopConstellation({
                     const positions = nodePositions[branchIdx];
                     const isFocusDimmed = focusedBranchId !== null && focusedBranchId !== branch.def.id;
                     const dimOpacity = isFocusDimmed ? 0.06 : 1;
-                    const branchActive = branch.totalXP > 0;
 
                     return (
                         <g key={`paths-${branch.def.id}`} opacity={dimOpacity} style={{ transition: 'opacity 0.5s ease' }}>
                             {/* Center → first node */}
                             {(() => {
                                 const firstActive = branch.nodes[0].state !== 'locked';
-                                const dx = positions[0].x - centerX;
-                                const dy = positions[0].y - centerY;
-                                const len = Math.sqrt(dx * dx + dy * dy);
                                 return (
                                     <>
                                         <line
@@ -246,9 +254,6 @@ export default function DesktopConstellation({
                                 const nextNode = branch.nodes[i + 1];
                                 const isPathActive = nextNode && nextNode.state !== 'locked' && nextNode.state !== 'milestone-locked';
                                 const isPrevCompleted = branch.nodes[i].state === 'completed' || branch.nodes[i].state === 'milestone-completed';
-                                const dx = nextPos.x - pos.x;
-                                const dy = nextPos.y - pos.y;
-                                const pathLen = Math.sqrt(dx * dx + dy * dy);
 
                                 return (
                                     <g key={`path-${branch.def.id}-${i}`}>
@@ -377,18 +382,27 @@ export default function DesktopConstellation({
                 {/* Branch labels at the outer edge */}
                 {branches.map((branch, branchIdx) => {
                     const angle = branchAngles[branchIdx];
-                    const labelDist = tierDistances[tierDistances.length - 1] + 60;
+                    const angleRad = (angle * Math.PI) / 180;
+                    const labelDist = tierDistances[tierDistances.length - 1] + 44;
                     const pos = polarToXY(angle, labelDist, centerX, centerY);
                     const isFocusDimmed = focusedBranchId !== null && focusedBranchId !== branch.def.id;
+                    const isTopLabel = Math.sin(angleRad) < -0.75;
+                    const isBottomLabel = Math.sin(angleRad) > 0.75;
+                    const isRightLabel = Math.cos(angleRad) > 0.45;
+                    const isLeftLabel = Math.cos(angleRad) < -0.45;
+                    const textAlign = isLeftLabel ? 'left' : isRightLabel ? 'right' : 'center';
+                    const translateX = isLeftLabel ? '0%' : isRightLabel ? '-100%' : '-50%';
+                    const translateY = isTopLabel ? '0%' : isBottomLabel ? '-100%' : '-50%';
 
                     return (
                         <motion.div
                             key={`label-${branch.def.id}`}
-                            className="absolute z-5 text-center pointer-events-none"
+                            className="absolute z-[5] pointer-events-none"
                             style={{
                                 left: `${(pos.x / width) * 100}%`,
                                 top: `${(pos.y / height) * 100}%`,
-                                transform: 'translate(-50%, -50%)',
+                                transform: `translate(${translateX}, ${translateY})`,
+                                textAlign,
                             }}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: isFocusDimmed ? 0.12 : 0.75, y: 0 }}
