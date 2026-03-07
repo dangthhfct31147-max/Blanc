@@ -54,7 +54,7 @@ export default function DesktopConstellation({
         branchAngles,
         tierDistances,
     } = DESKTOP_LAYOUT;
-    const canvasPadding = { top: 88, right: 92, bottom: 92, left: 92 };
+    const canvasPadding = { top: 120, right: 120, bottom: 120, left: 120 };
     const width = contentWidth + canvasPadding.left + canvasPadding.right;
     const height = contentHeight + canvasPadding.top + canvasPadding.bottom;
     const centerX = contentCenterX + canvasPadding.left;
@@ -390,9 +390,9 @@ export default function DesktopConstellation({
                     const isBottomLabel = Math.sin(angleRad) > 0.75;
                     const isRightLabel = Math.cos(angleRad) > 0.45;
                     const isLeftLabel = Math.cos(angleRad) < -0.45;
-                    const textAlign = isLeftLabel ? 'left' : isRightLabel ? 'right' : 'center';
-                    const translateX = isLeftLabel ? '0%' : isRightLabel ? '-100%' : '-50%';
-                    const translateY = isTopLabel ? '0%' : isBottomLabel ? '-100%' : '-50%';
+                    const textAlign = isLeftLabel ? 'right' : isRightLabel ? 'left' : 'center';
+                    const translateX = isLeftLabel ? '-100%' : isRightLabel ? '0%' : '-50%';
+                    const translateY = isTopLabel ? '-100%' : isBottomLabel ? '0%' : '-50%';
 
                     return (
                         <motion.div
