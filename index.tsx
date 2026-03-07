@@ -18,6 +18,15 @@ if (!rootElement) {
   throw new Error('Could not find root element to mount to');
 }
 
+const clerkLocalization = {
+  signIn: {
+    start: {
+      title: 'Sign in to Blanc',
+      titleCombined: 'Sign in to Blanc',
+    },
+  },
+};
+
 const ClerkProviderWithRouter: React.FC<{ children: React.ReactNode; publishableKey: string }> = ({
   children,
   publishableKey,
@@ -30,6 +39,7 @@ const ClerkProviderWithRouter: React.FC<{ children: React.ReactNode; publishable
       signInUrl="/login"
       signUpUrl="/register"
       afterSignOutUrl="/"
+      localization={clerkLocalization}
       __internal_bypassMissingPublishableKey={!publishableKey}
       {...({
         routerPush: (to: string) => navigate(to),
