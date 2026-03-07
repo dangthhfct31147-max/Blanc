@@ -10,6 +10,21 @@ const ReportTemplates: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all');
 
+    const getCategoryLabel = (category: string) => {
+        switch (category) {
+            case 'contest':
+                return t('reports.templates.category.contest');
+            case 'team':
+                return t('reports.templates.category.team');
+            case 'study':
+                return t('reports.templates.category.study');
+            case 'analysis':
+                return t('reports.templates.category.analysis');
+            default:
+                return category;
+        }
+    };
+
     const templates: ReportTemplate[] = [
         // Contest
         { id: 'contest-recap', title: t('reports.templates.items.contestRecap.title'), description: t('reports.templates.items.contestRecapFull.description'), category: 'contest', icon: 'Trophy' },
@@ -143,7 +158,7 @@ const ReportTemplates: React.FC = () => {
                             <div className="grow">
                                 <div className="flex items-center gap-2 mb-2">
                                     <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${getCategoryColor(template.category)}`}>
-                                        {t(`reports.templates.category.${template.category}`)}
+                                        {getCategoryLabel(template.category)}
                                     </span>
                                 </div>
                                 <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-primary-700 transition-colors">

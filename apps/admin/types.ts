@@ -140,6 +140,8 @@ export interface Contest {
   organizerDetails?: OrganizerDetails; // Extended organizer info
   maxParticipants?: number;
   registrationCount?: number;
+  createdAt?: string | null;
+  updatedAt?: string | null;
   // Comments/Reviews
   comments?: Comment[];
 }

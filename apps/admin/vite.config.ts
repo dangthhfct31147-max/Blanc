@@ -1,11 +1,12 @@
 import path from 'path';
 import { defineConfig } from 'vite';
+import type { PluginContext } from 'rollup';
 import react from '@vitejs/plugin-react';
 
 function buildStampPlugin() {
   return {
     name: 'build-stamp',
-    generateBundle() {
+    generateBundle(this: PluginContext) {
       const sha =
         process.env.RAILWAY_GIT_COMMIT_SHA ||
         process.env.COMMIT_SHA ||

@@ -289,6 +289,20 @@ router.get('/:userId', authGuard, async (req, res, next) => {
         // Compute overall level based on total XP
         const overallLevel = Math.floor(totalXP / 100) + 1;
 
+        // ── v2 enriched fields ───────────────────
+        const completedContestsCount = userRegistrations.filter(r => r.status === 'completed').length;
+        const completedCoursesCount = userEnrollments.filter(e => e.status === 'completed').length;
+
+        // Count project submissions
+        let projectsSubmittedCount = 0;
+        try {
+            const submissions = getCollection('project_submissions');
+            projectsSubmittedCount = await submissions.countDocuments({ userId: userObjectId });
+        } catch { /* collection may not exist */ }
+
+        // Streak (placeholder — real implementation would track daily login)
+        const streakDays = 0;
+
         res.json({
             user: {
                 id: user._id.toString(),
@@ -298,6 +312,11 @@ router.get('/:userId', authGuard, async (req, res, next) => {
             totalXP,
             overallLevel,
             branches,
+            // v2 fields
+            contestsCompleted: completedContestsCount,
+            projectsSubmitted: projectsSubmittedCount,
+            coursesCompleted: completedCoursesCount,
+            streakDays,
         });
     } catch (error) {
         next(error);

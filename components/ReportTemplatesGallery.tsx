@@ -12,6 +12,23 @@ export const ReportTemplatesGallery: React.FC<ReportTemplatesGalleryProps> = ({ 
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all');
 
+    const getCategoryLabel = (category: string) => {
+        switch (category) {
+            case 'study':
+                return t('reports.templates.category.study');
+            case 'contest':
+                return t('reports.templates.category.contest');
+            case 'team':
+                return t('reports.templates.category.team');
+            case 'course':
+                return t('reports.templates.category.course');
+            case 'analysis':
+                return t('reports.templates.category.analysis');
+            default:
+                return category;
+        }
+    };
+
     const templates: ReportTemplate[] = [
         // Study
         { id: 'weekly-progress', title: t('reports.templates.items.weeklyProgress.title'), description: t('reports.templates.items.weeklyProgress.description'), category: 'study', icon: 'BarChart' },
@@ -116,7 +133,7 @@ export const ReportTemplatesGallery: React.FC<ReportTemplatesGalleryProps> = ({ 
                         <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
-                                    {t(`reports.templates.category.${template.category}`)}
+                                    {getCategoryLabel(template.category)}
                                 </span>
                             </div>
                             <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-blue-700 transition-colors">

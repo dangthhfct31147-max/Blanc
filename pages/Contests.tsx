@@ -853,7 +853,7 @@ END:VCALENDAR`;
                 { value: 'reviews', label: t('contests.detail.tabs.reviews') },
               ]}
               activeTab={activeTab}
-              onChange={setActiveTab}
+              onChange={(tab) => setActiveTab(tab as ContestDetailTab)}
             />
 
             <div className="prose prose-slate max-w-none">

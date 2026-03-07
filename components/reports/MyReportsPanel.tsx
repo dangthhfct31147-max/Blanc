@@ -296,8 +296,8 @@ const MyReportsPanel: React.FC<MyReportsPanelProps> = ({ isLocked }) => {
       toast.error(t('reports.toast.upgradeRequired'));
       return;
     }
-    const t = createTitle.trim();
-    if (!t) {
+    const trimmedTitle = createTitle.trim();
+    if (!trimmedTitle) {
       toast.error(t('reports.toast.titleRequired'));
       return;
     }
@@ -307,7 +307,7 @@ const MyReportsPanel: React.FC<MyReportsPanelProps> = ({ isLocked }) => {
 
     try {
       const created = await reportService.create({
-        title: t,
+        title: trimmedTitle,
         template: createTemplate,
         status: 'Draft',
         content: '',
@@ -338,10 +338,10 @@ const MyReportsPanel: React.FC<MyReportsPanelProps> = ({ isLocked }) => {
     if (isLocked) return;
     if (validationError) return;
 
-    const t = window.setTimeout(() => {
+    const autosaveTimer = window.setTimeout(() => {
       void save();
     }, 900);
-    return () => window.clearTimeout(t);
+    return () => window.clearTimeout(autosaveTimer);
   }, [selectedId, isDirty, isSaving, isLocked, validationError, title, content, status, relatedType, relatedId, activities, evidence]);
 
   const filteredReports = useMemo(() => {
