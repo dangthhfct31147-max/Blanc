@@ -10,6 +10,7 @@ import { Button, Card, Badge } from './ui/Common';
 import { api } from '../lib/api';
 import { ROLE_COLORS } from '../constants/profileOptions';
 import RadarChart from './ui/RadarChart';
+import { useAppAuth } from '../contexts/AppAuthContext';
 
 // ============================================================================
 // TYPES
@@ -607,6 +608,7 @@ const TeammateRecommendations: React.FC<TeammateRecommendationsProps> = ({
     onInvite
 }) => {
     const navigate = useNavigate();
+    const { authStatus, refreshUser, syncError, user } = useAppAuth();
     const [recommendations, setRecommendations] = useState<TeammateRecommendation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -614,7 +616,7 @@ const TeammateRecommendations: React.FC<TeammateRecommendationsProps> = ({
     const [profileCompletion, setProfileCompletion] = useState<ProfileCompletionResponse | null>(null);
     const [selectedTeammate, setSelectedTeammate] = useState<TeammateRecommendation | null>(null);
 
-    const isLoggedIn = !!localStorage.getItem('user');
+    const isLoggedIn = authStatus === 'authenticated' && Boolean(user);
 
     const handleViewDetails = (teammate: TeammateRecommendation) => {
         setSelectedTeammate(teammate);
@@ -690,7 +692,7 @@ const TeammateRecommendations: React.FC<TeammateRecommendationsProps> = ({
     }, [fetchRecommendations, fetchProfileCompletion]);
 
     // Not logged in
-    if (!isLoggedIn) {
+    if (authStatus === 'signed_out') {
         return (
             <Card className={`p-6 ${className}`}>
                 <div className="text-center">
@@ -705,6 +707,25 @@ const TeammateRecommendations: React.FC<TeammateRecommendationsProps> = ({
                         onClick={() => window.dispatchEvent(new CustomEvent('show-auth-modal', { detail: { mode: 'login' } }))}
                     >
                         Đăng nhập ngay
+                    </Button>
+                </div>
+            </Card>
+        );
+    }
+
+    if (authStatus === 'sync_error') {
+        return (
+            <Card className={`p-6 ${className}`}>
+                <div className="text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-amber-100 rounded-full flex items-center justify-center">
+                        <Users className="w-8 h-8 text-amber-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-2">Chưa thể tải gợi ý đồng đội</h3>
+                    <p className="text-slate-500 text-sm mb-4">
+                        {syncError?.message || 'Tài khoản của bạn chưa được đồng bộ với hệ thống nên chưa thể lấy gợi ý.'}
+                    </p>
+                    <Button onClick={() => { void refreshUser(); }}>
+                        Đồng bộ lại
                     </Button>
                 </div>
             </Card>

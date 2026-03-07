@@ -9,6 +9,7 @@ import UserAvatar from '../components/UserAvatar';
 import { api } from '../lib/api';
 import { TeamPost } from '../types';
 import { useI18n } from '../contexts/I18nContext';
+import { useAppAuth } from '../contexts/AppAuthContext';
 
 const ROLES = [
    'Frontend Dev',
@@ -58,6 +59,7 @@ interface TeamPostsResponse {
 
 const Community: React.FC = () => {
    const { locale } = useI18n();
+   const { authStatus, syncError, user } = useAppAuth();
    const isEn = locale === 'en';
 
    const copy = useMemo(() => isEn ? {
@@ -148,21 +150,8 @@ const Community: React.FC = () => {
    const [isMembersManagerOpen, setIsMembersManagerOpen] = useState(false);
    const dropdownRef = useRef<HTMLDivElement>(null);
 
-   const isLoggedIn = !!localStorage.getItem('user');
-
-   // Get current user ID from stored user info
-   const getCurrentUserId = () => {
-      try {
-         const userStr = localStorage.getItem('user');
-         if (userStr) {
-            const user = JSON.parse(userStr);
-            return user.id || user._id;
-         }
-      } catch { }
-      return undefined;
-   };
-
-   const currentUserId = getCurrentUserId();
+   const isLoggedIn = authStatus === 'authenticated' && Boolean(user);
+   const currentUserId = user?.id;
 
    // Close dropdown when clicking outside
    useEffect(() => {
@@ -217,8 +206,14 @@ const Community: React.FC = () => {
    };
 
    const handleCreateClick = () => {
-      if (!isLoggedIn) {
+      if (authStatus === 'signed_out') {
          window.dispatchEvent(new CustomEvent('show-auth-modal', { detail: { mode: 'login' } }));
+         return;
+      }
+      if (!isLoggedIn) {
+         alert(syncError?.message || (isEn
+            ? 'Your account is still syncing. Please wait a moment and try again.'
+            : 'Tài khoản của bạn đang được đồng bộ. Vui lòng đợi một chút rồi thử lại.'));
          return;
       }
       setIsModalOpen(true);

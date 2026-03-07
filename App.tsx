@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-
 import { Toaster } from 'react-hot-toast';
 
 import Layout from './components/Layout';
+import AuthSyncNotice from './components/AuthSyncNotice';
 import ScrollToTop from './components/ScrollToTop';
 import LoadingSpinner from './components/LoadingSpinner';
 import ChatBubble from './components/ChatBubble';
@@ -68,11 +69,26 @@ const IDLE_USER_KEY = clientStorage.buildKey('session', 'last_activity_user');
 const IDLE_ACTIVITY_THROTTLE_MS = 5000;
 
 const RequireAppAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, isBootstrapping } = useAppAuth();
+  const { authStatus, logout, refreshUser, syncError, user } = useAppAuth();
   const location = useLocation();
 
-  if (isBootstrapping) {
+  if (authStatus === 'loading' || authStatus === 'syncing') {
     return <LoadingSpinner fullScreen />;
+  }
+
+  if (authStatus === 'sync_error') {
+    return (
+      <div className="min-h-[60vh] bg-slate-50 px-4 py-10">
+        <div className="mx-auto max-w-2xl">
+          <AuthSyncNotice
+            status="error"
+            syncError={syncError}
+            onRetry={() => { void refreshUser(); }}
+            onSignOut={() => { void logout(); }}
+          />
+        </div>
+      </div>
+    );
   }
 
   if (!user) {
@@ -86,12 +102,13 @@ const RequireAppAuth: React.FC<{ children: React.ReactNode }> = ({ children }) =
 const App: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAppAuth();
+  const { authStatus, logout, refreshUser, syncError, user } = useAppAuth();
   const isChatEnabled = import.meta.env.VITE_CHAT_ENABLED === 'true';
   const [sessionTimeoutMs, setSessionTimeoutMs] = useState(DEFAULT_SESSION_TIMEOUT_MINUTES * 60 * 1000);
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastActivityRef = useRef<number>(Date.now());
   const lastPersistedActivityRef = useRef<number>(0);
+  const displayUser = authStatus === 'authenticated' ? user : null;
 
   useEffect(() => {
     let isMounted = true;
@@ -139,7 +156,7 @@ const App: React.FC = () => {
   }, [location.hash, location.pathname, location.search, navigate]);
 
   useEffect(() => {
-    if (!user) {
+    if (!displayUser) {
       if (idleTimerRef.current) {
         clearTimeout(idleTimerRef.current);
         idleTimerRef.current = null;
@@ -158,10 +175,10 @@ const App: React.FC = () => {
     const storedUserId = localStorage.getItem(IDLE_USER_KEY);
     const storedActivity = Number(localStorage.getItem(IDLE_ACTIVITY_KEY));
 
-    if (storedUserId !== user.id || !Number.isFinite(storedActivity) || storedActivity <= 0) {
+    if (storedUserId !== displayUser.id || !Number.isFinite(storedActivity) || storedActivity <= 0) {
       lastActivityRef.current = now;
       lastPersistedActivityRef.current = now;
-      localStorage.setItem(IDLE_USER_KEY, user.id);
+      localStorage.setItem(IDLE_USER_KEY, displayUser.id);
       localStorage.setItem(IDLE_ACTIVITY_KEY, String(now));
     } else {
       lastActivityRef.current = storedActivity;
@@ -241,7 +258,7 @@ const App: React.FC = () => {
       window.removeEventListener('storage', handleStorage);
       document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, [handleLogout, sessionTimeoutMs, user]);
+  }, [displayUser, handleLogout, sessionTimeoutMs]);
 
   return (
     <>
@@ -279,7 +296,17 @@ const App: React.FC = () => {
         <Route path="/register" element={<Auth type="register" />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        <Route element={<Layout user={user} onLogout={handleLogout} />}>
+        <Route
+          element={(
+            <Layout
+              user={displayUser}
+              authStatus={authStatus}
+              authSyncError={syncError}
+              onLogout={handleLogout}
+              onRetryAuthSync={() => { void refreshUser(); }}
+            />
+          )}
+        >
           <Route path="/" element={<Home />} />
           <Route
             path="/contests"

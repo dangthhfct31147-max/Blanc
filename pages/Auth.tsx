@@ -3,10 +3,11 @@ import { Navigate, useSearchParams } from 'react-router-dom';
 import { SignIn, SignUp } from '@clerk/clerk-react';
 import { useAppAuth } from '../contexts/AppAuthContext';
 import { getClerkPublishableKey, getClerkPublishableKeyIssue } from '../lib/clerkConfig';
+import AuthSyncNotice from '../components/AuthSyncNotice';
 
 const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
   const [searchParams] = useSearchParams();
-  const { user } = useAppAuth();
+  const { authStatus, isSignedIn, logout, refreshUser, syncError, user } = useAppAuth();
   const clerkPublishableKey = getClerkPublishableKey();
   const clerkConfigIssue = getClerkPublishableKeyIssue();
 
@@ -28,7 +29,7 @@ const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
     && clerkErrorPayload.includes('external_account')
     && clerkErrorPayload.includes('not_found');
 
-  if (user) {
+  if (authStatus === 'authenticated' && user) {
     return <Navigate to={redirectTarget} replace />;
   }
 
@@ -53,6 +54,32 @@ const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
           <p className="mt-3 text-sm text-slate-600">
             {message}
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (authStatus === 'syncing') {
+    return (
+      <div className="min-h-screen bg-slate-50 px-4 py-10">
+        <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-xl items-center justify-center">
+          <AuthSyncNotice status="syncing" className="w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (isSignedIn && authStatus === 'sync_error') {
+    return (
+      <div className="min-h-screen bg-slate-50 px-4 py-10">
+        <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-xl items-center justify-center">
+          <AuthSyncNotice
+            status="error"
+            syncError={syncError}
+            onRetry={() => { void refreshUser(); }}
+            onSignOut={() => { void logout(); }}
+            className="w-full"
+          />
         </div>
       </div>
     );

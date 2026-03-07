@@ -4,10 +4,23 @@ import { api, setAccessTokenProvider, authToken, invalidateCache } from '../lib/
 import { localDrafts } from '../lib/cache';
 import { User } from '../types';
 
+export type AppAuthStatus = 'loading' | 'signed_out' | 'syncing' | 'authenticated' | 'sync_error';
+
+export interface AppAuthSyncError {
+  title: string;
+  message: string;
+  detail?: string;
+  status?: number;
+  code?: string;
+  canRetry: boolean;
+}
+
 interface AppAuthContextValue {
   user: User | null;
   isSignedIn: boolean;
   isBootstrapping: boolean;
+  authStatus: AppAuthStatus;
+  syncError: AppAuthSyncError | null;
   refreshUser: () => Promise<User | null>;
   logout: () => Promise<void>;
 }
@@ -33,11 +46,75 @@ function clearStoredUser() {
   window.dispatchEvent(new Event('auth-change'));
 }
 
+function buildAuthSyncError(error: unknown): AppAuthSyncError {
+  const status =
+    typeof (error as { status?: unknown })?.status === 'number'
+      ? Number((error as { status?: number }).status)
+      : undefined;
+  const code =
+    typeof (error as { code?: unknown })?.code === 'string'
+      ? String((error as { code?: string }).code)
+      : undefined;
+  const detail =
+    error instanceof Error && String(error.message || '').trim()
+      ? String(error.message || '').trim()
+      : undefined;
+  const normalizedDetail = detail?.toLowerCase() || '';
+
+  if (status === 503) {
+    return {
+      title: 'Clerk chưa được cấu hình trên máy chủ',
+      message: 'Bạn đã đăng nhập bằng Clerk nhưng backend chưa sẵn sàng để đồng bộ tài khoản. Hãy cấu hình `CLERK_SECRET_KEY` và `CLERK_PUBLISHABLE_KEY`, rồi thử lại.',
+      detail,
+      status,
+      code,
+      canRetry: true,
+    };
+  }
+
+  if (status === 404) {
+    return {
+      title: 'Không tìm thấy hồ sơ nội bộ',
+      message: 'Phiên Clerk của bạn hợp lệ nhưng hồ sơ người dùng trong hệ thống chưa được tạo hoặc không còn tồn tại. Hãy thử đồng bộ lại.',
+      detail,
+      status,
+      code,
+      canRetry: true,
+    };
+  }
+
+  if (status === 401 || status === 403) {
+    return {
+      title: 'Phiên Clerk chưa được backend chấp nhận',
+      message:
+        normalizedDetail.includes('invalid token') || normalizedDetail.includes('unauthorized')
+          ? 'Bạn đã đăng nhập bằng Clerk nhưng backend không chấp nhận phiên này. Kiểm tra cấu hình Clerk trên server và domain/redirect của Clerk rồi thử lại.'
+          : 'Bạn đã đăng nhập bằng Clerk nhưng ứng dụng chưa thể xác minh phiên này với backend. Hãy thử đồng bộ lại hoặc đăng xuất rồi đăng nhập lại.',
+      detail,
+      status,
+      code,
+      canRetry: true,
+    };
+  }
+
+  return {
+    title: 'Không thể đồng bộ tài khoản',
+    message: detail
+      ? `Ứng dụng chưa tải được hồ sơ nội bộ từ phiên Clerk hiện tại: ${detail}`
+      : 'Ứng dụng chưa tải được hồ sơ nội bộ từ phiên Clerk hiện tại. Hãy thử đồng bộ lại.',
+    detail,
+    status,
+    code,
+    canRetry: true,
+  };
+}
+
 export const AppAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoaded, isSignedIn, getToken } = useAuth();
   const { signOut } = useClerk();
   const [user, setUser] = useState<User | null>(() => readStoredUser());
   const [isBootstrapping, setIsBootstrapping] = useState(true);
+  const [syncError, setSyncError] = useState<AppAuthSyncError | null>(null);
 
   const syncFromStorage = useCallback(() => {
     setUser(readStoredUser());
@@ -55,12 +132,50 @@ export const AppAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setUser(null);
   }, []);
 
-  const refreshUser = useCallback(async (): Promise<User | null> => {
+  const loadUserFromApi = useCallback(async (): Promise<User> => {
     const response = await api.get<{ user: User }>('/auth/me');
     const nextUser = response?.user ?? null;
+    if (!nextUser) {
+      const error = new Error('`/auth/me` returned no user payload.');
+      (error as Error & { status?: number }).status = 502;
+      throw error;
+    }
+    return nextUser;
+  }, []);
+
+  const syncResolvedUser = useCallback((nextUser: User): User => {
+    setSyncError(null);
     persistUser(nextUser);
     return nextUser;
   }, [persistUser]);
+
+  const handleSyncFailure = useCallback((error: unknown) => {
+    persistUser(null);
+    const nextError = buildAuthSyncError(error);
+    setSyncError(nextError);
+    return nextError;
+  }, [persistUser]);
+
+  const refreshUser = useCallback(async (): Promise<User | null> => {
+    if (!isSignedIn) {
+      setSyncError(null);
+      persistUser(null);
+      return null;
+    }
+
+    setIsBootstrapping(true);
+    setSyncError(null);
+
+    try {
+      const nextUser = await loadUserFromApi();
+      return syncResolvedUser(nextUser);
+    } catch (error) {
+      handleSyncFailure(error);
+      throw error;
+    } finally {
+      setIsBootstrapping(false);
+    }
+  }, [handleSyncFailure, isSignedIn, loadUserFromApi, persistUser, syncResolvedUser]);
 
   const logout = useCallback(async () => {
     try {
@@ -69,6 +184,7 @@ export const AppAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Ignore legacy logout failures; Clerk sign-out is the source of truth.
     }
 
+    setSyncError(null);
     persistUser(null);
 
     try {
@@ -120,6 +236,7 @@ export const AppAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const bootstrap = async () => {
       if (!isSignedIn) {
+        setSyncError(null);
         persistUser(null);
         if (!cancelled) {
           setIsBootstrapping(false);
@@ -129,19 +246,17 @@ export const AppAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       if (!cancelled) {
         setIsBootstrapping(true);
+        setSyncError(null);
       }
 
       try {
-        await refreshUser();
+        const nextUser = await loadUserFromApi();
+        if (!cancelled) {
+          syncResolvedUser(nextUser);
+        }
       } catch (error) {
-        const status = typeof (error as { status?: unknown })?.status === 'number'
-          ? Number((error as { status?: number }).status)
-          : 0;
-
-        if (status === 401 || status === 403 || status === 404) {
-          persistUser(null);
-        } else {
-          syncFromStorage();
+        if (!cancelled) {
+          handleSyncFailure(error);
         }
       } finally {
         if (!cancelled) {
@@ -155,15 +270,26 @@ export const AppAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return () => {
       cancelled = true;
     };
-  }, [isLoaded, isSignedIn, persistUser, refreshUser, syncFromStorage]);
+  }, [handleSyncFailure, isLoaded, isSignedIn, loadUserFromApi, persistUser, syncResolvedUser]);
+
+  const authStatus = useMemo<AppAuthStatus>(() => {
+    if (!isLoaded) return 'loading';
+    if (!isSignedIn) return 'signed_out';
+    if (isBootstrapping) return 'syncing';
+    if (user) return 'authenticated';
+    if (syncError) return 'sync_error';
+    return 'syncing';
+  }, [isBootstrapping, isLoaded, isSignedIn, syncError, user]);
 
   const value = useMemo<AppAuthContextValue>(() => ({
     user,
     isSignedIn: Boolean(isSignedIn),
     isBootstrapping,
+    authStatus,
+    syncError,
     refreshUser,
     logout,
-  }), [isBootstrapping, isSignedIn, logout, refreshUser, user]);
+  }), [authStatus, isBootstrapping, isSignedIn, logout, refreshUser, syncError, user]);
 
   return (
     <AppAuthContext.Provider value={value}>

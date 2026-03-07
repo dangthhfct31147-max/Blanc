@@ -6,6 +6,7 @@ import UserAvatar from './UserAvatar';
 import { TeamPost, RoleSlot } from '../types';
 import { api } from '../lib/api';
 import { useI18n } from '../contexts/I18nContext';
+import { useAppAuth } from '../contexts/AppAuthContext';
 
 interface TeamPostDetailModalProps {
     isOpen: boolean;
@@ -43,6 +44,7 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
     currentUserId
 }) => {
     const { t, locale } = useI18n();
+    const { authStatus, syncError, user } = useAppAuth();
     const dateLocale = locale === 'en' ? 'en-US' : 'vi-VN';
     const [isRequesting, setIsRequesting] = useState(false);
     const [requestSent, setRequestSent] = useState(false);
@@ -96,8 +98,12 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
     };
 
     const handleJoinRequest = async () => {
-        if (!localStorage.getItem('user')) {
+        if (authStatus === 'signed_out') {
             window.dispatchEvent(new CustomEvent('show-auth-modal', { detail: { mode: 'login' } }));
+            return;
+        }
+        if (authStatus !== 'authenticated' || !user) {
+            alert(syncError?.message || t('teamPostDetail.toast.sendFailed'));
             return;
         }
 

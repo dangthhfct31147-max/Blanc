@@ -8,14 +8,15 @@ import { newsApi } from '../lib/newsApi';
 import { PinnedNewsSlider } from '../components/PinnedNewsSlider';
 import type { NewsArticle } from '../types';
 import { useI18n } from '../contexts/I18nContext';
+import { useAppAuth } from '../contexts/AppAuthContext';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { t, locale } = useI18n();
+  const { authStatus, user } = useAppAuth();
   const numberLocale = locale === 'en' ? 'en-US' : 'vi-VN';
 
-  // Check login status
-  const isLoggedIn = !!localStorage.getItem('user');
+  const isLoggedIn = authStatus === 'authenticated' && Boolean(user);
 
   // Database hooks
   const { stats, isLoading: statsLoading } = useStats();
