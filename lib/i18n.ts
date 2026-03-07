@@ -13,6 +13,7 @@ const vi = {
   'nav.hallOfFame': 'Hall of Fame',
   'nav.community': 'Cộng đồng',
   'nav.news': 'Bản tin',
+  'nav.skillTree': 'Cây kỹ năng',
 
   'home.hero.badge': '🚀 Nền tảng phát triển cá nhân số 1 cho học sinh',
   'home.hero.titleLine1': 'Khám phá tiềm năng',
@@ -1046,7 +1047,7 @@ const vi = {
   'locale.en': 'English',
 } as const;
 
-const en: typeof vi = {
+const en: Record<keyof typeof vi, string> = {
   'nav.home': 'Home',
   'nav.contests': 'Contests',
   'nav.mentors': 'Mentors',
@@ -1056,6 +1057,7 @@ const en: typeof vi = {
   'nav.hallOfFame': 'Hall of Fame',
   'nav.community': 'Community',
   'nav.news': 'News',
+  'nav.skillTree': 'Skill Tree',
 
   'home.hero.badge': '🚀 The #1 personal growth platform for students',
   'home.hero.titleLine1': 'Unlock your potential',

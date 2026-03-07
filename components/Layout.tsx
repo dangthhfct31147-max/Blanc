@@ -53,6 +53,7 @@ const Layout: React.FC<LayoutProps> = ({
     { name: t('nav.courses'), path: '/marketplace' },
     { name: t('nav.documents'), path: '/documents' },
     { name: t('nav.hallOfFame'), path: '/hall-of-fame' },
+    { name: t('nav.skillTree'), path: '/skill-tree' },
   ];
 
   const communityItems = [
@@ -71,7 +72,8 @@ const Layout: React.FC<LayoutProps> = ({
 
   const isLearningActive = location.pathname.startsWith('/marketplace')
     || location.pathname.startsWith('/documents')
-    || location.pathname.startsWith('/hall-of-fame');
+    || location.pathname.startsWith('/hall-of-fame')
+    || location.pathname.startsWith('/skill-tree');
   const isCommunityActive = location.pathname.startsWith('/community') || location.pathname.startsWith('/news');
 
   const desktopNavLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -350,7 +352,7 @@ const Layout: React.FC<LayoutProps> = ({
             </div>
 
             {/* Desktop Nav - True Center */}
-          <nav className="hidden md:flex items-center gap-1" aria-label={t('layout.aria.mainMenu')}>
+            <nav className="hidden md:flex items-center gap-1" aria-label={t('layout.aria.mainMenu')}>
               {leadingNavItems.map((item) => (
                 <NavLink
                   key={item.path}
