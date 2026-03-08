@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import OptimizedImage from '../OptimizedImage';
 import { cn } from '../ui/Common';
 import { useI18n } from '../../contexts/I18nContext';
@@ -229,77 +229,79 @@ const contestHubStoriesVi: ContestHubStory[] = [
 ];
 
 /* ─── Framer Motion Variants ─── */
-const fadeUp = {
+const EMPHATIC_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const fadeUp: Variants = {
   hidden: { y: 28, opacity: 0 },
   visible: (i: number) => ({
     y: 0,
     opacity: 1,
-    transition: { duration: 0.45, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.45, delay: i * 0.06, ease: EMPHATIC_EASE },
   }),
 };
 
-const fadeIn = {
+const fadeIn: Variants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.4, ease: 'easeOut' } },
+  visible: { opacity: 1, transition: { duration: 0.4, ease: 'easeOut' as const } },
 };
 
-const slideFromLeft = {
+const slideFromLeft: Variants = {
   hidden: { x: -32, opacity: 0 },
   visible: {
     x: 0,
     opacity: 1,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: EMPHATIC_EASE },
   },
 };
 
-const slideFromRight = {
+const slideFromRight: Variants = {
   hidden: { x: 32, opacity: 0 },
   visible: {
     x: 0,
     opacity: 1,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: EMPHATIC_EASE },
   },
 };
 
-const scaleReveal = {
+const scaleReveal: Variants = {
   hidden: { scale: 0.95, opacity: 0 },
   visible: {
     scale: 1,
     opacity: 1,
-    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.45, ease: EMPHATIC_EASE },
   },
 };
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: {},
   visible: {
     transition: { staggerChildren: 0.05, delayChildren: 0.08 },
   },
 };
 
-const staggerChild = {
+const staggerChild: Variants = {
   hidden: { y: 14, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
-    transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.35, ease: EMPHATIC_EASE },
   },
 };
 
-const bulletReveal = {
+const bulletReveal: Variants = {
   hidden: { x: -10, opacity: 0 },
   visible: (i: number) => ({
     x: 0,
     opacity: 1,
-    transition: { duration: 0.3, delay: 0.15 + i * 0.06, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.3, delay: 0.15 + i * 0.06, ease: EMPHATIC_EASE },
   }),
 };
 
-const lineGrow = {
+const lineGrow: Variants = {
   hidden: { scaleY: 0 },
   visible: {
     scaleY: 1,
-    transition: { duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, delay: 0.1, ease: EMPHATIC_EASE },
   },
 };
 
@@ -325,14 +327,15 @@ const StoryCard: React.FC<{
       className="group relative"
     >
       {/* Decorative vertical accent line */}
-      <motion.div
-        variants={lineGrow}
-        className={cn(
-          'absolute left-1/2 -top-6 h-12 w-px origin-top -translate-x-1/2 bg-linear-to-b md:-top-8 md:h-16',
-          story.tone.accentLine,
-        )}
-        style={{ display: index === 0 ? 'none' : 'block' }}
-      />
+      {index !== 0 && (
+        <motion.div
+          variants={lineGrow}
+          className={cn(
+            'absolute left-1/2 -top-6 h-12 w-px origin-top -translate-x-1/2 bg-linear-to-b md:-top-8 md:h-16',
+            story.tone.accentLine,
+          )}
+        />
+      )}
 
       <div className="relative overflow-hidden rounded-4xl border border-slate-200/80 bg-white/95 shadow-[0_24px_80px_-40px_rgba(15,23,42,0.18)] ring-1 ring-white/70 backdrop-blur-sm transition-all duration-500 hover:shadow-[0_32px_100px_-36px_rgba(15,23,42,0.22)]">
         <div className={cn('absolute inset-0 bg-linear-to-br opacity-80', story.tone.surfaceTint)} />
@@ -446,7 +449,7 @@ const StoryCard: React.FC<{
                   initial={{ y: 12, opacity: 0 }}
                   whileInView={{ y: 0, opacity: 1 }}
                   viewport={VIEWPORT_OPTS}
-                  transition={{ duration: 0.35, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.35, delay: 0.2, ease: EMPHATIC_EASE }}
                   className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/50 bg-white/80 px-5 py-3.5 shadow-lg shadow-slate-900/8 backdrop-blur-md"
                 >
                   <p className="text-sm font-medium leading-6 text-slate-700">

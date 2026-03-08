@@ -58,6 +58,7 @@ const Layout: React.FC<LayoutProps> = ({
 
   const communityItems = [
     { name: t('nav.community'), path: '/community' },
+    { name: t('nav.peerReview'), path: '/peer-review' },
     { name: t('nav.news'), path: '/news' },
   ];
 
@@ -74,7 +75,7 @@ const Layout: React.FC<LayoutProps> = ({
     || location.pathname.startsWith('/documents')
     || location.pathname.startsWith('/hall-of-fame')
     || location.pathname.startsWith('/skill-tree');
-  const isCommunityActive = location.pathname.startsWith('/community') || location.pathname.startsWith('/news');
+  const isCommunityActive = location.pathname.startsWith('/community') || location.pathname.startsWith('/news') || location.pathname.startsWith('/peer-review');
 
   const desktopNavLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
@@ -343,13 +344,13 @@ const Layout: React.FC<LayoutProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-center">
             {/* Logo - Absolute left */}
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 flex flex-row items-center cursor-pointer" onClick={() => navigate('/')}>
+            <NavLink to="/" aria-label="Blanc home" className="absolute left-0 top-1/2 flex -translate-y-1/2 flex-row items-center">
               <img src="/logo.png" alt="Blanc Logo" className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover shrink-0" />
               <div className="ml-2 md:ml-3 flex-col hidden sm:flex">
                 <span className="text-sm font-semibold text-slate-800 leading-tight">Beyond Learning</span>
                 <span className="text-xs text-slate-500 leading-tight">And New Challenges</span>
               </div>
-            </div>
+            </NavLink>
 
             {/* Desktop Nav - True Center */}
             <nav className="hidden md:flex items-center gap-1" aria-label={t('layout.aria.mainMenu')}>
@@ -382,18 +383,12 @@ const Layout: React.FC<LayoutProps> = ({
                     if (e.key === 'Escape') setIsLearningOpen(false);
                   }}
                   className={desktopNavDropdownButtonClass(isLearningActive, isLearningOpen)}
-                  aria-haspopup="menu"
-                  aria-expanded={isLearningOpen}
-                  aria-controls="learning-menu"
                 >
                   <span>{t('nav.learning')}</span>
                 </button>
 
                 {isLearningOpen && (
                   <div
-                    id="learning-menu"
-                    role="menu"
-                    aria-label={t('nav.learning')}
                     className="absolute left-1/2 -translate-x-1/2 mt-3 w-52 bg-white rounded-xl shadow-xl border border-slate-100 p-1 animation-fade-in z-50"
                   >
                     {learningItems.map((item) => (
@@ -401,7 +396,6 @@ const Layout: React.FC<LayoutProps> = ({
                         key={item.path}
                         to={item.path}
                         className={desktopDropdownLinkClass}
-                        role="menuitem"
                         onClick={() => setIsLearningOpen(false)}
                       >
                         {item.name}
@@ -429,18 +423,12 @@ const Layout: React.FC<LayoutProps> = ({
                     if (e.key === 'Escape') setIsCommunityOpen(false);
                   }}
                   className={desktopNavDropdownButtonClass(isCommunityActive, isCommunityOpen)}
-                  aria-haspopup="menu"
-                  aria-expanded={isCommunityOpen}
-                  aria-controls="community-menu"
                 >
                   <span>{t('nav.community')}</span>
                 </button>
 
                 {isCommunityOpen && (
                   <div
-                    id="community-menu"
-                    role="menu"
-                    aria-label={t('nav.community')}
                     className="absolute left-1/2 -translate-x-1/2 mt-3 w-52 bg-white rounded-xl shadow-xl border border-slate-100 p-1 animation-fade-in z-50"
                   >
                     {communityItems.map((item) => (
@@ -448,7 +436,6 @@ const Layout: React.FC<LayoutProps> = ({
                         key={item.path}
                         to={item.path}
                         className={desktopDropdownLinkClass}
-                        role="menuitem"
                         onClick={() => setIsCommunityOpen(false)}
                       >
                         {item.name}
@@ -652,14 +639,12 @@ const Layout: React.FC<LayoutProps> = ({
                     })
                   }
                   className={mobileNavDropdownButtonClass(isLearningActive, isLearningMobileOpen)}
-                  aria-expanded={isLearningMobileOpen}
-                  aria-controls="learning-menu-mobile"
                 >
                   <span>{t('nav.learning')}</span>
                 </button>
 
                 {isLearningMobileOpen && (
-                  <div id="learning-menu-mobile" className="mt-1 space-y-1 pl-4 border-l border-slate-100 ml-4">
+                  <div className="mt-1 space-y-1 pl-4 border-l border-slate-100 ml-4">
                     {learningItems.map((item) => (
                       <NavLink
                         key={item.path}
@@ -688,14 +673,12 @@ const Layout: React.FC<LayoutProps> = ({
                     })
                   }
                   className={mobileNavDropdownButtonClass(isCommunityActive, isCommunityMobileOpen)}
-                  aria-expanded={isCommunityMobileOpen}
-                  aria-controls="community-menu-mobile"
                 >
                   <span>{t('nav.community')}</span>
                 </button>
 
                 {isCommunityMobileOpen && (
-                  <div id="community-menu-mobile" className="mt-1 space-y-1 pl-4 border-l border-slate-100 ml-4">
+                  <div className="mt-1 space-y-1 pl-4 border-l border-slate-100 ml-4">
                     {communityItems.map((item) => (
                       <NavLink
                         key={item.path}

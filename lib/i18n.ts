@@ -13,6 +13,7 @@ const vi = {
   'nav.hallOfFame': 'Hall of Fame',
   'nav.community': 'Cộng đồng',
   'nav.news': 'Bản tin',
+  'nav.peerReview': 'Đánh giá chéo',
   'nav.skillTree': 'Cây kỹ năng',
 
   'home.hero.badge': '🚀 Nền tảng phát triển cá nhân số 1 cho học sinh',
@@ -1057,6 +1058,7 @@ const en: Record<keyof typeof vi, string> = {
   'nav.hallOfFame': 'Hall of Fame',
   'nav.community': 'Community',
   'nav.news': 'News',
+  'nav.peerReview': 'Peer Review',
   'nav.skillTree': 'Skill Tree',
 
   'home.hero.badge': '🚀 The #1 personal growth platform for students',

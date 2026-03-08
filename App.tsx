@@ -54,6 +54,7 @@ const CourseDetail = lazyWithRetry(() => import('./pages/Marketplace').then((m) 
 const Documents = lazyWithRetry(() => import('./pages/Documents'));
 const HallOfFame = lazyWithRetry(() => import('./pages/HallOfFame'));
 const Community = lazyWithRetry(() => import('./pages/Community'));
+const PeerReview = lazyWithRetry(() => import('./pages/PeerReview'));
 const News = lazyWithRetry(() => import('./pages/News'));
 const MentorList = lazyWithRetry(() => import('./pages/Mentors').then((m) => ({ default: m.MentorList })));
 const MentorDetail = lazyWithRetry(() => import('./pages/Mentors').then((m) => ({ default: m.MentorDetail })));
@@ -363,6 +364,14 @@ const App: React.FC = () => {
             element={(
               <Suspense fallback={<LoadingSpinner fullScreen />}>
                 <Community />
+              </Suspense>
+            )}
+          />
+          <Route
+            path="/peer-review"
+            element={(
+              <Suspense fallback={<LoadingSpinner fullScreen />}>
+                <PeerReview />
               </Suspense>
             )}
           />
