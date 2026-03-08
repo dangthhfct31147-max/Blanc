@@ -339,7 +339,11 @@ const StoryCard: React.FC<{
         <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-slate-200/90 to-transparent" />
 
         {/* Giant ghost number */}
-        <div className={cn('pointer-events-none absolute -right-4 -top-8 select-none text-[10rem] font-black leading-none tracking-tighter md:-right-2 md:-top-6 md:text-[14rem]', story.tone.numberColor)}>
+        <div className={cn(
+          'pointer-events-none absolute -top-8 select-none text-[10rem] font-black leading-none tracking-tighter md:-top-6 md:text-[14rem]',
+          reverseOnDesktop ? '-left-4 md:-left-2' : '-right-4 md:-right-2',
+          story.tone.numberColor,
+        )}>
           {storyNumber}
         </div>
 
