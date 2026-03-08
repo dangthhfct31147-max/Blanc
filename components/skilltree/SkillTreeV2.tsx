@@ -10,7 +10,7 @@ import {
 import type { BranchId, ComputedBranch, ComputedNode, Locale, Recommendation, UserSkillTreeState } from './types';
 import { BRANCH_MAP, xpToNextLevel } from './data';
 import { computeSkillTree } from './engine';
-import DesktopConstellation from './DesktopConstellation';
+import SkillTree from './SkillTree';
 import MobileBranchExplorer from './MobileBranchExplorer';
 import NodeDetailPanel from './NodeDetailPanel';
 import ProgressRing from './ProgressRing';
@@ -259,7 +259,7 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
                 <div className="p-4 sm:p-6 lg:p-8">
                     {isDesktop ? (
                         <div className="flex justify-center">
-                            <DesktopConstellation
+                            <SkillTree
                                 branches={branches}
                                 globalXP={userState.globalXP}
                                 globalLevel={userState.globalLevel}
