@@ -17,7 +17,8 @@ COPY apps/admin/package.json ./apps/admin/package.json
 # Install deps for the whole workspace
 RUN npm ci --legacy-peer-deps
 
-# Copy only admin sources (avoid pulling entire monorepo into this image)
+# Copy admin sources plus shared build helpers used by the workspace config
+COPY build ./build
 COPY apps/admin ./apps/admin
 
 # Build admin
