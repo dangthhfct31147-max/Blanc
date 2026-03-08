@@ -13,6 +13,8 @@ const ALLOWED_MIME_TYPES = new Set([
   'image/gif',
   'image/webp',
   'application/pdf',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'video/mp4',
   'video/webm',
   'video/quicktime',
@@ -23,7 +25,7 @@ const MAX_BYTES = Number(process.env.MEDIA_MAX_BYTES || DEFAULT_MAX_BYTES);
 const PRESIGN_TTL_MS = Number(process.env.MEDIA_PRESIGN_TTL_MS || 10 * 60 * 1000);
 
 const PUBLIC_FOLDERS = new Set(
-  String(process.env.MEDIA_PUBLIC_FOLDERS || 'avatars,mentor-blog')
+  String(process.env.MEDIA_PUBLIC_FOLDERS || 'avatars,mentor-blog,peer-review')
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean)

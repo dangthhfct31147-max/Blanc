@@ -10,6 +10,8 @@ import { fileURLToPath } from 'url';
 import { getClerkPublishableKey, getClerkSecretKey } from './lib/clerkAuth.js';
 import { RateLimiters } from './lib/security.js';
 import { trackConcurrentUsers } from './lib/concurrentUsers.js';
+import { requestLogger } from './middleware/requestLogger.js';
+import logger from './lib/logger.js';
 import { ipBlocklist } from './middleware/ipBlocklist.js';
 import { requestSanitizer } from './middleware/requestSanitizer.js';
 import adminRouter from './routes/admin.js';
@@ -30,6 +32,7 @@ import newsRouter from './routes/news.js';
 import notificationsRouter from './routes/notifications.js';
 import otpRouter from './routes/otp.js';
 import paymentsRouter from './routes/payments.js';
+import peerReviewRouter from './routes/peerReview.js';
 import recruitmentsRouter from './routes/recruitments.js';
 import registrationsRouter from './routes/registrations.js';
 import reportsRouter from './routes/reports.js';
@@ -40,6 +43,7 @@ import statsRouter from './routes/stats.js';
 import teamsRouter from './routes/teams.js';
 import skillTreeRouter from './routes/skillTree.js';
 import usersRouter from './routes/users.js';
+import clientErrorsRouter from './routes/clientErrors.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -105,6 +109,9 @@ app.use(
 // Enforce admin-managed IP blocks early (best-effort, cached).
 app.use(ipBlocklist);
 
+// Structured request logging
+app.use(requestLogger);
+
 app.use(compression());
 const jsonBodyLimit = process.env.JSON_BODY_LIMIT || '10mb';
 app.use('/api/webhooks/clerk', express.raw({ type: 'application/json' }), clerkWebhooksRouter);
@@ -156,6 +163,7 @@ app.use('/api/admin', RateLimiters.admin);
 app.use('/api', RateLimiters.api);
 
 app.use('/api/health', healthRouter);
+app.use('/api/client-errors', clientErrorsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/otp', otpRouter);
 app.use('/api/contests', contestsRouter);
@@ -182,6 +190,7 @@ app.use('/api/membership', membershipRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/mentors', mentorsRouter);
 app.use('/api/skill-tree', skillTreeRouter);
+app.use('/api/peer-review', peerReviewRouter);
 
 // Serve the built user frontend from /dist when available.
 // Some deployments (reverse proxies / homelab) may not set NODE_ENV=production,
@@ -218,16 +227,18 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Not Found' });
 });
 
-app.use((err, _req, res, _next) => {
+app.use((err, req, res, _next) => {
   // Generic error handler to avoid leaking stack traces
   const status = err.status || 500;
   const message = status === 500 ? 'Unexpected error' : err.message;
-  if (status === 500) {
-    // eslint-disable-next-line no-console
-    console.error('[server-error]', err);
+  if (status >= 500) {
+    logger.error('Unhandled server error', {
+      error: err,
+      req,
+      requestId: req.requestId,
+    });
   }
   res.status(status).json({ error: message });
 });
 
 export default app;
-

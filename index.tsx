@@ -12,6 +12,10 @@ import {
   setRuntimeAppEnvironment,
   setRuntimeClerkPublishableKey,
 } from './lib/clerkConfig';
+import { initErrorTracking } from './lib/errorTracking';
+
+// Initialize error tracking early (before React renders)
+initErrorTracking();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

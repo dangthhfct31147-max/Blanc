@@ -1,6 +1,8 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+import PageTransition from './PageTransition';
 import { Menu, X, Bell, User as UserIcon, LogOut, ChevronDown, Check, Trophy, Users, Info, BookOpen, Loader2, FileText, Mail, Phone, ShieldCheck, Rocket, Sparkles } from 'lucide-react';
 import { Button, cn } from './ui/Common';
 import { User, Notification } from '../types';
@@ -10,6 +12,8 @@ import type { AppAuthStatus, AppAuthSyncError } from '../contexts/AppAuthContext
 import StreakBadge from './StreakBadge';
 import MentorBlogPrompt from './MentorBlogPrompt';
 import AuthSyncNotice from './AuthSyncNotice';
+import CommandPalette from './CommandPalette';
+import Breadcrumbs from './Breadcrumbs';
 
 interface LayoutProps {
   user: User | null;
@@ -459,6 +463,7 @@ const Layout: React.FC<LayoutProps> = ({
 
             {/* Auth/Profile Actions - Absolute right */}
             <div className="absolute right-0 hidden md:flex items-center space-x-4">
+              <CommandPalette />
               {user ? (
                 <div className="flex items-center space-x-3">
                   {/* Streak Indicator */}
@@ -601,7 +606,8 @@ const Layout: React.FC<LayoutProps> = ({
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden absolute right-0 top-1/2 -translate-y-1/2 flex items-center">
+            <div className="md:hidden absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1">
+              <CommandPalette />
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="text-slate-500 hover:text-slate-700 focus:outline-none p-2"
@@ -785,8 +791,13 @@ const Layout: React.FC<LayoutProps> = ({
       )}
 
       {/* Main Content */}
+      <Breadcrumbs />
       <main className="grow">
-        <Outlet />
+        <AnimatePresence mode="wait">
+          <PageTransition key={location.pathname}>
+            <Outlet />
+          </PageTransition>
+        </AnimatePresence>
       </main>
 
       {/* Footer - Hidden on reports page for full-screen editor */}

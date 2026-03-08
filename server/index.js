@@ -1,9 +1,11 @@
 import 'dotenv/config';
+import { createServer } from 'http';
 import app from './app.js';
 import { connectToDatabase, disconnectFromDatabase } from './lib/db.js';
 import { disconnect as disconnectCache } from './lib/cache.js';
 import { startContestReminderScheduler } from './lib/scheduler.js';
 import { validateProductionSetup } from './lib/security.js';
+import { initSocket } from './lib/socket.js';
 
 const port = process.env.PORT || 4000;
 let server;
@@ -49,7 +51,10 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 
-server = app.listen(port, () => {
+const httpServer = createServer(app);
+initSocket(httpServer);
+
+server = httpServer.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`API server listening on port ${port}`);
 });

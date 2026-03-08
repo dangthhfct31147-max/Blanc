@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 
 import Layout from './components/Layout';
@@ -7,6 +8,8 @@ import AuthSyncNotice from './components/AuthSyncNotice';
 import ScrollToTop from './components/ScrollToTop';
 import LoadingSpinner from './components/LoadingSpinner';
 import ChatBubble from './components/ChatBubble';
+import ErrorBoundary from './components/ErrorBoundary';
+import OnboardingWizard, { isOnboardingComplete } from './components/OnboardingWizard';
 
 import Home from './pages/Home';
 import Auth from './pages/Auth';
@@ -18,6 +21,8 @@ import AccountSecurity from './pages/AccountSecurity';
 import { api } from './lib/api';
 import { clientStorage } from './lib/cache';
 import { useAppAuth } from './contexts/AppAuthContext';
+import { authToken } from './lib/api';
+import { SocketProvider } from './lib/socket';
 
 interface AuthModalDetail {
   mode: 'login' | 'register';
@@ -102,6 +107,15 @@ const RequireAppAuth: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return <>{children}</>;
 };
 
+/** ErrorBoundary + Suspense wrapper for lazy routes */
+const SafeSuspense: React.FC<{ name: string; children: React.ReactNode }> = ({ name, children }) => (
+  <ErrorBoundary name={name} variant="section">
+    <Suspense fallback={<LoadingSpinner fullScreen />}>
+      {children}
+    </Suspense>
+  </ErrorBoundary>
+);
+
 const App: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -112,6 +126,14 @@ const App: React.FC = () => {
   const lastActivityRef = useRef<number>(Date.now());
   const lastPersistedActivityRef = useRef<number>(0);
   const displayUser = authStatus === 'authenticated' ? user : null;
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Show onboarding wizard once after first registration
+  useEffect(() => {
+    if (displayUser && !isOnboardingComplete()) {
+      setShowOnboarding(true);
+    }
+  }, [displayUser]);
 
   useEffect(() => {
     let isMounted = true;
@@ -263,9 +285,21 @@ const App: React.FC = () => {
     };
   }, [displayUser, handleLogout, sessionTimeoutMs]);
 
+  const socketToken = displayUser ? authToken.get() : null;
+
   return (
-    <>
+    <SocketProvider token={socketToken}>
       <ScrollToTop />
+
+      <AnimatePresence>
+        {showOnboarding && (
+          <OnboardingWizard
+            userName={displayUser?.name}
+            onComplete={() => setShowOnboarding(false)}
+          />
+        )}
+      </AnimatePresence>
+
       <Toaster
         position="top-center"
         toastOptions={{
@@ -294,194 +328,196 @@ const App: React.FC = () => {
 
       {isChatEnabled && <ChatBubble />}
 
-      <Routes>
-        <Route path="/login" element={<Auth type="login" />} />
-        <Route path="/register" element={<Auth type="register" />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+      <ErrorBoundary name="App" variant="page">
+        <Routes>
+          <Route path="/login" element={<Auth type="login" />} />
+          <Route path="/register" element={<Auth type="register" />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        <Route
-          element={(
-            <Layout
-              user={displayUser}
-              authStatus={authStatus}
-              authSyncError={syncError}
-              onLogout={handleLogout}
-              onRetryAuthSync={() => { void refreshUser(); }}
+          <Route
+            element={(
+              <Layout
+                user={displayUser}
+                authStatus={authStatus}
+                authSyncError={syncError}
+                onLogout={handleLogout}
+                onRetryAuthSync={() => { void refreshUser(); }}
+              />
+            )}
+          >
+            <Route path="/" element={<Home />} />
+            <Route
+              path="/contests"
+              element={(
+                <SafeSuspense name="Contests">
+                  <ContestList />
+                </SafeSuspense>
+              )}
             />
-          )}
-        >
-          <Route path="/" element={<Home />} />
-          <Route
-            path="/contests"
-            element={(
-              <Suspense fallback={<LoadingSpinner fullScreen />}>
-                <ContestList />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="/contests/:id"
-            element={(
-              <Suspense fallback={<LoadingSpinner fullScreen />}>
-                <ContestDetail />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="/marketplace"
-            element={(
-              <Suspense fallback={<LoadingSpinner fullScreen />}>
-                <Marketplace />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="/courses/:id"
-            element={(
-              <Suspense fallback={<LoadingSpinner fullScreen />}>
-                <CourseDetail />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="/documents"
-            element={(
-              <Suspense fallback={<LoadingSpinner fullScreen />}>
-                <Documents />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="/hall-of-fame"
-            element={(
-              <Suspense fallback={<LoadingSpinner fullScreen />}>
-                <HallOfFame />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="/community"
-            element={(
-              <Suspense fallback={<LoadingSpinner fullScreen />}>
-                <Community />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="/peer-review"
-            element={(
-              <Suspense fallback={<LoadingSpinner fullScreen />}>
-                <PeerReview />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="/news"
-            element={(
-              <Suspense fallback={<LoadingSpinner fullScreen />}>
-                <News />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="/mentors"
-            element={(
-              <Suspense fallback={<LoadingSpinner fullScreen />}>
-                <MentorList />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="/mentors/:id"
-            element={(
-              <Suspense fallback={<LoadingSpinner fullScreen />}>
-                <MentorDetail />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="/reports"
-            element={(
-              <RequireAppAuth>
-                <Suspense fallback={<LoadingSpinner fullScreen />}>
-                  <Reports />
-                </Suspense>
-              </RequireAppAuth>
-            )}
-          />
-          <Route
-            path="/reports/new"
-            element={(
-              <RequireAppAuth>
-                <Suspense fallback={<LoadingSpinner fullScreen />}>
-                  <ReportTemplates />
-                </Suspense>
-              </RequireAppAuth>
-            )}
-          />
-          <Route
-            path="/profile"
-            element={(
-              <RequireAppAuth>
-                <Suspense fallback={<LoadingSpinner fullScreen />}>
-                  <Profile />
-                </Suspense>
-              </RequireAppAuth>
-            )}
-          />
-          <Route
-            path="/contact"
-            element={(
-              <RequireAppAuth>
-                <Suspense fallback={<LoadingSpinner fullScreen />}>
-                  <Contact />
-                </Suspense>
-              </RequireAppAuth>
-            )}
-          />
-          <Route
-            path="/account/security/*"
-            element={(
-              <RequireAppAuth>
-                <AccountSecurity />
-              </RequireAppAuth>
-            )}
-          />
-          <Route
-            path="/user/:id"
-            element={(
-              <Suspense fallback={<LoadingSpinner fullScreen />}>
-                <UserProfile />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="/my-team-posts"
-            element={(
-              <RequireAppAuth>
-                <Suspense fallback={<LoadingSpinner fullScreen />}>
-                  <MyTeamPosts />
-                </Suspense>
-              </RequireAppAuth>
-            )}
-          />
-          <Route
-            path="/skill-tree"
-            element={(
-              <RequireAppAuth>
-                <Suspense fallback={<LoadingSpinner fullScreen />}>
-                  <SkillTreePage />
-                </Suspense>
-              </RequireAppAuth>
-            )}
-          />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/privacy" element={<Privacy />} />
-        </Route>
+            <Route
+              path="/contests/:id"
+              element={(
+                <SafeSuspense name="ContestDetail">
+                  <ContestDetail />
+                </SafeSuspense>
+              )}
+            />
+            <Route
+              path="/marketplace"
+              element={(
+                <SafeSuspense name="Marketplace">
+                  <Marketplace />
+                </SafeSuspense>
+              )}
+            />
+            <Route
+              path="/courses/:id"
+              element={(
+                <SafeSuspense name="CourseDetail">
+                  <CourseDetail />
+                </SafeSuspense>
+              )}
+            />
+            <Route
+              path="/documents"
+              element={(
+                <SafeSuspense name="Documents">
+                  <Documents />
+                </SafeSuspense>
+              )}
+            />
+            <Route
+              path="/hall-of-fame"
+              element={(
+                <SafeSuspense name="HallOfFame">
+                  <HallOfFame />
+                </SafeSuspense>
+              )}
+            />
+            <Route
+              path="/community"
+              element={(
+                <SafeSuspense name="Community">
+                  <Community />
+                </SafeSuspense>
+              )}
+            />
+            <Route
+              path="/peer-review"
+              element={(
+                <SafeSuspense name="PeerReview">
+                  <PeerReview />
+                </SafeSuspense>
+              )}
+            />
+            <Route
+              path="/news"
+              element={(
+                <SafeSuspense name="News">
+                  <News />
+                </SafeSuspense>
+              )}
+            />
+            <Route
+              path="/mentors"
+              element={(
+                <SafeSuspense name="Mentors">
+                  <MentorList />
+                </SafeSuspense>
+              )}
+            />
+            <Route
+              path="/mentors/:id"
+              element={(
+                <SafeSuspense name="MentorDetail">
+                  <MentorDetail />
+                </SafeSuspense>
+              )}
+            />
+            <Route
+              path="/reports"
+              element={(
+                <RequireAppAuth>
+                  <SafeSuspense name="Reports">
+                    <Reports />
+                  </SafeSuspense>
+                </RequireAppAuth>
+              )}
+            />
+            <Route
+              path="/reports/new"
+              element={(
+                <RequireAppAuth>
+                  <SafeSuspense name="ReportTemplates">
+                    <ReportTemplates />
+                  </SafeSuspense>
+                </RequireAppAuth>
+              )}
+            />
+            <Route
+              path="/profile"
+              element={(
+                <RequireAppAuth>
+                  <SafeSuspense name="Profile">
+                    <Profile />
+                  </SafeSuspense>
+                </RequireAppAuth>
+              )}
+            />
+            <Route
+              path="/contact"
+              element={(
+                <RequireAppAuth>
+                  <SafeSuspense name="Contact">
+                    <Contact />
+                  </SafeSuspense>
+                </RequireAppAuth>
+              )}
+            />
+            <Route
+              path="/account/security/*"
+              element={(
+                <RequireAppAuth>
+                  <AccountSecurity />
+                </RequireAppAuth>
+              )}
+            />
+            <Route
+              path="/user/:id"
+              element={(
+                <SafeSuspense name="UserProfile">
+                  <UserProfile />
+                </SafeSuspense>
+              )}
+            />
+            <Route
+              path="/my-team-posts"
+              element={(
+                <RequireAppAuth>
+                  <SafeSuspense name="MyTeamPosts">
+                    <MyTeamPosts />
+                  </SafeSuspense>
+                </RequireAppAuth>
+              )}
+            />
+            <Route
+              path="/skill-tree"
+              element={(
+                <RequireAppAuth>
+                  <SafeSuspense name="SkillTree">
+                    <SkillTreePage />
+                  </SafeSuspense>
+                </RequireAppAuth>
+              )}
+            />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
+          </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </ErrorBoundary>
+    </SocketProvider>
   );
 };
 

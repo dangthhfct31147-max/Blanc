@@ -1,823 +1,1328 @@
-import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useAuth } from '@clerk/clerk-react';
+import toast from 'react-hot-toast';
 import {
-    Shield, Upload, FileText, Star, ChevronDown, ChevronRight, Eye, EyeOff,
-    Award, Sparkles, Clock, CheckCircle2, AlertCircle, Search, Filter,
-    ThumbsUp, MessageSquare, Zap, Trophy, BookOpen, X, Check, Loader2,
-    BarChart3, Users, Target, ArrowRight, Send
+  AlertCircle,
+  ArrowRight,
+  Award,
+  BookOpen,
+  CheckCircle2,
+  ChevronLeft,
+  Clock3,
+  EyeOff,
+  ExternalLink,
+  FileText,
+  Gauge,
+  Loader2,
+  Lock,
+  MessageSquare,
+  RefreshCw,
+  Search,
+  Send,
+  Shield,
+  Sparkles,
+  Star,
+  Target,
+  Trophy,
+  Upload,
+  type LucideIcon,
 } from 'lucide-react';
-import { Button, Card, Badge, cn } from '../components/ui/Common';
+import { cn } from '../components/ui/Common';
 import { useI18n } from '../contexts/I18nContext';
 import { useAppAuth } from '../contexts/AppAuthContext';
+import peerReviewService, {
+  type PeerReviewDashboardResponse,
+  type PeerReviewSubmissionStatus,
+  type PeerReviewSubmissionSummary,
+  type PeerReviewSubmissionType,
+  type PeerReviewTask,
+  type ReceivedPeerReview,
+} from '../services/peerReviewService';
 
-/* ─────────── Types ─────────── */
-type SubmissionStatus = 'pending' | 'in_review' | 'reviewed';
 type TabId = 'submissions' | 'review' | 'leaderboard';
 
-interface RubricCriterion {
-    id: string;
-    label: string;
-    labelEn: string;
-    description: string;
-    descriptionEn: string;
-    maxScore: number;
-    icon: React.ReactNode;
-}
-
-interface Submission {
-    id: string;
-    title: string;
-    contestName: string;
-    type: 'slide' | 'report';
-    status: SubmissionStatus;
-    submittedAt: string;
-    reviewCount: number;
-    avgScore: number | null;
-    anonymousId: string;
-}
-
-interface ReviewTask {
-    id: string;
-    submissionTitle: string;
-    contestName: string;
-    type: 'slide' | 'report';
-    deadline: string;
-    anonymousId: string;
-    pointsReward: number;
-}
-
-interface LeaderEntry {
-    rank: number;
-    displayName: string;
-    points: number;
-    reviewsDone: number;
-    avgRating: number;
-    isCurrentUser: boolean;
-}
-
-/* ─────────── Constants ─────────── */
-const RUBRIC_CRITERIA: RubricCriterion[] = [
-    {
-        id: 'clarity',
-        label: 'Tính rõ ràng & Logic',
-        labelEn: 'Clarity & Logic',
-        description: 'Nội dung trình bày logic, mạch lạc, dễ theo dõi',
-        descriptionEn: 'Clear, logical, and easy to follow presentation',
-        maxScore: 10,
-        icon: <Target className="w-4 h-4" />,
-    },
-    {
-        id: 'creativity',
-        label: 'Sáng tạo & Độc đáo',
-        labelEn: 'Creativity & Originality',
-        description: 'Ý tưởng mới lạ, cách tiếp cận sáng tạo',
-        descriptionEn: 'Fresh ideas and creative approaches',
-        maxScore: 10,
-        icon: <Sparkles className="w-4 h-4" />,
-    },
-    {
-        id: 'design',
-        label: 'Thiết kế & Hình thức',
-        labelEn: 'Design & Visuals',
-        description: 'Bố cục đẹp, chuyên nghiệp, có thẩm mỹ',
-        descriptionEn: 'Beautiful layout, professional, aesthetically pleasing',
-        maxScore: 10,
-        icon: <Eye className="w-4 h-4" />,
-    },
-    {
-        id: 'depth',
-        label: 'Chiều sâu phân tích',
-        labelEn: 'Analysis Depth',
-        description: 'Nghiên cứu kỹ lưỡng, dữ liệu thuyết phục',
-        descriptionEn: 'Thorough research, convincing data presentation',
-        maxScore: 10,
-        icon: <BarChart3 className="w-4 h-4" />,
-    },
-    {
-        id: 'impact',
-        label: 'Tác động & Khả thi',
-        labelEn: 'Impact & Feasibility',
-        description: 'Giải pháp khả thi, có tiềm năng tạo tác động',
-        descriptionEn: 'Feasible solution with real-world impact potential',
-        maxScore: 10,
-        icon: <Zap className="w-4 h-4" />,
-    },
-];
-
-/* Mock data */
-const MOCK_SUBMISSIONS: Submission[] = [
-    { id: '1', title: 'Nền tảng học tập AI cá nhân hóa', contestName: 'Hackathon AI 2025', type: 'slide', status: 'reviewed', submittedAt: '2025-01-10', reviewCount: 3, avgScore: 42, anonymousId: 'Team-α' },
-    { id: '2', title: 'Ứng dụng quản lý rác thải thông minh', contestName: 'Green Innovation', type: 'report', status: 'in_review', submittedAt: '2025-01-12', reviewCount: 1, avgScore: null, anonymousId: 'Team-β' },
-    { id: '3', title: 'Hệ thống phân tích dữ liệu y tế', contestName: 'Health-Tech Challenge', type: 'slide', status: 'pending', submittedAt: '2025-01-14', reviewCount: 0, avgScore: null, anonymousId: 'Team-γ' },
-];
-
-const MOCK_REVIEW_TASKS: ReviewTask[] = [
-    { id: 'r1', submissionTitle: 'Smart Campus Navigator', contestName: 'Hackathon AI 2025', type: 'slide', deadline: '2025-01-18', anonymousId: 'Team-δ', pointsReward: 15 },
-    { id: 'r2', submissionTitle: 'Sustainable Fashion Marketplace', contestName: 'Green Innovation', type: 'report', deadline: '2025-01-20', anonymousId: 'Team-ε', pointsReward: 20 },
-    { id: 'r3', submissionTitle: 'Virtual Lab Experiment Platform', contestName: 'EduTech Summit', type: 'slide', deadline: '2025-01-22', anonymousId: 'Team-ζ', pointsReward: 15 },
-];
-
-const MOCK_LEADERBOARD: LeaderEntry[] = [
-    { rank: 1, displayName: 'Reviewer_Phoenix', points: 520, reviewsDone: 34, avgRating: 4.9, isCurrentUser: false },
-    { rank: 2, displayName: 'Reviewer_Sage', points: 485, reviewsDone: 31, avgRating: 4.8, isCurrentUser: false },
-    { rank: 3, displayName: 'Reviewer_Nova', points: 410, reviewsDone: 27, avgRating: 4.7, isCurrentUser: false },
-    { rank: 4, displayName: 'Reviewer_Atlas', points: 365, reviewsDone: 24, avgRating: 4.6, isCurrentUser: true },
-    { rank: 5, displayName: 'Reviewer_Echo', points: 310, reviewsDone: 20, avgRating: 4.5, isCurrentUser: false },
-    { rank: 6, displayName: 'Reviewer_Zen', points: 275, reviewsDone: 18, avgRating: 4.4, isCurrentUser: false },
-    { rank: 7, displayName: 'Reviewer_Flux', points: 240, reviewsDone: 16, avgRating: 4.3, isCurrentUser: false },
-    { rank: 8, displayName: 'Reviewer_Pulse', points: 205, reviewsDone: 14, avgRating: 4.2, isCurrentUser: false },
-];
-
-const SCORE_BAR_WIDTH_CLASSES = [
-    'w-0',
-    'w-[10%]',
-    'w-[20%]',
-    'w-[30%]',
-    'w-[40%]',
-    'w-[50%]',
-    'w-[60%]',
-    'w-[70%]',
-    'w-[80%]',
-    'w-[90%]',
-    'w-full',
-] as const;
-
-const STAGGER_DELAY_CLASSES = [
-    '[animation-delay:0ms]',
-    '[animation-delay:60ms]',
-    '[animation-delay:120ms]',
-    '[animation-delay:180ms]',
-    '[animation-delay:240ms]',
-    '[animation-delay:300ms]',
-    '[animation-delay:360ms]',
-    '[animation-delay:420ms]',
-] as const;
-
-const getScoreBarWidthClass = (value: number, max: number) => {
-    if (!Number.isFinite(value) || !Number.isFinite(max) || max <= 0) {
-        return SCORE_BAR_WIDTH_CLASSES[0];
-    }
-    const ratioIndex = Math.round((Math.max(0, Math.min(value, max)) / max) * (SCORE_BAR_WIDTH_CLASSES.length - 1));
-    return SCORE_BAR_WIDTH_CLASSES[ratioIndex];
+type RubricCriterion = {
+  id: string;
+  label: string;
+  labelEn: string;
+  description: string;
+  descriptionEn: string;
+  icon: LucideIcon;
 };
 
-const getStaggerDelayClass = (index: number) => STAGGER_DELAY_CLASSES[Math.min(index, STAGGER_DELAY_CLASSES.length - 1)];
+const RUBRIC_CRITERIA: RubricCriterion[] = [
+  {
+    id: 'clarity',
+    label: 'Tính rõ ràng & logic',
+    labelEn: 'Clarity & logic',
+    description: 'Nội dung dễ theo dõi, có cấu trúc và lập luận mạch lạc.',
+    descriptionEn: 'The submission is easy to follow with clear structure and reasoning.',
+    icon: Target,
+  },
+  {
+    id: 'creativity',
+    label: 'Sáng tạo & độc đáo',
+    labelEn: 'Creativity & originality',
+    description: 'Ý tưởng có nét riêng, cách tiếp cận không rập khuôn.',
+    descriptionEn: 'The idea shows originality and avoids a formulaic approach.',
+    icon: Sparkles,
+  },
+  {
+    id: 'design',
+    label: 'Thiết kế & trình bày',
+    labelEn: 'Design & presentation',
+    description: 'Bố cục và hình thức hỗ trợ cho việc truyền đạt nội dung.',
+    descriptionEn: 'Layout and presentation support the communication of the work.',
+    icon: FileText,
+  },
+  {
+    id: 'depth',
+    label: 'Chiều sâu phân tích',
+    labelEn: 'Depth of analysis',
+    description: 'Lập luận, minh chứng và phần đào sâu đủ sức thuyết phục.',
+    descriptionEn: 'Arguments, evidence, and depth make the work persuasive.',
+    icon: BookOpen,
+  },
+  {
+    id: 'impact',
+    label: 'Tác động & tính khả thi',
+    labelEn: 'Impact & feasibility',
+    description: 'Giải pháp có khả năng triển khai và tạo giá trị thực tế.',
+    descriptionEn: 'The solution appears practical and capable of real impact.',
+    icon: Award,
+  },
+];
 
-/* ─────────── Utility components ─────────── */
+const ACCEPTED_FILE_TYPES = new Set([
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+]);
+
+const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+
+function createEmptyRubricScores() {
+  return Object.fromEntries(RUBRIC_CRITERIA.map((criterion) => [criterion.id, 0])) as Record<string, number>;
+}
+
+function formatDateLabel(value: string | null | undefined, isEn: boolean) {
+  if (!value) return isEn ? 'N/A' : 'Chưa có';
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return value;
+  return new Intl.DateTimeFormat(isEn ? 'en-US' : 'vi-VN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(date);
+}
+
+function formatHourLabel(value: number | null | undefined, isEn: boolean) {
+  if (!Number.isFinite(Number(value))) return isEn ? 'N/A' : 'Chưa có';
+  return `${Number(value).toFixed(1)} ${isEn ? 'hours' : 'giờ'}`;
+}
+
+function formatFileSize(bytes: number) {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 MB';
+  return `${(bytes / (1024 * 1024)).toFixed(bytes >= 10 * 1024 * 1024 ? 0 : 1)} MB`;
+}
+
+function getStatusMeta(status: PeerReviewSubmissionStatus, isEn: boolean) {
+  if (status === 'reviewed') {
+    return {
+      label: isEn ? 'Fully reviewed' : 'Đủ review',
+      className: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+    };
+  }
+  if (status === 'in_review') {
+    return {
+      label: isEn ? 'In review' : 'Đang được review',
+      className: 'border-sky-200 bg-sky-50 text-sky-700',
+    };
+  }
+  return {
+    label: isEn ? 'Waiting for reviewers' : 'Đang chờ reviewer',
+    className: 'border-amber-200 bg-amber-50 text-amber-700',
+  };
+}
+
+function getTypeMeta(type: PeerReviewSubmissionType, isEn: boolean) {
+  if (type === 'report') {
+    return {
+      label: isEn ? 'Report' : 'Báo cáo',
+      className: 'bg-sky-100 text-sky-700',
+      icon: BookOpen,
+    };
+  }
+  return {
+    label: isEn ? 'Slides' : 'Slides',
+    className: 'bg-violet-100 text-violet-700',
+    icon: FileText,
+  };
+}
 
 const ScoreInput: React.FC<{
-    value: number;
-    max: number;
-    onChange: (v: number) => void;
-}> = ({ value, max, onChange }) => {
-    const pct = max > 0 ? (value / max) * 100 : 0;
-    const color = pct >= 70 ? 'bg-emerald-500' : pct >= 40 ? 'bg-amber-500' : 'bg-rose-400';
-    return (
-        <div className="flex items-center gap-3">
-            <div className="relative h-2 grow rounded-full bg-slate-100 overflow-hidden">
-                <div
-                    className={cn(
-                        'absolute inset-y-0 left-0 rounded-full transition-all duration-300',
-                        color,
-                        getScoreBarWidthClass(value, max),
-                    )}
-                />
-            </div>
-            <div className="flex items-center gap-1">
-                <button
-                    type="button"
-                    aria-label="Decrease score"
-                    className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-sm font-medium transition-colors"
-                    onClick={() => onChange(Math.max(0, value - 1))}
-                >−</button>
-                <span className="w-10 text-center text-sm font-bold tabular-nums">{value}/{max}</span>
-                <button
-                    type="button"
-                    aria-label="Increase score"
-                    className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-sm font-medium transition-colors"
-                    onClick={() => onChange(Math.min(max, value + 1))}
-                >+</button>
-            </div>
+  value: number;
+  label: string;
+  description: string;
+  icon: LucideIcon;
+  onChange: (nextValue: number) => void;
+}> = ({ value, label, description, icon: Icon, onChange }) => (
+  <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+    <div className="flex items-start gap-3">
+      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-violet-600 shadow-sm">
+        <Icon className="h-4 w-4" />
+      </div>
+      <div className="min-w-0 grow">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm font-semibold text-slate-800">{label}</p>
+          <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700 shadow-sm">{value}/10</span>
         </div>
-    );
-};
+        <p className="mt-1 text-xs leading-5 text-slate-500">{description}</p>
+        <input
+          type="range"
+          min={0}
+          max={10}
+          step={1}
+          value={value}
+          onChange={(event) => onChange(Number(event.target.value))}
+          className="mt-4 h-2 w-full cursor-pointer accent-violet-600"
+        />
+      </div>
+    </div>
+  </div>
+);
 
-const StatusBadge: React.FC<{ status: SubmissionStatus; isEn: boolean }> = ({ status, isEn }) => {
-    const config = {
-        pending: { label: isEn ? 'Pending' : 'Chờ duyệt', bg: 'bg-amber-50 text-amber-700 border-amber-200', icon: <Clock className="w-3 h-3" /> },
-        in_review: { label: isEn ? 'In Review' : 'Đang đánh giá', bg: 'bg-sky-50 text-sky-700 border-sky-200', icon: <Eye className="w-3 h-3" /> },
-        reviewed: { label: isEn ? 'Reviewed' : 'Đã đánh giá', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: <CheckCircle2 className="w-3 h-3" /> },
-    }[status];
-    return (
-        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${config.bg}`}>
-            {config.icon} {config.label}
-        </span>
-    );
-};
+const HelpfulnessRating: React.FC<{
+  rating: number | null;
+  disabled?: boolean;
+  onRate: (rating: number) => void;
+}> = ({ rating, disabled = false, onRate }) => (
+  <div className="flex items-center gap-1">
+    {Array.from({ length: 5 }, (_, index) => index + 1).map((value) => (
+      <button
+        key={value}
+        type="button"
+        disabled={disabled}
+        onClick={() => onRate(value)}
+        className={cn(
+          'rounded-lg p-1 transition-colors',
+          disabled ? 'cursor-not-allowed opacity-60' : 'hover:bg-amber-50',
+        )}
+        aria-label={`Rate review ${value} out of 5`}
+      >
+        <Star
+          className={cn(
+            'h-4 w-4',
+            value <= Number(rating || 0) ? 'fill-amber-400 text-amber-500' : 'text-slate-300',
+          )}
+        />
+      </button>
+    ))}
+  </div>
+);
 
-const RankBadge: React.FC<{ rank: number }> = ({ rank }) => {
-    if (rank === 1) return <span className="text-xl">🥇</span>;
-    if (rank === 2) return <span className="text-xl">🥈</span>;
-    if (rank === 3) return <span className="text-xl">🥉</span>;
-    return <span className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600">{rank}</span>;
-};
-
-/* ─────────── Main component ─────────── */
 const PeerReview: React.FC = () => {
-    const { locale } = useI18n();
-    const { authStatus, user } = useAppAuth();
-    const isEn = locale === 'en';
-    const isLoggedIn = authStatus === 'authenticated' && Boolean(user);
+  const { locale } = useI18n();
+  const { authStatus, user } = useAppAuth();
+  const { getToken } = useAuth();
+  const isEn = locale === 'en';
+  const isLoggedIn = authStatus === 'authenticated' && Boolean(user);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-    /* Local UI state */
-    const [activeTab, setActiveTab] = useState<TabId>('submissions');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [isUploadOpen, setIsUploadOpen] = useState(false);
-    const [reviewingTask, setReviewingTask] = useState<ReviewTask | null>(null);
-    const [rubricScores, setRubricScores] = useState<Record<string, number>>(
-        Object.fromEntries(RUBRIC_CRITERIA.map(c => [c.id, 0]))
+  const [activeTab, setActiveTab] = useState<TabId>('submissions');
+  const [dashboard, setDashboard] = useState<PeerReviewDashboardResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [uploadTitle, setUploadTitle] = useState('');
+  const [uploadContestName, setUploadContestName] = useState('');
+  const [uploadType, setUploadType] = useState<PeerReviewSubmissionType>('slide');
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [reviewingTask, setReviewingTask] = useState<PeerReviewTask | null>(null);
+  const [rubricScores, setRubricScores] = useState<Record<string, number>>(createEmptyRubricScores);
+  const [reviewComment, setReviewComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [helpfulnessBusyId, setHelpfulnessBusyId] = useState<string | null>(null);
+
+  const copy = useMemo(() => (isEn ? {
+    badge: 'Peer review workspace',
+    heroTitle: 'Anonymous cross-review with daily quotas and reviewer trust',
+    heroDesc: 'Teams submit anonymously, reviewers get a daily cap, and thoughtful feedback earns higher reputation so stronger reviewers matter more over time.',
+    featureAnonymous: 'Anonymous submission and reviewer aliases',
+    featureQuota: 'Daily review cap to prevent overload',
+    featureTrust: 'Reviewer reputation affects community trust',
+    tabSubmissions: 'My submissions',
+    tabReview: 'Review queue',
+    tabLeaderboard: 'Reviewer trust board',
+    searchPlaceholder: 'Search by contest, anonymous ID, or reviewer alias...',
+    loginTitle: 'Sign in to submit, review, and build reputation',
+    loginDesc: 'Peer review data is tied to your account because quotas, trust scores, and ownership feedback all run on the server.',
+    signIn: 'Sign in',
+    uploadTitle: 'Submit work anonymously',
+    uploadDesc: 'Upload one PDF, PPTX, or DOCX. The community only sees an anonymous code, not your account identity.',
+    uploadCta: 'Create anonymous submission',
+    titlePlaceholder: 'Project title',
+    contestPlaceholder: 'Contest or challenge name',
+    uploadHint: 'Accepted: PDF, PPTX, DOCX up to 20MB',
+    noSubmissions: 'No submissions yet.',
+    noTasks: 'No review tasks available right now.',
+    noLeaderboard: 'No reviewer data yet.',
+    reviews: 'reviews',
+    avgScore: 'Average',
+    weightedScore: 'Trust-adjusted',
+    reviewDeadline: 'Review by',
+    openFile: 'Open file',
+    dailyQuota: 'Daily quota',
+    remainingToday: 'Remaining today',
+    reputation: 'Reputation',
+    trustWeight: 'Trust weight',
+    reviewsDone: 'Reviews done',
+    submissionsReceived: 'Feedback received',
+    turnaround: 'Average turnaround',
+    startReview: 'Start review',
+    finishReview: 'Submit review',
+    backToQueue: 'Back to queue',
+    rubricTitle: 'Rubric scoring',
+    commentPlaceholder: 'Leave specific, constructive feedback that helps the team improve.',
+    reviewPreviewTitle: 'Anonymous review package',
+    hiddenIdentity: 'Identity hidden',
+    helpfulnessLabel: 'How useful was this review?',
+    uploadSuccess: 'Anonymous submission created.',
+    uploadFailed: 'Unable to create submission.',
+    reviewSuccess: 'Review submitted.',
+    reviewFailed: 'Unable to submit review.',
+    helpfulnessSaved: 'Reviewer helpfulness updated.',
+    helpfulnessFailed: 'Unable to update helpfulness.',
+    reload: 'Reload',
+    reviewerBoard: 'Top trusted reviewers',
+    points: 'Points',
+    helpfulness: 'Helpfulness',
+    currentYou: 'You',
+    enoughReviews: 'Enough reviews reached',
+    quotaReached: 'You reached your review limit for today.',
+    reviewQuality: 'Review quality',
+    anonymousCode: 'Anonymous code',
+  } : {
+    badge: 'Không gian chấm chéo',
+    heroTitle: 'Chấm chéo ẩn danh, có quota theo ngày và điểm uy tín reviewer',
+    heroDesc: 'Mỗi bài được nộp dưới mã ẩn danh, mỗi reviewer có giới hạn review mỗi ngày, và phản hồi tốt sẽ nâng uy tín để tiếng nói của reviewer chất lượng được tin cậy hơn theo thời gian.',
+    featureAnonymous: 'Ẩn danh cả phía submitter lẫn reviewer',
+    featureQuota: 'Giới hạn review mỗi ngày để tránh quá tải',
+    featureTrust: 'Điểm uy tín ảnh hưởng mức độ tin cậy',
+    tabSubmissions: 'Bài nộp của tôi',
+    tabReview: 'Hàng đợi review',
+    tabLeaderboard: 'Bảng uy tín reviewer',
+    searchPlaceholder: 'Tìm theo cuộc thi, mã ẩn danh hoặc reviewer...',
+    loginTitle: 'Đăng nhập để nộp bài, review và tích điểm uy tín',
+    loginDesc: 'Quota, điểm uy tín và quyền đánh giá chất lượng feedback đều được xử lý ở server nên cần gắn với tài khoản của bạn.',
+    signIn: 'Đăng nhập',
+    uploadTitle: 'Nộp bài ẩn danh',
+    uploadDesc: 'Tải lên một file PDF, PPTX hoặc DOCX. Cộng đồng chỉ nhìn thấy mã ẩn danh, không thấy danh tính tài khoản của bạn.',
+    uploadCta: 'Tạo bài nộp ẩn danh',
+    titlePlaceholder: 'Tên dự án / bài nộp',
+    contestPlaceholder: 'Tên cuộc thi hoặc challenge',
+    uploadHint: 'Chấp nhận PDF, PPTX, DOCX tối đa 20MB',
+    noSubmissions: 'Bạn chưa có bài nộp nào.',
+    noTasks: 'Hiện chưa có bài nào chờ review.',
+    noLeaderboard: 'Chưa có dữ liệu reviewer.',
+    reviews: 'đánh giá',
+    avgScore: 'Điểm TB',
+    weightedScore: 'Điểm theo trust',
+    reviewDeadline: 'Review trước',
+    openFile: 'Mở file',
+    dailyQuota: 'Quota mỗi ngày',
+    remainingToday: 'Còn lại hôm nay',
+    reputation: 'Uy tín',
+    trustWeight: 'Trọng số trust',
+    reviewsDone: 'Đã review',
+    submissionsReceived: 'Feedback nhận được',
+    turnaround: 'Tốc độ phản hồi TB',
+    startReview: 'Bắt đầu review',
+    finishReview: 'Gửi review',
+    backToQueue: 'Quay lại hàng đợi',
+    rubricTitle: 'Chấm điểm theo rubric',
+    commentPlaceholder: 'Để lại phản hồi cụ thể, có ích và đủ rõ để đội kia biết nên sửa gì tiếp theo.',
+    reviewPreviewTitle: 'Gói bài review ẩn danh',
+    hiddenIdentity: 'Danh tính đã được ẩn',
+    helpfulnessLabel: 'Review này hữu ích đến mức nào?',
+    uploadSuccess: 'Đã tạo bài nộp ẩn danh.',
+    uploadFailed: 'Không thể tạo bài nộp.',
+    reviewSuccess: 'Đã gửi review.',
+    reviewFailed: 'Không thể gửi review.',
+    helpfulnessSaved: 'Đã cập nhật độ hữu ích của review.',
+    helpfulnessFailed: 'Không thể cập nhật độ hữu ích.',
+    reload: 'Tải lại',
+    reviewerBoard: 'Reviewer được tin cậy nhất',
+    points: 'Điểm',
+    helpfulness: 'Độ hữu ích',
+    currentYou: 'Bạn',
+    enoughReviews: 'Bài đã đủ số review',
+    quotaReached: 'Bạn đã dùng hết quota review trong hôm nay.',
+    reviewQuality: 'Chất lượng review',
+    anonymousCode: 'Mã ẩn danh',
+  }), [isEn]);
+
+  const totalScore = useMemo(
+    () => Object.values(rubricScores).reduce((sum, value) => sum + value, 0),
+    [rubricScores],
+  );
+
+  const loadDashboard = useCallback(async () => {
+    if (!isLoggedIn) return;
+    setLoading(true);
+    setError('');
+    try {
+      const response = await peerReviewService.getDashboard();
+      setDashboard(response);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to load peer review data.');
+    } finally {
+      setLoading(false);
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setDashboard(null);
+      setReviewingTask(null);
+      return;
+    }
+    void loadDashboard();
+  }, [isLoggedIn, loadDashboard]);
+
+  useEffect(() => {
+    if (!dashboard || !reviewingTask) return;
+    const refreshedTask = dashboard.availableTasks.find((task) => task.id === reviewingTask.id) || null;
+    setReviewingTask(refreshedTask);
+  }, [dashboard, reviewingTask]);
+
+  const filteredSubmissions = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return dashboard?.submissions || [];
+    return (dashboard?.submissions || []).filter((submission) =>
+      [submission.title, submission.contestName, submission.anonymousId].join(' ').toLowerCase().includes(query),
     );
-    const [reviewComment, setReviewComment] = useState('');
-    const [submitting, setSubmitting] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const uploadInputId = 'peer-review-upload-input';
+  }, [dashboard?.submissions, searchQuery]);
 
-    /* Copy */
-    const copy = useMemo(() => isEn ? {
-        badge: '⚔️ Peer-Review Battle Room',
-        heroTitle: 'Sharpen your work through anonymous peer feedback',
-        heroDesc: 'Submit your slides & reports anonymously before the deadline. Review others\' work with our rubric system and earn Contribution Points redeemable for courses & resources.',
-        featureAnonymous: 'Anonymous submissions',
-        featureRubric: 'Rubric-based scoring',
-        featurePoints: 'Earn contribution points',
-        tabSubmissions: 'My Submissions',
-        tabReview: 'Review Queue',
-        tabLeaderboard: 'Leaderboard',
-        uploadTitle: 'Submit Your Work',
-        uploadDesc: 'Upload your presentation or report for anonymous peer review. Your identity stays hidden.',
-        uploadBtn: 'Upload File',
-        uploadHint: 'Accepted: PDF, PPTX, DOCX (max 20MB)',
-        titlePlaceholder: 'Submission title...',
-        contestPlaceholder: 'Contest name...',
-        typeSlide: 'Slides',
-        typeReport: 'Report',
-        submit: 'Submit Anonymously',
-        cancel: 'Cancel',
-        mySubmissions: 'Your Submissions',
-        noSubmissions: 'No submissions yet. Upload your first work to get anonymous feedback!',
-        reviews: 'reviews',
-        avgScore: 'Avg score',
-        reviewQueue: 'Available Reviews',
-        noReviews: 'No review tasks available right now. Check back soon!',
-        deadline: 'Deadline',
-        reward: 'Reward',
-        pts: 'pts',
-        startReview: 'Start Review',
-        reviewTitle: 'Reviewing',
-        rubricTitle: 'Rubric Scoring',
-        commentPlaceholder: 'Leave constructive feedback for the team...',
-        submitReview: 'Submit Review',
-        totalScore: 'Total Score',
-        leaderboard: 'Top Reviewers',
-        contributor: 'Contributor',
-        points: 'Points',
-        reviewsDone: 'Reviews',
-        rating: 'Rating',
-        you: '(You)',
-        statsReviews: 'Total reviews given',
-        statsSubmissions: 'Submissions received',
-        statsAvgTurnaround: 'Avg turnaround',
-        hours: 'hours',
-        loginPrompt: 'Sign in to start submitting and reviewing!',
-        signIn: 'Sign In',
-    } : {
-        badge: '⚔️ Không gian Đánh giá chéo',
-        heroTitle: 'Mài sắc bài thi qua phản hồi ẩn danh từ đồng đẳng',
-        heroDesc: 'Nộp Slides & Báo cáo ẩn danh trước deadline. Đánh giá bài của đội khác theo Rubric và nhận Điểm cống hiến đổi khóa học, tài liệu miễn phí.',
-        featureAnonymous: 'Nộp bài ẩn danh',
-        featureRubric: 'Chấm điểm Rubric',
-        featurePoints: 'Tích điểm cống hiến',
-        tabSubmissions: 'Bài nộp của tôi',
-        tabReview: 'Hàng đợi đánh giá',
-        tabLeaderboard: 'Bảng xếp hạng',
-        uploadTitle: 'Nộp bài của bạn',
-        uploadDesc: 'Tải lên bài thuyết trình hoặc báo cáo để nhận đánh giá ẩn danh. Danh tính của bạn được giấu kín.',
-        uploadBtn: 'Tải tệp lên',
-        uploadHint: 'Chấp nhận: PDF, PPTX, DOCX (tối đa 20MB)',
-        titlePlaceholder: 'Tiêu đề bài nộp...',
-        contestPlaceholder: 'Tên cuộc thi...',
-        typeSlide: 'Slides',
-        typeReport: 'Báo cáo',
-        submit: 'Nộp ẩn danh',
-        cancel: 'Hủy',
-        mySubmissions: 'Bài nộp của bạn',
-        noSubmissions: 'Chưa có bài nộp nào. Tải lên bài đầu tiên để nhận phản hồi ẩn danh!',
-        reviews: 'đánh giá',
-        avgScore: 'Điểm TB',
-        reviewQueue: 'Đánh giá khả dụng',
-        noReviews: 'Chưa có bài cần đánh giá. Quay lại sau nhé!',
-        deadline: 'Hạn chót',
-        reward: 'Thưởng',
-        pts: 'đ',
-        startReview: 'Bắt đầu đánh giá',
-        reviewTitle: 'Đang đánh giá',
-        rubricTitle: 'Chấm điểm theo Rubric',
-        commentPlaceholder: 'Gửi nhận xét mang tính xây dựng cho đội...',
-        submitReview: 'Gửi đánh giá',
-        totalScore: 'Tổng điểm',
-        leaderboard: 'Reviewer xuất sắc',
-        contributor: 'Người đóng góp',
-        points: 'Điểm',
-        reviewsDone: 'Đánh giá',
-        rating: 'Xếp hạng',
-        you: '(Bạn)',
-        statsReviews: 'Tổng đánh giá',
-        statsSubmissions: 'Bài nộp nhận được',
-        statsAvgTurnaround: 'Thời gian phản hồi TB',
-        hours: 'giờ',
-        loginPrompt: 'Đăng nhập để bắt đầu nộp bài và đánh giá!',
-        signIn: 'Đăng nhập',
-    }, [isEn]);
+  const filteredTasks = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return dashboard?.availableTasks || [];
+    return (dashboard?.availableTasks || []).filter((task) =>
+      [task.contestName, task.anonymousId, task.file.name].join(' ').toLowerCase().includes(query),
+    );
+  }, [dashboard?.availableTasks, searchQuery]);
 
-    /* Handlers */
-    const totalScore = useMemo(() => Object.values(rubricScores).reduce((a, b) => a + b, 0), [rubricScores]);
-    const maxTotal = RUBRIC_CRITERIA.reduce((a, c) => a + c.maxScore, 0);
+  const filteredLeaderboard = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return dashboard?.leaderboard || [];
+    return (dashboard?.leaderboard || []).filter((entry) => entry.alias.toLowerCase().includes(query));
+  }, [dashboard?.leaderboard, searchQuery]);
 
-    const handleRubricChange = useCallback((criterionId: string, val: number) => {
-        setRubricScores(prev => ({ ...prev, [criterionId]: val }));
-    }, []);
+  const handleLoginClick = useCallback(() => {
+    window.dispatchEvent(new CustomEvent('show-auth-modal', { detail: { mode: 'login' } }));
+  }, []);
 
-    const handleSubmitReview = useCallback(async () => {
-        setSubmitting(true);
-        // Simulate API call
-        await new Promise(r => setTimeout(r, 1200));
-        setSubmitting(false);
-        setReviewingTask(null);
-        setRubricScores(Object.fromEntries(RUBRIC_CRITERIA.map(c => [c.id, 0])));
-        setReviewComment('');
-    }, []);
+  const handleFileSelection = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    if (!file) {
+      setUploadFile(null);
+      return;
+    }
+    if (!ACCEPTED_FILE_TYPES.has(file.type)) {
+      toast.error(isEn ? 'Only PDF, PPTX, and DOCX files are supported.' : 'Chỉ hỗ trợ PDF, PPTX và DOCX.');
+      event.target.value = '';
+      return;
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      toast.error(isEn ? 'Each file must be 20MB or smaller.' : 'Mỗi file phải nhỏ hơn hoặc bằng 20MB.');
+      event.target.value = '';
+      return;
+    }
+    setUploadFile(file);
+  }, [isEn]);
 
-    const handleLoginClick = useCallback(() => {
-        window.dispatchEvent(new CustomEvent('show-auth-modal', { detail: { mode: 'login' } }));
-    }, []);
+  const resetUploadForm = useCallback(() => {
+    setUploadTitle('');
+    setUploadContestName('');
+    setUploadType('slide');
+    setUploadFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, []);
 
-    const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
-        { id: 'submissions', label: copy.tabSubmissions, icon: <FileText className="w-4 h-4" /> },
-        { id: 'review', label: copy.tabReview, icon: <Eye className="w-4 h-4" /> },
-        { id: 'leaderboard', label: copy.tabLeaderboard, icon: <Trophy className="w-4 h-4" /> },
-    ];
+  const handleCreateSubmission = useCallback(async () => {
+    if (!uploadTitle.trim() || !uploadContestName.trim() || !uploadFile) {
+      toast.error(isEn ? 'Title, contest name, and file are required.' : 'Cần nhập tiêu đề, tên cuộc thi và chọn file.');
+      return;
+    }
 
-    return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    setUploading(true);
+    try {
+      const accessToken = await getToken().catch(() => null);
+      await peerReviewService.createSubmission({
+        title: uploadTitle.trim(),
+        contestName: uploadContestName.trim(),
+        type: uploadType,
+        file: uploadFile,
+        accessToken,
+      });
+      toast.success(copy.uploadSuccess);
+      setIsUploadOpen(false);
+      resetUploadForm();
+      setActiveTab('submissions');
+      await loadDashboard();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : copy.uploadFailed);
+    } finally {
+      setUploading(false);
+    }
+  }, [copy.uploadFailed, copy.uploadSuccess, getToken, isEn, loadDashboard, resetUploadForm, uploadContestName, uploadFile, uploadTitle, uploadType]);
 
-            {/* ═══════ Hero Section ═══════ */}
-            <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-violet-100/60 mb-10">
-                {/* Background blobs */}
-                <div className="absolute inset-0 bg-linear-to-br from-violet-50 via-white to-fuchsia-50 opacity-90" aria-hidden="true" />
-                <div className="absolute -top-20 right-12 h-44 w-44 rounded-full bg-violet-200/50 blur-3xl" aria-hidden="true" />
-                <div className="absolute -bottom-24 left-8 h-52 w-52 rounded-full bg-fuchsia-200/40 blur-3xl" aria-hidden="true" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 rounded-full bg-indigo-100/30 blur-3xl" aria-hidden="true" />
+  const handleStartReview = useCallback((task: PeerReviewTask) => {
+    if (!dashboard || dashboard.userState.reviewsRemainingToday <= 0) {
+      toast.error(copy.quotaReached);
+      return;
+    }
+    setRubricScores(createEmptyRubricScores());
+    setReviewComment('');
+    setReviewingTask(task);
+  }, [copy.quotaReached, dashboard]);
 
-                <div className="relative p-6 md:p-8 lg:p-10">
-                    <div className="grid grid-cols-1 lg:grid-cols-[1.35fr_1fr] gap-8 items-center">
-                        {/* Left */}
-                        <div className="space-y-4 animate-fade-in-up">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-white/70 text-xs font-semibold text-violet-700 shadow-sm">
-                                <Shield className="w-3.5 h-3.5" />
-                                {copy.badge}
-                            </div>
-                            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
-                                {copy.heroTitle}
-                            </h1>
-                            <p className="text-sm md:text-base text-slate-600 leading-relaxed max-w-xl">
-                                {copy.heroDesc}
-                            </p>
-                            <div className="flex flex-wrap gap-3 pt-1">
-                                <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
-                                    <EyeOff className="w-4 h-4 text-violet-500" />
-                                    {copy.featureAnonymous}
-                                </div>
-                                <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
-                                    <Star className="w-4 h-4 text-amber-500" />
-                                    {copy.featureRubric}
-                                </div>
-                                <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
-                                    <Award className="w-4 h-4 text-emerald-500" />
-                                    {copy.featurePoints}
-                                </div>
-                            </div>
-                        </div>
+  const handleSubmitReview = useCallback(async () => {
+    if (!reviewingTask) return;
+    if (totalScore <= 0) {
+      toast.error(isEn ? 'Please score the submission before sending the review.' : 'Hãy chấm điểm trước khi gửi review.');
+      return;
+    }
 
-                        {/* Right stats */}
-                    <div className="space-y-4 animate-fade-in-up [animation-delay:100ms] [animation-fill-mode:both]">
-                            <div className="rounded-2xl border border-white/80 bg-white/80 p-5 shadow-md backdrop-blur-sm">
-                                <div className="grid grid-cols-3 gap-4 text-center">
-                                    <div>
-                                        <div className="text-2xl font-bold text-slate-900">128</div>
-                                        <div className="text-[11px] text-slate-500 mt-0.5">{copy.statsReviews}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-2xl font-bold text-slate-900">47</div>
-                                        <div className="text-[11px] text-slate-500 mt-0.5">{copy.statsSubmissions}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-2xl font-bold text-slate-900">18</div>
-                                        <div className="text-[11px] text-slate-500 mt-0.5">{copy.statsAvgTurnaround} ({copy.hours})</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="rounded-xl border border-violet-100 bg-violet-50/80 px-4 py-3">
-                                    <div className="text-xs font-semibold text-violet-700">{copy.featureRubric}</div>
-                                    <div className="mt-1 text-2xl font-bold text-violet-800">{RUBRIC_CRITERIA.length}</div>
-                                    <div className="text-[11px] text-violet-600 mt-0.5">{isEn ? 'criteria' : 'tiêu chí'}</div>
-                                </div>
-                                <div className="rounded-xl border border-amber-100 bg-amber-50/80 px-4 py-3">
-                                    <div className="text-xs font-semibold text-amber-700">{copy.featurePoints}</div>
-                                    <div className="mt-1 text-2xl font-bold text-amber-800">15-20</div>
-                                    <div className="text-[11px] text-amber-600 mt-0.5">{isEn ? 'pts / review' : 'đ / đánh giá'}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+    setSubmittingReview(true);
+    try {
+      await peerReviewService.submitReview({
+        submissionId: reviewingTask.id,
+        scores: rubricScores,
+        comment: reviewComment.trim(),
+      });
+      toast.success(copy.reviewSuccess);
+      setReviewingTask(null);
+      setReviewComment('');
+      setRubricScores(createEmptyRubricScores());
+      await loadDashboard();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : copy.reviewFailed);
+    } finally {
+      setSubmittingReview(false);
+    }
+  }, [copy.reviewFailed, copy.reviewSuccess, isEn, loadDashboard, reviewComment, reviewingTask, rubricScores, totalScore]);
 
-            {/* ═══════ Not logged in prompt ═══════ */}
-            {!isLoggedIn && (
-                <div className="mb-8 rounded-2xl border border-violet-100 bg-violet-50/50 p-6 text-center animate-fade-in-up">
-                    <AlertCircle className="w-8 h-8 text-violet-400 mx-auto mb-3" />
-                    <p className="text-sm text-slate-600 mb-4">{copy.loginPrompt}</p>
-                    <button
-                        type="button"
-                        onClick={handleLoginClick}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-violet-600 text-white text-sm font-semibold shadow-lg shadow-violet-200 hover:bg-violet-700 transition-all"
-                    >
-                        {copy.signIn}
-                        <ArrowRight className="w-4 h-4" />
-                    </button>
-                </div>
-            )}
+  const handleRateHelpfulness = useCallback(async (review: ReceivedPeerReview, rating: number) => {
+    setHelpfulnessBusyId(review.id);
+    try {
+      await peerReviewService.rateHelpfulness(review.id, rating);
+      toast.success(copy.helpfulnessSaved);
+      await loadDashboard();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : copy.helpfulnessFailed);
+    } finally {
+      setHelpfulnessBusyId(null);
+    }
+  }, [copy.helpfulnessFailed, copy.helpfulnessSaved, loadDashboard]);
 
-            {/* ═══════ Tab Navigation ═══════ */}
-            <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl mb-8 max-w-fit">
-                {tabs.map(tab => (
-                    <button
-                        key={tab.id}
-                        type="button"
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${activeTab === tab.id
-                                ? 'bg-white text-violet-700 shadow-sm'
-                                : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
-                            }`}
-                    >
-                        {tab.icon}
-                        <span className="hidden sm:inline">{tab.label}</span>
-                    </button>
+  const topStats = dashboard ? [
+    { label: copy.dailyQuota, value: `${dashboard.userState.reviewsSubmittedToday}/${dashboard.userState.dailyReviewLimit}`, tone: 'from-violet-500 to-fuchsia-500', icon: Clock3 },
+    { label: copy.remainingToday, value: String(dashboard.userState.reviewsRemainingToday), tone: 'from-emerald-500 to-teal-500', icon: Shield },
+    { label: copy.reputation, value: String(dashboard.userState.reviewerProfile.reputationScore), tone: 'from-amber-400 to-orange-500', icon: Award },
+    { label: copy.trustWeight, value: `${dashboard.userState.reviewerProfile.trustWeight}x`, tone: 'from-sky-500 to-cyan-500', icon: Gauge },
+  ] : [];
+
+  const tabs: { id: TabId; label: string }[] = [
+    { id: 'submissions', label: copy.tabSubmissions },
+    { id: 'review', label: copy.tabReview },
+    { id: 'leaderboard', label: copy.tabLeaderboard },
+  ];
+
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_24px_80px_-40px_rgba(91,33,182,0.45)]">
+        <div className="absolute inset-0 bg-linear-to-br from-violet-50 via-white to-cyan-50" aria-hidden="true" />
+        <div className="absolute -left-10 top-10 h-40 w-40 rounded-full bg-violet-200/40 blur-3xl" aria-hidden="true" />
+        <div className="absolute bottom-0 right-0 h-56 w-56 translate-x-1/4 translate-y-1/4 rounded-full bg-cyan-200/40 blur-3xl" aria-hidden="true" />
+
+        <div className="relative p-6 md:p-8 lg:p-10">
+          <div className="grid gap-8 lg:grid-cols-[1.25fr_0.95fr] lg:items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-violet-700 shadow-sm">
+                <EyeOff className="h-3.5 w-3.5" />
+                {copy.badge}
+              </div>
+              <h1 className="mt-4 max-w-3xl text-3xl font-black tracking-tight text-slate-900 md:text-5xl">
+                {copy.heroTitle}
+              </h1>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600 md:text-base">
+                {copy.heroDesc}
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                {[
+                  { icon: Lock, label: copy.featureAnonymous },
+                  { icon: Clock3, label: copy.featureQuota },
+                  { icon: Award, label: copy.featureTrust },
+                ].map((item) => (
+                  <div key={item.label} className="inline-flex items-center gap-2 rounded-2xl border border-white/70 bg-white/90 px-4 py-2 text-sm text-slate-600 shadow-sm">
+                    <item.icon className="h-4 w-4 text-violet-500" />
+                    <span>{item.label}</span>
+                  </div>
                 ))}
+              </div>
             </div>
 
-            {/* ═══════ Tab Content ═══════ */}
-
-            {/* ── Submissions Tab ── */}
-            {activeTab === 'submissions' && (
-                <div className="space-y-6 animate-fade-in-up">
-                    {/* Upload Section */}
-                    <div className="rounded-2xl border border-dashed border-violet-200 bg-violet-50/30 p-6">
-                        {!isUploadOpen ? (
-                            <div className="text-center">
-                                <div className="w-14 h-14 rounded-2xl bg-violet-100 flex items-center justify-center mx-auto mb-3">
-                                    <Upload className="w-6 h-6 text-violet-600" />
-                                </div>
-                                <h3 className="text-base font-semibold text-slate-800 mb-1">{copy.uploadTitle}</h3>
-                                <p className="text-sm text-slate-500 mb-4 max-w-md mx-auto">{copy.uploadDesc}</p>
-                                <button
-                                    type="button"
-                                    onClick={() => isLoggedIn ? setIsUploadOpen(true) : handleLoginClick()}
-                                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-violet-200 hover:bg-violet-700 transition-all hover:shadow-xl hover:-translate-y-0.5"
-                                >
-                                    <Upload className="w-4 h-4" />
-                                    {copy.uploadBtn}
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="max-w-lg mx-auto space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-base font-semibold text-slate-800">{copy.uploadTitle}</h3>
-                                    <button
-                                        type="button"
-                                        aria-label={isEn ? 'Close dialog' : 'Đóng hộp thoại'}
-                                        onClick={() => setIsUploadOpen(false)}
-                                        className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                </div>
-                                <input
-                                    type="text"
-                                    placeholder={copy.titlePlaceholder}
-                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-violet-400 focus:border-violet-400 outline-none transition-all"
-                                />
-                                <input
-                                    type="text"
-                                    placeholder={copy.contestPlaceholder}
-                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-violet-400 focus:border-violet-400 outline-none transition-all"
-                                />
-                                <div className="flex gap-3">
-                                    <label className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-violet-300 transition-colors">
-                                        <input type="radio" name="type" value="slide" defaultChecked className="accent-violet-600" />
-                                        <FileText className="w-4 h-4 text-violet-500" />
-                                        <span className="text-sm">{copy.typeSlide}</span>
-                                    </label>
-                                    <label className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-violet-300 transition-colors">
-                                        <input type="radio" name="type" value="report" className="accent-violet-600" />
-                                        <BookOpen className="w-4 h-4 text-violet-500" />
-                                        <span className="text-sm">{copy.typeReport}</span>
-                                    </label>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="w-full border-2 border-dashed border-slate-200 rounded-xl p-6 text-center cursor-pointer hover:border-violet-300 hover:bg-violet-50/30 transition-all"
-                                >
-                                    <Upload className="w-6 h-6 mx-auto text-slate-400 mb-2" />
-                                    <p className="text-sm text-slate-500">{copy.uploadHint}</p>
-                                </button>
-                                <input id={uploadInputId} ref={fileInputRef} type="file" className="hidden" accept=".pdf,.pptx,.docx" title="Upload file" />
-                                <div className="flex gap-3 justify-end">
-                                    <button type="button" onClick={() => setIsUploadOpen(false)} className="px-4 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-100 transition-colors">
-                                        {copy.cancel}
-                                    </button>
-                                    <button type="button" className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-violet-200 hover:bg-violet-700 transition-all">
-                                        <Shield className="w-4 h-4" />
-                                        {copy.submit}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
+            <div className="grid gap-3 sm:grid-cols-2">
+              {isLoggedIn && dashboard ? topStats.map((stat) => (
+                <div key={stat.label} className="overflow-hidden rounded-[1.5rem] border border-white/80 bg-white/90 shadow-sm">
+                  <div className={cn('h-1.5 w-full bg-linear-to-r', stat.tone)} />
+                  <div className="flex items-center gap-3 p-4">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
+                      <stat.icon className="h-5 w-5" />
                     </div>
-
-                    {/* Submissions List */}
                     <div>
-                        <h2 className="text-lg font-semibold text-slate-800 mb-4">{copy.mySubmissions}</h2>
-                        {MOCK_SUBMISSIONS.length === 0 ? (
-                            <div className="text-center py-12 text-sm text-slate-400">{copy.noSubmissions}</div>
-                        ) : (
-                            <div className="grid gap-4">
-                                {MOCK_SUBMISSIONS.map((sub, i) => (
-                                    <div
-                                        key={sub.id}
-                                        className={cn(
-                                            'flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-all hover:border-violet-100 hover:shadow-md animate-fade-in-up [animation-fill-mode:both]',
-                                            getStaggerDelayClass(i),
-                                        )}
-                                    >
-                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${sub.type === 'slide' ? 'bg-violet-100 text-violet-600' : 'bg-sky-100 text-sky-600'
-                                            }`}>
-                                            {sub.type === 'slide' ? <FileText className="w-5 h-5" /> : <BookOpen className="w-5 h-5" />}
-                                        </div>
-                                        <div className="grow min-w-0">
-                                            <div className="flex items-center gap-2 flex-wrap">
-                                                <span className="text-sm font-semibold text-slate-800 truncate">{sub.title}</span>
-                                                <StatusBadge status={sub.status} isEn={isEn} />
-                                            </div>
-                                            <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
-                                                <span>{sub.contestName}</span>
-                                                <span>·</span>
-                                                <span>{sub.anonymousId}</span>
-                                                <span>·</span>
-                                                <span>{sub.submittedAt}</span>
-                                            </div>
-                                        </div>
-                                        <div className="text-right shrink-0">
-                                            <div className="text-xs text-slate-500">{sub.reviewCount} {copy.reviews}</div>
-                                            {sub.avgScore !== null && (
-                                                <div className="text-sm font-bold text-violet-600">{copy.avgScore}: {sub.avgScore}/{maxTotal}</div>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{stat.label}</p>
+                      <p className="mt-1 text-xl font-black text-slate-900">{stat.value}</p>
                     </div>
+                  </div>
                 </div>
-            )}
-
-            {/* ── Review Tab ── */}
-            {activeTab === 'review' && !reviewingTask && (
-                <div className="space-y-6 animate-fade-in-up">
-                    <h2 className="text-lg font-semibold text-slate-800">{copy.reviewQueue}</h2>
-                    {MOCK_REVIEW_TASKS.length === 0 ? (
-                        <div className="text-center py-12 text-sm text-slate-400">{copy.noReviews}</div>
-                    ) : (
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {MOCK_REVIEW_TASKS.map((task, i) => (
-                                <div
-                                    key={task.id}
-                                    className={cn(
-                                        'group flex flex-col rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:border-violet-100 hover:shadow-lg animate-fade-in-up [animation-fill-mode:both]',
-                                        getStaggerDelayClass(i),
-                                    )}
-                                >
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${task.type === 'slide' ? 'bg-violet-100 text-violet-600' : 'bg-sky-100 text-sky-600'
-                                            }`}>
-                                            {task.type === 'slide' ? <FileText className="w-4 h-4" /> : <BookOpen className="w-4 h-4" />}
-                                        </div>
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs font-medium border border-amber-200">
-                                            <Zap className="w-3 h-3" />
-                                            +{task.pointsReward} {copy.pts}
-                                        </span>
-                                    </div>
-                                    <h3 className="text-sm font-semibold text-slate-800 mb-1 line-clamp-2">{task.submissionTitle}</h3>
-                                    <p className="text-xs text-slate-500 mb-1">{task.contestName}</p>
-                                    <p className="text-xs text-slate-400 mb-auto">{task.anonymousId}</p>
-                                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-50">
-                                        <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                                            <Clock className="w-3 h-3" />
-                                            {copy.deadline}: {task.deadline}
-                                        </span>
-                                        <button
-                                            type="button"
-                                            onClick={() => isLoggedIn ? setReviewingTask(task) : handleLoginClick()}
-                                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-violet-600 text-white text-xs font-semibold hover:bg-violet-700 shadow-sm transition-all group-hover:shadow-md group-hover:-translate-y-0.5"
-                                        >
-                                            {copy.startReview}
-                                            <ArrowRight className="w-3 h-3" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+              )) : (
+                <div className="rounded-[1.75rem] border border-white/80 bg-white/92 p-6 shadow-sm sm:col-span-2">
+                  <p className="text-sm font-semibold text-slate-900">{copy.loginTitle}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{copy.loginDesc}</p>
+                  <button
+                    type="button"
+                    onClick={handleLoginClick}
+                    className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-200 transition-colors hover:bg-violet-700"
+                  >
+                    <Shield className="h-4 w-4" />
+                    {copy.signIn}
+                  </button>
                 </div>
-            )}
-
-            {/* ── Active Review (Rubric Panel) ── */}
-            {activeTab === 'review' && reviewingTask && (
-                <div className="animate-fade-in-up">
-                    <div className="flex items-center gap-3 mb-6">
-                        <button
-                            type="button"
-                            aria-label={isEn ? 'Back to review queue' : 'Quay lại hàng đợi đánh giá'}
-                            onClick={() => setReviewingTask(null)}
-                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
-                        >
-                            <ChevronDown className="w-4 h-4 rotate-90" />
-                        </button>
-                        <div>
-                            <h2 className="text-lg font-semibold text-slate-800">
-                                {copy.reviewTitle}: <span className="text-violet-600">{reviewingTask.submissionTitle}</span>
-                            </h2>
-                            <p className="text-xs text-slate-500">{reviewingTask.contestName} · {reviewingTask.anonymousId}</p>
-                        </div>
-                    </div>
-
-                    <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-                        {/* Preview placeholder */}
-                        <div className="rounded-2xl border border-slate-200 bg-slate-50 min-h-100 flex items-center justify-center">
-                            <div className="text-center text-slate-400">
-                                <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                                <p className="text-sm">{isEn ? 'Document preview area' : 'Khu vực xem trước tài liệu'}</p>
-                            </div>
-                        </div>
-
-                        {/* Rubric scoring panel */}
-                        <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-5 shadow-sm">
-                            <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
-                                <Star className="w-4 h-4 text-amber-500" />
-                                {copy.rubricTitle}
-                            </h3>
-
-                            <div className="space-y-4">
-                                {RUBRIC_CRITERIA.map(criterion => (
-                                    <div key={criterion.id} className="space-y-1.5">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-violet-500">{criterion.icon}</span>
-                                            <span className="text-xs font-semibold text-slate-700">
-                                                {isEn ? criterion.labelEn : criterion.label}
-                                            </span>
-                                        </div>
-                                        <p className="text-[11px] text-slate-400 leading-relaxed">
-                                            {isEn ? criterion.descriptionEn : criterion.description}
-                                        </p>
-                                        <ScoreInput
-                                            value={rubricScores[criterion.id]}
-                                            max={criterion.maxScore}
-                                            onChange={(v) => handleRubricChange(criterion.id, v)}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Total */}
-                            <div className="rounded-xl bg-linear-to-r from-violet-50 to-fuchsia-50 border border-violet-100 p-3 flex items-center justify-between">
-                                <span className="text-sm font-semibold text-slate-700">{copy.totalScore}</span>
-                                <span className={`text-xl font-bold tabular-nums ${totalScore >= maxTotal * 0.7 ? 'text-emerald-600' : totalScore >= maxTotal * 0.4 ? 'text-amber-600' : 'text-rose-500'
-                                    }`}>
-                                    {totalScore}<span className="text-sm text-slate-400">/{maxTotal}</span>
-                                </span>
-                            </div>
-
-                            {/* Comment */}
-                            <textarea
-                                value={reviewComment}
-                                onChange={e => setReviewComment(e.target.value)}
-                                placeholder={copy.commentPlaceholder}
-                                rows={3}
-                                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm resize-none focus:ring-2 focus:ring-violet-400 focus:border-violet-400 outline-none transition-all"
-                            />
-
-                            {/* Submit */}
-                            <button
-                                type="button"
-                                onClick={handleSubmitReview}
-                                disabled={submitting || totalScore === 0}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-violet-600 text-white text-sm font-semibold shadow-lg shadow-violet-200 hover:bg-violet-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {submitting ? (
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                    <Send className="w-4 h-4" />
-                                )}
-                                {copy.submitReview}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* ── Leaderboard Tab ── */}
-            {activeTab === 'leaderboard' && (
-                <div className="space-y-6 animate-fade-in-up">
-                    <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                        <Trophy className="w-5 h-5 text-amber-500" />
-                        {copy.leaderboard}
-                    </h2>
-
-                    {/* Top 3 podium */}
-                    <div className="grid grid-cols-3 gap-3 mb-2">
-                        {MOCK_LEADERBOARD.slice(0, 3).map((entry, i) => {
-                            const order = [1, 0, 2]; // silver, gold, bronze column order
-                            const idx = order[i];
-                            const e = MOCK_LEADERBOARD[idx];
-                            const heights = ['h-28', 'h-36', 'h-24'];
-                            const colors = [
-                                'from-slate-300 to-slate-400', // silver
-                                'from-amber-300 to-amber-500', // gold
-                                'from-orange-300 to-orange-400', // bronze
-                            ];
-                            return (
-                                <div key={e.rank} className={cn('flex flex-col items-center animate-fade-in-up [animation-fill-mode:both]', getStaggerDelayClass(i))}>
-                                    <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center mb-2 text-xs font-bold text-violet-600">
-                                        {e.displayName.slice(-2)}
-                                    </div>
-                                    <span className="text-xs font-semibold text-slate-700 mb-1 truncate max-w-full text-center">{e.displayName}</span>
-                                    <span className="text-[11px] text-slate-500 mb-2">{e.points} {copy.pts}</span>
-                                    <div className={`w-full ${heights[i]} rounded-t-xl bg-linear-to-t ${colors[i]} flex items-start justify-center pt-3`}>
-                                        <RankBadge rank={e.rank} />
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    {/* Rest of leaderboard */}
-                    <div className="rounded-2xl border border-slate-100 bg-white overflow-hidden shadow-sm">
-                        <div className="grid grid-cols-[3rem_1fr_5rem_4rem_4rem] gap-2 px-4 py-2.5 bg-slate-50 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                            <span>#</span>
-                            <span>{copy.contributor}</span>
-                            <span className="text-right">{copy.points}</span>
-                            <span className="text-right">{copy.reviewsDone}</span>
-                            <span className="text-right">{copy.rating}</span>
-                        </div>
-                        {MOCK_LEADERBOARD.map((entry, i) => (
-                            <div
-                                key={entry.rank}
-                                className={cn(
-                                    'grid grid-cols-[3rem_1fr_5rem_4rem_4rem] items-center gap-2 border-t border-slate-50 px-4 py-3 text-sm transition-colors animate-fade-in-up [animation-fill-mode:both]',
-                                    entry.isCurrentUser ? 'bg-violet-50/50' : 'hover:bg-slate-50',
-                                    getStaggerDelayClass(i),
-                                )}
-                            >
-                                <span><RankBadge rank={entry.rank} /></span>
-                                <span className={`font-medium truncate ${entry.isCurrentUser ? 'text-violet-700' : 'text-slate-700'}`}>
-                                    {entry.displayName} {entry.isCurrentUser && <span className="text-xs text-violet-500">{copy.you}</span>}
-                                </span>
-                                <span className="text-right font-bold text-slate-800 tabular-nums">{entry.points}</span>
-                                <span className="text-right text-slate-500 tabular-nums">{entry.reviewsDone}</span>
-                                <span className="text-right tabular-nums">
-                                    <span className="inline-flex items-center gap-0.5 text-amber-600 font-medium">
-                                        <Star className="w-3 h-3 fill-amber-400" />
-                                        {entry.avgRating}
-                                    </span>
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
+              )}
+            </div>
+          </div>
         </div>
-    );
+      </section>
+
+      <div className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm md:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap gap-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  'rounded-2xl px-4 py-2.5 text-sm font-semibold transition-all',
+                  activeTab === tab.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <label className="relative block min-w-0 sm:w-80">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={copy.searchPlaceholder}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-700 outline-none transition-colors focus:border-violet-300 focus:bg-white"
+              />
+            </label>
+            {activeTab === 'submissions' && isLoggedIn && (
+              <button
+                type="button"
+                onClick={() => setIsUploadOpen(true)}
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-200 transition-colors hover:bg-violet-700"
+              >
+                <Upload className="h-4 w-4" />
+                {copy.uploadCta}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {isLoggedIn && (
+          <div className="mt-4 grid gap-3 rounded-[1.5rem] border border-violet-100 bg-violet-50/60 p-4 md:grid-cols-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-500">{copy.reviewsDone}</p>
+              <p className="mt-1 text-lg font-black text-slate-900">{dashboard?.stats.totalReviewsGiven ?? 0}</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-500">{copy.submissionsReceived}</p>
+              <p className="mt-1 text-lg font-black text-slate-900">{dashboard?.stats.submissionsReceived ?? 0}</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-500">{copy.turnaround}</p>
+              <p className="mt-1 text-lg font-black text-slate-900">{formatHourLabel(dashboard?.stats.avgTurnaroundHours, isEn)}</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-500">{copy.reviewerBoard}</p>
+              <p className="mt-1 truncate text-lg font-black text-slate-900">
+                {dashboard?.userState.reviewerProfile.alias || (isEn ? 'No profile yet' : 'Chưa có hồ sơ')}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {!isLoggedIn ? (
+          <div className="mt-6 rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
+            <Shield className="mx-auto h-10 w-10 text-violet-500" />
+            <p className="mt-4 text-lg font-semibold text-slate-900">{copy.loginTitle}</p>
+            <p className="mx-auto mt-2 max-w-2xl text-sm leading-7 text-slate-600">{copy.loginDesc}</p>
+            <button
+              type="button"
+              onClick={handleLoginClick}
+              className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-200 transition-colors hover:bg-violet-700"
+            >
+              <Shield className="h-4 w-4" />
+              {copy.signIn}
+            </button>
+          </div>
+        ) : loading ? (
+          <div className="mt-8 flex items-center justify-center gap-3 rounded-[1.75rem] border border-slate-200 bg-slate-50 py-16 text-slate-500">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span>{isEn ? 'Loading peer review data...' : 'Đang tải dữ liệu chấm chéo...'}</span>
+          </div>
+        ) : error ? (
+          <div className="mt-8 rounded-[1.75rem] border border-rose-200 bg-rose-50 p-6 text-rose-700">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
+                <p className="text-sm leading-6">{error}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void loadDashboard()}
+                className="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-rose-700 shadow-sm"
+              >
+                <RefreshCw className="h-4 w-4" />
+                {copy.reload}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {activeTab === 'submissions' && (
+              <div className="mt-6 space-y-4">
+                {filteredSubmissions.length === 0 ? (
+                  <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 py-14 text-center text-sm text-slate-500">
+                    {copy.noSubmissions}
+                  </div>
+                ) : filteredSubmissions.map((submission) => {
+                  const statusMeta = getStatusMeta(submission.status, isEn);
+                  const typeMeta = getTypeMeta(submission.type, isEn);
+                  return (
+                    <div key={submission.id} className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm">
+                      <div className="flex flex-col gap-4 border-b border-slate-100 p-5 lg:flex-row lg:items-start lg:justify-between">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className={cn('inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold', typeMeta.className)}>
+                              <typeMeta.icon className="h-3.5 w-3.5" />
+                              {typeMeta.label}
+                            </span>
+                            <span className={cn('rounded-full border px-3 py-1 text-xs font-semibold', statusMeta.className)}>
+                              {statusMeta.label}
+                            </span>
+                            <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-500">
+                              {copy.anonymousCode}: {submission.anonymousId}
+                            </span>
+                          </div>
+                          <h2 className="mt-3 text-xl font-black text-slate-900">{submission.title}</h2>
+                          <p className="mt-1 text-sm text-slate-500">{submission.contestName}</p>
+                          <div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-500">
+                            <span>{formatDateLabel(submission.submittedAt, isEn)}</span>
+                            <span>{submission.reviewCount} {copy.reviews}</span>
+                            <span>{submission.file.name} • {formatFileSize(submission.file.sizeBytes)}</span>
+                          </div>
+                        </div>
+
+                        <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[320px]">
+                          <div className="rounded-2xl bg-slate-50 p-4">
+                            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.avgScore}</p>
+                            <p className="mt-2 text-2xl font-black text-slate-900">
+                              {submission.averageScore ?? '—'}
+                              {submission.averageScore !== null && (
+                                <span className="text-sm font-semibold text-slate-400"> / {dashboard?.config.maxTotalScore ?? 50}</span>
+                              )}
+                            </p>
+                          </div>
+                          <div className="rounded-2xl bg-violet-50 p-4">
+                            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-500">{copy.weightedScore}</p>
+                            <p className="mt-2 text-2xl font-black text-slate-900">
+                              {submission.weightedAverageScore ?? '—'}
+                              {submission.weightedAverageScore !== null && (
+                                <span className="text-sm font-semibold text-slate-400"> / {dashboard?.config.maxTotalScore ?? 50}</span>
+                              )}
+                            </p>
+                          </div>
+                          <a
+                            href={submission.file.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-violet-200 hover:text-violet-700 sm:col-span-2"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                            {copy.openFile}
+                          </a>
+                        </div>
+                      </div>
+
+                      <div className="p-5">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-slate-900">{isEn ? 'Anonymous feedback received' : 'Feedback ẩn danh đã nhận'}</p>
+                            <p className="mt-1 text-xs text-slate-500">
+                              {isEn ? 'Rate usefulness to improve reviewer reputation.' : 'Đánh giá độ hữu ích để hệ thống cập nhật điểm uy tín reviewer.'}
+                            </p>
+                          </div>
+                          <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
+                            {submission.receivedReviews.length}/{dashboard?.config.maxReviewsPerSubmission ?? 3}
+                          </div>
+                        </div>
+
+                        {submission.receivedReviews.length === 0 ? (
+                          <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
+                            {isEn ? 'No anonymous feedback yet.' : 'Chưa có feedback ẩn danh nào.'}
+                          </div>
+                        ) : (
+                          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                            {submission.receivedReviews.map((review) => (
+                              <div key={review.id} className="rounded-[1.5rem] border border-slate-200 bg-slate-50/70 p-4">
+                                <div className="flex flex-wrap items-center justify-between gap-3">
+                                  <div>
+                                    <p className="text-sm font-semibold text-slate-900">{review.reviewerAlias}</p>
+                                    <p className="mt-1 text-xs text-slate-500">{formatDateLabel(review.submittedAt, isEn)}</p>
+                                  </div>
+                                  <div className="flex flex-wrap gap-2">
+                                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600 shadow-sm">
+                                      {copy.reputation}: {review.reviewerProfile.reputationScore}
+                                    </span>
+                                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600 shadow-sm">
+                                      {copy.trustWeight}: {review.reviewerProfile.trustWeight}x
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="mt-4 flex items-end justify-between gap-4">
+                                  <div>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.weightedScore}</p>
+                                    <p className="mt-1 text-2xl font-black text-slate-900">
+                                      {review.totalScore}
+                                      <span className="text-sm font-semibold text-slate-400"> / {review.maxTotalScore}</span>
+                                    </p>
+                                  </div>
+                                  <div className="rounded-2xl bg-white px-3 py-2 text-right shadow-sm">
+                                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.reviewQuality}</p>
+                                    <p className="mt-1 text-sm font-bold text-slate-700">{Math.round(review.reviewerProfile.qualityScore * 100)}%</p>
+                                  </div>
+                                </div>
+
+                                <p className="mt-4 rounded-2xl border border-white/80 bg-white px-4 py-3 text-sm leading-6 text-slate-600">
+                                  {review.comment}
+                                </p>
+
+                                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                                  {RUBRIC_CRITERIA.map((criterion) => (
+                                    <div key={`${review.id}-${criterion.id}`} className="rounded-2xl bg-white px-3 py-2 shadow-sm">
+                                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                                        {isEn ? criterion.labelEn : criterion.label}
+                                      </p>
+                                      <p className="mt-1 text-sm font-bold text-slate-800">{review.scores[criterion.id]} / 10</p>
+                                    </div>
+                                  ))}
+                                </div>
+
+                                <div className="mt-4 flex flex-col gap-2 rounded-2xl border border-amber-100 bg-amber-50/70 p-3">
+                                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">{copy.helpfulnessLabel}</p>
+                                  <HelpfulnessRating
+                                    rating={review.helpfulnessRating}
+                                    disabled={helpfulnessBusyId === review.id}
+                                    onRate={(rating) => void handleRateHelpfulness(review, rating)}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {activeTab === 'review' && (
+              <div className="mt-6 space-y-5">
+                <div className={cn(
+                  'rounded-[1.75rem] border p-5',
+                  (dashboard?.userState.reviewsRemainingToday || 0) > 0 ? 'border-emerald-200 bg-emerald-50/70' : 'border-rose-200 bg-rose-50/70',
+                )}>
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex items-start gap-3">
+                      {(dashboard?.userState.reviewsRemainingToday || 0) > 0 ? (
+                        <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+                      ) : (
+                        <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />
+                      )}
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">
+                          {isEn
+                            ? `You can still review ${dashboard?.userState.reviewsRemainingToday ?? 0} submission(s) today.`
+                            : `Hôm nay bạn còn review được ${dashboard?.userState.reviewsRemainingToday ?? 0} bài.`}
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-slate-600">
+                          {isEn
+                            ? 'Higher-quality feedback increases your reputation, and future reviews from you will carry more trust weight.'
+                            : 'Feedback chất lượng sẽ tăng điểm uy tín của bạn, và các review sau này từ bạn sẽ có trọng số trust cao hơn.'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+                        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.reputation}</p>
+                        <p className="mt-1 text-xl font-black text-slate-900">{dashboard?.userState.reviewerProfile.reputationScore ?? 0}</p>
+                      </div>
+                      <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+                        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.trustWeight}</p>
+                        <p className="mt-1 text-xl font-black text-slate-900">{dashboard?.userState.reviewerProfile.trustWeight ?? 0.85}x</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {!reviewingTask ? (
+                  filteredTasks.length === 0 ? (
+                    <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 py-14 text-center text-sm text-slate-500">
+                      {copy.noTasks}
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                      {filteredTasks.map((task) => {
+                        const typeMeta = getTypeMeta(task.type, isEn);
+                        return (
+                          <div key={task.id} className="flex h-full flex-col rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm">
+                            <div className="flex items-start justify-between gap-3">
+                              <span className={cn('inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold', typeMeta.className)}>
+                                <typeMeta.icon className="h-3.5 w-3.5" />
+                                {typeMeta.label}
+                              </span>
+                              <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                                +{task.pointsReward} {copy.points}
+                              </span>
+                            </div>
+
+                            <div className="mt-4">
+                              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{copy.anonymousCode}</p>
+                              <h3 className="mt-2 text-xl font-black text-slate-900">{task.anonymousId}</h3>
+                              <p className="mt-2 text-sm text-slate-600">{task.contestName}</p>
+                            </div>
+
+                            <div className="mt-5 space-y-2 rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
+                              <div className="flex items-center justify-between gap-3">
+                                <span>{copy.reviewDeadline}</span>
+                                <span className="font-semibold text-slate-800">{formatDateLabel(task.reviewDeadline, isEn)}</span>
+                              </div>
+                              <div className="flex items-center justify-between gap-3">
+                                <span>{copy.reviews}</span>
+                                <span className="font-semibold text-slate-800">
+                                  {task.currentReviewCount}/{dashboard?.config.maxReviewsPerSubmission ?? 3}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between gap-3">
+                                <span>{isEn ? 'Still needed' : 'Còn thiếu'}</span>
+                                <span className="font-semibold text-slate-800">{task.reviewsNeeded}</span>
+                              </div>
+                              <div className="flex items-center justify-between gap-3">
+                                <span>{isEn ? 'File' : 'Tệp'}</span>
+                                <span className="max-w-[65%] truncate font-semibold text-slate-800">{task.file.name}</span>
+                              </div>
+                            </div>
+
+                            <div className="mt-5 flex gap-3">
+                              <a
+                                href={task.file.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex grow items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:border-violet-200 hover:text-violet-700"
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                                {copy.openFile}
+                              </a>
+                              <button
+                                type="button"
+                                disabled={(dashboard?.userState.reviewsRemainingToday || 0) <= 0}
+                                onClick={() => handleStartReview(task)}
+                                className="inline-flex grow items-center justify-center gap-2 rounded-2xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-200 transition-colors hover:bg-violet-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
+                              >
+                                {copy.startReview}
+                                <ArrowRight className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )
+                ) : (
+                  <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+                    <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => setReviewingTask(null)}
+                            className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                            {copy.backToQueue}
+                          </button>
+                          <h2 className="mt-4 text-2xl font-black text-slate-900">{reviewingTask.anonymousId}</h2>
+                          <p className="mt-2 text-sm text-slate-600">{reviewingTask.contestName}</p>
+                        </div>
+                        <div className="rounded-2xl border border-violet-100 bg-white px-4 py-3 text-right shadow-sm">
+                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-500">{copy.hiddenIdentity}</p>
+                          <p className="mt-1 text-sm font-semibold text-slate-700">{copy.reviewPreviewTitle}</p>
+                        </div>
+                      </div>
+
+                      <div className="mt-5 flex flex-wrap gap-3">
+                        <a
+                          href={reviewingTask.file.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          {copy.openFile}
+                        </a>
+                        <div className="rounded-2xl bg-white px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm">
+                          {reviewingTask.file.name} • {formatFileSize(reviewingTask.file.sizeBytes)}
+                        </div>
+                      </div>
+
+                      <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white">
+                        {reviewingTask.file.mimeType === 'application/pdf' ? (
+                          <iframe
+                            src={reviewingTask.file.url}
+                            title={reviewingTask.file.name}
+                            className="h-[620px] w-full"
+                          />
+                        ) : (
+                          <div className="flex min-h-[620px] flex-col items-center justify-center gap-4 bg-linear-to-br from-slate-100 via-white to-slate-50 p-8 text-center">
+                            <FileText className="h-14 w-14 text-violet-500" />
+                            <div>
+                              <p className="text-lg font-semibold text-slate-900">{reviewingTask.file.name}</p>
+                              <p className="mt-2 max-w-md text-sm leading-6 text-slate-600">
+                                {isEn
+                                  ? 'This file type opens in a new tab for review. The anonymous code remains visible while the account identity stays hidden.'
+                                  : 'Loại file này sẽ mở ở tab mới để review. Hệ thống vẫn chỉ hiển thị mã ẩn danh và không lộ danh tính tài khoản.'}
+                              </p>
+                            </div>
+                            <a
+                              href={reviewingTask.file.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-2 rounded-2xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-200 transition-colors hover:bg-violet-700"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              {copy.openFile}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm">
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">{copy.rubricTitle}</p>
+                          <p className="mt-1 text-xs leading-5 text-slate-500">
+                            {isEn
+                              ? 'A stronger review has both clear scoring and useful written feedback.'
+                              : 'Một review tốt cần vừa có điểm rõ ràng, vừa có nhận xét đủ hữu ích.'}
+                          </p>
+                        </div>
+                        <div className="rounded-2xl bg-violet-50 px-4 py-3 text-right">
+                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-500">{copy.weightedScore}</p>
+                          <p className="mt-1 text-2xl font-black text-slate-900">
+                            {totalScore}
+                            <span className="text-sm font-semibold text-slate-400"> / {dashboard?.config.maxTotalScore ?? 50}</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-5 space-y-4">
+                        {RUBRIC_CRITERIA.map((criterion) => (
+                          <ScoreInput
+                            key={criterion.id}
+                            value={rubricScores[criterion.id] || 0}
+                            label={isEn ? criterion.labelEn : criterion.label}
+                            description={isEn ? criterion.descriptionEn : criterion.description}
+                            icon={criterion.icon}
+                            onChange={(nextValue) => setRubricScores((current) => ({ ...current, [criterion.id]: nextValue }))}
+                          />
+                        ))}
+                      </div>
+
+                      <div className="mt-5 rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4">
+                        <div className="flex items-center gap-2">
+                          <MessageSquare className="h-4 w-4 text-violet-500" />
+                          <span className="text-sm font-semibold text-slate-800">{isEn ? 'Constructive feedback' : 'Nhận xét xây dựng'}</span>
+                        </div>
+                        <textarea
+                          value={reviewComment}
+                          onChange={(event) => setReviewComment(event.target.value)}
+                          rows={6}
+                          placeholder={copy.commentPlaceholder}
+                          className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-700 outline-none transition-colors focus:border-violet-300"
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => void handleSubmitReview()}
+                        disabled={submittingReview || totalScore <= 0 || reviewComment.trim().length < 24}
+                        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-200 transition-colors hover:bg-violet-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
+                      >
+                        {submittingReview ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                        {copy.finishReview}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'leaderboard' && (
+              <div className="mt-6 space-y-4">
+                <div className="grid gap-4 md:grid-cols-3">
+                  {filteredLeaderboard.slice(0, 3).map((entry) => (
+                    <div key={entry.alias} className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">#{entry.rank}</p>
+                          <h3 className="mt-2 text-xl font-black text-slate-900">{entry.alias}</h3>
+                        </div>
+                        <Trophy className="h-8 w-8 text-amber-500" />
+                      </div>
+                      <div className="mt-5 grid grid-cols-2 gap-3">
+                        <div className="rounded-2xl bg-white p-3 shadow-sm">
+                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.points}</p>
+                          <p className="mt-1 text-lg font-black text-slate-900">{entry.points}</p>
+                        </div>
+                        <div className="rounded-2xl bg-white p-3 shadow-sm">
+                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.reputation}</p>
+                          <p className="mt-1 text-lg font-black text-slate-900">{entry.reputationScore}</p>
+                        </div>
+                        <div className="rounded-2xl bg-white p-3 shadow-sm">
+                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.reviewsDone}</p>
+                          <p className="mt-1 text-lg font-black text-slate-900">{entry.reviewsDone}</p>
+                        </div>
+                        <div className="rounded-2xl bg-white p-3 shadow-sm">
+                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.helpfulness}</p>
+                          <p className="mt-1 text-lg font-black text-slate-900">{entry.avgHelpfulness ?? '—'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {filteredLeaderboard.length === 0 ? (
+                  <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 py-14 text-center text-sm text-slate-500">
+                    {copy.noLeaderboard}
+                  </div>
+                ) : (
+                  <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm">
+                    <div className="grid grid-cols-[4rem_1.4fr_0.9fr_0.9fr_0.9fr_0.9fr] gap-3 bg-slate-50 px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                      <span>#</span>
+                      <span>{isEn ? 'Reviewer' : 'Reviewer'}</span>
+                      <span className="text-right">{copy.points}</span>
+                      <span className="text-right">{copy.reviewsDone}</span>
+                      <span className="text-right">{copy.reputation}</span>
+                      <span className="text-right">{copy.helpfulness}</span>
+                    </div>
+                    {filteredLeaderboard.map((entry) => (
+                      <div
+                        key={entry.alias}
+                        className={cn(
+                          'grid grid-cols-[4rem_1.4fr_0.9fr_0.9fr_0.9fr_0.9fr] items-center gap-3 border-t border-slate-100 px-5 py-4 text-sm',
+                          entry.isCurrentUser ? 'bg-violet-50/60' : 'bg-white',
+                        )}
+                      >
+                        <span className="text-sm font-semibold text-slate-500">#{entry.rank}</span>
+                        <div className="min-w-0">
+                          <p className="truncate font-semibold text-slate-900">
+                            {entry.alias} {entry.isCurrentUser && <span className="text-xs font-medium text-violet-500">({copy.currentYou})</span>}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500">{copy.trustWeight}: {entry.trustWeight}x</p>
+                        </div>
+                        <span className="text-right font-bold text-slate-900">{entry.points}</span>
+                        <span className="text-right text-slate-600">{entry.reviewsDone}</span>
+                        <span className="text-right text-slate-600">{entry.reputationScore}</span>
+                        <span className="text-right text-slate-600">{entry.avgHelpfulness ?? '—'}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {isUploadOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            className="absolute inset-0 bg-slate-950/45 backdrop-blur-sm"
+            onClick={() => {
+              setIsUploadOpen(false);
+              resetUploadForm();
+            }}
+            aria-label={isEn ? 'Close upload dialog' : 'Đóng hộp thoại nộp bài'}
+          />
+          <div className="relative z-10 w-full max-w-2xl overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-[0_30px_90px_-40px_rgba(91,33,182,0.55)]">
+            <div className="bg-linear-to-r from-violet-600 to-fuchsia-500 px-6 py-5 text-white">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/80">{copy.uploadTitle}</p>
+              <h2 className="mt-2 text-2xl font-black">{copy.uploadCta}</h2>
+              <p className="mt-2 text-sm leading-6 text-white/85">{copy.uploadDesc}</p>
+            </div>
+
+            <div className="space-y-5 p-6">
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold text-slate-700">{isEn ? 'Title' : 'Tiêu đề'}</span>
+                  <input
+                    value={uploadTitle}
+                    onChange={(event) => setUploadTitle(event.target.value)}
+                    placeholder={copy.titlePlaceholder}
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition-colors focus:border-violet-300 focus:bg-white"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold text-slate-700">{isEn ? 'Contest' : 'Cuộc thi'}</span>
+                  <input
+                    value={uploadContestName}
+                    onChange={(event) => setUploadContestName(event.target.value)}
+                    placeholder={copy.contestPlaceholder}
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition-colors focus:border-violet-300 focus:bg-white"
+                  />
+                </label>
+              </div>
+
+              <div>
+                <span className="mb-2 block text-sm font-semibold text-slate-700">{isEn ? 'Format' : 'Loại bài'}</span>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {(['slide', 'report'] as PeerReviewSubmissionType[]).map((type) => {
+                    const typeMeta = getTypeMeta(type, isEn);
+                    return (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => setUploadType(type)}
+                        className={cn(
+                          'flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-colors',
+                          uploadType === type ? 'border-violet-300 bg-violet-50 text-violet-700' : 'border-slate-200 bg-white text-slate-600 hover:border-violet-200',
+                        )}
+                      >
+                        <div className={cn('flex h-10 w-10 items-center justify-center rounded-2xl', typeMeta.className)}>
+                          <typeMeta.icon className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold">{typeMeta.label}</p>
+                          <p className="mt-1 text-xs text-slate-500">{type === 'slide' ? 'PDF / PPTX' : 'PDF / DOCX'}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 p-5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">{isEn ? 'Review file' : 'File để review'}</p>
+                    <p className="mt-1 text-sm text-slate-500">{copy.uploadHint}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:text-violet-700"
+                  >
+                    <Upload className="h-4 w-4" />
+                    {isEn ? 'Choose file' : 'Chọn file'}
+                  </button>
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.pptx,.docx"
+                  className="hidden"
+                  onChange={handleFileSelection}
+                />
+
+                <div className="mt-4 rounded-2xl bg-white px-4 py-3 shadow-sm">
+                  {uploadFile ? (
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">{uploadFile.name}</p>
+                        <p className="mt-1 text-xs text-slate-500">{formatFileSize(uploadFile.size)}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUploadFile(null);
+                          if (fileInputRef.current) fileInputRef.current.value = '';
+                        }}
+                        className="rounded-2xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600"
+                      >
+                        {isEn ? 'Remove' : 'Bỏ file'}
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-slate-500">{isEn ? 'No file selected yet.' : 'Chưa chọn file nào.'}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsUploadOpen(false);
+                    resetUploadForm();
+                  }}
+                  className="rounded-2xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600"
+                >
+                  {isEn ? 'Cancel' : 'Hủy'}
+                </button>
+                <button
+                  type="button"
+                  disabled={uploading}
+                  onClick={() => void handleCreateSubmission()}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-200 transition-colors hover:bg-violet-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
+                >
+                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                  {copy.uploadCta}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default PeerReview;
