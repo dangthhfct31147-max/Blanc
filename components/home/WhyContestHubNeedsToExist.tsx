@@ -6,7 +6,7 @@ import { useI18n } from '../../contexts/I18nContext';
 
 type StoryTone = {
   badge: string;
-  bulletDot: string;
+  bulletHighlight: string;
   divider: string;
   imageBorder: string;
   imageGlow: string;
@@ -40,7 +40,7 @@ export const contestHubStoryTheme = {
 const storyTonePresets: Record<'gold' | 'teal' | 'mint', StoryTone> = {
   gold: {
     badge: 'border-amber-200/70 bg-amber-50 text-amber-900',
-    bulletDot: 'bg-amber-400',
+    bulletHighlight: 'bg-linear-to-r from-amber-200/90 via-amber-300/70 to-amber-200/55',
     divider: 'border-amber-100/80',
     imageBorder: 'border-amber-100/80',
     imageGlow: 'from-amber-200/60 via-amber-100/10 to-primary-100/50',
@@ -51,7 +51,7 @@ const storyTonePresets: Record<'gold' | 'teal' | 'mint', StoryTone> = {
   },
   teal: {
     badge: 'border-primary-100 bg-primary-50 text-primary-800',
-    bulletDot: 'bg-primary-500',
+    bulletHighlight: 'bg-linear-to-r from-primary-200/90 via-primary-300/70 to-primary-200/55',
     divider: 'border-primary-100/80',
     imageBorder: 'border-primary-100/80',
     imageGlow: 'from-primary-200/60 via-primary-100/10 to-emerald-100/55',
@@ -62,7 +62,7 @@ const storyTonePresets: Record<'gold' | 'teal' | 'mint', StoryTone> = {
   },
   mint: {
     badge: 'border-emerald-100 bg-emerald-50 text-emerald-900',
-    bulletDot: 'bg-emerald-400',
+    bulletHighlight: 'bg-linear-to-r from-emerald-200/90 via-emerald-300/70 to-emerald-200/55',
     divider: 'border-emerald-100/80',
     imageBorder: 'border-emerald-100/80',
     imageGlow: 'from-emerald-200/60 via-white to-primary-100/50',
@@ -343,13 +343,19 @@ const StoryCard: React.FC<{
           <motion.div
             variants={contentVariant}
             className={cn(
-              'flex flex-col justify-center px-8 py-10 md:px-12 md:py-14 lg:px-14',
+              'flex flex-col justify-center px-8 py-10 text-center md:px-12 md:py-14 lg:px-14',
               reverseOnDesktop ? 'lg:order-2' : 'lg:order-1',
             )}
           >
-            <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={VIEWPORT_OPTS}>
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={VIEWPORT_OPTS}
+              className="mx-auto flex max-w-xl flex-col items-center text-center"
+            >
               {/* Badge row */}
-              <motion.div variants={staggerChild} className="flex flex-wrap items-center gap-3">
+              <motion.div variants={staggerChild} className="flex flex-wrap items-center justify-center gap-3">
                 <span className={cn('inline-flex rounded-full border px-3.5 py-1 text-xs font-bold uppercase tracking-[0.2em]', story.tone.badge)}>
                   {story.badge}
                 </span>
@@ -370,7 +376,7 @@ const StoryCard: React.FC<{
               </motion.p>
 
               {/* Bullet points */}
-              <div className="mt-7 space-y-3.5">
+              <div className="mt-7 flex w-full flex-col items-center gap-3.5">
                 {story.bullets.map((point, i) => (
                   <motion.div
                     key={point}
@@ -379,16 +385,26 @@ const StoryCard: React.FC<{
                     initial="hidden"
                     whileInView="visible"
                     viewport={VIEWPORT_OPTS}
-                    className="flex items-start gap-3.5 text-[0.9rem] leading-7 text-slate-600"
+                    className="w-full"
                   >
-                    <span className={cn('mt-2 h-2 w-2 shrink-0 rounded-full ring-2 ring-offset-2 ring-offset-white', story.tone.bulletDot, story.tone.bulletDot.replace('bg-', 'ring-'))} />
-                    <span>{point}</span>
+                    <span className="mx-auto block w-fit max-w-full text-center text-[0.9rem] leading-7 text-slate-600">
+                      <span className="relative inline-block px-2 pb-1">
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            'pointer-events-none absolute inset-x-1 bottom-1 h-2 rounded-full opacity-90',
+                            story.tone.bulletHighlight,
+                          )}
+                        />
+                        <span className="relative">{point}</span>
+                      </span>
+                    </span>
                   </motion.div>
                 ))}
               </div>
 
               {/* Closing promise */}
-              <motion.div variants={staggerChild} className={cn('mt-8 border-t pt-6', story.tone.divider)}>
+              <motion.div variants={staggerChild} className={cn('mt-8 w-full max-w-xl border-t pt-6', story.tone.divider)}>
                 <p className={cn('text-sm font-semibold leading-7 italic md:text-base', story.tone.promise)}>
                   {story.closing}
                 </p>
