@@ -7,8 +7,8 @@ import {
     Zap, TrendingUp, Trophy, Target, Sparkles,
     ChevronRight, Info, X,
 } from 'lucide-react';
-import type { BranchId, ComputedBranch, ComputedNode, Locale, Recommendation, UserSkillTreeState } from './types';
-import { BRANCH_MAP, xpToNextLevel } from './data';
+import type { BranchId, ComputedBranch, ComputedNode, Locale, UserSkillTreeState } from './types';
+import { xpToNextLevel } from './data';
 import { computeSkillTree } from './engine';
 import SkillTree from './SkillTree';
 import MobileBranchExplorer from './MobileBranchExplorer';
@@ -18,6 +18,93 @@ import ProgressRing from './ProgressRing';
 interface SkillTreeV2Props {
     userState: UserSkillTreeState;
     locale?: Locale;
+}
+
+type StatTone = 'indigo' | 'emerald' | 'amber' | 'pink';
+
+type BranchAccentClasses = {
+    recommendationCard: string;
+    recommendationIcon: string;
+    accentText: string;
+    activeButton: string;
+    progressDot: string;
+    activityDot: string;
+    activityText: string;
+};
+
+const STAT_TONE_CLASSES: Record<StatTone, { card: string; icon: string; label: string }> = {
+    indigo: {
+        card: 'border border-[#6366f120] bg-[linear-gradient(135deg,_#6366f110,_#6366f105)]',
+        icon: 'text-[#6366f1]',
+        label: 'text-[#6366f1cc]',
+    },
+    emerald: {
+        card: 'border border-[#10b98120] bg-[linear-gradient(135deg,_#10b98110,_#10b98105)]',
+        icon: 'text-[#10b981]',
+        label: 'text-[#10b981cc]',
+    },
+    amber: {
+        card: 'border border-[#f59e0b20] bg-[linear-gradient(135deg,_#f59e0b10,_#f59e0b05)]',
+        icon: 'text-[#f59e0b]',
+        label: 'text-[#f59e0bcc]',
+    },
+    pink: {
+        card: 'border border-[#ec489920] bg-[linear-gradient(135deg,_#ec489910,_#ec489905)]',
+        icon: 'text-[#ec4899]',
+        label: 'text-[#ec4899cc]',
+    },
+};
+
+const BRANCH_ACCENT_CLASSES: Record<BranchId, BranchAccentClasses> = {
+    research: {
+        recommendationCard: 'border border-[#3b82f620] bg-[linear-gradient(135deg,_#3b82f608,_transparent)]',
+        recommendationIcon: 'bg-[#3b82f615]',
+        accentText: 'text-[#3b82f6]',
+        activeButton: 'border border-[#3b82f640] bg-[#3b82f612]',
+        progressDot: 'bg-[#3b82f630]',
+        activityDot: 'bg-[#3b82f6]',
+        activityText: 'text-[#93c5fd]',
+    },
+    coding: {
+        recommendationCard: 'border border-[#10b98120] bg-[linear-gradient(135deg,_#10b98108,_transparent)]',
+        recommendationIcon: 'bg-[#10b98115]',
+        accentText: 'text-[#10b981]',
+        activeButton: 'border border-[#10b98140] bg-[#10b98112]',
+        progressDot: 'bg-[#10b98130]',
+        activityDot: 'bg-[#10b981]',
+        activityText: 'text-[#6ee7b7]',
+    },
+    entrepreneurship: {
+        recommendationCard: 'border border-[#f59e0b20] bg-[linear-gradient(135deg,_#f59e0b08,_transparent)]',
+        recommendationIcon: 'bg-[#f59e0b15]',
+        accentText: 'text-[#f59e0b]',
+        activeButton: 'border border-[#f59e0b40] bg-[#f59e0b12]',
+        progressDot: 'bg-[#f59e0b30]',
+        activityDot: 'bg-[#f59e0b]',
+        activityText: 'text-[#fcd34d]',
+    },
+    creativity: {
+        recommendationCard: 'border border-[#ec489920] bg-[linear-gradient(135deg,_#ec489908,_transparent)]',
+        recommendationIcon: 'bg-[#ec489915]',
+        accentText: 'text-[#ec4899]',
+        activeButton: 'border border-[#ec489940] bg-[#ec489912]',
+        progressDot: 'bg-[#ec489930]',
+        activityDot: 'bg-[#ec4899]',
+        activityText: 'text-[#f9a8d4]',
+    },
+    presentation: {
+        recommendationCard: 'border border-[#8b5cf620] bg-[linear-gradient(135deg,_#8b5cf608,_transparent)]',
+        recommendationIcon: 'bg-[#8b5cf615]',
+        accentText: 'text-[#8b5cf6]',
+        activeButton: 'border border-[#8b5cf640] bg-[#8b5cf612]',
+        progressDot: 'bg-[#8b5cf630]',
+        activityDot: 'bg-[#8b5cf6]',
+        activityText: 'text-[#c4b5fd]',
+    },
+};
+
+function cn(...classes: Array<string | false | null | undefined>) {
+    return classes.filter(Boolean).join(' ');
 }
 
 function useMediaQuery(query: string): boolean {
@@ -66,7 +153,7 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
     }, [selectedNodeId, branches]);
 
     // Level progress
-    const { next, progress: levelProgress } = xpToNextLevel(userState.globalXP);
+    const { progress: levelProgress } = xpToNextLevel(userState.globalXP);
 
     // Handlers
     const handleSelectNode = useCallback((nodeId: string, branchId: BranchId) => {
@@ -95,6 +182,8 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
 
     // Top recommendation
     const topRec = recommendations[0];
+    const topRecAccent = topRec ? BRANCH_ACCENT_CLASSES[topRec.branchId] : null;
+    const activeBranchId = isDesktop ? focusedBranchId : selectedBranchId;
 
     return (
         <div className="relative w-full">
@@ -104,48 +193,47 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
                     icon={<Zap className="w-4 h-4" />}
                     label={t ? 'Total XP' : 'Tổng XP'}
                     value={userState.globalXP.toLocaleString()}
-                    color="#6366f1"
+                    tone="indigo"
                 />
                 <StatCard
                     icon={<TrendingUp className="w-4 h-4" />}
                     label={t ? 'Level' : 'Cấp độ'}
                     value={String(userState.globalLevel)}
                     sublabel={`${Math.round(levelProgress * 100)}% → ${t ? 'next' : 'tiếp'}`}
-                    color="#10b981"
+                    tone="emerald"
                 />
                 <StatCard
                     icon={<Trophy className="w-4 h-4" />}
                     label={t ? 'Unlocked' : 'Đã mở khóa'}
                     value={`${totalUnlocked}`}
                     sublabel={`/ ${totalNodes} ${t ? 'skills' : 'kỹ năng'}`}
-                    color="#f59e0b"
+                    tone="amber"
                 />
                 <StatCard
                     icon={<Target className="w-4 h-4" />}
                     label={t ? 'Active Branches' : 'Nhánh đang mở'}
                     value={`${activeBranchCount}`}
                     sublabel={`/ ${branches.length}`}
-                    color="#ec4899"
+                    tone="pink"
                 />
             </div>
 
             {/* ── Top Recommendation Card ── */}
-            {topRec && (
+            {topRec && topRecAccent && (
                 <motion.div
-                    className="mb-6 rounded-xl p-4 flex items-center gap-3"
-                    style={{
-                        background: `linear-gradient(135deg, ${BRANCH_MAP[topRec.branchId]?.accentColor || '#6366f1'}08, transparent)`,
-                        border: `1px solid ${BRANCH_MAP[topRec.branchId]?.accentColor || '#6366f1'}20`,
-                    }}
+                    className={cn(
+                        'mb-6 flex items-center gap-3 rounded-xl p-4',
+                        topRecAccent.recommendationCard
+                    )}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
                 >
-                    <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{ background: `${BRANCH_MAP[topRec.branchId]?.accentColor || '#6366f1'}15` }}
-                    >
-                        <Sparkles size={18} style={{ color: BRANCH_MAP[topRec.branchId]?.accentColor }} />
+                    <div className={cn(
+                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl',
+                        topRecAccent.recommendationIcon
+                    )}>
+                        <Sparkles size={18} className={topRecAccent.accentText} />
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">
@@ -155,7 +243,7 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
                             {t ? topRec.reasonEn : topRec.reason}
                         </div>
                     </div>
-                    <ChevronRight size={18} className="text-slate-500 flex-shrink-0" />
+                    <ChevronRight size={18} className="shrink-0 text-slate-500" />
                 </motion.div>
             )}
 
@@ -171,13 +259,13 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
                                 handleSelectBranch(branch.def.id);
                             }
                         }}
-                        className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl flex-shrink-0 transition-all duration-200 group focus:outline-none"
-                        style={{
-                            background: (isDesktop ? focusedBranchId : selectedBranchId) === branch.def.id
-                                ? `${branch.def.accentColor}12`
-                                : 'rgba(30,41,59,0.5)',
-                            border: `1px solid ${(isDesktop ? focusedBranchId : selectedBranchId) === branch.def.id ? `${branch.def.accentColor}40` : 'rgba(51,65,85,0.2)'}`,
-                        }}
+                        type="button"
+                        className={cn(
+                            'flex shrink-0 items-center gap-2.5 rounded-xl px-3.5 py-2 transition-all duration-200 focus:outline-none',
+                            activeBranchId === branch.def.id
+                                ? BRANCH_ACCENT_CLASSES[branch.def.id].activeButton
+                                : 'border border-slate-700/20 bg-slate-800/50'
+                        )}
                     >
                         <ProgressRing
                             progress={branch.progressPercent / 100}
@@ -185,10 +273,7 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
                             strokeWidth={2.5}
                             color={branch.def.accentColor}
                         >
-                            <div
-                                className="w-4 h-4 rounded-full"
-                                style={{ background: `${branch.def.accentColor}30` }}
-                            />
+                            <div className={cn('h-4 w-4 rounded-full', BRANCH_ACCENT_CLASSES[branch.def.id].progressDot)} />
                         </ProgressRing>
                         <div className="text-left">
                             <div className="text-[11px] font-semibold text-slate-300 leading-none">
@@ -203,8 +288,8 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
                 {/* Legend toggle */}
                 <button
                     onClick={() => setShowLegend(prev => !prev)}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl flex-shrink-0 text-slate-500 hover:text-slate-300 transition-colors"
-                    style={{ background: 'rgba(30,41,59,0.5)', border: '1px solid rgba(51,65,85,0.2)' }}
+                    type="button"
+                    className="flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-700/20 bg-slate-800/50 px-3 py-2 text-slate-500 transition-colors hover:text-slate-300"
                 >
                     <Info size={14} />
                     <span className="text-[11px]">{t ? 'Legend' : 'Chú thích'}</span>
@@ -215,8 +300,8 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
             <AnimatePresence>
                 {showLegend && (
                     <motion.div
-                        className="mb-5 rounded-xl p-4"
-                        style={{ background: 'rgba(30,41,59,0.5)', border: '1px solid rgba(51,65,85,0.15)' }}
+                        id="skill-tree-legend"
+                        className="mb-5 rounded-xl border border-slate-700/15 bg-slate-800/50 p-4"
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
@@ -226,21 +311,24 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
                             <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                                 {t ? 'Node States' : 'Trạng thái node'}
                             </h4>
-                            <button onClick={() => setShowLegend(false)} className="text-slate-500 hover:text-slate-300">
+                            <button
+                                type="button"
+                                aria-label={t ? 'Close legend' : 'Đóng chú thích'}
+                                onClick={() => setShowLegend(false)}
+                                className="text-slate-500 hover:text-slate-300"
+                            >
                                 <X size={14} />
                             </button>
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            <LegendItem color="#334155" label={t ? 'Locked' : 'Chưa mở'} icon="🔒" dotClassName="bg-slate-600" />
-                            <LegendItem color="#6366f1" label={t ? 'Available' : 'Sẵn sàng'} icon="⚡" dotClassName="bg-indigo-400 animate-pulse" />
-                            <LegendItem color="#f59e0b" label={t ? 'In Progress' : 'Đang tiến hành'} icon="🔥" dotClassName="bg-amber-400" />
-                            <LegendItem color="#10b981" label={t ? 'Completed' : 'Hoàn thành'} icon="✅" dotClassName="bg-emerald-400" />
+                            <LegendItem label={t ? 'Locked' : 'Chưa mở'} icon="🔒" dotClassName="bg-slate-600" />
+                            <LegendItem label={t ? 'Available' : 'Sẵn sàng'} icon="⚡" dotClassName="bg-indigo-400 animate-pulse" />
+                            <LegendItem label={t ? 'In Progress' : 'Đang tiến hành'} icon="🔥" dotClassName="bg-amber-400" />
+                            <LegendItem label={t ? 'Completed' : 'Hoàn thành'} icon="✅" dotClassName="bg-emerald-400" />
                             <LegendItem
-                                color="#f59e0b"
                                 label={t ? 'Milestone' : 'Cột mốc'}
                                 icon="⭐"
-                                dotClassName="bg-amber-400 ring-2"
-                                dotStyle={{ boxShadow: '0 0 0 4px rgba(251, 191, 36, 0.18)' }}
+                                dotClassName="bg-amber-400 ring-2 shadow-[0_0_0_4px_rgba(251,191,36,0.18)]"
                             />
                         </div>
                     </motion.div>
@@ -249,12 +337,7 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
 
             {/* ── Main Tree View ── */}
             <div
-                className="rounded-2xl overflow-hidden"
-                style={{
-                    background: 'linear-gradient(180deg, rgba(15,23,42,0.6) 0%, rgba(2,6,23,0.8) 100%)',
-                    border: '1px solid rgba(148,163,184,0.06)',
-                    boxShadow: '0 4px 32px rgba(0,0,0,0.2)',
-                }}
+                className="overflow-hidden rounded-2xl border border-slate-400/5 bg-linear-to-b from-slate-900/60 to-slate-950/80 shadow-[0_4px_32px_rgba(0,0,0,0.2)]"
             >
                 <div className="p-4 sm:p-6 lg:p-8">
                     {isDesktop ? (
@@ -297,17 +380,11 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
                         {userState.recentActivities.slice(0, 5).map(act => (
                             <div
                                 key={act.id}
-                                className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg"
-                                style={{ background: 'rgba(30,41,59,0.4)', border: '1px solid rgba(51,65,85,0.15)' }}
+                                className="flex items-center gap-3 rounded-lg border border-slate-700/15 bg-slate-800/40 px-3.5 py-2.5"
                             >
-                                <div className="w-2 h-2 rounded-full flex-shrink-0"
-                                    style={{ background: BRANCH_MAP[act.branchId]?.accentColor || '#6366f1' }}
-                                />
+                                <div className={cn('h-2 w-2 shrink-0 rounded-full', BRANCH_ACCENT_CLASSES[act.branchId].activityDot)} />
                                 <span className="text-sm text-slate-300 flex-1 truncate">{act.title}</span>
-                                <span
-                                    className="text-xs font-semibold flex-shrink-0"
-                                    style={{ color: BRANCH_MAP[act.branchId]?.accentLight || '#93c5fd' }}
-                                >
+                                <span className={cn('shrink-0 text-xs font-semibold', BRANCH_ACCENT_CLASSES[act.branchId].activityText)}>
                                     +{act.xpAmount} XP
                                 </span>
                             </div>
@@ -334,25 +411,21 @@ function StatCard({
     label,
     value,
     sublabel,
-    color,
+    tone,
 }: {
     icon: React.ReactNode;
     label: string;
     value: string;
     sublabel?: string;
-    color: string;
+    tone: StatTone;
 }) {
+    const toneClasses = STAT_TONE_CLASSES[tone];
+
     return (
-        <div
-            className="rounded-xl p-3.5"
-            style={{
-                background: `linear-gradient(135deg, ${color}10, ${color}05)`,
-                border: `1px solid ${color}20`,
-            }}
-        >
+        <div className={cn('rounded-xl p-3.5', toneClasses.card)}>
             <div className="flex items-center gap-2 mb-1.5">
-                <span style={{ color }}>{icon}</span>
-                <span className="text-[11px] font-medium" style={{ color: `${color}cc` }}>
+                <span className={toneClasses.icon}>{icon}</span>
+                <span className={cn('text-[11px] font-medium', toneClasses.label)}>
                     {label}
                 </span>
             </div>
@@ -369,17 +442,14 @@ function LegendItem({
     label,
     icon,
     dotClassName,
-    dotStyle,
 }: {
-    color: string;
     label: string;
     icon: string;
     dotClassName: string;
-    dotStyle?: React.CSSProperties;
 }) {
     return (
         <div className="flex items-center gap-2 text-xs text-slate-400">
-            <div className={`w-2.5 h-2.5 rounded-full ${dotClassName}`} style={dotStyle} />
+            <div className={cn('h-2.5 w-2.5 rounded-full', dotClassName)} />
             <span>{icon}</span>
             <span>{label}</span>
         </div>
