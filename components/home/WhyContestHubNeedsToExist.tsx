@@ -102,8 +102,7 @@ const contestHubStoriesEn: ContestHubStory[] = [
     ],
     closing:
       'Blanc aims to become a clearer starting point where opportunity feels organized, credible, and easier to choose.',
-    image:
-      'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/stories/story-01-discovery.jpg',
     imageAlt:
       'A student reviewing notes and searching for the right direction at a desk.',
     imageCaption: 'Searching for direction should not feel this fragmented.',
@@ -126,8 +125,7 @@ const contestHubStoriesEn: ContestHubStory[] = [
     ],
     closing:
       'Blanc promises a more serious space to meet teammates, connect with mentors, and grow inside a community that shows up.',
-    image:
-      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/stories/story-02-community.jpg',
     imageAlt:
       'A group of students collaborating around a table with laptops and notebooks.',
     imageCaption: 'Good collaboration begins with trust, alignment, and shared effort.',
@@ -150,8 +148,7 @@ const contestHubStoriesEn: ContestHubStory[] = [
     ],
     closing:
       'Blanc is being built to help students shape a clearer portfolio, a stronger rhythm of growth, and a journey worth carrying forward.',
-    image:
-      'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/stories/story-03-portfolio.jpg',
     imageAlt:
       'A student refining a presentation and organizing project work on a laptop.',
     imageCaption: 'Progress becomes more powerful when it can be seen as one story.',
@@ -177,8 +174,7 @@ const contestHubStoriesVi: ContestHubStory[] = [
     ],
     closing:
       'ContestHub hướng tới một điểm bắt đầu rõ ràng hơn.',
-    image:
-      'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/stories/story-01-discovery.jpg',
     imageAlt:
       'Học sinh đang xem ghi chú và tìm hướng đi phù hợp tại bàn học.',
     imageCaption: 'Việc tìm hướng đi không nên bắt đầu từ sự rời rạc.',
@@ -201,8 +197,7 @@ const contestHubStoriesVi: ContestHubStory[] = [
     ],
     closing:
       'ContestHub muốn kết nối những người có thể đi xa cùng nhau.',
-    image:
-      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/stories/story-02-community.jpg',
     imageAlt:
       'Nhóm học sinh đang thảo luận và làm việc cùng nhau quanh bàn học.',
     imageCaption: 'Cộng tác tốt bắt đầu từ sự tin tưởng và sự đồng lòng.',
@@ -225,8 +220,7 @@ const contestHubStoriesVi: ContestHubStory[] = [
     ],
     closing:
       'ContestHub giúp biến nỗ lực thành một hành trình rõ ràng hơn.',
-    image:
-      'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/stories/story-03-portfolio.jpg',
     imageAlt:
       'Học sinh đang hoàn thiện bài thuyết trình và sắp xếp tài liệu dự án trên laptop.',
     imageCaption: 'Nỗ lực sẽ có giá trị hơn khi được nhìn thấy như một câu chuyện liền mạch.',
