@@ -37,7 +37,7 @@ export const contestHubStoryTheme = {
   sectionTitle: 'from-slate-900 via-slate-800 to-primary-700',
 };
 
-const storyTonePresets: Record<'gold' | 'teal' | 'mint', StoryTone> = {
+const storyTonePresets: Record<'gold' | 'teal' | 'mint' | 'rose', StoryTone> = {
   gold: {
     badge: 'border-amber-200/70 bg-amber-50 text-amber-900',
     bulletHighlight: 'bg-linear-to-r from-amber-200/90 via-amber-300/70 to-amber-200/55',
@@ -70,6 +70,17 @@ const storyTonePresets: Record<'gold' | 'teal' | 'mint', StoryTone> = {
     surfaceTint: 'from-emerald-50/60 via-white to-white',
     accentLine: 'from-emerald-400 to-emerald-200',
     numberColor: 'text-emerald-200/30',
+  },
+  rose: {
+    badge: 'border-rose-200/70 bg-rose-50 text-rose-900',
+    bulletHighlight: 'bg-linear-to-r from-rose-200/90 via-rose-300/70 to-rose-200/55',
+    divider: 'border-rose-100/80',
+    imageBorder: 'border-rose-200/60',
+    imageGlow: 'from-rose-200/60 via-rose-100/10 to-pink-100/50',
+    promise: 'text-rose-900',
+    surfaceTint: 'from-rose-50/55 via-white to-white',
+    accentLine: 'from-rose-400 to-rose-200',
+    numberColor: 'text-rose-200/30',
   },
 };
 
@@ -144,7 +155,7 @@ const contestHubStoriesEn: ContestHubStory[] = [
     imageAlt:
       'A student refining a presentation and organizing project work on a laptop.',
     imageCaption: 'Progress becomes more powerful when it can be seen as one story.',
-    tone: storyTonePresets.mint,
+    tone: storyTonePresets.rose,
   },
 ];
 
@@ -219,74 +230,74 @@ const contestHubStoriesVi: ContestHubStory[] = [
     imageAlt:
       'Học sinh đang hoàn thiện bài thuyết trình và sắp xếp tài liệu dự án trên laptop.',
     imageCaption: 'Nỗ lực sẽ có giá trị hơn khi được nhìn thấy như một câu chuyện liền mạch.',
-    tone: storyTonePresets.mint,
+    tone: storyTonePresets.rose,
   },
 ];
 
 /* ─── Framer Motion Variants ─── */
 const fadeUp = {
-  hidden: { y: 48, opacity: 0 },
+  hidden: { y: 28, opacity: 0 },
   visible: (i: number) => ({
     y: 0,
     opacity: 1,
-    transition: { duration: 0.7, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.45, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
 const fadeIn = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.8, ease: 'easeOut' } },
+  visible: { opacity: 1, transition: { duration: 0.4, ease: 'easeOut' } },
 };
 
 const slideFromLeft = {
-  hidden: { x: -60, opacity: 0 },
+  hidden: { x: -32, opacity: 0 },
   visible: {
     x: 0,
     opacity: 1,
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
 const slideFromRight = {
-  hidden: { x: 60, opacity: 0 },
+  hidden: { x: 32, opacity: 0 },
   visible: {
     x: 0,
     opacity: 1,
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
 const scaleReveal = {
-  hidden: { scale: 0.92, opacity: 0 },
+  hidden: { scale: 0.95, opacity: 0 },
   visible: {
     scale: 1,
     opacity: 1,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
 const staggerContainer = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.1, delayChildren: 0.15 },
+    transition: { staggerChildren: 0.05, delayChildren: 0.08 },
   },
 };
 
 const staggerChild = {
-  hidden: { y: 24, opacity: 0 },
+  hidden: { y: 14, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
-    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
 const bulletReveal = {
-  hidden: { x: -16, opacity: 0 },
+  hidden: { x: -10, opacity: 0 },
   visible: (i: number) => ({
     x: 0,
     opacity: 1,
-    transition: { duration: 0.45, delay: 0.35 + i * 0.1, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.3, delay: 0.15 + i * 0.06, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
@@ -294,18 +305,18 @@ const lineGrow = {
   hidden: { scaleY: 0 },
   visible: {
     scaleY: 1,
-    transition: { duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
-const VIEWPORT_OPTS = { once: true, margin: '-80px' } as const;
+const VIEWPORT_OPTS = { once: true, margin: '-40px' } as const;
 
 /* ─── StoryCard Component ─── */
 const StoryCard: React.FC<{
   story: ContestHubStory;
   index: number;
 }> = ({ story, index }) => {
-  const reverseOnDesktop = index === 1;
+  const reverseOnDesktop = index !== 1;
   const storyNumber = String(index + 1).padStart(2, '0');
 
   const contentVariant = reverseOnDesktop ? slideFromRight : slideFromLeft;
@@ -434,10 +445,10 @@ const StoryCard: React.FC<{
                 </div>
                 <div className="pointer-events-none absolute inset-0 rounded-[1.75rem] bg-linear-to-t from-slate-950/25 via-transparent to-white/10" />
                 <motion.div
-                  initial={{ y: 20, opacity: 0 }}
+                  initial={{ y: 12, opacity: 0 }}
                   whileInView={{ y: 0, opacity: 1 }}
                   viewport={VIEWPORT_OPTS}
-                  transition={{ duration: 0.5, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.35, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
                   className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/50 bg-white/80 px-5 py-3.5 shadow-lg shadow-slate-900/8 backdrop-blur-md"
                 >
                   <p className="text-sm font-medium leading-6 text-slate-700">
