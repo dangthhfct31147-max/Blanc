@@ -2,7 +2,7 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import type { PluginContext } from 'rollup';
 import react from '@vitejs/plugin-react';
-import { createManualChunks } from '../../build/viteManualChunks';
+import { createManualChunks } from './build/viteManualChunks';
 
 function buildStampPlugin() {
   return {
