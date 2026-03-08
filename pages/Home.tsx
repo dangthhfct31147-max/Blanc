@@ -258,7 +258,12 @@ const Home: React.FC = () => {
           <WhyContestHubNeedsToExist />
 
           {/* Stats */}
-          <div className="relative left-1/2 right-1/2 w-screen -ml-[50vw] -mr-[50vw] overflow-hidden -mb-22 md:-mb-26">
+          <section
+            id="home-live-stats"
+            aria-labelledby="home-live-stats-title"
+            tabIndex={-1}
+            className="relative left-1/2 right-1/2 w-screen -ml-[50vw] -mr-[50vw] overflow-hidden -mb-22 scroll-mt-24 focus:outline-none md:-mb-26 md:scroll-mt-28"
+          >
             <div className="absolute inset-0 bg-linear-to-r from-primary-50 via-white to-emerald-50" />
             <div className="absolute -left-20 top-0 w-72 h-72 bg-primary-200/60 blur-3xl" />
             <div className="absolute -right-30 -bottom-30 w-80 h-80 bg-emerald-200/60 blur-3xl" />
@@ -266,7 +271,7 @@ const Home: React.FC = () => {
             <div className="relative max-w-6xl mx-auto px-6 md:px-14 py-14 md:py-16">
               <div className="flex flex-col items-center text-center gap-4 md:gap-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-600">{t('home.stats.kicker')}</p>
-                <h3 className="text-3xl md:text-4xl font-black text-slate-900">{t('home.stats.title')}</h3>
+                <h3 id="home-live-stats-title" className="text-3xl md:text-4xl font-black text-slate-900">{t('home.stats.title')}</h3>
                 <p className="text-slate-600 max-w-3xl">
                   {t('home.stats.description')}
                 </p>
@@ -347,7 +352,7 @@ const Home: React.FC = () => {
                 )}
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </section>
 

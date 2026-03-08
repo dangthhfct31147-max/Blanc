@@ -357,9 +357,9 @@ const Layout: React.FC<LayoutProps> = ({
       {/* Sticky Header */}
       <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 dark:bg-slate-900/80 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative flex h-16 items-center justify-center">
-            {/* Logo - Absolute left */}
-            <NavLink to="/" aria-label="Blanc home" className="absolute left-0 top-1/2 flex -translate-y-1/2 flex-row items-center">
+          <div className="relative flex h-16 items-center md:grid md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-8 lg:gap-10">
+            {/* Logo */}
+            <NavLink to="/" aria-label="Blanc home" className="flex shrink-0 flex-row items-center">
               <img src="/logo.png" alt="Blanc Logo" className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover shrink-0" />
               <div className="ml-2 md:ml-3 flex-col hidden sm:flex">
                 <span className="text-sm font-semibold text-slate-800 leading-tight">Beyond Learning</span>
@@ -367,8 +367,8 @@ const Layout: React.FC<LayoutProps> = ({
               </div>
             </NavLink>
 
-            {/* Desktop Nav - True Center */}
-            <nav className="hidden md:flex items-center gap-1" aria-label={t('layout.aria.mainMenu')}>
+            {/* Desktop Nav */}
+            <nav className="hidden md:flex items-center gap-1 justify-self-start md:ml-4 lg:ml-8" aria-label={t('layout.aria.mainMenu')}>
               {leadingNavItems.map((item) => (
                 <NavLink
                   key={item.path}
@@ -472,8 +472,8 @@ const Layout: React.FC<LayoutProps> = ({
               ))}
             </nav>
 
-            {/* Auth/Profile Actions - Absolute right */}
-            <div className="absolute right-0 hidden md:flex items-center space-x-4">
+            {/* Auth/Profile Actions */}
+            <div className="hidden md:flex items-center justify-self-end space-x-4">
               <CommandPalette />
               <ThemeToggle />
               {user ? (
@@ -817,7 +817,7 @@ const Layout: React.FC<LayoutProps> = ({
 
       {/* Main Content */}
       <Breadcrumbs />
-      <main id="main-content" role="main" className="grow">
+      <main id="main-content" role="main" tabIndex={-1} className="grow scroll-mt-20 focus:outline-none">
         <AnimatePresence mode="wait">
           <PageTransition key={location.pathname}>
             <Outlet />
