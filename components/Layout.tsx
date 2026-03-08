@@ -14,6 +14,9 @@ import MentorBlogPrompt from './MentorBlogPrompt';
 import AuthSyncNotice from './AuthSyncNotice';
 import CommandPalette from './CommandPalette';
 import Breadcrumbs from './Breadcrumbs';
+import ThemeToggle from './ThemeToggle';
+import SkipToContent from './SkipToContent';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 interface LayoutProps {
   user: User | null;
@@ -32,6 +35,7 @@ const Layout: React.FC<LayoutProps> = ({
 }) => {
   const { t, locale } = useI18n();
   const dateLocale = locale === 'en' ? 'en-US' : 'vi-VN';
+  const notificationToggleLabel = locale === 'en' ? 'Open notifications' : 'Mở thông báo';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isLearningOpen, setIsLearningOpen] = useState(false);
@@ -41,6 +45,9 @@ const Layout: React.FC<LayoutProps> = ({
   const [isMentorPromptOpen, setIsMentorPromptOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoadingNotifs, setIsLoadingNotifs] = useState(false);
+  const mobileMenuLabel = isMenuOpen
+    ? (locale === 'en' ? 'Close menu' : 'Đóng menu')
+    : (locale === 'en' ? 'Open menu' : 'Mở menu');
   const notifRef = useRef<HTMLDivElement>(null);
   const learningRef = useRef<HTMLDivElement>(null);
   const communityRef = useRef<HTMLDivElement>(null);
@@ -49,6 +56,9 @@ const Layout: React.FC<LayoutProps> = ({
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Dynamic SEO meta tags per route
+  usePageMeta();
 
   // Hide footer on reports page (for full-screen editor experience)
   const hideFooter = location.pathname.startsWith('/reports');
@@ -337,14 +347,15 @@ const Layout: React.FC<LayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 font-sans transition-colors duration-200">
+      <SkipToContent />
       <MentorBlogPrompt
         isOpen={isMentorPromptOpen}
         onClose={() => setIsMentorPromptOpen(false)}
         onUpdate={handleMentorPromptUpdate}
       />
       {/* Sticky Header */}
-      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200">
+      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 dark:bg-slate-900/80 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-center">
             {/* Logo - Absolute left */}
@@ -464,6 +475,7 @@ const Layout: React.FC<LayoutProps> = ({
             {/* Auth/Profile Actions - Absolute right */}
             <div className="absolute right-0 hidden md:flex items-center space-x-4">
               <CommandPalette />
+              <ThemeToggle />
               {user ? (
                 <div className="flex items-center space-x-3">
                   {/* Streak Indicator */}
@@ -472,7 +484,11 @@ const Layout: React.FC<LayoutProps> = ({
                   {/* Notification Bell with Dropdown */}
                   <div className="relative" ref={notifRef}>
                     <button
+                      type="button"
                       onClick={() => setIsNotifOpen(!isNotifOpen)}
+                      aria-label={notificationToggleLabel}
+                      aria-expanded={isNotifOpen}
+                      aria-controls="site-notifications-menu"
                       className={`relative p-2 transition-colors rounded-full hover:bg-slate-100 ${isNotifOpen ? 'bg-slate-100 text-slate-800' : 'text-slate-500'}`}
                     >
                       <Bell className="w-5 h-5" />
@@ -483,11 +499,15 @@ const Layout: React.FC<LayoutProps> = ({
 
                     {/* Notification Dropdown Panel */}
                     {isNotifOpen && (
-                      <div className="absolute right-0 mt-3 w-80 md:w-96 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden animation-fade-in z-50 origin-top-right">
+                      <div
+                        id="site-notifications-menu"
+                        className="absolute right-0 mt-3 w-80 md:w-96 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden animation-fade-in z-50 origin-top-right"
+                      >
                         <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-white">
                           <h3 className="font-bold text-slate-900">{t('layout.notifications.title')}</h3>
                           {unreadCount > 0 && (
                             <button
+                              type="button"
                               onClick={markAllAsRead}
                               className="text-xs font-medium text-primary-600 hover:text-primary-700 flex items-center"
                             >
@@ -496,7 +516,7 @@ const Layout: React.FC<LayoutProps> = ({
                           )}
                         </div>
 
-                        <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                        <div className="max-h-100 overflow-y-auto custom-scrollbar">
                           {isLoadingNotifs ? (
                             <div className="flex justify-center py-8">
                               <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
@@ -543,6 +563,7 @@ const Layout: React.FC<LayoutProps> = ({
 
                         <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
                           <button
+                            type="button"
                             onClick={handleViewAllNotifications}
                             className="text-sm font-medium text-primary-600 hover:text-primary-700"
                           >
@@ -609,7 +630,11 @@ const Layout: React.FC<LayoutProps> = ({
             <div className="md:hidden absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1">
               <CommandPalette />
               <button
+                type="button"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label={mobileMenuLabel}
+                aria-expanded={isMenuOpen}
+                aria-controls="mobile-site-menu"
                 className="text-slate-500 hover:text-slate-700 focus:outline-none p-2"
               >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -620,7 +645,7 @@ const Layout: React.FC<LayoutProps> = ({
 
         {/* Mobile Nav */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-b border-slate-200">
+          <div id="mobile-site-menu" className="md:hidden bg-white border-b border-slate-200">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {leadingNavItems.map((item) => (
                 <NavLink
@@ -792,7 +817,7 @@ const Layout: React.FC<LayoutProps> = ({
 
       {/* Main Content */}
       <Breadcrumbs />
-      <main className="grow">
+      <main id="main-content" role="main" className="grow">
         <AnimatePresence mode="wait">
           <PageTransition key={location.pathname}>
             <Outlet />
@@ -802,7 +827,7 @@ const Layout: React.FC<LayoutProps> = ({
 
       {/* Footer - Hidden on reports page for full-screen editor */}
       {!hideFooter && (
-        <footer className="bg-white border-t border-slate-200 py-12">
+        <footer role="contentinfo" className="bg-white border-t border-slate-200 py-12 dark:bg-slate-900 dark:border-slate-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
               <div className="col-span-1 lg:col-span-3">

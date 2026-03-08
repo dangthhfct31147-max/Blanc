@@ -11,6 +11,8 @@ interface ImportMeta {
     readonly env: ImportMetaEnv;
 }
 
+declare const __APP_VERSION__: string | undefined;
+
 interface Window {
     __CLERK_PUBLISHABLE_KEY__?: string;
     __APP_RUNTIME_CONFIG__?: {

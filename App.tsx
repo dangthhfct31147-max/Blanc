@@ -10,6 +10,7 @@ import LoadingSpinner from './components/LoadingSpinner';
 import ChatBubble from './components/ChatBubble';
 import ErrorBoundary from './components/ErrorBoundary';
 import OnboardingWizard, { isOnboardingComplete } from './components/OnboardingWizard';
+import KeyboardShortcuts from './components/KeyboardShortcuts';
 
 import Home from './pages/Home';
 import Auth from './pages/Auth';
@@ -327,6 +328,8 @@ const App: React.FC = () => {
       />
 
       {isChatEnabled && <ChatBubble />}
+
+      <KeyboardShortcuts />
 
       <ErrorBoundary name="App" variant="page">
         <Routes>

@@ -193,7 +193,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-2">{headerText}</p>
               </div>
             )}
-            <div className="max-h-[280px] overflow-y-auto p-2">
+            <div className="max-h-70 overflow-y-auto p-2">
               {options.map(option => {
                 const isSelected = value === option.value;
                 return (
@@ -241,18 +241,18 @@ export const Tabs: React.FC<{ tabs: TabItem[]; activeTab: string; onChange: (tab
         const value = typeof tab === 'string' ? tab : tab.value;
         const label = typeof tab === 'string' ? tab : tab.label;
         return (
-        <button
-          key={value}
-          onClick={() => onChange(value)}
-          className={cn(
-            "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors",
-            activeTab === value
-              ? "border-primary-600 text-primary-600"
-              : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700"
-          )}
-        >
-          {label}
-        </button>
+          <button
+            key={value}
+            onClick={() => onChange(value)}
+            className={cn(
+              "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors",
+              activeTab === value
+                ? "border-primary-600 text-primary-600"
+                : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700"
+            )}
+          >
+            {label}
+          </button>
         );
       })}
     </nav>
@@ -300,19 +300,94 @@ export const Avatar: React.FC<AvatarProps> = ({ src, name = 'User', size = 'md',
 };
 
 // Empty State
+export type EmptyStateVariant = 'default' | 'search' | 'error' | 'no-data' | 'no-access';
+
 interface EmptyStateProps {
   icon?: React.ReactNode;
   title: string;
   description?: string;
   action?: React.ReactNode;
+  variant?: EmptyStateVariant;
+  compact?: boolean;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ icon, title, description, action }) => (
-  <div className="text-center py-12">
-    {icon && <div className="mx-auto mb-4 text-slate-300">{icon}</div>}
-    <h3 className="text-lg font-medium text-slate-900 mb-2">{title}</h3>
-    {description && <p className="text-slate-500 mb-4">{description}</p>}
-    {action}
+const VARIANT_ILLUSTRATION: Record<EmptyStateVariant, React.ReactNode> = {
+  default: (
+    <svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="20" y="20" width="80" height="60" rx="8" className="fill-slate-100 dark:fill-slate-800" />
+      <rect x="30" y="34" width="40" height="4" rx="2" className="fill-slate-200 dark:fill-slate-700" />
+      <rect x="30" y="44" width="60" height="4" rx="2" className="fill-slate-200 dark:fill-slate-700" />
+      <rect x="30" y="54" width="28" height="4" rx="2" className="fill-slate-200 dark:fill-slate-700" />
+      <circle cx="85" cy="70" r="18" className="fill-indigo-100 dark:fill-indigo-900/30" />
+      <path d="M79 70l4 4 8-8" className="stroke-indigo-400" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </svg>
+  ),
+  search: (
+    <svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="55" cy="45" r="24" className="stroke-slate-200 dark:stroke-slate-700" strokeWidth="3" fill="none" />
+      <line x1="72" y1="62" x2="90" y2="80" className="stroke-slate-300 dark:stroke-slate-600" strokeWidth="3" strokeLinecap="round" />
+      <circle cx="55" cy="45" r="10" className="fill-indigo-50 dark:fill-indigo-900/20" />
+      <text x="51" y="49" className="fill-indigo-400" fontSize="14" fontWeight="bold">?</text>
+    </svg>
+  ),
+  error: (
+    <svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="60" cy="50" r="30" className="fill-red-50 dark:fill-red-900/20" />
+      <circle cx="60" cy="50" r="22" className="stroke-red-200 dark:stroke-red-800" strokeWidth="2" fill="none" />
+      <path d="M52 42l16 16M68 42L52 58" className="stroke-red-400" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  ),
+  'no-data': (
+    <svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="15" y="25" width="90" height="55" rx="6" className="fill-slate-50 dark:fill-slate-800 stroke-slate-200 dark:stroke-slate-700" strokeWidth="1.5" />
+      <rect x="25" y="38" width="30" height="3" rx="1.5" className="fill-slate-200 dark:fill-slate-700" />
+      <rect x="25" y="48" width="70" height="3" rx="1.5" className="fill-slate-100 dark:fill-slate-800" />
+      <rect x="25" y="58" width="50" height="3" rx="1.5" className="fill-slate-100 dark:fill-slate-800" />
+      <circle cx="95" cy="30" r="15" className="fill-amber-50 dark:fill-amber-900/20" />
+      <text x="90" y="36" className="fill-amber-400" fontSize="18" fontWeight="bold">!</text>
+    </svg>
+  ),
+  'no-access': (
+    <svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="35" y="35" width="50" height="40" rx="4" className="fill-slate-100 dark:fill-slate-800 stroke-slate-200 dark:stroke-slate-700" strokeWidth="1.5" />
+      <rect x="50" y="20" width="20" height="25" rx="10" className="stroke-slate-300 dark:stroke-slate-600" strokeWidth="2.5" fill="none" />
+      <circle cx="60" cy="52" r="5" className="fill-slate-300 dark:fill-slate-600" />
+      <rect x="58" y="55" width="4" height="8" rx="2" className="fill-slate-300 dark:fill-slate-600" />
+    </svg>
+  ),
+};
+
+export const EmptyState: React.FC<EmptyStateProps> = ({
+  icon,
+  title,
+  description,
+  action,
+  variant = 'default',
+  compact = false,
+}) => (
+  <div className={cn('flex flex-col items-center justify-center text-center', compact ? 'py-8' : 'py-16 px-6')}>
+    {/* Illustration */}
+    <div className="mb-6 opacity-80">
+      {icon || VARIANT_ILLUSTRATION[variant]}
+    </div>
+
+    <h3 className={cn(
+      'font-semibold text-slate-900 dark:text-slate-100 mb-2',
+      compact ? 'text-base' : 'text-lg',
+    )}>
+      {title}
+    </h3>
+
+    {description && (
+      <p className={cn(
+        'max-w-md text-slate-500 dark:text-slate-400',
+        compact ? 'text-sm mb-4' : 'text-sm mb-6',
+      )}>
+        {description}
+      </p>
+    )}
+
+    {action && <div>{action}</div>}
   </div>
 );
 
@@ -439,7 +514,9 @@ const ToastItem: React.FC<ToastItemProps> = ({ id, type, message, duration = 400
       <span className={iconStyles[type]}>{icons[type]}</span>
       <p className="text-sm font-medium flex-1">{message}</p>
       <button
+        type="button"
         onClick={() => onClose(id)}
+        aria-label="Dismiss notification"
         className="text-current opacity-50 hover:opacity-100 transition-opacity"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -494,15 +571,11 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 interface SkeletonProps {
   className?: string;
   variant?: 'text' | 'circular' | 'rectangular';
-  width?: string | number;
-  height?: string | number;
 }
 
 export const Skeleton: React.FC<SkeletonProps> = ({
   className,
-  variant = 'text',
-  width,
-  height
+  variant = 'text'
 }) => {
   const baseStyles = 'animate-pulse bg-slate-200';
 
@@ -515,7 +588,6 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   return (
     <div
       className={cn(baseStyles, variants[variant], className)}
-      style={{ width, height }}
     />
   );
 };
@@ -526,17 +598,17 @@ export const ReportCardSkeleton: React.FC = () => (
     <td className="px-6 py-4">
       <div className="flex items-center gap-3">
         <Skeleton variant="rectangular" className="w-8 h-8" />
-        <Skeleton width={200} />
+        <Skeleton className="w-50" />
       </div>
     </td>
     <td className="px-6 py-4 hidden md:table-cell">
-      <Skeleton width={120} />
+      <Skeleton className="w-30" />
     </td>
     <td className="px-6 py-4">
-      <Skeleton width={80} className="rounded-full h-6" />
+      <Skeleton className="h-6 w-20 rounded-full" />
     </td>
     <td className="px-6 py-4 hidden sm:table-cell">
-      <Skeleton width={100} />
+      <Skeleton className="w-25" />
     </td>
     <td className="px-6 py-4 text-right">
       <Skeleton variant="circular" className="w-8 h-8 ml-auto" />

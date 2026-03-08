@@ -23,6 +23,32 @@
 body {
     background-color: #f8fafc;
     color: #0f172a;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Dark mode base */
+.dark body,
+html.dark body {
+    background-color: #0f172a;
+    color: #e2e8f0;
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: #1e293b;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
 }
 
 /* Hide native password reveal/clear icons (Edge/IE) to avoid duplicate "eye" buttons */
@@ -149,6 +175,7 @@ input[type='password']::-ms-clear {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     .animation-fade-in,
     .animate-fade-in,
     .animate-fade-in-up,
@@ -206,6 +233,7 @@ input[type='password']::-ms-clear {
 
 /* Streak badge animations */
 @keyframes streak-flame {
+
     0%,
     100% {
         transform: translateY(0) rotate(-6deg) scale(1);
@@ -224,6 +252,7 @@ input[type='password']::-ms-clear {
 }
 
 @keyframes streak-spark {
+
     0%,
     100% {
         transform: rotate(0deg) scale(1);
