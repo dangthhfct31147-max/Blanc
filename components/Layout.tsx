@@ -817,7 +817,7 @@ const Layout: React.FC<LayoutProps> = ({
 
       {/* Main Content */}
       <Breadcrumbs />
-      <main id="main-content" role="main" tabIndex={-1} className="grow scroll-mt-20 focus:outline-none">
+      <main id="main-content" role="main" className="grow">
         <AnimatePresence mode="wait">
           <PageTransition key={location.pathname}>
             <Outlet />
