@@ -357,7 +357,7 @@ const Layout: React.FC<LayoutProps> = ({
       {/* Sticky Header */}
       <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 dark:bg-slate-900/80 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative flex h-16 items-center md:grid md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-4 lg:gap-6 xl:gap-8">
+          <div className="relative flex h-16 items-center gap-4 lg:gap-6">
             {/* Logo */}
             <NavLink to="/" aria-label="Blanc home" className="flex shrink-0 flex-row items-center">
               <img src="/logo.png" alt="Blanc Logo" className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover shrink-0" />
@@ -368,7 +368,7 @@ const Layout: React.FC<LayoutProps> = ({
             </NavLink>
 
             {/* Desktop Nav */}
-            <nav className="hidden md:flex min-w-max items-center gap-0 justify-self-center" aria-label={t('layout.aria.mainMenu')}>
+            <nav className="hidden md:flex min-w-max items-center gap-0 ml-auto" aria-label={t('layout.aria.mainMenu')}>
               {leadingNavItems.map((item) => (
                 <NavLink
                   key={item.path}
@@ -473,7 +473,7 @@ const Layout: React.FC<LayoutProps> = ({
             </nav>
 
             {/* Auth/Profile Actions */}
-            <div className="hidden md:flex items-center justify-self-end space-x-2.5 lg:space-x-3">
+            <div className="hidden md:flex items-center space-x-2.5 lg:space-x-3">
               <CommandPalette />
               <ThemeToggle />
               {user ? (
