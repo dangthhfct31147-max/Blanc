@@ -128,12 +128,12 @@ export default function SkillNode({
                     className="rounded-2xl border px-3 py-2 backdrop-blur-md"
                     style={{
                         background: isSelected
-                            ? `linear-gradient(135deg, ${branch.def.accentColor}16, rgba(15,23,42,0.94))`
-                            : 'linear-gradient(135deg, rgba(15,23,42,0.78), rgba(15,23,42,0.92))',
-                        borderColor: isSelected ? `${branch.def.accentColor}4a` : 'rgba(148,163,184,0.16)',
+                            ? `linear-gradient(135deg, ${branch.def.accentColor}18, rgba(15,23,42,0.92))`
+                            : 'linear-gradient(135deg, rgba(15,23,42,0.75), rgba(15,23,42,0.9))',
+                        borderColor: isSelected ? `${branch.def.accentColor}4a` : 'rgba(148,163,184,0.12)',
                         boxShadow: isSelected
-                            ? `0 10px 28px ${branch.def.accentColor}1c`
-                            : '0 10px 24px rgba(2,6,23,0.22)',
+                            ? `0 10px 28px ${branch.def.accentColor}1c, inset 0 1px 0 rgba(255,255,255,0.04)`
+                            : '0 10px 24px rgba(2,6,23,0.22), inset 0 1px 0 rgba(255,255,255,0.03)',
                     }}
                 >
                     <div className="flex items-start gap-2">

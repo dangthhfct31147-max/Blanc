@@ -79,20 +79,36 @@ export default function TreeNode({
         >
             {/* Outer ambient glow for completed nodes */}
             {isCompleted && !isFocusDimmed && (
-                <motion.div
-                    className="absolute"
-                    style={{
-                        width: dimensions + 28,
-                        height: dimensions + 28,
-                        borderRadius: isMilestone ? 24 : '50%',
-                        top: -14,
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        background: `radial-gradient(circle, ${color}18 0%, ${color}08 40%, transparent 70%)`,
-                    }}
-                    animate={{ scale: [1, 1.08, 1], opacity: [0.6, 1, 0.6] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                />
+                <>
+                    <motion.div
+                        className="absolute"
+                        style={{
+                            width: dimensions + 32,
+                            height: dimensions + 32,
+                            borderRadius: isMilestone ? 26 : '50%',
+                            top: -16,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            background: `radial-gradient(circle, ${color}20 0%, ${color}0a 40%, transparent 70%)`,
+                        }}
+                        animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0.9, 0.5] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                    />
+                    <motion.div
+                        className="absolute"
+                        style={{
+                            width: dimensions + 20,
+                            height: dimensions + 20,
+                            borderRadius: isMilestone ? 22 : '50%',
+                            top: -10,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            background: `radial-gradient(circle, ${color}15 0%, transparent 60%)`,
+                        }}
+                        animate={{ opacity: [0.3, 0.6, 0.3] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                    />
+                </>
             )}
 
             {/* Pulsing ring for available nodes */}
@@ -191,11 +207,11 @@ export default function TreeNode({
                     height: dimensions,
                     borderRadius: isMilestone ? 16 : '50%',
                     background: isCompleted
-                        ? `linear-gradient(135deg, ${color}28, ${color}12)`
+                        ? `linear-gradient(135deg, ${color}30, ${color}15)`
                         : isActive
-                            ? `linear-gradient(135deg, ${color}22, ${color}0a)`
+                            ? `linear-gradient(135deg, ${color}24, ${color}0c)`
                             : isAvailable
-                                ? `linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,41,59,0.9))`
+                                ? `linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,41,59,0.85))`
                                 : 'rgba(15, 23, 42, 0.5)',
                     border: isCompleted
                         ? `2px solid ${color}`
@@ -205,12 +221,12 @@ export default function TreeNode({
                                 ? `1.5px solid ${color}45`
                                 : '1.5px solid rgba(51, 65, 85, 0.4)',
                     boxShadow: isSelected
-                        ? `0 0 24px ${color}40, 0 0 48px ${color}15, inset 0 0 12px ${color}10`
+                        ? `0 0 28px ${color}45, 0 0 56px ${color}18, inset 0 0 14px ${color}12, inset 0 1px 0 rgba(255,255,255,0.06)`
                         : isCompleted
-                            ? `0 0 16px ${color}25, inset 0 1px 0 rgba(255,255,255,0.06)`
+                            ? `0 0 20px ${color}28, 0 0 40px ${color}08, inset 0 1px 0 rgba(255,255,255,0.06)`
                             : isActive
-                                ? `0 0 20px ${color}18, inset 0 1px 0 rgba(255,255,255,0.04)`
-                                : 'inset 0 1px 0 rgba(255,255,255,0.03)',
+                                ? `0 0 24px ${color}1c, inset 0 1px 0 rgba(255,255,255,0.05)`
+                                : 'inset 0 1px 0 rgba(255,255,255,0.04), 0 4px 12px rgba(0,0,0,0.15)',
                     transition: 'box-shadow 0.4s ease, border-color 0.4s ease, background 0.4s ease',
                 }}
             >
@@ -252,7 +268,7 @@ export default function TreeNode({
                 {isCompleted && (
                     <motion.div
                         className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center"
-                        style={{ background: color, boxShadow: `0 2px 10px ${color}60` }}
+                        style={{ background: color, boxShadow: `0 2px 12px ${color}70, 0 0 20px ${color}30` }}
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ type: 'spring', damping: 12, delay: 0.3 }}
@@ -263,7 +279,7 @@ export default function TreeNode({
 
                 {/* Icon */}
                 {isLocked ? (
-                    <Lock size={size === 'sm' ? 18 : 22} className="text-slate-600" style={{ opacity: 0.6 }} />
+                    <Lock size={size === 'sm' ? 18 : 22} className="text-slate-600" style={{ opacity: 0.5 }} />
                 ) : (
                     <motion.div
                         animate={isActive ? { rotate: [0, 3, -3, 0] } : undefined}
@@ -274,7 +290,7 @@ export default function TreeNode({
                             className="relative z-10"
                             style={{
                                 color: isCompleted ? color : isActive ? color : colorLight,
-                                filter: isCompleted || isActive ? `drop-shadow(0 0 6px ${color}30)` : 'none',
+                                filter: isCompleted || isActive ? `drop-shadow(0 0 8px ${color}40)` : 'none',
                             }}
                         />
                     </motion.div>
@@ -290,7 +306,7 @@ export default function TreeNode({
                             border: `1px solid ${isCompleted ? color : `${color}50`}`,
                             fontSize: 9,
                             lineHeight: 1,
-                            boxShadow: isCompleted ? `0 1px 6px ${color}40` : 'none',
+                            boxShadow: isCompleted ? `0 1px 8px ${color}50, 0 0 16px ${color}15` : '0 2px 6px rgba(0,0,0,0.2)',
                         }}
                     >
                         T{def.tier}

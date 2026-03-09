@@ -30,6 +30,21 @@ export default function CentralHub({
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', damping: 18, stiffness: 180, delay: 0.05 }}
         >
+            {/* Deep ambient glow (outermost) */}
+            <motion.div
+                className="absolute rounded-full"
+                style={{
+                    width: 200,
+                    height: 200,
+                    background: 'radial-gradient(circle, rgba(99,102,241,0.08) 0%, rgba(99,102,241,0.02) 50%, transparent 75%)',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                }}
+                animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.8, 0.5] }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+            />
+
             {/* Outer orbiting ring */}
             <motion.div
                 className="absolute"
@@ -40,7 +55,7 @@ export default function CentralHub({
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     borderRadius: '50%',
-                    border: '1px solid rgba(99,102,241,0.12)',
+                    border: '1px solid rgba(99,102,241,0.15)',
                 }}
                 animate={{ rotate: 360 }}
                 transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
@@ -49,8 +64,8 @@ export default function CentralHub({
                 <div
                     className="absolute w-2 h-2 rounded-full"
                     style={{
-                        background: '#6366f1',
-                        boxShadow: '0 0 8px #6366f1, 0 0 16px rgba(99,102,241,0.3)',
+                        background: '#818cf8',
+                        boxShadow: '0 0 10px #6366f1, 0 0 20px rgba(99,102,241,0.4), 0 0 40px rgba(99,102,241,0.15)',
                         top: -4,
                         left: '50%',
                         transform: 'translateX(-50%)',
@@ -68,7 +83,7 @@ export default function CentralHub({
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     borderRadius: '50%',
-                    border: '1px dashed rgba(99,102,241,0.06)',
+                    border: '1px dashed rgba(99,102,241,0.08)',
                 }}
                 animate={{ rotate: -360 }}
                 transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
@@ -76,9 +91,36 @@ export default function CentralHub({
                 <div
                     className="absolute w-1.5 h-1.5 rounded-full"
                     style={{
-                        background: '#818cf8',
-                        boxShadow: '0 0 6px rgba(129,140,248,0.5)',
+                        background: '#a5b4fc',
+                        boxShadow: '0 0 8px rgba(165,180,252,0.6), 0 0 16px rgba(165,180,252,0.2)',
                         top: -3,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                    }}
+                />
+            </motion.div>
+
+            {/* Third micro ring */}
+            <motion.div
+                className="absolute"
+                style={{
+                    width: 156,
+                    height: 156,
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    borderRadius: '50%',
+                    border: '0.5px solid rgba(99,102,241,0.06)',
+                }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+            >
+                <div
+                    className="absolute w-1 h-1 rounded-full"
+                    style={{
+                        background: '#c7d2fe',
+                        boxShadow: '0 0 4px rgba(199,210,254,0.4)',
+                        bottom: -2,
                         left: '50%',
                         transform: 'translateX(-50%)',
                     }}
@@ -91,7 +133,7 @@ export default function CentralHub({
                 style={{
                     width: 150,
                     height: 150,
-                    background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, rgba(99,102,241,0.04) 40%, transparent 70%)',
+                    background: 'radial-gradient(circle, rgba(99,102,241,0.14) 0%, rgba(99,102,241,0.05) 40%, transparent 70%)',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
@@ -111,11 +153,11 @@ export default function CentralHub({
                 <motion.div
                     className="w-[88px] h-[88px] rounded-full flex flex-col items-center justify-center"
                     style={{
-                        background: 'linear-gradient(135deg, rgba(15,23,42,0.98), rgba(30,41,59,0.98))',
-                        border: '2px solid rgba(99,102,241,0.4)',
-                        boxShadow: '0 0 28px rgba(99,102,241,0.1), 0 0 56px rgba(99,102,241,0.04), inset 0 1px 0 rgba(255,255,255,0.06)',
+                        background: 'linear-gradient(135deg, rgba(15,23,42,0.98), rgba(30,41,59,0.95))',
+                        border: '2px solid rgba(99,102,241,0.45)',
+                        boxShadow: '0 0 32px rgba(99,102,241,0.12), 0 0 64px rgba(99,102,241,0.05), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.2)',
                     }}
-                    whileHover={{ boxShadow: '0 0 32px rgba(99,102,241,0.2), 0 0 64px rgba(99,102,241,0.08), inset 0 1px 0 rgba(255,255,255,0.08)' }}
+                    whileHover={{ boxShadow: '0 0 40px rgba(99,102,241,0.22), 0 0 80px rgba(99,102,241,0.08), inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2)' }}
                     transition={{ duration: 0.3 }}
                 >
                     {userAvatar ? (
@@ -140,7 +182,7 @@ export default function CentralHub({
 
             {/* Name label */}
             <motion.span
-                className="mt-2 text-xs font-medium text-slate-400 truncate max-w-[100px]"
+                className="mt-2 text-xs font-medium text-slate-400 truncate max-w-[100px] drop-shadow-[0_0_8px_rgba(99,102,241,0.15)]"
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.4 }}

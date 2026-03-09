@@ -49,9 +49,10 @@ export default function NodeDetailPanel({
                     <motion.div
                         className="relative ml-auto w-full max-w-md pointer-events-auto overflow-y-auto"
                         style={{
-                            background: 'linear-gradient(160deg, rgba(15,23,42,0.97), rgba(30,41,59,0.97))',
-                            borderLeft: '1px solid rgba(148,163,184,0.1)',
-                            boxShadow: '-8px 0 40px rgba(0,0,0,0.4)',
+                            background: 'linear-gradient(160deg, rgba(15,23,42,0.97), rgba(30,41,59,0.95))',
+                            borderLeft: '1px solid rgba(148,163,184,0.08)',
+                            boxShadow: '-12px 0 48px rgba(0,0,0,0.5), -4px 0 16px rgba(0,0,0,0.3), inset 1px 0 0 rgba(255,255,255,0.03)',
+                            backdropFilter: 'blur(24px) saturate(1.5)',
                         }}
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
@@ -63,7 +64,7 @@ export default function NodeDetailPanel({
                             <button
                                 onClick={onClose}
                                 title="Close"
-                                className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                                className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700/60 backdrop-blur-sm transition-all duration-200 hover:shadow-[0_0_12px_rgba(148,163,184,0.1)]"
                             >
                                 <X size={18} />
                             </button>
@@ -86,11 +87,12 @@ export default function NodeDetailPanel({
                                 <div
                                     className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
                                     style={{
-                                        background: `linear-gradient(135deg, ${branch.def.accentColor}20, ${branch.def.accentColor}08)`,
+                                        background: `linear-gradient(135deg, ${branch.def.accentColor}22, ${branch.def.accentColor}0a)`,
                                         border: `1px solid ${branch.def.accentColor}40`,
+                                        boxShadow: `0 0 24px ${branch.def.accentColor}10, inset 0 1px 0 rgba(255,255,255,0.04)`,
                                     }}
                                 >
-                                    <Zap size={24} style={{ color: branch.def.accentColor }} />
+                                    <Zap size={24} style={{ color: branch.def.accentColor, filter: `drop-shadow(0 0 6px ${branch.def.accentColor}40)` }} />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <h3 className="text-xl font-bold text-white leading-tight">
@@ -127,7 +129,11 @@ export default function NodeDetailPanel({
                             {/* XP Progress */}
                             <div
                                 className="rounded-xl p-4 mb-6"
-                                style={{ background: 'rgba(30,41,59,0.6)', border: '1px solid rgba(148,163,184,0.08)' }}
+                                style={{
+                                    background: 'rgba(30,41,59,0.5)',
+                                    border: '1px solid rgba(148,163,184,0.06)',
+                                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.02), 0 2px 8px rgba(0,0,0,0.1)',
+                                }}
                             >
                                 <div className="flex items-center justify-between mb-3">
                                     <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
@@ -137,10 +143,13 @@ export default function NodeDetailPanel({
                                         {node.xpCurrent} / {node.xpNeeded || '—'} XP
                                     </span>
                                 </div>
-                                <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
+                                <div className="h-2 rounded-full bg-slate-800/80 overflow-hidden shadow-inner">
                                     <motion.div
                                         className="h-full rounded-full"
-                                        style={{ background: `linear-gradient(90deg, ${branch.def.accentColor}, ${branch.def.accentLight})` }}
+                                        style={{
+                                            background: `linear-gradient(90deg, ${branch.def.accentColor}, ${branch.def.accentLight})`,
+                                            boxShadow: `0 0 12px ${branch.def.accentColor}40`,
+                                        }}
                                         initial={{ width: 0 }}
                                         animate={{ width: `${Math.min(100, node.xpProgress * 100)}%` }}
                                         transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -235,8 +244,8 @@ export default function NodeDetailPanel({
                                         {node.def.suggestedActions.map((action, i) => (
                                             <div
                                                 key={i}
-                                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg group/action cursor-pointer hover:bg-slate-700 transition-colors"
-                                                style={{ background: 'rgba(30,41,59,0.4)', border: '1px solid rgba(51,65,85,0.2)' }}
+                                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg group/action cursor-pointer hover:bg-slate-700/50 transition-all duration-200 hover:shadow-[0_2px_12px_rgba(0,0,0,0.15)]"
+                                                style={{ background: 'rgba(30,41,59,0.35)', border: '1px solid rgba(51,65,85,0.15)' }}
                                             >
                                                 <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
                                                     style={{ background: `${branch.def.accentColor}15` }}>

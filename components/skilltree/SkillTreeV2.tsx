@@ -32,26 +32,30 @@ type BranchAccentClasses = {
     activityText: string;
 };
 
-const STAT_TONE_CLASSES: Record<StatTone, { card: string; icon: string; label: string }> = {
+const STAT_TONE_CLASSES: Record<StatTone, { card: string; icon: string; label: string; glowColor: string }> = {
     indigo: {
-        card: 'border border-[#6366f120] bg-[linear-gradient(135deg,_#6366f110,_#6366f105)]',
-        icon: 'text-[#6366f1]',
-        label: 'text-[#6366f1cc]',
+        card: 'border border-[#6366f118] bg-[linear-gradient(135deg,_#6366f10d,_#6366f106)] backdrop-blur-sm shadow-[0_4px_24px_rgba(99,102,241,0.06),inset_0_1px_0_rgba(255,255,255,0.04)]',
+        icon: 'text-[#818cf8]',
+        label: 'text-[#818cf8cc]',
+        glowColor: 'rgba(99,102,241,0.08)',
     },
     emerald: {
-        card: 'border border-[#10b98120] bg-[linear-gradient(135deg,_#10b98110,_#10b98105)]',
-        icon: 'text-[#10b981]',
-        label: 'text-[#10b981cc]',
+        card: 'border border-[#10b98118] bg-[linear-gradient(135deg,_#10b9810d,_#10b98106)] backdrop-blur-sm shadow-[0_4px_24px_rgba(16,185,129,0.06),inset_0_1px_0_rgba(255,255,255,0.04)]',
+        icon: 'text-[#34d399]',
+        label: 'text-[#34d399cc]',
+        glowColor: 'rgba(16,185,129,0.08)',
     },
     amber: {
-        card: 'border border-[#f59e0b20] bg-[linear-gradient(135deg,_#f59e0b10,_#f59e0b05)]',
-        icon: 'text-[#f59e0b]',
-        label: 'text-[#f59e0bcc]',
+        card: 'border border-[#f59e0b18] bg-[linear-gradient(135deg,_#f59e0b0d,_#f59e0b06)] backdrop-blur-sm shadow-[0_4px_24px_rgba(245,158,11,0.06),inset_0_1px_0_rgba(255,255,255,0.04)]',
+        icon: 'text-[#fbbf24]',
+        label: 'text-[#fbbf24cc]',
+        glowColor: 'rgba(245,158,11,0.08)',
     },
     pink: {
-        card: 'border border-[#ec489920] bg-[linear-gradient(135deg,_#ec489910,_#ec489905)]',
-        icon: 'text-[#ec4899]',
-        label: 'text-[#ec4899cc]',
+        card: 'border border-[#ec489918] bg-[linear-gradient(135deg,_#ec48990d,_#ec489906)] backdrop-blur-sm shadow-[0_4px_24px_rgba(236,72,153,0.06),inset_0_1px_0_rgba(255,255,255,0.04)]',
+        icon: 'text-[#f472b6]',
+        label: 'text-[#f472b6cc]',
+        glowColor: 'rgba(236,72,153,0.08)',
     },
 };
 
@@ -187,6 +191,9 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
 
     return (
         <div className="relative w-full">
+            {/* ── Ambient background glow ── */}
+            <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full opacity-[0.07]" style={{ background: 'radial-gradient(ellipse, #6366f1 0%, transparent 70%)' }} />
+
             {/* ── Stats Grid ── */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
                 <StatCard
@@ -222,20 +229,28 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
             {topRec && topRecAccent && (
                 <motion.div
                     className={cn(
-                        'mb-6 flex items-center gap-3 rounded-xl p-4',
+                        'mb-6 flex items-center gap-3 rounded-xl p-4 relative overflow-hidden',
                         topRecAccent.recommendationCard
                     )}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
+                    whileHover={{ scale: 1.005, transition: { duration: 0.2 } }}
                 >
+                    {/* Subtle shimmer overlay */}
+                    <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(110deg,transparent_25%,rgba(255,255,255,0.4)_50%,transparent_75%)] bg-[length:200%_100%] aurora-shimmer" />
                     <div className={cn(
-                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl',
+                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl relative',
                         topRecAccent.recommendationIcon
                     )}>
-                        <Sparkles size={18} className={topRecAccent.accentText} />
+                        <motion.div
+                            animate={{ rotate: [0, 8, -8, 0] }}
+                            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                        >
+                            <Sparkles size={18} className={topRecAccent.accentText} />
+                        </motion.div>
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 relative">
                         <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">
                             {t ? 'Recommended Next' : 'Đề xuất tiếp theo'}
                         </div>
@@ -301,7 +316,7 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
                 {showLegend && (
                     <motion.div
                         id="skill-tree-legend"
-                        className="mb-5 rounded-xl border border-slate-700/15 bg-slate-800/50 p-4"
+                        className="mb-5 rounded-xl border border-slate-700/10 bg-slate-800/40 backdrop-blur-md p-4 shadow-[0_4px_24px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.03)]"
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
@@ -337,9 +352,13 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
 
             {/* ── Main Tree View ── */}
             <div
-                className="overflow-hidden rounded-2xl border border-slate-400/5 bg-linear-to-b from-slate-900/60 to-slate-950/80 shadow-[0_4px_32px_rgba(0,0,0,0.2)]"
+                className="relative overflow-hidden rounded-2xl border border-slate-400/8 shadow-[0_8px_48px_rgba(0,0,0,0.3),0_0_0_1px_rgba(148,163,184,0.04),inset_0_1px_0_rgba(255,255,255,0.03)] noise-overlay"
+                style={{ background: 'linear-gradient(180deg, rgba(15,23,42,0.65) 0%, rgba(2,6,23,0.85) 100%)' }}
             >
-                <div className="p-4 sm:p-6 lg:p-8">
+                {/* Ambient corner glows */}
+                <div className="pointer-events-none absolute -top-24 -left-24 h-48 w-48 rounded-full opacity-[0.04]" style={{ background: 'radial-gradient(circle, #6366f1, transparent 70%)' }} />
+                <div className="pointer-events-none absolute -bottom-24 -right-24 h-48 w-48 rounded-full opacity-[0.03]" style={{ background: 'radial-gradient(circle, #ec4899, transparent 70%)' }} />
+                <div className="relative p-4 sm:p-6 lg:p-8">
                     {isDesktop ? (
                         <div className="flex justify-center">
                             <SkillTree
@@ -377,17 +396,20 @@ export default function SkillTreeV2({ userState, locale = 'vi' }: SkillTreeV2Pro
                         {t ? 'Recent Activity' : 'Hoạt động gần đây'}
                     </h3>
                     <div className="space-y-2">
-                        {userState.recentActivities.slice(0, 5).map(act => (
-                            <div
+                        {userState.recentActivities.slice(0, 5).map((act, i) => (
+                            <motion.div
                                 key={act.id}
-                                className="flex items-center gap-3 rounded-lg border border-slate-700/15 bg-slate-800/40 px-3.5 py-2.5"
+                                className="flex items-center gap-3 rounded-xl border border-slate-700/10 bg-slate-800/30 backdrop-blur-sm px-3.5 py-2.5 shadow-[0_2px_12px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.02)] hover:bg-slate-800/50 transition-colors duration-200"
+                                initial={{ opacity: 0, x: -12 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.3, delay: i * 0.06 }}
                             >
-                                <div className={cn('h-2 w-2 shrink-0 rounded-full', BRANCH_ACCENT_CLASSES[act.branchId].activityDot)} />
+                                <div className={cn('h-2.5 w-2.5 shrink-0 rounded-full shadow-[0_0_6px_currentColor]', BRANCH_ACCENT_CLASSES[act.branchId].activityDot)} />
                                 <span className="text-sm text-slate-300 flex-1 truncate">{act.title}</span>
-                                <span className={cn('shrink-0 text-xs font-semibold', BRANCH_ACCENT_CLASSES[act.branchId].activityText)}>
+                                <span className={cn('shrink-0 text-xs font-bold tabular-nums', BRANCH_ACCENT_CLASSES[act.branchId].activityText)}>
                                     +{act.xpAmount} XP
                                 </span>
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
@@ -422,18 +444,27 @@ function StatCard({
     const toneClasses = STAT_TONE_CLASSES[tone];
 
     return (
-        <div className={cn('rounded-xl p-3.5', toneClasses.card)}>
-            <div className="flex items-center gap-2 mb-1.5">
-                <span className={toneClasses.icon}>{icon}</span>
-                <span className={cn('text-[11px] font-medium', toneClasses.label)}>
-                    {label}
-                </span>
+        <motion.div
+            className={cn('rounded-xl p-3.5 relative overflow-hidden group', toneClasses.card)}
+            whileHover={{ scale: 1.02, y: -2 }}
+            transition={{ duration: 0.2 }}
+            style={{ '--glow-color': toneClasses.glowColor } as React.CSSProperties}
+        >
+            {/* Subtle inner shine on hover */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.04),transparent_60%)]" />
+            <div className="relative">
+                <div className="flex items-center gap-2 mb-1.5">
+                    <span className={cn('drop-shadow-[0_0_6px_currentColor]', toneClasses.icon)}>{icon}</span>
+                    <span className={cn('text-[11px] font-medium', toneClasses.label)}>
+                        {label}
+                    </span>
+                </div>
+                <div className="flex items-baseline gap-1.5">
+                    <span className="text-xl font-bold text-white drop-shadow-[0_0_12px_rgba(255,255,255,0.06)]">{value}</span>
+                    {sublabel && <span className="text-xs text-slate-500">{sublabel}</span>}
+                </div>
             </div>
-            <div className="flex items-baseline gap-1.5">
-                <span className="text-xl font-bold text-white">{value}</span>
-                {sublabel && <span className="text-xs text-slate-500">{sublabel}</span>}
-            </div>
-        </div>
+        </motion.div>
     );
 }
 
@@ -449,8 +480,8 @@ function LegendItem({
 }) {
     return (
         <div className="flex items-center gap-2 text-xs text-slate-400">
-            <div className={cn('h-2.5 w-2.5 rounded-full', dotClassName)} />
-            <span>{icon}</span>
+            <div className={cn('h-2.5 w-2.5 rounded-full shadow-[0_0_6px_currentColor]', dotClassName)} />
+            <span className="text-sm">{icon}</span>
             <span>{label}</span>
         </div>
     );

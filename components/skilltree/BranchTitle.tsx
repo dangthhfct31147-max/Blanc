@@ -35,9 +35,9 @@ export default function BranchTitle({
             <div
                 className="inline-flex max-w-full flex-col rounded-2xl border px-4 py-3 backdrop-blur-md"
                 style={{
-                    borderColor: `${branch.def.accentColor}30`,
-                    background: `linear-gradient(135deg, ${branch.def.accentColor}14, rgba(15,23,42,0.9))`,
-                    boxShadow: `0 12px 40px ${branch.def.accentColor}14`,
+                    borderColor: `${branch.def.accentColor}28`,
+                    background: `linear-gradient(135deg, ${branch.def.accentColor}14, rgba(15,23,42,0.88))`,
+                    boxShadow: `0 12px 40px ${branch.def.accentColor}14, 0 0 0 1px rgba(255,255,255,0.02), inset 0 1px 0 rgba(255,255,255,0.04)`,
                 }}
             >
                 <span
