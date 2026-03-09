@@ -157,43 +157,43 @@ export const Dropdown: React.FC<DropdownProps> = ({
   }, []);
 
   return (
-    <div className={cn("w-full", className)}>
-      {label && <label className="block text-sm font-medium text-slate-700 mb-2">{label}</label>}
-      <div ref={dropdownRef} className="relative">
-        <button
-          type="button"
-          onClick={() => !disabled && setIsOpen(!isOpen)}
-          disabled={disabled}
-          className={cn(
-            "w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-left transition-all outline-none flex items-center justify-between gap-2",
-            "hover:bg-white hover:border-slate-300",
-            "focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500",
-            isOpen && "bg-white ring-2 ring-primary-500 border-primary-500",
-            disabled && "opacity-50 cursor-not-allowed",
-            error && "border-red-500 focus:ring-red-500",
-            !disabled && "cursor-pointer"
-          )}
-        >
-          <span className={cn(
-            "truncate",
-            selectedOption ? "text-slate-900" : "text-slate-400"
-          )}>
-            {selectedOption ? selectedOption.label : placeholder}
-          </span>
-          <ChevronDown className={cn(
-            "w-4 h-4 text-slate-400 transition-transform shrink-0",
-            isOpen && "rotate-180"
-          )} />
-        </button>
-
-        {isOpen && !disabled && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-slate-200 shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-            {headerText && (
-              <div className="p-2 border-b border-slate-100">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-2">{headerText}</p>
-              </div>
+      <div className={cn("w-full", className)}>
+        {label && <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>}
+        <div ref={dropdownRef} className="relative">
+          <button
+            type="button"
+            onClick={() => !disabled && setIsOpen(!isOpen)}
+            disabled={disabled}
+            className={cn(
+              "flex w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm transition-all outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100",
+              "hover:bg-white hover:border-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800",
+              "focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:bg-slate-800",
+              isOpen && "bg-white ring-2 ring-primary-500 border-primary-500 dark:bg-slate-800",
+              disabled && "opacity-50 cursor-not-allowed",
+              error && "border-red-500 focus:ring-red-500",
+              !disabled && "cursor-pointer"
             )}
-            <div className="max-h-70 overflow-y-auto p-2">
+          >
+            <span className={cn(
+              "truncate",
+              selectedOption ? "text-slate-900 dark:text-slate-100" : "text-slate-400 dark:text-slate-500"
+            )}>
+              {selectedOption ? selectedOption.label : placeholder}
+            </span>
+            <ChevronDown className={cn(
+              "w-4 h-4 shrink-0 text-slate-400 transition-transform dark:text-slate-500",
+              isOpen && "rotate-180"
+            )} />
+          </button>
+
+          {isOpen && !disabled && (
+            <div className="absolute top-full left-0 right-0 z-50 mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700 dark:bg-slate-900">
+              {headerText && (
+                <div className="border-b border-slate-100 p-2 dark:border-slate-800">
+                  <p className="px-2 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{headerText}</p>
+                </div>
+              )}
+              <div className="max-h-70 overflow-y-auto p-2">
               {options.map(option => {
                 const isSelected = value === option.value;
                 return (
@@ -204,13 +204,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
                       onChange(option.value);
                       setIsOpen(false);
                     }}
-                    className={cn(
-                      "w-full px-3 py-2.5 rounded-lg text-sm text-left transition-all flex items-center justify-between group",
-                      isSelected
-                        ? "bg-primary-50 text-primary-700 font-medium"
-                        : "text-slate-600 hover:bg-slate-50"
-                    )}
-                  >
+                      className={cn(
+                        "w-full px-3 py-2.5 rounded-lg text-sm text-left transition-all flex items-center justify-between group",
+                        isSelected
+                          ? "bg-primary-50 text-primary-700 font-medium dark:bg-primary-500/10 dark:text-primary-200"
+                          : "text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70"
+                      )}
+                    >
                     <div className="flex items-center gap-2">
                       {option.color && (
                         <span className={cn("w-2 h-2 rounded-full", option.color)} />
@@ -218,10 +218,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
                       {option.icon}
                       <span>{option.label}</span>
                     </div>
-                    {isSelected && <Check className="w-4 h-4 text-primary-600" />}
-                  </button>
-                );
-              })}
+                      {isSelected && <Check className="w-4 h-4 text-primary-600 dark:text-primary-200" />}
+                    </button>
+                  );
+                })}
             </div>
           </div>
         )}

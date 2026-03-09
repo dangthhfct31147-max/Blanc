@@ -830,8 +830,8 @@ const Layout: React.FC<LayoutProps> = ({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
               <div className="col-span-1 lg:col-span-3">
-                <div className="relative overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg shadow-slate-200/60 p-6 h-full flex flex-col">
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-sky-50 opacity-80" aria-hidden="true"></div>
+                <div className="relative overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/95 shadow-lg shadow-slate-200/60 p-6 h-full flex flex-col">
+                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-sky-50 opacity-80 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/40 dark:opacity-100" aria-hidden="true"></div>
                   <div className="relative">
                     <div className="flex items-center mb-4">
                       <img src="/logo.png" alt="Blanc Logo" className="h-10 w-10 rounded-full object-cover mr-3 shadow-sm" />
@@ -858,23 +858,23 @@ const Layout: React.FC<LayoutProps> = ({
                       </div>
                     </div>
                     <div className="mt-5 flex flex-wrap gap-2">
-                      <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-semibold">Blanc Community</span>
-                      <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-semibold">{t('layout.footer.tag.learningAndContests')}</span>
+                      <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-semibold dark:bg-indigo-500/15 dark:text-indigo-200">Blanc Community</span>
+                      <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-semibold dark:bg-emerald-500/15 dark:text-emerald-200">{t('layout.footer.tag.learningAndContests')}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="col-span-1 lg:col-span-3">
-                <div className="relative overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md shadow-slate-200/40 p-6 h-full flex flex-col">
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-indigo-50 opacity-60" aria-hidden="true"></div>
+                <div className="relative overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/95 shadow-md shadow-slate-200/40 p-6 h-full flex flex-col">
+                  <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-indigo-50 opacity-60 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/35 dark:opacity-100" aria-hidden="true"></div>
                   <div className="relative flex flex-col gap-4 h-full">
                     <div className="flex items-start justify-between">
                       <div>
                         <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider mb-1">{t('layout.footer.supportTitle')}</h3>
                         <p className="text-xs text-slate-500 dark:text-slate-400">{t('layout.footer.supportDescription')}</p>
                       </div>
-                      <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-semibold">Online</span>
+                      <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-semibold dark:bg-indigo-500/15 dark:text-indigo-200">Online</span>
                     </div>
                     <ul className="space-y-3">
                       <li><NavLink to="/terms" className="text-slate-500 dark:text-slate-400 hover:text-primary-600 text-sm">{t('layout.footer.terms')}</NavLink></li>
@@ -889,8 +889,8 @@ const Layout: React.FC<LayoutProps> = ({
               </div>
 
               <div className="lg:col-span-6">
-                <div className="relative overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/50">
-                  <div className="absolute inset-0 bg-gradient-to-r from-sky-50 via-white to-indigo-50 opacity-80" aria-hidden="true"></div>
+                <div className="relative overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/95 shadow-xl shadow-slate-200/50">
+                  <div className="absolute inset-0 bg-gradient-to-r from-sky-50 via-white to-indigo-50 opacity-80 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/40 dark:opacity-100" aria-hidden="true"></div>
                   <div className="relative px-6 py-8 md:px-10 md:py-10">
                     <div className="text-center">
                       <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider mb-2">{t('layout.footer.contactTitle')}</h3>
@@ -898,7 +898,7 @@ const Layout: React.FC<LayoutProps> = ({
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8 mt-8">
-                      <div className="rounded-xl border border-white/80 bg-white dark:bg-slate-900/70 backdrop-blur-sm p-6 shadow-sm">
+                      <div className="rounded-xl border border-white/80 bg-white dark:border-slate-700/70 dark:bg-slate-900/70 backdrop-blur-sm p-6 shadow-sm">
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-200">
                             <Mail className="w-5 h-5" />
@@ -932,7 +932,7 @@ const Layout: React.FC<LayoutProps> = ({
                             href="https://www.tiktok.com/@blancfpt"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-slate-200 transition-colors shadow-sm"
+                            className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-sm"
                             title="TikTok"
                           >
                             <span className="sr-only">TikTok</span>
@@ -943,7 +943,7 @@ const Layout: React.FC<LayoutProps> = ({
                         </div>
                       </div>
 
-                      <div className="rounded-xl border border-white/80 bg-white dark:bg-slate-900/70 backdrop-blur-sm p-6 shadow-sm">
+                      <div className="rounded-xl border border-white/80 bg-white dark:border-slate-700/70 dark:bg-slate-900/70 backdrop-blur-sm p-6 shadow-sm">
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 rounded-full bg-sky-500 text-white flex items-center justify-center shadow-md shadow-sky-200">
                             <Mail className="w-5 h-5" />
@@ -977,7 +977,7 @@ const Layout: React.FC<LayoutProps> = ({
                             href="https://www.tiktok.com/@mrhomeless_12"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-slate-200 transition-colors shadow-sm"
+                            className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-sm"
                             title="TikTok"
                           >
                             <span className="sr-only">TikTok</span>
