@@ -29,5 +29,12 @@
     "noEmit": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "exclude": [
+    "dist",
+    "node_modules",
+    "*.cjs",
+    "Layout.backup.tsx",
+    "**/* (1).tsx"
+  ]
 }
