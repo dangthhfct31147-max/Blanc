@@ -21,10 +21,10 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = "inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap";
 
   const variants = {
-    primary: "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-sm",
-    secondary: "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 focus:ring-slate-200 shadow-sm",
-    ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
-    danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
+    primary: "bg-primary-600 dark:bg-primary-500 text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:ring-primary-500 shadow-sm dark:shadow-[0_0_15px_rgba(99,102,241,0.4)] transition-all",
+    secondary: "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 focus:ring-slate-200 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-slate-600 dark:shadow-none hover:shadow-md transition-all",
+    ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100 transition-colors",
+    danger: "bg-red-600 dark:bg-red-500 text-white hover:bg-red-700 dark:hover:bg-red-600 focus:ring-red-500 shadow-sm dark:shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all",
   };
 
   const sizes = {
@@ -45,7 +45,7 @@ export const Button: React.FC<ButtonProps> = ({
 
 // Card
 export const Card: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, children, ...props }) => (
-  <div className={cn("bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden", className)} {...props}>
+  <div className={cn("bg-white dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-shadow duration-300 overflow-hidden glass-card", className)} {...props}>
     {children}
   </div>
 );

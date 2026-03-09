@@ -218,7 +218,7 @@ export default function CommandPalette() {
             >
                 <Search size={14} />
                 <span className="max-w-28 truncate lg:max-w-32">{t('common.search' as any) || 'Tìm kiếm...'}</span>
-                <kbd className="ml-1.5 hidden items-center gap-0.5 rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-400 2xl:flex">
+                <kbd className="ml-1.5 hidden items-center gap-0.5 rounded-md border border-slate-200 bg-slate-50 dark:bg-slate-800/60 dark:bg-slate-800/60 px-1.5 py-0.5 text-[10px] font-medium text-slate-400 2xl:flex">
                     <Command size={10} />K
                 </kbd>
             </button>
@@ -226,7 +226,7 @@ export default function CommandPalette() {
             {/* Mobile trigger */}
             <button
                 onClick={() => setOpen(true)}
-                className="flex md:hidden items-center justify-center rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                className="flex md:hidden items-center justify-center rounded-lg p-2 text-slate-500 dark:text-slate-400 dark:text-slate-400 dark:text-slate-400 dark:text-slate-400 hover:bg-slate-100 hover:text-slate-700"
                 aria-label="Search"
             >
                 <Search size={18} />
@@ -254,7 +254,7 @@ export default function CommandPalette() {
                             className="fixed inset-x-4 top-[12vh] z-[101] mx-auto max-w-xl overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-900/10 sm:inset-x-auto"
                         >
                             {/* Search input */}
-                            <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
+                            <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 dark:border-slate-800 px-4 py-3">
                                 <Search size={18} className="shrink-0 text-slate-400" />
                                 <input
                                     ref={inputRef}
@@ -262,14 +262,14 @@ export default function CommandPalette() {
                                     onChange={(e) => setQuery(e.target.value)}
                                     onKeyDown={onInputKeyDown}
                                     placeholder={t('common.search' as any) || 'Tìm trang, cuộc thi, khóa học...'}
-                                    className="grow bg-transparent text-sm text-slate-800 placeholder:text-slate-400 outline-none"
+                                    className="grow bg-transparent text-sm text-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 dark:text-slate-400 dark:placeholder:text-slate-500 dark:text-slate-400 dark:text-slate-400 outline-none"
                                     autoComplete="off"
                                     spellCheck={false}
                                 />
                                 {isLoading && (
                                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-500 border-r-transparent" />
                                 )}
-                                <kbd className="hidden items-center rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-400 sm:flex">
+                                <kbd className="hidden items-center rounded-md border border-slate-200 bg-slate-50 dark:bg-slate-800/60 dark:bg-slate-800/60 px-1.5 py-0.5 text-[10px] font-medium text-slate-400 sm:flex">
                                     ESC
                                 </kbd>
                             </div>
@@ -278,7 +278,7 @@ export default function CommandPalette() {
                             <div ref={listRef} className="max-h-[50vh] overflow-y-auto overscroll-contain px-2 py-2">
                                 {items.length === 0 && query.length >= 2 && !isLoading && (
                                     <div className="py-12 text-center text-sm text-slate-400">
-                                        Không tìm thấy kết quả cho "<span className="font-medium text-slate-500">{query}</span>"
+                                        Không tìm thấy kết quả cho "<span className="font-medium text-slate-500 dark:text-slate-400 dark:text-slate-400">{query}</span>"
                                     </div>
                                 )}
 
@@ -298,13 +298,13 @@ export default function CommandPalette() {
                                                     onMouseEnter={() => setActiveIndex(idx)}
                                                     className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${isActive
                                                             ? 'bg-primary-50 text-primary-700'
-                                                            : 'text-slate-700 hover:bg-slate-50'
+                                                            : 'text-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/60 dark:bg-slate-800/60 dark:hover:bg-slate-800/60 dark:bg-slate-800/60'
                                                         }`}
                                                 >
                                                     <div
                                                         className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${isActive
                                                                 ? 'bg-primary-100 text-primary-600'
-                                                                : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200'
+                                                                : 'bg-slate-100 text-slate-500 dark:text-slate-400 dark:text-slate-400 group-hover:bg-slate-200'
                                                             }`}
                                                     >
                                                         <item.icon size={16} />
@@ -326,7 +326,7 @@ export default function CommandPalette() {
                             </div>
 
                             {/* Footer hints */}
-                            <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/50 px-4 py-2 text-[11px] text-slate-400">
+                            <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50 dark:bg-slate-800/60 dark:bg-slate-800/60/50 px-4 py-2 text-[11px] text-slate-400">
                                 <div className="flex items-center gap-3">
                                     <span className="flex items-center gap-1">
                                         <kbd className="rounded border border-slate-200 bg-white px-1 py-0.5 font-mono">↑↓</kbd>

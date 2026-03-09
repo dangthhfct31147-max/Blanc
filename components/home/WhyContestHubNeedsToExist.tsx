@@ -33,7 +33,7 @@ export interface ContestHubStory {
 // Swap these classes to re-theme the section without touching layout or content.
 export const contestHubStoryTheme = {
   sectionGlow: 'from-primary-100/70 via-transparent to-emerald-100/70',
-  sectionBadge: 'border-primary-100 bg-white/90 text-primary-700',
+  sectionBadge: 'border-primary-100 dark:border-primary-900/50 bg-white/90 dark:bg-slate-900/90 text-primary-700 dark:text-primary-400',
   sectionTitle: 'from-slate-900 via-slate-800 to-primary-700',
 };
 
@@ -337,7 +337,7 @@ const StoryCard: React.FC<{
         />
       )}
 
-      <div className="relative overflow-hidden rounded-4xl border border-slate-200/80 bg-white/95 shadow-[0_24px_80px_-40px_rgba(15,23,42,0.18)] ring-1 ring-white/70 backdrop-blur-sm transition-all duration-500 hover:shadow-[0_32px_100px_-36px_rgba(15,23,42,0.22)]">
+      <div className="relative overflow-hidden rounded-4xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 shadow-[0_24px_80px_-40px_rgba(15,23,42,0.18)] dark:shadow-[0_24px_80px_-40px_rgba(0,0,0,0.5)] ring-1 ring-white/70 dark:ring-white/5 backdrop-blur-sm transition-all duration-500 hover:shadow-[0_32px_100px_-36px_rgba(15,23,42,0.22)]">
         <div className={cn('absolute inset-0 bg-linear-to-br opacity-80', story.tone.surfaceTint)} />
         <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-slate-200/90 to-transparent" />
 
@@ -450,7 +450,7 @@ const StoryCard: React.FC<{
                   whileInView={{ y: 0, opacity: 1 }}
                   viewport={VIEWPORT_OPTS}
                   transition={{ duration: 0.35, delay: 0.2, ease: EMPHATIC_EASE }}
-                  className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/50 bg-white/80 px-5 py-3.5 shadow-lg shadow-slate-900/8 backdrop-blur-md"
+                  className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/50 dark:border-slate-700/50 bg-white/80 dark:bg-slate-800/80 px-5 py-3.5 shadow-lg shadow-slate-900/8 dark:shadow-black/20 backdrop-blur-md"
                 >
                   <p className="text-sm font-medium leading-6 text-slate-700">
                     {story.imageCaption}
@@ -520,7 +520,7 @@ const WhyContestHubNeedsToExist: React.FC = () => {
         custom={0}
         className="mx-auto w-full max-w-6xl"
       >
-        <div className="relative overflow-hidden rounded-4xl border border-white/70 bg-white/90 px-6 py-8 text-center shadow-[0_24px_80px_-40px_rgba(15,23,42,0.28)] ring-1 ring-white/70 backdrop-blur-sm md:px-10 md:py-10">
+        <div className="relative overflow-hidden rounded-4xl border border-white/70 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 px-6 py-8 text-center shadow-[0_24px_80px_-40px_rgba(15,23,42,0.28)] dark:shadow-[0_24px_80px_-40px_rgba(0,0,0,0.5)] ring-1 ring-white/70 dark:ring-white/5 backdrop-blur-sm md:px-10 md:py-10">
           <div className="absolute inset-0 bg-linear-to-br from-white via-primary-50/55 to-emerald-50/65" />
           <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-slate-200/90 to-transparent" />
 
@@ -531,7 +531,7 @@ const WhyContestHubNeedsToExist: React.FC = () => {
             viewport={VIEWPORT_OPTS}
             className="relative mx-auto flex max-w-4xl flex-col items-center"
           >
-            <motion.div variants={staggerChild} className="relative inline-flex h-24 w-24 items-center justify-center rounded-4xl border border-white/80 bg-white shadow-lg shadow-primary-200/50 ring-4 ring-primary-50/70">
+            <motion.div variants={staggerChild} className="relative inline-flex h-24 w-24 items-center justify-center rounded-4xl border border-white/80 dark:border-slate-700/80 bg-white dark:bg-slate-800 shadow-lg shadow-primary-200/50 dark:shadow-primary-900/30 ring-4 ring-primary-50/70 dark:ring-primary-900/20">
               <div className="absolute inset-0 rounded-4xl bg-linear-to-br from-primary-100/75 via-white to-emerald-100/80" />
               <img src="/logo.png" alt="Blanc Logo" className="relative h-16 w-16 rounded-full object-cover shadow-sm" />
             </motion.div>
