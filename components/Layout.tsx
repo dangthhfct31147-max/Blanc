@@ -368,7 +368,7 @@ const Layout: React.FC<LayoutProps> = ({
             </NavLink>
 
             {/* Desktop Nav */}
-            <nav className="hidden md:flex min-w-max items-center gap-0 justify-self-start md:ml-1 lg:ml-3 xl:ml-4" aria-label={t('layout.aria.mainMenu')}>
+            <nav className="hidden md:flex min-w-max items-center gap-0 justify-self-center" aria-label={t('layout.aria.mainMenu')}>
               {leadingNavItems.map((item) => (
                 <NavLink
                   key={item.path}
