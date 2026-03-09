@@ -22,31 +22,31 @@ const SORT_OPTIONS: DropdownOption[] = [
   {
     value: 'random',
     label: 'Ngẫu nhiên (trong ngày)',
-    icon: <Shuffle className="w-4 h-4 text-slate-500" />,
+    icon: <Shuffle className="h-4 w-4 text-slate-500 dark:text-slate-400" />,
     color: 'bg-amber-400',
   },
   {
     value: 'newest',
     label: 'Mới nhất',
-    icon: <CalendarArrowDown className="w-4 h-4 text-slate-500" />,
+    icon: <CalendarArrowDown className="h-4 w-4 text-slate-500 dark:text-slate-400" />,
     color: 'bg-emerald-500',
   },
   {
     value: 'oldest',
     label: 'Cũ nhất',
-    icon: <CalendarArrowUp className="w-4 h-4 text-slate-500" />,
+    icon: <CalendarArrowUp className="h-4 w-4 text-slate-500 dark:text-slate-400" />,
     color: 'bg-slate-400',
   },
   {
     value: 'name-asc',
     label: 'Tên A-Z',
-    icon: <ArrowDownAZ className="w-4 h-4 text-slate-500" />,
+    icon: <ArrowDownAZ className="h-4 w-4 text-slate-500 dark:text-slate-400" />,
     color: 'bg-sky-500',
   },
   {
     value: 'name-desc',
     label: 'Tên Z-A',
-    icon: <ArrowDownZA className="w-4 h-4 text-slate-500" />,
+    icon: <ArrowDownZA className="h-4 w-4 text-slate-500 dark:text-slate-400" />,
     color: 'bg-indigo-500',
   },
 ];
@@ -274,11 +274,11 @@ const MentorList: React.FC = () => {
   }, [isEn]);
 
   const SORT_OPTIONS_LOCALIZED: DropdownOption[] = useMemo(() => [
-    { value: 'random', label: copy.sortRandom, icon: <Shuffle className="w-4 h-4 text-slate-500" />, color: 'bg-amber-400' },
-    { value: 'newest', label: copy.sortNewest, icon: <CalendarArrowDown className="w-4 h-4 text-slate-500" />, color: 'bg-emerald-500' },
-    { value: 'oldest', label: copy.sortOldest, icon: <CalendarArrowUp className="w-4 h-4 text-slate-500" />, color: 'bg-slate-400' },
-    { value: 'name-asc', label: copy.sortNameAsc, icon: <ArrowDownAZ className="w-4 h-4 text-slate-500" />, color: 'bg-sky-500' },
-    { value: 'name-desc', label: copy.sortNameDesc, icon: <ArrowDownZA className="w-4 h-4 text-slate-500" />, color: 'bg-indigo-500' },
+    { value: 'random', label: copy.sortRandom, icon: <Shuffle className="h-4 w-4 text-slate-500 dark:text-slate-400" />, color: 'bg-amber-400' },
+    { value: 'newest', label: copy.sortNewest, icon: <CalendarArrowDown className="h-4 w-4 text-slate-500 dark:text-slate-400" />, color: 'bg-emerald-500' },
+    { value: 'oldest', label: copy.sortOldest, icon: <CalendarArrowUp className="h-4 w-4 text-slate-500 dark:text-slate-400" />, color: 'bg-slate-400' },
+    { value: 'name-asc', label: copy.sortNameAsc, icon: <ArrowDownAZ className="h-4 w-4 text-slate-500 dark:text-slate-400" />, color: 'bg-sky-500' },
+    { value: 'name-desc', label: copy.sortNameDesc, icon: <ArrowDownZA className="h-4 w-4 text-slate-500 dark:text-slate-400" />, color: 'bg-indigo-500' },
   ], [copy]);
 
   const FIELD_OPTIONS_LOCALIZED: DropdownOption[] = useMemo(() => [
@@ -402,69 +402,69 @@ const MentorList: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col gap-6">
-        <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-sky-100/60">
-          <div className="absolute inset-0 bg-linear-to-br from-sky-50 via-white to-emerald-50 opacity-90" aria-hidden="true" />
-          <div className="absolute -top-24 right-8 h-48 w-48 rounded-full bg-sky-200/40 blur-3xl" aria-hidden="true" />
-          <div className="absolute -bottom-28 left-6 h-56 w-56 rounded-full bg-emerald-200/40 blur-3xl" aria-hidden="true" />
+        <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-sky-100/60 dark:border-slate-800 dark:bg-slate-950/70 dark:shadow-[0_20px_60px_rgba(2,6,23,0.45)]">
+          <div className="absolute inset-0 bg-linear-to-br from-sky-50 via-white to-emerald-50 opacity-90 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:opacity-100" aria-hidden="true" />
+          <div className="absolute -top-24 right-8 h-48 w-48 rounded-full bg-sky-200/40 blur-3xl dark:bg-sky-500/10" aria-hidden="true" />
+          <div className="absolute -bottom-28 left-6 h-56 w-56 rounded-full bg-emerald-200/40 blur-3xl dark:bg-emerald-500/10" aria-hidden="true" />
           <div className="relative p-6 md:p-8 lg:p-10">
             <div className="grid grid-cols-1 lg:grid-cols-[1.35fr_1fr] gap-8 items-center">
               <div className="space-y-4 animate-fade-in-up">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-white/70 text-xs font-semibold text-sky-700 shadow-sm">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-xs font-semibold text-sky-700 shadow-sm dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-200">
                   <Sparkles className="w-3.5 h-3.5" />
                   Mentor đồng hành
                 </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
+                <h2 className="text-3xl font-bold leading-tight text-slate-900 dark:text-slate-50 md:text-4xl">
                   Kết nối mentor phù hợp, bứt phá mục tiêu học tập
                 </h2>
-                <p className="text-sm md:text-base text-slate-600 leading-relaxed max-w-xl md:max-w-none md:whitespace-nowrap">
+                <p className="max-w-xl text-sm leading-relaxed text-slate-600 dark:text-slate-300 md:max-w-none md:text-base md:whitespace-nowrap">
                   Khám phá mentor theo lĩnh vực, tối ưu lộ trình phát triển và nhận gợi ý phù hợp mỗi ngày.
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
+                  <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-white/90 px-3 py-2 text-xs text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-300">
                     <Search className="w-4 h-4 text-sky-500" />
                     Tìm theo chuyên môn
                   </div>
-                  <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
+                  <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-white/90 px-3 py-2 text-xs text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-300">
                     <ShieldCheck className="w-4 h-4 text-emerald-500" />
                     Qui tính cao
                   </div>
-                  <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
+                  <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-white/90 px-3 py-2 text-xs text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-300">
                     <Shuffle className="w-4 h-4 text-amber-500" />
                     Gợi ý mỗi ngày
                   </div>
-                  <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
-                    <Users className="w-4 h-4 text-slate-600" />
+                  <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-white/90 px-3 py-2 text-xs text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-300">
+                    <Users className="w-4 h-4 text-slate-600 dark:text-slate-300" />
                     Cộng đồng mentor
                   </div>
                 </div>
               </div>
 
               <div className="space-y-4 animate-fade-in-up">
-                <div className="rounded-2xl border border-white/80 bg-white/80 p-5 shadow-md">
-                  <div className="text-xs font-semibold uppercase tracking-widest text-slate-400">{resultLabel}</div>
+                <div className="rounded-2xl border border-white/80 bg-white/80 p-5 shadow-md dark:border-slate-800 dark:bg-slate-950/70">
+                  <div className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">{resultLabel}</div>
                   <div className="mt-3 flex items-end gap-2">
-                    <span className="text-3xl font-bold text-slate-900">{isLoading ? '--' : total}</span>
-                    <span className="text-sm text-slate-500">mentor</span>
+                    <span className="text-3xl font-bold text-slate-900 dark:text-slate-50">{isLoading ? '--' : total}</span>
+                    <span className="text-sm text-slate-500 dark:text-slate-400">mentor</span>
                   </div>
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                     Cập nhật liên tục, ưu tiên mentor có hoạt động gần đây.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
-                  <div className="rounded-xl border border-sky-100 bg-sky-50/80 px-4 py-3">
+                  <div className="rounded-xl border border-sky-100 bg-sky-50/80 px-4 py-3 dark:border-sky-500/20 dark:bg-sky-500/10">
                     <div className="text-xs font-semibold text-sky-700">{copy.currentlyShowing}</div>
-                    <div className="mt-1 text-2xl font-bold text-sky-800">
+                    <div className="mt-1 text-2xl font-bold text-sky-800 dark:text-sky-200">
                       {isLoading ? '--' : visibleCount}
                     </div>
                   </div>
-                  <div className="rounded-xl border border-emerald-100 bg-emerald-50/80 px-4 py-3">
+                  <div className="rounded-xl border border-emerald-100 bg-emerald-50/80 px-4 py-3 dark:border-emerald-500/20 dark:bg-emerald-500/10">
                     <div className="text-xs font-semibold text-emerald-700">{copy.fields}</div>
-                    <div className="mt-1 text-2xl font-bold text-emerald-800">{fieldCount}</div>
+                    <div className="mt-1 text-2xl font-bold text-emerald-800 dark:text-emerald-200">{fieldCount}</div>
                   </div>
-                  <div className="rounded-xl border border-amber-100 bg-amber-50/80 px-4 py-3">
+                  <div className="rounded-xl border border-amber-100 bg-amber-50/80 px-4 py-3 dark:border-amber-500/20 dark:bg-amber-500/10">
                     <div className="text-xs font-semibold text-amber-700">{copy.pages}</div>
-                    <div className="mt-1 text-2xl font-bold text-amber-800">
+                    <div className="mt-1 text-2xl font-bold text-amber-800 dark:text-amber-200">
                       {isLoading ? '--' : pageCount}
                     </div>
                   </div>
@@ -474,12 +474,12 @@ const MentorList: React.FC = () => {
           </div>
         </section>
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-slate-900">{copy.title}</h1>
-          <p className="text-slate-500 text-sm">Danh sách mentor và hành trình đồng hành cùng học viên.</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50">{copy.title}</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Danh sách mentor và hành trình đồng hành cùng học viên.</p>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 flex gap-2">
-          <Info className="w-4 h-4 mt-0.5 text-slate-400" />
+        <div className="flex gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-300">
+          <Info className="mt-0.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
           <p>Trang này không dùng thông tin người dùng để gợi ý mentor. Đây là nơi tổng hợp thông tin mentor để bạn tham khảo.</p>
         </div>
 
@@ -492,7 +492,7 @@ const MentorList: React.FC = () => {
                 placeholder={copy.searchPlaceholder}
                 className="pl-10"
               />
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
             </div>
           </div>
           <div className="w-full lg:w-64">
@@ -518,18 +518,18 @@ const MentorList: React.FC = () => {
         </div>
 
         {error && (
-          <Card className="p-4 border border-red-200 bg-red-50 text-red-700 text-sm">
+          <Card className="border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-200">
             {error}
           </Card>
         )}
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-16 text-slate-500">
+          <div className="flex items-center justify-center py-16 text-slate-500 dark:text-slate-300">
             <Loader2 className="w-6 h-6 animate-spin mr-2" />
             Đang tải mentor...
           </div>
         ) : visibleMentors.length === 0 ? (
-          <Card className="p-8 text-center text-slate-500">
+          <Card className="p-8 text-center text-slate-500 dark:text-slate-300">
             Chưa có mentor phù hợp.
           </Card>
         ) : (
@@ -540,7 +540,7 @@ const MentorList: React.FC = () => {
               return (
                 <Card
                   key={mentor.id}
-                  className="cursor-pointer hover:shadow-lg transition-shadow group"
+                  className="group cursor-pointer transition-shadow hover:shadow-lg dark:border-slate-800 dark:bg-slate-950/80"
                   onClick={() => navigate(`/mentors/${mentor.id}`)}
                 >
                   <OptimizedImage
@@ -550,10 +550,10 @@ const MentorList: React.FC = () => {
                     className="w-full"
                   />
                   <div className="p-4">
-                    <h3 className="text-lg font-semibold text-slate-900 line-clamp-1 group-hover:text-primary-600 transition-colors">
+                    <h3 className="line-clamp-1 text-lg font-semibold text-slate-900 transition-colors group-hover:text-primary-600 dark:text-slate-100">
                       {mentor.name}
                     </h3>
-                    <div className="mt-2 flex items-center gap-2 text-xs text-slate-500">
+                    <div className="mt-2 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                       <Calendar className="w-4 h-4" />
                       <span>{copy.joined} {formatDate(mentor.joinedAt)}</span>
                     </div>
@@ -562,7 +562,7 @@ const MentorList: React.FC = () => {
                         {fields.map((field) => (
                           <span
                             key={`${mentor.id}-${field}`}
-                            className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium"
+                            className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-900 dark:text-slate-300"
                           >
                             {field}
                           </span>
@@ -635,7 +635,7 @@ const MentorDetailPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center text-slate-500">
+      <div className="flex min-h-[60vh] items-center justify-center text-slate-500 dark:text-slate-300">
         <Loader2 className="w-6 h-6 animate-spin mr-2" />
         Đang tải mentor...
       </div>
@@ -644,7 +644,7 @@ const MentorDetailPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 text-slate-500">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-slate-500 dark:text-slate-300">
         <p>{error}</p>
         <Button variant="secondary" onClick={() => navigate(-1)}>
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -667,7 +667,7 @@ const MentorDetailPage: React.FC = () => {
         <ArrowLeft className="w-4 h-4 mr-2" />
         Quay lại</Button>
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden dark:border-slate-800 dark:bg-slate-950/80">
         <OptimizedImage
           src={bannerSrc}
           alt={mentor.name}
@@ -676,8 +676,8 @@ const MentorDetailPage: React.FC = () => {
         />
         <div className="p-6 md:p-8 space-y-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-900">{mentor.name}</h1>
-            <p className="text-sm text-slate-500 mt-1">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 md:text-3xl">{mentor.name}</h1>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Tham gia: {formatDate(mentor.joinedAt)}
             </p>
             {fields.length > 0 && (
@@ -685,7 +685,7 @@ const MentorDetailPage: React.FC = () => {
                 {fields.map((field) => (
                   <span
                     key={`${mentor.id}-${field}`}
-                    className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium"
+                    className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 dark:bg-slate-900 dark:text-slate-300"
                   >
                     {field}
                   </span>
@@ -693,11 +693,11 @@ const MentorDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-          <div className="prose prose-slate max-w-none">
+          <div className="prose prose-slate max-w-none dark:prose-invert">
             {body ? (
-              <p className="whitespace-pre-line text-slate-700">{body}</p>
+              <p className="whitespace-pre-line text-slate-700 dark:text-slate-200">{body}</p>
             ) : (
-              <p className="text-slate-500">{copy.noBlog}</p>
+              <p className="text-slate-500 dark:text-slate-400">{copy.noBlog}</p>
             )}
           </div>
         </div>
