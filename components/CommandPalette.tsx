@@ -214,11 +214,11 @@ export default function CommandPalette() {
             {/* Trigger hint in header */}
             <button
                 onClick={() => setOpen(true)}
-                className="hidden md:flex items-center gap-2 rounded-xl border border-slate-200 bg-white/60 px-3 py-1.5 text-sm text-slate-400 backdrop-blur transition-all hover:border-slate-300 hover:bg-white hover:text-slate-600 hover:shadow-sm"
+                className="hidden md:flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/60 px-2.5 py-1.5 text-sm text-slate-400 backdrop-blur transition-all hover:border-slate-300 hover:bg-white hover:text-slate-600 hover:shadow-sm"
             >
                 <Search size={14} />
-                <span>{t('common.search' as any) || 'Tìm kiếm...'}</span>
-                <kbd className="ml-2 hidden items-center gap-0.5 rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-400 sm:flex">
+                <span className="max-w-28 truncate lg:max-w-32">{t('common.search' as any) || 'Tìm kiếm...'}</span>
+                <kbd className="ml-1.5 hidden items-center gap-0.5 rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-400 2xl:flex">
                     <Command size={10} />K
                 </kbd>
             </button>

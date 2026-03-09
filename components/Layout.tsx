@@ -93,7 +93,7 @@ const Layout: React.FC<LayoutProps> = ({
 
   const desktopNavLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      'inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
+      'inline-flex shrink-0 items-center whitespace-nowrap px-3 py-2 rounded-full text-sm font-semibold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:px-4',
       isActive
         ? 'bg-primary-50 text-primary-700 shadow-sm shadow-primary-100/70'
         : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
@@ -101,7 +101,7 @@ const Layout: React.FC<LayoutProps> = ({
 
   const desktopNavDropdownButtonClass = (isActive: boolean, isOpen: boolean) =>
     cn(
-      'inline-flex items-center gap-1 px-4 py-2 rounded-full text-sm font-semibold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
+      'inline-flex shrink-0 items-center gap-1 whitespace-nowrap px-3 py-2 rounded-full text-sm font-semibold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:px-4',
       isActive
         ? 'bg-primary-50 text-primary-700 shadow-sm shadow-primary-100/70'
         : isOpen
@@ -357,7 +357,7 @@ const Layout: React.FC<LayoutProps> = ({
       {/* Sticky Header */}
       <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 dark:bg-slate-900/80 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative flex h-16 items-center md:grid md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-8 lg:gap-10">
+          <div className="relative flex h-16 items-center md:grid md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-4 lg:gap-6 xl:gap-8">
             {/* Logo */}
             <NavLink to="/" aria-label="Blanc home" className="flex shrink-0 flex-row items-center">
               <img src="/logo.png" alt="Blanc Logo" className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover shrink-0" />
@@ -368,7 +368,7 @@ const Layout: React.FC<LayoutProps> = ({
             </NavLink>
 
             {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-1 justify-self-start md:ml-4 lg:ml-8" aria-label={t('layout.aria.mainMenu')}>
+            <nav className="hidden md:flex min-w-max items-center gap-0 justify-self-start md:ml-1 lg:ml-3 xl:ml-4" aria-label={t('layout.aria.mainMenu')}>
               {leadingNavItems.map((item) => (
                 <NavLink
                   key={item.path}
@@ -473,7 +473,7 @@ const Layout: React.FC<LayoutProps> = ({
             </nav>
 
             {/* Auth/Profile Actions */}
-            <div className="hidden md:flex items-center justify-self-end space-x-4">
+            <div className="hidden md:flex items-center justify-self-end space-x-2.5 lg:space-x-3">
               <CommandPalette />
               <ThemeToggle />
               {user ? (
@@ -817,7 +817,7 @@ const Layout: React.FC<LayoutProps> = ({
 
       {/* Main Content */}
       <Breadcrumbs />
-      <main id="main-content" role="main" className="grow">
+      <main id="main-content" role="main" tabIndex={-1} className="grow scroll-mt-20 focus:outline-none">
         <AnimatePresence mode="wait">
           <PageTransition key={location.pathname}>
             <Outlet />
