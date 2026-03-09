@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo, useDeferredValue } from 'react';
 import { createPortal } from 'react-dom';
 import {
     Plus, Edit2, Trash2, BookOpen, Star, MoreHorizontal, Sparkles,
@@ -12,6 +12,12 @@ import { documentService, validateAndSanitizeUrl } from '../services/documentSer
 import { courseService } from '../services/courseService';
 import { Dropdown } from './ui/Dropdown';
 import { ConfirmActionModal } from './ui/UserModals';
+import {
+    AdminPage,
+    AdminPageHeader,
+    AdminSectionCard,
+    AdminStatCard,
+} from './ui/AdminPrimitives';
 import { useAuth } from '../contexts/AuthContext';
 import { convertGoogleDriveImageUrl } from '../utils/googleDrive';
 
@@ -217,6 +223,7 @@ const DocumentManager: React.FC = () => {
 
     // Search state for documents
     const [documentSearchQuery, setDocumentSearchQuery] = useState('');
+    const deferredDocumentSearchQuery = useDeferredValue(documentSearchQuery);
 
     // Loading states
     const [isLoadingCourses, setIsLoadingCourses] = useState(true);
@@ -252,15 +259,17 @@ const DocumentManager: React.FC = () => {
 
     // Filter documents by search query
     const filteredDocuments = useMemo(() => {
-        if (!documentSearchQuery.trim()) return documents;
-        const query = documentSearchQuery.toLowerCase().trim();
+        if (!deferredDocumentSearchQuery.trim()) return documents;
+        const query = deferredDocumentSearchQuery.toLowerCase().trim();
         return documents.filter(doc =>
             doc.title.toLowerCase().includes(query) ||
             doc.author.toLowerCase().includes(query) ||
             doc.category.toLowerCase().includes(query) ||
             doc.description?.toLowerCase().includes(query)
         );
-    }, [documents, documentSearchQuery]);
+    }, [deferredDocumentSearchQuery, documents]);
+
+    const isDocumentSearchPending = documentSearchQuery !== deferredDocumentSearchQuery;
 
     const documentTotalPages = useMemo(() => Math.ceil(filteredDocuments.length / ITEMS_PER_PAGE), [filteredDocuments.length]);
 
@@ -835,7 +844,7 @@ const DocumentManager: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <AdminPage>
             <ConfirmActionModal
                 isOpen={Boolean(pendingConfirm)}
                 onClose={() => {
@@ -865,85 +874,109 @@ const DocumentManager: React.FC = () => {
                     onClose={() => setToast(null)}
                 />
             )}
-
-            <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900">Documents & Courses</h2>
-                    <p className="text-gray-500 mt-1">Manage learning materials, documents and instructors</p>
-                </div>
-                <div className="flex gap-2">
-                    {/* Refresh button */}
-                    <button
-                        type="button"
-                        onClick={() => activeTab === 'courses' ? fetchCourses() : fetchDocuments()}
-                        disabled={isLoadingCourses || isLoadingDocuments}
-                        title="Refresh data"
-                        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
-                    >
-                        <RefreshCw size={18} className={(isLoadingCourses || isLoadingDocuments) ? 'animate-spin' : ''} />
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleDeleteAll}
-                        disabled={
-                            !canManageDocuments
-                            || (activeTab === 'courses' ? isLoadingCourses : isLoadingDocuments)
-                            || (activeTab === 'courses' ? isBulkDeletingCourses : isBulkDeletingDocuments)
-                        }
-                        className="bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-sm"
-                        title={activeTab === 'courses' ? 'Delete all courses' : 'Delete all documents'}
-                    >
-                        <Trash2 size={18} />
-                        {(activeTab === 'courses' ? isBulkDeletingCourses : isBulkDeletingDocuments) ? 'Deleting...' : 'Delete All'}
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => openDocumentModal()}
-                        className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-sm"
-                    >
-                        <Plus size={18} />
-                        Add Document
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => openCourseModal()}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-sm"
-                    >
-                        <Plus size={18} />
-                        Add Course
-                    </button>
-                </div>
-            </div>
-
-            {/* Tab Navigation */}
-            <div className="flex border-b border-gray-200">
-                <button
-                    onClick={() => setActiveTab('courses')}
-                    className={`px-6 py-3 font-medium text-sm transition-all border-b-2 ${activeTab === 'courses'
-                        ? 'border-emerald-500 text-emerald-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                        }`}
-                >
-                    <div className="flex items-center gap-2">
-                        <BookOpen size={18} />
-                        Courses ({courses.length})
-                        {isLoadingCourses && <Loader2 size={14} className="animate-spin" />}
+            <AdminPageHeader
+                eyebrow="Learning operations"
+                title="Courses and documents in one editorial workspace"
+                description="Manage the learner-facing library with the same glassy admin shell, while keeping CRUD behavior and moderation safeguards intact."
+                actions={
+                    <div className="flex flex-wrap gap-2">
+                        <button
+                            type="button"
+                            onClick={() => activeTab === 'courses' ? fetchCourses() : fetchDocuments()}
+                            disabled={isLoadingCourses || isLoadingDocuments}
+                            title="Refresh data"
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200/80 bg-white/80 text-slate-600 transition hover:bg-slate-50 disabled:opacity-50"
+                        >
+                            <RefreshCw size={18} className={(isLoadingCourses || isLoadingDocuments) ? 'animate-spin' : ''} />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleDeleteAll}
+                            disabled={
+                                !canManageDocuments
+                                || (activeTab === 'courses' ? isLoadingCourses : isLoadingDocuments)
+                                || (activeTab === 'courses' ? isBulkDeletingCourses : isBulkDeletingDocuments)
+                            }
+                            className="inline-flex items-center gap-2 rounded-full bg-rose-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+                            title={activeTab === 'courses' ? 'Delete all courses' : 'Delete all documents'}
+                        >
+                            <Trash2 size={16} />
+                            {(activeTab === 'courses' ? isBulkDeletingCourses : isBulkDeletingDocuments) ? 'Deleting...' : 'Delete all'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => openDocumentModal()}
+                            className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-amber-600"
+                        >
+                            <Plus size={16} />
+                            Add document
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => openCourseModal()}
+                            className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#0f766e,#0ea5e9)] px-4 py-3 text-sm font-semibold text-white transition hover:brightness-105"
+                        >
+                            <Plus size={16} />
+                            Add course
+                        </button>
                     </div>
-                </button>
-                <button
-                    onClick={() => setActiveTab('documents')}
-                    className={`px-6 py-3 font-medium text-sm transition-all border-b-2 ${activeTab === 'documents'
-                        ? 'border-amber-500 text-amber-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                        }`}
-                >
-                    <div className="flex items-center gap-2">
-                        <FileText size={18} />
-                        Documents ({documents.length})
-                        {isLoadingDocuments && <Loader2 size={14} className="animate-spin" />}
-                    </div>
-                </button>
-            </div>
+                }
+            />
+
+            <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <AdminStatCard
+                    icon={BookOpen}
+                    label="Courses"
+                    value={courses.length}
+                    detail="Published course records currently loaded in the admin workspace."
+                    tone="teal"
+                />
+                <AdminStatCard
+                    icon={FileText}
+                    label="Documents"
+                    value={documents.length}
+                    detail="Document entries available for search, visibility changes, and curation."
+                    tone="amber"
+                />
+                <AdminStatCard
+                    icon={Search}
+                    label="Filtered results"
+                    value={activeTab === 'documents' ? filteredDocuments.length : courses.length}
+                    detail={activeTab === 'documents' && documentSearchQuery ? `Live search for "${documentSearchQuery}"` : 'Ready for document search and pagination.'}
+                    tone="sky"
+                />
+            </section>
+
+            <AdminSectionCard className="p-0 overflow-hidden">
+                <div className="flex border-b border-slate-200/80">
+                    <button
+                        onClick={() => setActiveTab('courses')}
+                        className={`px-6 py-4 font-medium text-sm transition-all border-b-2 ${activeTab === 'courses'
+                            ? 'border-teal-500 bg-teal-50/50 text-teal-700'
+                            : 'border-transparent text-slate-500 hover:text-slate-700'
+                            }`}
+                    >
+                        <div className="flex items-center gap-2">
+                            <BookOpen size={18} />
+                            Courses ({courses.length})
+                            {isLoadingCourses && <Loader2 size={14} className="animate-spin" />}
+                        </div>
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('documents')}
+                        className={`px-6 py-4 font-medium text-sm transition-all border-b-2 ${activeTab === 'documents'
+                            ? 'border-amber-500 bg-amber-50/60 text-amber-700'
+                            : 'border-transparent text-slate-500 hover:text-slate-700'
+                            }`}
+                    >
+                        <div className="flex items-center gap-2">
+                            <FileText size={18} />
+                            Documents ({documents.length})
+                            {isLoadingDocuments && <Loader2 size={14} className="animate-spin" />}
+                        </div>
+                    </button>
+                </div>
+            </AdminSectionCard>
 
             {/* Courses Table */}
             {activeTab === 'courses' && (
@@ -1157,14 +1190,19 @@ const DocumentManager: React.FC = () => {
                                 <p className="text-sm text-gray-500">
                                     Found <span className="font-semibold text-amber-600">{filteredDocuments.length}</span> document{filteredDocuments.length !== 1 ? 's' : ''} matching "<span className="font-medium">{documentSearchQuery}</span>"
                                 </p>
-                                {filteredDocuments.length > 0 && (
-                                    <button
-                                        onClick={() => setDocumentSearchQuery('')}
-                                        className="text-sm text-amber-600 hover:text-amber-700 font-medium"
-                                    >
-                                        Clear search
-                                    </button>
-                                )}
+                                <div className="flex items-center gap-3">
+                                    {isDocumentSearchPending && (
+                                        <span className="text-xs font-medium text-slate-400">Filtering...</span>
+                                    )}
+                                    {filteredDocuments.length > 0 && (
+                                        <button
+                                            onClick={() => setDocumentSearchQuery('')}
+                                            className="text-sm text-amber-600 hover:text-amber-700 font-medium"
+                                        >
+                                            Clear search
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         )}
 
@@ -2351,7 +2389,7 @@ const DocumentManager: React.FC = () => {
                 </div>,
                 document.body
             )}
-        </div>
+        </AdminPage>
     );
 };
 

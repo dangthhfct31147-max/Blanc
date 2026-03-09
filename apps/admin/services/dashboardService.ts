@@ -1,134 +1,124 @@
-/**
- * Dashboard Service
- * API operations for dashboard statistics and analytics
- * Note: Using /stats endpoints (shared with user app)
- */
-
 import api from './api';
+import type { PlatformSettings } from './settingsService';
+import type { SecurityAnalysis } from './securityService';
 
-export interface DashboardStats {
-    totalStudents: number;
+export interface DashboardSummary {
+    totalUsers: number;
+    activeUsers: number;
+    newUsersThisMonth: number;
     activeContests: number;
-    totalRevenue: number;
-    courseCompletionRate: number;
-    trends: {
-        students: { value: number; isUp: boolean };
-        contests: { value: number; isUp: boolean };
-        revenue: { value: number; isUp: boolean };
-        completion: { value: number; isUp: boolean };
-    };
+    totalCourses: number;
+    unreadNotifications: number;
+    activeThreatCount: number;
+    lockedAccountsCount: number;
+    failureRate: string;
+    sessionTimeout: number;
+    maintenanceMode: boolean;
+    twoFactorRequired: boolean;
 }
 
-export interface RevenueData {
-    date: string;
-    revenue: number;
+export interface DashboardTrendPoint {
+    label: string;
+    failedLogins: number;
 }
 
-export interface ActivityData {
-    date: string;
-    logins: number;
-    registrations: number;
-    enrollments: number;
+export interface DashboardNotificationItem {
+    id: string;
+    title: string;
+    message: string;
+    type: 'info' | 'success' | 'warning' | 'error';
+    read: boolean;
+    createdAt: string;
+    link?: string | null;
 }
+
+export interface DashboardOverview {
+    summary: DashboardSummary;
+    trend: DashboardTrendPoint[];
+    notifications: DashboardNotificationItem[];
+}
+
+interface StatsResponse {
+    users?: number;
+    contests?: number;
+    courses?: number;
+}
+
+interface UserStatsResponse {
+    totalUsers?: number;
+    activeUsers?: number;
+    bannedUsers?: number;
+    newUsersThisMonth?: number;
+}
+
+interface NotificationsResponse {
+    notifications?: DashboardNotificationItem[];
+    unreadCount?: number;
+}
+
+const defaultOverview: DashboardOverview = {
+    summary: {
+        totalUsers: 0,
+        activeUsers: 0,
+        newUsersThisMonth: 0,
+        activeContests: 0,
+        totalCourses: 0,
+        unreadNotifications: 0,
+        activeThreatCount: 0,
+        lockedAccountsCount: 0,
+        failureRate: '0%',
+        sessionTimeout: 30,
+        maintenanceMode: false,
+        twoFactorRequired: false,
+    },
+    trend: [],
+    notifications: [],
+};
+
+const buildTrend = (security: SecurityAnalysis | null): DashboardTrendPoint[] => {
+    if (!security?.failedOverTime?.length) return [];
+
+    return security.failedOverTime
+        .slice(-8)
+        .map((item) => ({
+            label: String(item._id || '').slice(11, 16) || 'N/A',
+            failedLogins: Number(item.count || 0),
+        }));
+};
 
 export const dashboardService = {
-    /**
-     * Get dashboard overview statistics
-     */
-    getStats: async (_period: 'day' | 'week' | 'month' = 'week'): Promise<DashboardStats> => {
-        try {
-            const response = await api.get<{ users?: number; contests?: number }>('/stats');
-            return {
-                totalStudents: response.data.users || 0,
-                activeContests: response.data.contests || 0,
-                totalRevenue: 0,
-                courseCompletionRate: 0,
-                trends: {
-                    students: { value: 0, isUp: true },
-                    contests: { value: 0, isUp: true },
-                    revenue: { value: 0, isUp: true },
-                    completion: { value: 0, isUp: true },
-                },
-            };
-        } catch {
-            return {
-                totalStudents: 0,
-                activeContests: 0,
-                totalRevenue: 0,
-                courseCompletionRate: 0,
-                trends: {
-                    students: { value: 0, isUp: true },
-                    contests: { value: 0, isUp: true },
-                    revenue: { value: 0, isUp: true },
-                    completion: { value: 0, isUp: true },
-                },
-            };
-        }
-    },
+    async getOverview(): Promise<DashboardOverview> {
+        const [statsResult, userStatsResult, notificationsResult, settingsResult, securityResult] = await Promise.allSettled([
+            api.get<StatsResponse>('/stats'),
+            api.get<UserStatsResponse>('/admin/users/stats'),
+            api.get<NotificationsResponse>('/admin/notifications', { params: { limit: 5 } }),
+            api.get<PlatformSettings>('/admin/settings'),
+            api.get<SecurityAnalysis>('/admin/security/analysis'),
+        ]);
 
-    /**
-     * Get revenue analytics data
-     */
-    getRevenueAnalytics: async (
-        _startDate?: string,
-        _endDate?: string,
-        _granularity: 'day' | 'week' | 'month' = 'day'
-    ): Promise<RevenueData[]> => {
-        // Return empty array - endpoint not available
-        return [];
-    },
+        const stats = statsResult.status === 'fulfilled' ? statsResult.value.data : null;
+        const userStats = userStatsResult.status === 'fulfilled' ? userStatsResult.value.data : null;
+        const notifications = notificationsResult.status === 'fulfilled' ? notificationsResult.value.data : null;
+        const settings = settingsResult.status === 'fulfilled' ? settingsResult.value.data : null;
+        const security = securityResult.status === 'fulfilled' ? securityResult.value.data : null;
 
-    /**
-     * Get user activity data
-     */
-    getActivityData: async (
-        _startDate?: string,
-        _endDate?: string
-    ): Promise<ActivityData[]> => {
-        // Return empty array - endpoint not available
-        return [];
-    },
-
-    /**
-     * Get recent notifications
-     */
-    getNotifications: async (_limit = 10): Promise<{
-        id: string;
-        title: string;
-        message: string;
-        type: 'info' | 'success' | 'warning' | 'error';
-        timestamp: string;
-        read: boolean;
-    }[]> => {
-        // Return empty array - endpoint not available
-        return [];
-    },
-
-    /**
-     * Mark notification as read
-     */
-    markNotificationRead: async (_id: string): Promise<void> => {
-        // No-op - endpoint not available
-    },
-
-    /**
-     * Mark all notifications as read
-     */
-    markAllNotificationsRead: async (): Promise<void> => {
-        // No-op - endpoint not available
-    },
-
-    /**
-     * Get top performing content
-     */
-    getTopContent: async (): Promise<{
-        topCourses: { id: string; title: string; enrollments: number; revenue: number }[];
-        topContests: { id: string; title: string; participants: number; revenue: number }[];
-    }> => {
-        // Return empty data - endpoint not available
         return {
-            topCourses: [],
-            topContests: [],
+            summary: {
+                totalUsers: Number(userStats?.totalUsers ?? stats?.users ?? 0),
+                activeUsers: Number(userStats?.activeUsers ?? 0),
+                newUsersThisMonth: Number(userStats?.newUsersThisMonth ?? 0),
+                activeContests: Number(stats?.contests ?? 0),
+                totalCourses: Number(stats?.courses ?? 0),
+                unreadNotifications: Number(notifications?.unreadCount ?? 0),
+                activeThreatCount: Number(security?.summary?.activeThreatCount ?? 0),
+                lockedAccountsCount: Number(security?.summary?.lockedAccountsCount ?? 0),
+                failureRate: String(security?.summary?.failureRate ?? '0%'),
+                sessionTimeout: Number(settings?.security?.sessionTimeout ?? defaultOverview.summary.sessionTimeout),
+                maintenanceMode: Boolean(settings?.general?.maintenanceMode ?? false),
+                twoFactorRequired: Boolean(settings?.security?.twoFactorRequired ?? false),
+            },
+            trend: buildTrend(security),
+            notifications: notifications?.notifications ?? [],
         };
     },
 };

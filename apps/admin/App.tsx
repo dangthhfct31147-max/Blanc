@@ -1,23 +1,24 @@
-import type { FC, ReactNode } from 'react';
+import { lazy, Suspense, type FC, type ReactNode } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import Login from './components/Login';
-import ForgotPassword from './components/ForgotPassword';
-import DashboardHome from './components/DashboardHome';
-import ContestManager from './components/ContestManager';
-import UserManager from './components/UserManager';
-import DocumentManager from './components/DocumentManager';
-import CommunityManager from './components/CommunityManager';
-import NewsManager from './components/NewsManager';
-import RecruitmentManager from './components/RecruitmentManager';
-import MentorBlogManager from './components/MentorBlogManager';
-import MentorDirectory from './components/MentorDirectory';
-import Settings from './components/Settings';
-import AuditLog from './components/AuditLog';
-import SecurityDashboard from './components/SecurityDashboard';
-import ReportReviewManager from './components/ReportReviewManager';
+
+const ForgotPassword = lazy(() => import('./components/ForgotPassword'));
+const DashboardHome = lazy(() => import('./components/DashboardHome'));
+const ContestManager = lazy(() => import('./components/ContestManager'));
+const UserManager = lazy(() => import('./components/UserManager'));
+const DocumentManager = lazy(() => import('./components/DocumentManager'));
+const CommunityManager = lazy(() => import('./components/CommunityManager'));
+const NewsManager = lazy(() => import('./components/NewsManager'));
+const RecruitmentManager = lazy(() => import('./components/RecruitmentManager'));
+const MentorBlogManager = lazy(() => import('./components/MentorBlogManager'));
+const MentorDirectory = lazy(() => import('./components/MentorDirectory'));
+const Settings = lazy(() => import('./components/Settings'));
+const AuditLog = lazy(() => import('./components/AuditLog'));
+const SecurityDashboard = lazy(() => import('./components/SecurityDashboard'));
+const ReportReviewManager = lazy(() => import('./components/ReportReviewManager'));
 
 /**
  * Protected Route Wrapper
@@ -44,6 +45,19 @@ const ProtectedRoute: FC<{ children: ReactNode }> = ({ children }) => {
   return <>{children}</>;
 };
 
+const RouteLoader: FC = () => (
+  <div className="flex min-h-[60vh] items-center justify-center">
+    <div className="flex items-center gap-3 rounded-full border border-slate-200/80 bg-white/80 px-5 py-3 text-sm font-medium text-slate-600 shadow-sm backdrop-blur-sm">
+      <div className="h-4 w-4 animate-spin rounded-full border-2 border-teal-600/30 border-t-teal-600" />
+      Loading workspace
+    </div>
+  </div>
+);
+
+const LazyPage: FC<{ children: ReactNode }> = ({ children }) => (
+  <Suspense fallback={<RouteLoader />}>{children}</Suspense>
+);
+
 /**
  * Main App Routes
  */
@@ -60,7 +74,7 @@ const AppRoutes: FC = () => {
       />
       <Route
         path="/forgot-password"
-        element={isAuthenticated ? <Navigate to="/" replace /> : <ForgotPassword />}
+        element={isAuthenticated ? <Navigate to="/" replace /> : <LazyPage><ForgotPassword /></LazyPage>}
       />
 
       {/* Protected Routes */}
@@ -69,7 +83,9 @@ const AppRoutes: FC = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              {isMentor ? <ReportReviewManager /> : <DashboardHome />}
+              <LazyPage>
+                {isMentor ? <ReportReviewManager /> : <DashboardHome />}
+              </LazyPage>
             </Layout>
           </ProtectedRoute>
         }
@@ -79,7 +95,9 @@ const AppRoutes: FC = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              <ReportReviewManager />
+              <LazyPage>
+                <ReportReviewManager />
+              </LazyPage>
             </Layout>
           </ProtectedRoute>
         }
@@ -89,7 +107,9 @@ const AppRoutes: FC = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              {isMentor ? <Navigate to="/reports" replace /> : <ContestManager />}
+              <LazyPage>
+                {isMentor ? <Navigate to="/reports" replace /> : <ContestManager />}
+              </LazyPage>
             </Layout>
           </ProtectedRoute>
         }
@@ -99,7 +119,9 @@ const AppRoutes: FC = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              {isMentor ? <Navigate to="/reports" replace /> : <UserManager />}
+              <LazyPage>
+                {isMentor ? <Navigate to="/reports" replace /> : <UserManager />}
+              </LazyPage>
             </Layout>
           </ProtectedRoute>
         }
@@ -109,7 +131,9 @@ const AppRoutes: FC = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              {isMentor ? <Navigate to="/reports" replace /> : <DocumentManager />}
+              <LazyPage>
+                {isMentor ? <Navigate to="/reports" replace /> : <DocumentManager />}
+              </LazyPage>
             </Layout>
           </ProtectedRoute>
         }
@@ -119,7 +143,9 @@ const AppRoutes: FC = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              {isMentor ? <Navigate to="/reports" replace /> : <CommunityManager />}
+              <LazyPage>
+                {isMentor ? <Navigate to="/reports" replace /> : <CommunityManager />}
+              </LazyPage>
             </Layout>
           </ProtectedRoute>
         }
@@ -129,7 +155,9 @@ const AppRoutes: FC = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              {isMentor ? <Navigate to="/reports" replace /> : <RecruitmentManager />}
+              <LazyPage>
+                {isMentor ? <Navigate to="/reports" replace /> : <RecruitmentManager />}
+              </LazyPage>
             </Layout>
           </ProtectedRoute>
         }
@@ -139,7 +167,9 @@ const AppRoutes: FC = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              {isMentor ? <Navigate to="/reports" replace /> : <NewsManager />}
+              <LazyPage>
+                {isMentor ? <Navigate to="/reports" replace /> : <NewsManager />}
+              </LazyPage>
             </Layout>
           </ProtectedRoute>
         }
@@ -149,7 +179,9 @@ const AppRoutes: FC = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              {isMentor ? <Navigate to="/reports" replace /> : <MentorDirectory />}
+              <LazyPage>
+                {isMentor ? <Navigate to="/reports" replace /> : <MentorDirectory />}
+              </LazyPage>
             </Layout>
           </ProtectedRoute>
         }
@@ -159,7 +191,9 @@ const AppRoutes: FC = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              {isMentor ? <Navigate to="/reports" replace /> : <MentorBlogManager />}
+              <LazyPage>
+                {isMentor ? <Navigate to="/reports" replace /> : <MentorBlogManager />}
+              </LazyPage>
             </Layout>
           </ProtectedRoute>
         }
@@ -169,7 +203,9 @@ const AppRoutes: FC = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              {isMentor ? <Navigate to="/reports" replace /> : <AuditLog />}
+              <LazyPage>
+                {isMentor ? <Navigate to="/reports" replace /> : <AuditLog />}
+              </LazyPage>
             </Layout>
           </ProtectedRoute>
         }
@@ -179,7 +215,9 @@ const AppRoutes: FC = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              {isMentor ? <Navigate to="/reports" replace /> : <SecurityDashboard />}
+              <LazyPage>
+                {isMentor ? <Navigate to="/reports" replace /> : <SecurityDashboard />}
+              </LazyPage>
             </Layout>
           </ProtectedRoute>
         }
@@ -189,7 +227,9 @@ const AppRoutes: FC = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              {isMentor ? <Navigate to="/reports" replace /> : <Settings />}
+              <LazyPage>
+                {isMentor ? <Navigate to="/reports" replace /> : <Settings />}
+              </LazyPage>
             </Layout>
           </ProtectedRoute>
         }

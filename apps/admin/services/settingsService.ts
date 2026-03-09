@@ -4,7 +4,7 @@
  * Sử dụng API backend /api/admin/settings
  */
 
-import api, { ApiError, tokenManager } from './api';
+import api, { ApiError } from './api';
 
 export interface PlatformSettings {
     general: {
@@ -65,37 +65,6 @@ const defaultSettings: PlatformSettings = {
     },
 };
 
-// API keys still use localStorage (no backend endpoint)
-const API_KEYS_KEY = 'blanc_admin_api_keys';
-
-interface ApiKey {
-    id: string;
-    name: string;
-    key: string;
-    createdAt: string;
-    lastUsed?: string;
-}
-
-const getStoredApiKeys = (): ApiKey[] => {
-    try {
-        const stored = localStorage.getItem(API_KEYS_KEY);
-        if (stored) {
-            return JSON.parse(stored);
-        }
-    } catch (error) {
-        console.error('Error reading API keys from localStorage:', error);
-    }
-    return [];
-};
-
-const saveApiKeys = (keys: ApiKey[]): void => {
-    try {
-        localStorage.setItem(API_KEYS_KEY, JSON.stringify(keys));
-    } catch (error) {
-        console.error('Error saving API keys to localStorage:', error);
-    }
-};
-
 export const settingsService = {
     /**
      * Get all platform settings from API
@@ -151,40 +120,6 @@ export const settingsService = {
     resetAllSessions: async (): Promise<{ sessionsCleared: number }> => {
         const response = await api.post<{ sessionsCleared: number }>('/admin/settings/reset-sessions');
         return response.data;
-    },
-
-    /**
-     * Get API keys (from localStorage - no backend endpoint)
-     */
-    getApiKeys: async (): Promise<ApiKey[]> => {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        return getStoredApiKeys();
-    },
-
-    /**
-     * Generate new API key
-     */
-    generateApiKey: async (name: string): Promise<ApiKey> => {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        const newKey: ApiKey = {
-            id: `key_${Date.now()}`,
-            name,
-            key: `ch_${btoa(Math.random().toString(36)).substring(0, 32)}`,
-            createdAt: new Date().toISOString(),
-        };
-        const keys = getStoredApiKeys();
-        keys.push(newKey);
-        saveApiKeys(keys);
-        return newKey;
-    },
-
-    /**
-     * Revoke API key
-     */
-    revokeApiKey: async (id: string): Promise<void> => {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        const keys = getStoredApiKeys().filter(k => k.id !== id);
-        saveApiKeys(keys);
     },
 
     /**

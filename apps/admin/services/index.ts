@@ -3,7 +3,7 @@
  * Central export for all API services
  */
 
-export { default as api, tokenManager, ApiError } from './api';
+export { default as api, ApiError } from './api';
 export { default as userService } from './userService';
 export { default as contestService } from './contestService';
 export { default as courseService } from './courseService';

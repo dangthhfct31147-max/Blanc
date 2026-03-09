@@ -9,7 +9,7 @@
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import api, { tokenManager, ApiError } from '../services/api';
+import api, { ApiError } from '../services/api';
 
 // Types
 export interface AdminUser {
@@ -76,22 +76,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         pending2FA: null,
     });
 
-    const getCookieValue = (name: string): string | null => {
-        if (typeof document === 'undefined') return null;
-        const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const match = document.cookie.match(new RegExp(`(?:^|; )${escaped}=([^;]*)`));
-        return match ? decodeURIComponent(match[1]) : null;
-    };
-
-    const csrfCookieName = import.meta.env.VITE_CSRF_COOKIE_NAME || 'csrf_token';
-
-    // If admin is hosted on a different site (e.g. netlify.app) than the backend,
-    // browsers may block third-party cookies. The CSRF cookie is not httpOnly,
-    // so its presence is a good signal that cookie-based auth is working.
-    const shouldFallbackToBearerAuth = (): boolean => {
-        return !getCookieValue(csrfCookieName);
-    };
-
     // Helper: Check if user can access privileged area (admin/mentor)
     const isPrivilegedRole = (role: string): boolean => {
         return role === 'admin' || role === 'super_admin' || role === 'mentor';
@@ -106,7 +90,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
             // SECURITY: Verify user has privileged role
             if (!isPrivilegedRole(userData.role)) {
-                tokenManager.clearTokens();
                 setState({
                     user: null,
                     isAuthenticated: false,
@@ -127,7 +110,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 pending2FA: null,
             });
         } catch {
-            tokenManager.clearTokens();
             setState({
                 user: null,
                 isAuthenticated: false,
@@ -187,12 +169,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             if (!userData || !isPrivilegedRole(userData.role)) {
                 throw new Error('Access denied. Privileged access required.');
             }
-
-            // Keep a Bearer token available for API calls even when cookie auth works.
-            // This avoids CSRF/cookie edge cases and supports cross-site admin hosting.
-            const token = (response.data as unknown as { token?: string })?.token;
-            if (token) tokenManager.setTokens({ accessToken: token, refreshToken: '' });
-            else if (shouldFallbackToBearerAuth()) tokenManager.clearTokens();
 
             setState({
                 user: userData,
@@ -258,11 +234,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 throw new Error('Access denied. Privileged access required.');
             }
 
-            // Keep a Bearer token available for API calls even when cookie auth works.
-            const token = response.data.token;
-            if (token) tokenManager.setTokens({ accessToken: token, refreshToken: '' });
-            else if (shouldFallbackToBearerAuth()) tokenManager.clearTokens();
-
             setState({
                 user: userData,
                 isAuthenticated: true,
@@ -322,7 +293,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         } catch {
             // Continue with local logout even if server request fails
         } finally {
-            tokenManager.clearTokens();
             setState({
                 user: null,
                 isAuthenticated: false,
