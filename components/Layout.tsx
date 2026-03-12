@@ -1,8 +1,6 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-import PageTransition from './PageTransition';
 import { Menu, X, Bell, User as UserIcon, LogOut, ChevronDown, Check, Trophy, Users, Info, BookOpen, Loader2, FileText, Mail, Phone, ShieldCheck, Rocket, Sparkles } from 'lucide-react';
 import { Button, cn } from './ui/Common';
 import { User, Notification } from '../types';
@@ -12,11 +10,6 @@ import type { AppAuthStatus, AppAuthSyncError } from '../contexts/AppAuthContext
 import StreakBadge from './StreakBadge';
 import MentorBlogPrompt from './MentorBlogPrompt';
 import AuthSyncNotice from './AuthSyncNotice';
-import CommandPalette from './CommandPalette';
-import Breadcrumbs from './Breadcrumbs';
-import ThemeToggle from './ThemeToggle';
-import SkipToContent from './SkipToContent';
-import { usePageMeta } from '../hooks/usePageMeta';
 
 interface LayoutProps {
   user: User | null;
@@ -35,7 +28,6 @@ const Layout: React.FC<LayoutProps> = ({
 }) => {
   const { t, locale } = useI18n();
   const dateLocale = locale === 'en' ? 'en-US' : 'vi-VN';
-  const notificationToggleLabel = locale === 'en' ? 'Open notifications' : 'Mở thông báo';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isLearningOpen, setIsLearningOpen] = useState(false);
@@ -45,9 +37,6 @@ const Layout: React.FC<LayoutProps> = ({
   const [isMentorPromptOpen, setIsMentorPromptOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoadingNotifs, setIsLoadingNotifs] = useState(false);
-  const mobileMenuLabel = isMenuOpen
-    ? (locale === 'en' ? 'Close menu' : 'Đóng menu')
-    : (locale === 'en' ? 'Open menu' : 'Mở menu');
   const notifRef = useRef<HTMLDivElement>(null);
   const learningRef = useRef<HTMLDivElement>(null);
   const communityRef = useRef<HTMLDivElement>(null);
@@ -56,9 +45,6 @@ const Layout: React.FC<LayoutProps> = ({
 
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Dynamic SEO meta tags per route
-  usePageMeta();
 
   // Hide footer on reports page (for full-screen editor experience)
   const hideFooter = location.pathname.startsWith('/reports');
@@ -72,7 +58,6 @@ const Layout: React.FC<LayoutProps> = ({
 
   const communityItems = [
     { name: t('nav.community'), path: '/community' },
-    { name: t('nav.peerReview'), path: '/peer-review' },
     { name: t('nav.news'), path: '/news' },
   ];
 
@@ -89,58 +74,52 @@ const Layout: React.FC<LayoutProps> = ({
     || location.pathname.startsWith('/documents')
     || location.pathname.startsWith('/hall-of-fame')
     || location.pathname.startsWith('/skill-tree');
-  const isCommunityActive = location.pathname.startsWith('/community') || location.pathname.startsWith('/news') || location.pathname.startsWith('/peer-review');
+  const isCommunityActive = location.pathname.startsWith('/community') || location.pathname.startsWith('/news');
 
   const desktopNavLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      'inline-flex shrink-0 items-center whitespace-nowrap px-3 py-2 rounded-full text-sm font-semibold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900 lg:px-4',
+      'inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
       isActive
-        ? 'bg-primary-50 text-primary-700 shadow-sm shadow-primary-100/70 dark:bg-primary-500/10 dark:text-primary-200 dark:shadow-primary-950/40'
-        : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70 dark:hover:text-primary-200'
+        ? 'bg-primary-50 text-primary-700 shadow-sm shadow-primary-100/70'
+        : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
     );
 
   const desktopNavDropdownButtonClass = (isActive: boolean, isOpen: boolean) =>
     cn(
-      'inline-flex shrink-0 items-center gap-1 whitespace-nowrap px-3 py-2 rounded-full text-sm font-semibold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900 lg:px-4',
+      'inline-flex items-center gap-1 px-4 py-2 rounded-full text-sm font-semibold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
       isActive
-        ? 'bg-primary-50 text-primary-700 shadow-sm shadow-primary-100/70 dark:bg-primary-500/10 dark:text-primary-200 dark:shadow-primary-950/40'
+        ? 'bg-primary-50 text-primary-700 shadow-sm shadow-primary-100/70'
         : isOpen
-          ? 'bg-slate-50 text-primary-600 dark:bg-slate-800/70 dark:text-primary-200'
-          : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70 dark:hover:text-primary-200'
+          ? 'bg-slate-50 text-primary-600'
+          : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
     );
 
   const desktopDropdownLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      'flex items-center w-full px-3 py-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900',
-      isActive
-        ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-200'
-        : 'text-slate-700 hover:bg-slate-50 hover:text-primary-700 dark:text-slate-200 dark:hover:bg-slate-800/70 dark:hover:text-primary-100'
+      'flex items-center w-full px-3 py-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
+      isActive ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50 hover:text-primary-700'
     );
 
   const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      'block px-4 py-2 rounded-lg text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900',
-      isActive
-        ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-200'
-        : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70 dark:hover:text-primary-200'
+      'block px-4 py-2 rounded-lg text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
+      isActive ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
     );
 
   const mobileNavDropdownButtonClass = (isActive: boolean, isOpen: boolean) =>
     cn(
-      'w-full flex items-center justify-between px-4 py-2 rounded-lg text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900',
+      'w-full flex items-center justify-between px-4 py-2 rounded-lg text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
       isActive
-        ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-200'
+        ? 'bg-primary-50 text-primary-700'
         : isOpen
-          ? 'bg-slate-50 text-primary-600 dark:bg-slate-800/70 dark:text-primary-200'
-          : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70 dark:hover:text-primary-200'
+          ? 'bg-slate-50 text-primary-600'
+          : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
     );
 
   const mobileNavSubLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      'block px-4 py-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900',
-      isActive
-        ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-200'
-        : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70 dark:hover:text-primary-200'
+      'block px-4 py-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
+      isActive ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
     );
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
@@ -326,7 +305,7 @@ const Layout: React.FC<LayoutProps> = ({
       case 'contestRegistration': return <Trophy className="w-5 h-5 text-primary-500" />;
       case 'announcement': return <Info className="w-5 h-5 text-blue-500" />;
       case 'welcome': return <Trophy className="w-5 h-5 text-amber-500" />;
-      default: return <Info className="w-5 h-5 text-slate-500 dark:text-slate-400" />;
+      default: return <Info className="w-5 h-5 text-slate-500" />;
     }
   };
 
@@ -353,28 +332,27 @@ const Layout: React.FC<LayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 font-sans transition-colors duration-200 dark:bg-slate-950">
-      <SkipToContent />
+    <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
       <MentorBlogPrompt
         isOpen={isMentorPromptOpen}
         onClose={() => setIsMentorPromptOpen(false)}
         onUpdate={handleMentorPromptUpdate}
       />
       {/* Sticky Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/80">
+      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative flex h-16 items-center gap-4 lg:gap-6">
-            {/* Logo */}
-            <NavLink to="/" aria-label="Blanc home" className="flex shrink-0 flex-row items-center">
+          <div className="relative flex h-16 items-center justify-center">
+            {/* Logo - Absolute left */}
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 flex flex-row items-center cursor-pointer" onClick={() => navigate('/')}>
               <img src="/logo.png" alt="Blanc Logo" className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover shrink-0" />
-              <div className="ml-2 md:ml-3 hidden flex-col sm:flex">
-                <span className="text-sm font-semibold leading-tight text-slate-800 dark:text-slate-100">Beyond Learning</span>
-                <span className="text-xs leading-tight text-slate-500 dark:text-slate-400">And New Challenges</span>
+              <div className="ml-2 md:ml-3 flex-col hidden sm:flex">
+                <span className="text-sm font-semibold text-slate-800 leading-tight">Beyond Learning</span>
+                <span className="text-xs text-slate-500 leading-tight">And New Challenges</span>
               </div>
-            </NavLink>
+            </div>
 
-            {/* Desktop Nav */}
-            <nav className="hidden md:flex min-w-max items-center gap-0 ml-auto" aria-label={t('layout.aria.mainMenu')}>
+            {/* Desktop Nav - True Center */}
+            <nav className="hidden md:flex items-center gap-1" aria-label={t('layout.aria.mainMenu')}>
               {leadingNavItems.map((item) => (
                 <NavLink
                   key={item.path}
@@ -404,17 +382,26 @@ const Layout: React.FC<LayoutProps> = ({
                     if (e.key === 'Escape') setIsLearningOpen(false);
                   }}
                   className={desktopNavDropdownButtonClass(isLearningActive, isLearningOpen)}
+                  aria-haspopup="menu"
+                  aria-expanded={isLearningOpen}
+                  aria-controls="learning-menu"
                 >
                   <span>{t('nav.learning')}</span>
                 </button>
 
                 {isLearningOpen && (
-                  <div className="absolute left-1/2 z-50 mt-3 w-52 -translate-x-1/2 rounded-xl border border-slate-100 bg-white p-1 shadow-xl animation-fade-in dark:border-slate-800 dark:bg-slate-900/95">
+                  <div
+                    id="learning-menu"
+                    role="menu"
+                    aria-label={t('nav.learning')}
+                    className="absolute left-1/2 -translate-x-1/2 mt-3 w-52 bg-white rounded-xl shadow-xl border border-slate-100 p-1 animation-fade-in z-50"
+                  >
                     {learningItems.map((item) => (
                       <NavLink
                         key={item.path}
                         to={item.path}
                         className={desktopDropdownLinkClass}
+                        role="menuitem"
                         onClick={() => setIsLearningOpen(false)}
                       >
                         {item.name}
@@ -442,17 +429,26 @@ const Layout: React.FC<LayoutProps> = ({
                     if (e.key === 'Escape') setIsCommunityOpen(false);
                   }}
                   className={desktopNavDropdownButtonClass(isCommunityActive, isCommunityOpen)}
+                  aria-haspopup="menu"
+                  aria-expanded={isCommunityOpen}
+                  aria-controls="community-menu"
                 >
                   <span>{t('nav.community')}</span>
                 </button>
 
                 {isCommunityOpen && (
-                  <div className="absolute left-1/2 z-50 mt-3 w-52 -translate-x-1/2 rounded-xl border border-slate-100 bg-white p-1 shadow-xl animation-fade-in dark:border-slate-800 dark:bg-slate-900/95">
+                  <div
+                    id="community-menu"
+                    role="menu"
+                    aria-label={t('nav.community')}
+                    className="absolute left-1/2 -translate-x-1/2 mt-3 w-52 bg-white rounded-xl shadow-xl border border-slate-100 p-1 animation-fade-in z-50"
+                  >
                     {communityItems.map((item) => (
                       <NavLink
                         key={item.path}
                         to={item.path}
                         className={desktopDropdownLinkClass}
+                        role="menuitem"
                         onClick={() => setIsCommunityOpen(false)}
                       >
                         {item.name}
@@ -474,43 +470,34 @@ const Layout: React.FC<LayoutProps> = ({
               ))}
             </nav>
 
-            {/* Auth/Profile Actions */}
-            <div className="hidden md:flex items-center space-x-2.5 lg:space-x-3">
-              <CommandPalette />
-              <ThemeToggle />
+            {/* Auth/Profile Actions - Absolute right */}
+            <div className="absolute right-0 hidden md:flex items-center space-x-4">
               {user ? (
                 <div className="flex items-center space-x-3">
+                  {/* Streak Indicator */}
                   <StreakBadge userId={user.id} />
 
+                  {/* Notification Bell with Dropdown */}
                   <div className="relative" ref={notifRef}>
                     <button
-                      type="button"
                       onClick={() => setIsNotifOpen(!isNotifOpen)}
-                      aria-label={notificationToggleLabel}
-                      aria-expanded={isNotifOpen}
-                      aria-controls="site-notifications-menu"
-                      className={`relative rounded-full p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 ${isNotifOpen
-                        ? 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100'
-                        : 'text-slate-500 dark:text-slate-400'}`}
+                      className={`relative p-2 transition-colors rounded-full hover:bg-slate-100 ${isNotifOpen ? 'bg-slate-100 text-slate-800' : 'text-slate-500'}`}
                     >
                       <Bell className="w-5 h-5" />
                       {unreadCount > 0 && (
-                        <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-red-500 ring-1 ring-white dark:border-slate-900 dark:ring-slate-900"></span>
+                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white ring-1 ring-white"></span>
                       )}
                     </button>
 
+                    {/* Notification Dropdown Panel */}
                     {isNotifOpen && (
-                      <div
-                        id="site-notifications-menu"
-                        className="absolute right-0 z-50 mt-3 w-80 origin-top-right overflow-hidden rounded-xl border border-slate-100 bg-white shadow-xl animation-fade-in md:w-96 dark:border-slate-800 dark:bg-slate-900/95"
-                      >
-                        <div className="flex items-center justify-between border-b border-slate-100 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/95">
-                          <h3 className="font-bold text-slate-900 dark:text-slate-100">{t('layout.notifications.title')}</h3>
+                      <div className="absolute right-0 mt-3 w-80 md:w-96 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden animation-fade-in z-50 origin-top-right">
+                        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-white">
+                          <h3 className="font-bold text-slate-900">{t('layout.notifications.title')}</h3>
                           {unreadCount > 0 && (
                             <button
-                              type="button"
                               onClick={markAllAsRead}
-                              className="flex items-center text-xs font-medium text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200"
+                              className="text-xs font-medium text-primary-600 hover:text-primary-700 flex items-center"
                             >
                               <Check className="w-3 h-3 mr-1" /> {t('layout.notifications.markAllRead')}
                             </button>
@@ -528,25 +515,25 @@ const Layout: React.FC<LayoutProps> = ({
                                 <div
                                   key={notif.id}
                                   onClick={() => handleNotificationClick(notif)}
-                                  className={`cursor-pointer border-b border-slate-50 px-4 py-3 transition-colors last:border-0 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/60 ${!notif.isRead ? 'bg-primary-50/30 dark:bg-primary-500/10' : ''}`}
+                                  className={`px-4 py-3 hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-50 last:border-0 ${!notif.isRead ? 'bg-primary-50/30' : ''}`}
                                 >
                                   <div className="flex gap-3">
-                                    <div className={`mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${!notif.isRead ? 'bg-white shadow-sm dark:bg-slate-900 dark:shadow-none' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                                    <div className={`mt-1 w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${!notif.isRead ? 'bg-white shadow-sm' : 'bg-slate-100'}`}>
                                       {getIconByType(notif.type)}
                                     </div>
                                     <div className="flex-1 space-y-1">
                                       <div className="flex justify-between items-start">
-                                        <p className={`text-sm ${!notif.isRead ? 'font-bold text-slate-900 dark:text-slate-100' : 'font-medium text-slate-700 dark:text-slate-300'}`}>
+                                        <p className={`text-sm ${!notif.isRead ? 'font-bold text-slate-900' : 'font-medium text-slate-700'}`}>
                                           {notif.title}
                                         </p>
                                         {!notif.isRead && (
                                           <span className="w-2 h-2 bg-primary-500 rounded-full mt-1.5"></span>
                                         )}
                                       </div>
-                                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                                      <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
                                         {notif.message}
                                       </p>
-                                      <p className="pt-1 text-[10px] font-medium text-slate-400 dark:text-slate-500">
+                                      <p className="text-[10px] text-slate-400 font-medium pt-1">
                                         {notif.time || formatTimeAgo(notif.createdAt)}
                                       </p>
                                     </div>
@@ -555,18 +542,17 @@ const Layout: React.FC<LayoutProps> = ({
                               ))}
                             </div>
                           ) : (
-                            <div className="p-8 text-center text-slate-500 dark:text-slate-400">
-                              <Bell className="w-8 h-8 mx-auto mb-3 text-slate-300 dark:text-slate-700" />
+                            <div className="p-8 text-center text-slate-500">
+                              <Bell className="w-8 h-8 mx-auto mb-3 text-slate-300" />
                               <p className="text-sm">{t('layout.notifications.empty')}</p>
                             </div>
                           )}
                         </div>
 
-                        <div className="border-t border-slate-100 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-900/80">
+                        <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
                           <button
-                            type="button"
                             onClick={handleViewAllNotifications}
-                            className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200"
+                            className="text-sm font-medium text-primary-600 hover:text-primary-700"
                           >
                             {t('common.viewAll')}
                           </button>
@@ -580,24 +566,25 @@ const Layout: React.FC<LayoutProps> = ({
                       <img
                         src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=6366f1&color=fff`}
                         alt="Avatar"
-                        className="w-8 h-8 rounded-full border border-slate-200 object-cover dark:border-slate-700"
+                        className="w-8 h-8 rounded-full border border-slate-200 object-cover"
                       />
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{user.name}</span>
-                      <ChevronDown className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                      <span className="text-sm font-medium text-slate-700">{user.name}</span>
+                      <ChevronDown className="w-4 h-4 text-slate-400" />
                     </button>
 
-                    <div className="absolute right-0 z-40 mt-2 invisible w-48 origin-top-right rounded-xl border border-slate-100 bg-white py-1 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100 dark:border-slate-800 dark:bg-slate-900">
-                      <div className="mb-1 border-b border-slate-100 px-4 py-3 dark:border-slate-800">
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{t('layout.userMenu.signedInAs')}</p>
-                        <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">{user.email}</p>
+                    {/* Dropdown */}
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-1 border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right z-40">
+                      <div className="px-4 py-3 border-b border-slate-100 mb-1">
+                        <p className="text-xs text-slate-500">{t('layout.userMenu.signedInAs')}</p>
+                        <p className="text-sm font-bold text-slate-900 truncate">{user.email}</p>
                       </div>
-                      <NavLink to="/profile" className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70">
-                        <UserIcon className="w-4 h-4 mr-2 text-slate-400 dark:text-slate-500" /> {t('layout.userMenu.profile')}
+                      <NavLink to="/profile" className="flex px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 items-center">
+                        <UserIcon className="w-4 h-4 mr-2 text-slate-400" /> {t('layout.userMenu.profile')}
                       </NavLink>
-                      <NavLink to="/my-team-posts" className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70">
-                        <FileText className="w-4 h-4 mr-2 text-slate-400 dark:text-slate-500" /> {t('layout.userMenu.myPosts')}
+                      <NavLink to="/my-team-posts" className="flex px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 items-center">
+                        <FileText className="w-4 h-4 mr-2 text-slate-400" /> {t('layout.userMenu.myPosts')}
                       </NavLink>
-                      <button onClick={onLogout} className="flex w-full items-center px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10">
+                      <button onClick={onLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center">
                         <LogOut className="w-4 h-4 mr-2" /> {t('layout.userMenu.logout')}
                       </button>
                     </div>
@@ -627,15 +614,10 @@ const Layout: React.FC<LayoutProps> = ({
             </div>
 
             {/* Mobile menu button */}
-            <div className="absolute right-0 top-1/2 flex -translate-y-1/2 items-center gap-1 md:hidden">
-              <CommandPalette />
+            <div className="md:hidden absolute right-0 top-1/2 -translate-y-1/2 flex items-center">
               <button
-                type="button"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                aria-label={mobileMenuLabel}
-                aria-expanded={isMenuOpen}
-                aria-controls="mobile-site-menu"
-                className="p-2 text-slate-500 hover:text-slate-700 focus:outline-none dark:text-slate-400 dark:hover:text-slate-200"
+                className="text-slate-500 hover:text-slate-700 focus:outline-none p-2"
               >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -645,8 +627,8 @@ const Layout: React.FC<LayoutProps> = ({
 
         {/* Mobile Nav */}
         {isMenuOpen && (
-          <div id="mobile-site-menu" className="md:hidden border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-            <div className="space-y-1 px-2 pt-2 pb-3 sm:px-3">
+          <div className="md:hidden bg-white border-b border-slate-200">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {leadingNavItems.map((item) => (
                 <NavLink
                   key={item.path}
@@ -670,12 +652,14 @@ const Layout: React.FC<LayoutProps> = ({
                     })
                   }
                   className={mobileNavDropdownButtonClass(isLearningActive, isLearningMobileOpen)}
+                  aria-expanded={isLearningMobileOpen}
+                  aria-controls="learning-menu-mobile"
                 >
                   <span>{t('nav.learning')}</span>
                 </button>
 
                 {isLearningMobileOpen && (
-                  <div className="mt-1 ml-4 space-y-1 border-l border-slate-100 pl-4 dark:border-slate-800">
+                  <div id="learning-menu-mobile" className="mt-1 space-y-1 pl-4 border-l border-slate-100 ml-4">
                     {learningItems.map((item) => (
                       <NavLink
                         key={item.path}
@@ -704,12 +688,14 @@ const Layout: React.FC<LayoutProps> = ({
                     })
                   }
                   className={mobileNavDropdownButtonClass(isCommunityActive, isCommunityMobileOpen)}
+                  aria-expanded={isCommunityMobileOpen}
+                  aria-controls="community-menu-mobile"
                 >
                   <span>{t('nav.community')}</span>
                 </button>
 
                 {isCommunityMobileOpen && (
-                  <div className="mt-1 ml-4 space-y-1 border-l border-slate-100 pl-4 dark:border-slate-800">
+                  <div id="community-menu-mobile" className="mt-1 space-y-1 pl-4 border-l border-slate-100 ml-4">
                     {communityItems.map((item) => (
                       <NavLink
                         key={item.path}
@@ -740,34 +726,35 @@ const Layout: React.FC<LayoutProps> = ({
               ))}
               {user ? (
                 <>
-                  <div className="my-2 border-t border-slate-100 pt-2 dark:border-slate-800">
-                    <div className="flex items-center justify-between px-3 py-2">
+                  <div className="border-t border-slate-100 my-2 pt-2">
+                    {/* Mobile Streak Display */}
+                    <div className="px-3 py-2 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <img src="/streak/flame-tight.gif" className="streak-motion w-5 h-5 object-contain mix-blend-screen" alt="" aria-hidden="true" />
                         <img src="/streak/flame-tight.png" className="streak-reduce-motion w-5 h-5 object-contain mix-blend-screen" alt="" aria-hidden="true" />
-                        <span className="font-medium text-slate-700 dark:text-slate-300">{t('profile.overview.streakLabel')}</span>
+                        <span className="font-medium text-slate-700">{t('profile.overview.streakLabel')}</span>
                       </div>
                       <StreakBadge userId={user.id} />
                     </div>
                   </div>
-                  <div className="my-2 border-t border-slate-100 pt-2 dark:border-slate-800">
-                    <div className="flex items-center justify-between px-3 py-2 text-slate-600 dark:text-slate-300">
+                  <div className="border-t border-slate-100 my-2 pt-2">
+                    <div className="px-3 py-2 flex items-center justify-between text-slate-600">
                       <span className="font-medium">{t('layout.notifications.title')}</span>
-                      {unreadCount > 0 && <span className="rounded-full bg-red-500 px-2 py-0.5 text-xs text-white">{t('layout.notifications.newCount', { count: unreadCount })}</span>}
+                      {unreadCount > 0 && <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{t('layout.notifications.newCount', { count: unreadCount })}</span>}
                     </div>
                   </div>
-                  <NavLink to="/profile" className="block rounded-md px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70">
+                  <NavLink to="/profile" className="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">
                     {t('layout.userMenu.myProfile')}
                   </NavLink>
-                  <NavLink to="/my-team-posts" className="block rounded-md px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70">
+                  <NavLink to="/my-team-posts" className="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50">
                     {t('layout.userMenu.myPosts')}
                   </NavLink>
-                  <button onClick={() => { onLogout(); setIsMenuOpen(false); }} className="block w-full rounded-md px-3 py-2 text-left text-base font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10">
+                  <button onClick={() => { onLogout(); setIsMenuOpen(false); }} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50">
                     {t('layout.userMenu.logout')}
                   </button>
                 </>
               ) : authStatus === 'sync_error' ? (
-                <div className="px-3 pt-4">
+                <div className="pt-4 px-3">
                   <AuthSyncNotice
                     status="error"
                     syncError={authSyncError}
@@ -782,11 +769,11 @@ const Layout: React.FC<LayoutProps> = ({
                   />
                 </div>
               ) : authStatus === 'syncing' ? (
-                <div className="px-3 pt-4">
+                <div className="pt-4 px-3">
                   <AuthSyncNotice status="syncing" />
                 </div>
               ) : (
-                <div className="flex flex-col space-y-2 px-3 pt-4">
+                <div className="pt-4 flex flex-col space-y-2 px-3">
                   <NavLink to="/login" onClick={() => setIsMenuOpen(false)}>
                     <Button variant="secondary" className="w-full justify-center">{t('layout.buttons.login')}</Button>
                   </NavLink>
@@ -801,7 +788,7 @@ const Layout: React.FC<LayoutProps> = ({
       </header>
 
       {authStatus === 'sync_error' && !user && (
-        <div className="border-b border-amber-100 bg-white/95 backdrop-blur-md dark:border-amber-900/60 dark:bg-slate-900/95">
+        <div className="border-b border-amber-100 bg-white/95 backdrop-blur-md">
           <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
             <AuthSyncNotice
               status="error"
@@ -815,36 +802,30 @@ const Layout: React.FC<LayoutProps> = ({
       )}
 
       {/* Main Content */}
-      <Breadcrumbs />
-      <main id="main-content" role="main" tabIndex={-1} className="grow scroll-mt-20 focus:outline-none">
-        <AnimatePresence mode="wait">
-          <PageTransition key={location.pathname}>
-            <Outlet />
-          </PageTransition>
-        </AnimatePresence>
+      <main className="grow">
+        <Outlet />
       </main>
 
       {/* Footer - Hidden on reports page for full-screen editor */}
       {!hideFooter && (
-        <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-12">
+        <footer className="bg-white border-t border-slate-200 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
               <div className="col-span-1 lg:col-span-3">
-                <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 h-full flex flex-col shadow-lg shadow-slate-200/60 dark:border-slate-800 dark:bg-slate-950/95 dark:shadow-[0_24px_64px_rgba(0,0,0,0.35)]">
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-sky-50 opacity-80 dark:hidden" aria-hidden="true"></div>
-                  <div className="absolute inset-0 hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/40 opacity-100 dark:block" aria-hidden="true"></div>
+                <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-lg shadow-slate-200/60 p-6 h-full flex flex-col">
+                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-sky-50 opacity-80" aria-hidden="true"></div>
                   <div className="relative">
                     <div className="flex items-center mb-4">
                       <img src="/logo.png" alt="Blanc Logo" className="h-10 w-10 rounded-full object-cover mr-3 shadow-sm" />
                       <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 leading-tight">Beyond Learning</span>
-                        <span className="text-xs text-slate-500 dark:text-slate-400 leading-tight">And New Challenges</span>
+                        <span className="text-sm font-semibold text-slate-800 leading-tight">Beyond Learning</span>
+                        <span className="text-xs text-slate-500 leading-tight">And New Challenges</span>
                       </div>
                     </div>
-                    <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-4">
+                    <p className="text-slate-600 text-sm leading-relaxed mb-4">
                       {t('layout.footer.description')}
                     </p>
-                    <div className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                    <div className="space-y-2 text-sm text-slate-600">
                       <div className="flex items-start gap-2">
                         <ShieldCheck className="w-4 h-4 text-indigo-500 mt-0.5" />
                         <span>{t('layout.footer.feature.security')}</span>
@@ -859,31 +840,30 @@ const Layout: React.FC<LayoutProps> = ({
                       </div>
                     </div>
                     <div className="mt-5 flex flex-wrap gap-2">
-                      <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-semibold dark:bg-indigo-500/15 dark:text-indigo-200">Blanc Community</span>
-                      <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-semibold dark:bg-emerald-500/15 dark:text-emerald-200">{t('layout.footer.tag.learningAndContests')}</span>
+                      <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-semibold">Blanc Community</span>
+                      <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-semibold">{t('layout.footer.tag.learningAndContests')}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="col-span-1 lg:col-span-3">
-                <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 h-full flex flex-col shadow-md shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-950/95 dark:shadow-[0_24px_64px_rgba(0,0,0,0.35)]">
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-indigo-50 opacity-60 dark:hidden" aria-hidden="true"></div>
-                  <div className="absolute inset-0 hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/35 opacity-100 dark:block" aria-hidden="true"></div>
+                <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-md shadow-slate-200/40 p-6 h-full flex flex-col">
+                  <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-indigo-50 opacity-60" aria-hidden="true"></div>
                   <div className="relative flex flex-col gap-4 h-full">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider mb-1">{t('layout.footer.supportTitle')}</h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{t('layout.footer.supportDescription')}</p>
+                        <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-1">{t('layout.footer.supportTitle')}</h3>
+                        <p className="text-xs text-slate-500">{t('layout.footer.supportDescription')}</p>
                       </div>
-                      <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-semibold dark:bg-indigo-500/15 dark:text-indigo-200">Online</span>
+                      <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-semibold">Online</span>
                     </div>
                     <ul className="space-y-3">
-                      <li><NavLink to="/terms" className="text-slate-500 dark:text-slate-400 hover:text-primary-600 text-sm">{t('layout.footer.terms')}</NavLink></li>
-                      <li><NavLink to="/privacy" className="text-slate-500 dark:text-slate-400 hover:text-primary-600 text-sm">{t('layout.footer.privacy')}</NavLink></li>
-                      <li><a href="mailto:clbflife2025thptfptcantho@gmail.com?subject=Li%C3%AAn%20h%E1%BB%87%20t%E1%BB%AB%20Blanc&body=Xin%20ch%C3%A0o%2C%0A%0AT%C3%B4i%20mu%E1%BB%91n%20li%C3%AAn%20h%E1%BB%87%20v%E1%BB%81..." className="text-slate-500 dark:text-slate-400 hover:text-primary-600 text-sm">{t('layout.footer.contact')}</a></li>
+                      <li><NavLink to="/terms" className="text-slate-500 hover:text-primary-600 text-sm">{t('layout.footer.terms')}</NavLink></li>
+                      <li><NavLink to="/privacy" className="text-slate-500 hover:text-primary-600 text-sm">{t('layout.footer.privacy')}</NavLink></li>
+                      <li><a href="mailto:clbflife2025thptfptcantho@gmail.com?subject=Li%C3%AAn%20h%E1%BB%87%20t%E1%BB%AB%20Blanc&body=Xin%20ch%C3%A0o%2C%0A%0AT%C3%B4i%20mu%E1%BB%91n%20li%C3%AAn%20h%E1%BB%87%20v%E1%BB%81..." className="text-slate-500 hover:text-primary-600 text-sm">{t('layout.footer.contact')}</a></li>
                     </ul>
-                    <div className="mt-auto inline-flex items-center gap-2 px-3 py-2 rounded-full bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 text-xs font-medium">
+                    <div className="mt-auto inline-flex items-center gap-2 px-3 py-2 rounded-full bg-slate-50 text-slate-600 text-xs font-medium">
                       <Sparkles className="w-4 h-4 text-indigo-500" /> {t('layout.footer.supportBadge')}
                     </div>
                   </div>
@@ -891,29 +871,28 @@ const Layout: React.FC<LayoutProps> = ({
               </div>
 
               <div className="lg:col-span-6">
-                <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl shadow-slate-200/50 dark:border-slate-800 dark:bg-slate-950/95 dark:shadow-[0_24px_64px_rgba(0,0,0,0.4)]">
-                  <div className="absolute inset-0 bg-gradient-to-r from-sky-50 via-white to-indigo-50 opacity-80 dark:hidden" aria-hidden="true"></div>
-                  <div className="absolute inset-0 hidden bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950/40 opacity-100 dark:block" aria-hidden="true"></div>
+                <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl shadow-slate-200/50">
+                  <div className="absolute inset-0 bg-gradient-to-r from-sky-50 via-white to-indigo-50 opacity-80" aria-hidden="true"></div>
                   <div className="relative px-6 py-8 md:px-10 md:py-10">
                     <div className="text-center">
-                      <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider mb-2">{t('layout.footer.contactTitle')}</h3>
-                      <p className="text-slate-500 dark:text-slate-400 text-sm">{t('layout.footer.contactDescription')}</p>
+                      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-2">{t('layout.footer.contactTitle')}</h3>
+                      <p className="text-slate-500 text-sm">{t('layout.footer.contactDescription')}</p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8 mt-8">
-                      <div className="rounded-xl border border-white/80 bg-white backdrop-blur-sm p-6 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/80">
+                      <div className="rounded-xl border border-white/80 bg-white/70 backdrop-blur-sm p-6 shadow-sm">
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-200">
                             <Mail className="w-5 h-5" />
                           </div>
                           <div>
                             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-indigo-600">{t('layout.footer.inbox')}</p>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">CLB Blanc</p>
+                            <p className="text-sm text-slate-500">CLB Blanc</p>
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <p className="text-slate-700 dark:text-slate-300 text-sm font-medium break-words">clbflife2025thptfptcantho@gmail.com</p>
-                          <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+                          <p className="text-slate-700 text-sm font-medium break-words">clbflife2025thptfptcantho@gmail.com</p>
+                          <div className="flex items-center gap-2 text-slate-500 text-sm">
                             <Phone className="w-4 h-4 text-indigo-500" />
                             <span>+84 916 007 090</span>
                           </div>
@@ -935,7 +914,7 @@ const Layout: React.FC<LayoutProps> = ({
                             href="https://www.tiktok.com/@blancfpt"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-sm"
+                            className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-200 transition-colors shadow-sm"
                             title="TikTok"
                           >
                             <span className="sr-only">TikTok</span>
@@ -946,19 +925,19 @@ const Layout: React.FC<LayoutProps> = ({
                         </div>
                       </div>
 
-                      <div className="rounded-xl border border-white/80 bg-white backdrop-blur-sm p-6 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/80">
+                      <div className="rounded-xl border border-white/80 bg-white/70 backdrop-blur-sm p-6 shadow-sm">
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 rounded-full bg-sky-500 text-white flex items-center justify-center shadow-md shadow-sky-200">
                             <Mail className="w-5 h-5" />
                           </div>
                           <div>
                             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-600">{t('layout.footer.inbox')}</p>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">Trần Hữu Hải Đăng</p>
+                            <p className="text-sm text-slate-500">Trần Hữu Hải Đăng</p>
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <p className="text-slate-700 dark:text-slate-300 text-sm font-medium break-words">dangthhfct31147@gmail.com</p>
-                          <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+                          <p className="text-slate-700 text-sm font-medium break-words">dangthhfct31147@gmail.com</p>
+                          <div className="flex items-center gap-2 text-slate-500 text-sm">
                             <Phone className="w-4 h-4 text-sky-500" />
                             <span>+84 339 122 620</span>
                           </div>
@@ -980,7 +959,7 @@ const Layout: React.FC<LayoutProps> = ({
                             href="https://www.tiktok.com/@mrhomeless_12"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-sm"
+                            className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-200 transition-colors shadow-sm"
                             title="TikTok"
                           >
                             <span className="sr-only">TikTok</span>
@@ -995,8 +974,8 @@ const Layout: React.FC<LayoutProps> = ({
                 </div>
               </div>
             </div>
-            <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-center items-center">
-              <span className="text-slate-400 dark:text-slate-300 text-sm">Made with ❤️ for Education</span>
+            <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-center items-center">
+              <span className="text-slate-400 text-sm">Made with ❤️ for Education</span>
             </div>
           </div>
         </footer>

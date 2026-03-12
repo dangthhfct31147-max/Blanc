@@ -21,10 +21,10 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = "inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap";
 
   const variants = {
-    primary: "bg-primary-600 dark:bg-primary-500 text-white hover:bg-primary-700 dark:hover:bg-primary-600 focus:ring-primary-500 shadow-sm dark:shadow-[0_0_15px_rgba(99,102,241,0.4)] transition-all",
-    secondary: "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 focus:ring-slate-200 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-slate-600 dark:shadow-none hover:shadow-md transition-all",
-    ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100 transition-colors",
-    danger: "bg-red-600 dark:bg-red-500 text-white hover:bg-red-700 dark:hover:bg-red-600 focus:ring-red-500 shadow-sm dark:shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all",
+    primary: "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-sm",
+    secondary: "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 focus:ring-slate-200 shadow-sm",
+    ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+    danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
   };
 
   const sizes = {
@@ -45,7 +45,7 @@ export const Button: React.FC<ButtonProps> = ({
 
 // Card
 export const Card: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, children, ...props }) => (
-  <div className={cn("bg-white dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-shadow duration-300 overflow-hidden glass-card", className)} {...props}>
+  <div className={cn("bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden", className)} {...props}>
     {children}
   </div>
 );
@@ -73,10 +73,10 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const Input: React.FC<InputProps> = ({ label, error, className, ...props }) => (
   <div className="w-full">
-    {label && <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>}
+    {label && <label className="block text-sm font-medium text-slate-700 mb-1.5">{label}</label>}
     <input
       className={cn(
-        "flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 transition-all dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500",
+        "flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 transition-all",
         error && "border-red-500 focus:ring-red-500",
         className
       )}
@@ -157,43 +157,43 @@ export const Dropdown: React.FC<DropdownProps> = ({
   }, []);
 
   return (
-      <div className={cn("w-full", className)}>
-        {label && <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>}
-        <div ref={dropdownRef} className="relative">
-          <button
-            type="button"
-            onClick={() => !disabled && setIsOpen(!isOpen)}
-            disabled={disabled}
-            className={cn(
-              "flex w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm transition-all outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100",
-              "hover:bg-white hover:border-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800",
-              "focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:bg-slate-800",
-              isOpen && "bg-white ring-2 ring-primary-500 border-primary-500 dark:bg-slate-800",
-              disabled && "opacity-50 cursor-not-allowed",
-              error && "border-red-500 focus:ring-red-500",
-              !disabled && "cursor-pointer"
-            )}
-          >
-            <span className={cn(
-              "truncate",
-              selectedOption ? "text-slate-900 dark:text-slate-100" : "text-slate-400 dark:text-slate-500"
-            )}>
-              {selectedOption ? selectedOption.label : placeholder}
-            </span>
-            <ChevronDown className={cn(
-              "w-4 h-4 shrink-0 text-slate-400 transition-transform dark:text-slate-500",
-              isOpen && "rotate-180"
-            )} />
-          </button>
+    <div className={cn("w-full", className)}>
+      {label && <label className="block text-sm font-medium text-slate-700 mb-2">{label}</label>}
+      <div ref={dropdownRef} className="relative">
+        <button
+          type="button"
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          disabled={disabled}
+          className={cn(
+            "w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-left transition-all outline-none flex items-center justify-between gap-2",
+            "hover:bg-white hover:border-slate-300",
+            "focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500",
+            isOpen && "bg-white ring-2 ring-primary-500 border-primary-500",
+            disabled && "opacity-50 cursor-not-allowed",
+            error && "border-red-500 focus:ring-red-500",
+            !disabled && "cursor-pointer"
+          )}
+        >
+          <span className={cn(
+            "truncate",
+            selectedOption ? "text-slate-900" : "text-slate-400"
+          )}>
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
+          <ChevronDown className={cn(
+            "w-4 h-4 text-slate-400 transition-transform shrink-0",
+            isOpen && "rotate-180"
+          )} />
+        </button>
 
-          {isOpen && !disabled && (
-            <div className="absolute top-full left-0 right-0 z-50 mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700 dark:bg-slate-900">
-              {headerText && (
-                <div className="border-b border-slate-100 p-2 dark:border-slate-800">
-                  <p className="px-2 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{headerText}</p>
-                </div>
-              )}
-              <div className="max-h-70 overflow-y-auto p-2">
+        {isOpen && !disabled && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-slate-200 shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+            {headerText && (
+              <div className="p-2 border-b border-slate-100">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-2">{headerText}</p>
+              </div>
+            )}
+            <div className="max-h-[280px] overflow-y-auto p-2">
               {options.map(option => {
                 const isSelected = value === option.value;
                 return (
@@ -204,13 +204,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
                       onChange(option.value);
                       setIsOpen(false);
                     }}
-                      className={cn(
-                        "w-full px-3 py-2.5 rounded-lg text-sm text-left transition-all flex items-center justify-between group",
-                        isSelected
-                          ? "bg-primary-50 text-primary-700 font-medium dark:bg-primary-500/10 dark:text-primary-200"
-                          : "text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70"
-                      )}
-                    >
+                    className={cn(
+                      "w-full px-3 py-2.5 rounded-lg text-sm text-left transition-all flex items-center justify-between group",
+                      isSelected
+                        ? "bg-primary-50 text-primary-700 font-medium"
+                        : "text-slate-600 hover:bg-slate-50"
+                    )}
+                  >
                     <div className="flex items-center gap-2">
                       {option.color && (
                         <span className={cn("w-2 h-2 rounded-full", option.color)} />
@@ -218,10 +218,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
                       {option.icon}
                       <span>{option.label}</span>
                     </div>
-                      {isSelected && <Check className="w-4 h-4 text-primary-600 dark:text-primary-200" />}
-                    </button>
-                  );
-                })}
+                    {isSelected && <Check className="w-4 h-4 text-primary-600" />}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -241,18 +241,18 @@ export const Tabs: React.FC<{ tabs: TabItem[]; activeTab: string; onChange: (tab
         const value = typeof tab === 'string' ? tab : tab.value;
         const label = typeof tab === 'string' ? tab : tab.label;
         return (
-          <button
-            key={value}
-            onClick={() => onChange(value)}
-            className={cn(
-              "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors",
-              activeTab === value
-                ? "border-primary-600 text-primary-600"
-                : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700"
-            )}
-          >
-            {label}
-          </button>
+        <button
+          key={value}
+          onClick={() => onChange(value)}
+          className={cn(
+            "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors",
+            activeTab === value
+              ? "border-primary-600 text-primary-600"
+              : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700"
+          )}
+        >
+          {label}
+        </button>
         );
       })}
     </nav>
@@ -300,94 +300,19 @@ export const Avatar: React.FC<AvatarProps> = ({ src, name = 'User', size = 'md',
 };
 
 // Empty State
-export type EmptyStateVariant = 'default' | 'search' | 'error' | 'no-data' | 'no-access';
-
 interface EmptyStateProps {
   icon?: React.ReactNode;
   title: string;
   description?: string;
   action?: React.ReactNode;
-  variant?: EmptyStateVariant;
-  compact?: boolean;
 }
 
-const VARIANT_ILLUSTRATION: Record<EmptyStateVariant, React.ReactNode> = {
-  default: (
-    <svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <rect x="20" y="20" width="80" height="60" rx="8" className="fill-slate-100 dark:fill-slate-800" />
-      <rect x="30" y="34" width="40" height="4" rx="2" className="fill-slate-200 dark:fill-slate-700" />
-      <rect x="30" y="44" width="60" height="4" rx="2" className="fill-slate-200 dark:fill-slate-700" />
-      <rect x="30" y="54" width="28" height="4" rx="2" className="fill-slate-200 dark:fill-slate-700" />
-      <circle cx="85" cy="70" r="18" className="fill-indigo-100 dark:fill-indigo-900/30" />
-      <path d="M79 70l4 4 8-8" className="stroke-indigo-400" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-    </svg>
-  ),
-  search: (
-    <svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <circle cx="55" cy="45" r="24" className="stroke-slate-200 dark:stroke-slate-700" strokeWidth="3" fill="none" />
-      <line x1="72" y1="62" x2="90" y2="80" className="stroke-slate-300 dark:stroke-slate-600" strokeWidth="3" strokeLinecap="round" />
-      <circle cx="55" cy="45" r="10" className="fill-indigo-50 dark:fill-indigo-900/20" />
-      <text x="51" y="49" className="fill-indigo-400" fontSize="14" fontWeight="bold">?</text>
-    </svg>
-  ),
-  error: (
-    <svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <circle cx="60" cy="50" r="30" className="fill-red-50 dark:fill-red-900/20" />
-      <circle cx="60" cy="50" r="22" className="stroke-red-200 dark:stroke-red-800" strokeWidth="2" fill="none" />
-      <path d="M52 42l16 16M68 42L52 58" className="stroke-red-400" strokeWidth="2.5" strokeLinecap="round" />
-    </svg>
-  ),
-  'no-data': (
-    <svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <rect x="15" y="25" width="90" height="55" rx="6" className="fill-slate-50 dark:fill-slate-800 stroke-slate-200 dark:stroke-slate-700" strokeWidth="1.5" />
-      <rect x="25" y="38" width="30" height="3" rx="1.5" className="fill-slate-200 dark:fill-slate-700" />
-      <rect x="25" y="48" width="70" height="3" rx="1.5" className="fill-slate-100 dark:fill-slate-800" />
-      <rect x="25" y="58" width="50" height="3" rx="1.5" className="fill-slate-100 dark:fill-slate-800" />
-      <circle cx="95" cy="30" r="15" className="fill-amber-50 dark:fill-amber-900/20" />
-      <text x="90" y="36" className="fill-amber-400" fontSize="18" fontWeight="bold">!</text>
-    </svg>
-  ),
-  'no-access': (
-    <svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <rect x="35" y="35" width="50" height="40" rx="4" className="fill-slate-100 dark:fill-slate-800 stroke-slate-200 dark:stroke-slate-700" strokeWidth="1.5" />
-      <rect x="50" y="20" width="20" height="25" rx="10" className="stroke-slate-300 dark:stroke-slate-600" strokeWidth="2.5" fill="none" />
-      <circle cx="60" cy="52" r="5" className="fill-slate-300 dark:fill-slate-600" />
-      <rect x="58" y="55" width="4" height="8" rx="2" className="fill-slate-300 dark:fill-slate-600" />
-    </svg>
-  ),
-};
-
-export const EmptyState: React.FC<EmptyStateProps> = ({
-  icon,
-  title,
-  description,
-  action,
-  variant = 'default',
-  compact = false,
-}) => (
-  <div className={cn('flex flex-col items-center justify-center text-center', compact ? 'py-8' : 'py-16 px-6')}>
-    {/* Illustration */}
-    <div className="mb-6 opacity-80">
-      {icon || VARIANT_ILLUSTRATION[variant]}
-    </div>
-
-    <h3 className={cn(
-      'font-semibold text-slate-900 dark:text-slate-100 mb-2',
-      compact ? 'text-base' : 'text-lg',
-    )}>
-      {title}
-    </h3>
-
-    {description && (
-      <p className={cn(
-        'max-w-md text-slate-500 dark:text-slate-400',
-        compact ? 'text-sm mb-4' : 'text-sm mb-6',
-      )}>
-        {description}
-      </p>
-    )}
-
-    {action && <div>{action}</div>}
+export const EmptyState: React.FC<EmptyStateProps> = ({ icon, title, description, action }) => (
+  <div className="text-center py-12">
+    {icon && <div className="mx-auto mb-4 text-slate-300">{icon}</div>}
+    <h3 className="text-lg font-medium text-slate-900 mb-2">{title}</h3>
+    {description && <p className="text-slate-500 mb-4">{description}</p>}
+    {action}
   </div>
 );
 
@@ -514,9 +439,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ id, type, message, duration = 400
       <span className={iconStyles[type]}>{icons[type]}</span>
       <p className="text-sm font-medium flex-1">{message}</p>
       <button
-        type="button"
         onClick={() => onClose(id)}
-        aria-label="Dismiss notification"
         className="text-current opacity-50 hover:opacity-100 transition-opacity"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -571,11 +494,15 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 interface SkeletonProps {
   className?: string;
   variant?: 'text' | 'circular' | 'rectangular';
+  width?: string | number;
+  height?: string | number;
 }
 
 export const Skeleton: React.FC<SkeletonProps> = ({
   className,
-  variant = 'text'
+  variant = 'text',
+  width,
+  height
 }) => {
   const baseStyles = 'animate-pulse bg-slate-200';
 
@@ -588,6 +515,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   return (
     <div
       className={cn(baseStyles, variants[variant], className)}
+      style={{ width, height }}
     />
   );
 };
@@ -598,17 +526,17 @@ export const ReportCardSkeleton: React.FC = () => (
     <td className="px-6 py-4">
       <div className="flex items-center gap-3">
         <Skeleton variant="rectangular" className="w-8 h-8" />
-        <Skeleton className="w-50" />
+        <Skeleton width={200} />
       </div>
     </td>
     <td className="px-6 py-4 hidden md:table-cell">
-      <Skeleton className="w-30" />
+      <Skeleton width={120} />
     </td>
     <td className="px-6 py-4">
-      <Skeleton className="h-6 w-20 rounded-full" />
+      <Skeleton width={80} className="rounded-full h-6" />
     </td>
     <td className="px-6 py-4 hidden sm:table-cell">
-      <Skeleton className="w-25" />
+      <Skeleton width={100} />
     </td>
     <td className="px-6 py-4 text-right">
       <Skeleton variant="circular" className="w-8 h-8 ml-auto" />

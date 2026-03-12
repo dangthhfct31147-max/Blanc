@@ -1,195 +1,83 @@
-import React, { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import React, { ReactNode, useState, useEffect, useCallback } from 'react';
+import { NavLink } from 'react-router-dom';
 import {
-  Bell,
-  BookOpen,
-  ExternalLink,
-  FileText,
-  FolderKanban,
   LayoutDashboard,
+  Users,
+  Trophy,
+  BookOpen,
+  Settings,
   LogOut,
   Menu,
+  Bell,
+  Search,
+  FileText,
+  Briefcase,
+  Check,
+  Info,
+  AlertTriangle,
+  XCircle,
+  Clock,
+  ShieldAlert,
   MessageSquare,
   Newspaper,
+  Trash2,
   RefreshCw,
-  Settings,
-  ShieldAlert,
-  Sparkles,
-  Trophy,
-  Users,
-  Briefcase,
-  X,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getAvatarUrl, avatarPresets } from '../utils/avatar';
-import {
-  notificationService,
-  type AdminNotification,
-  formatRelativeTime,
-} from '../services/notificationService';
+import { notificationService, AdminNotification, formatRelativeTime } from '../services/notificationService';
 import { ConfirmActionModal } from './ui/UserModals';
 
 interface LayoutProps {
   children: ReactNode;
 }
 
-interface NavItem {
-  to: string;
-  label: string;
-  icon: React.ElementType;
-}
-
-const MAIN_NAV: NavItem[] = [
-  { to: '/', label: 'Overview', icon: LayoutDashboard },
-  { to: '/reports', label: 'Reports', icon: FileText },
-  { to: '/users', label: 'Users', icon: Users },
-  { to: '/contests', label: 'Contests', icon: Trophy },
-  { to: '/courses', label: 'Documents', icon: FolderKanban },
-  { to: '/community', label: 'Community', icon: MessageSquare },
-  { to: '/recruitments', label: 'Recruitments', icon: Briefcase },
-  { to: '/news', label: 'News', icon: Newspaper },
-  { to: '/mentors', label: 'Mentors', icon: Users },
-  { to: '/mentor-blogs', label: 'Mentor Blogs', icon: BookOpen },
-];
-
-const SYSTEM_NAV: NavItem[] = [
-  { to: '/security', label: 'Security', icon: ShieldAlert },
-  { to: '/audit', label: 'Audit Log', icon: FileText },
-  { to: '/settings', label: 'Settings', icon: Settings },
-];
-
-const MENTOR_NAV: NavItem[] = [{ to: '/reports', label: 'Reports', icon: FileText }];
-
-const PAGE_COPY: Record<string, { title: string; description: string }> = {
-  '/': {
-    title: 'Operations overview',
-    description: 'Monitor the platform, triage urgent activity, and jump into the highest-priority workflows.',
-  },
-  '/reports': {
-    title: 'Review reports',
-    description: 'Process submissions, review mentor feedback, and keep the quality loop moving.',
-  },
-  '/users': {
-    title: 'User operations',
-    description: 'Manage people, roles, balances, and account states from one control surface.',
-  },
-  '/contests': {
-    title: 'Contest operations',
-    description: 'Keep contest listings, schedules, prizes, and registration quality aligned with the public site.',
-  },
-  '/courses': {
-    title: 'Learning library',
-    description: 'Curate courses and documents with a structure that mirrors the learner-facing experience.',
-  },
-  '/community': {
-    title: 'Community activity',
-    description: 'Moderate collaboration posts and keep community momentum healthy.',
-  },
-  '/recruitments': {
-    title: 'Recruitment board',
-    description: 'Publish and maintain trusted opportunities without breaking content quality.',
-  },
-  '/news': {
-    title: 'Newsroom',
-    description: 'Ship announcements and updates in the same polished voice as the public platform.',
-  },
-  '/mentors': {
-    title: 'Mentor directory',
-    description: 'Review mentor visibility, bios, and discovery quality across the platform.',
-  },
-  '/mentor-blogs': {
-    title: 'Mentor stories',
-    description: 'Maintain mentor content and keep editorial presentation consistent.',
-  },
-  '/security': {
-    title: 'Security operations',
-    description: 'Inspect threats, rate limits, and lockouts without leaving the admin workspace.',
-  },
-  '/audit': {
-    title: 'Audit trail',
-    description: 'Track sensitive actions and system changes with a clearer operational timeline.',
-  },
-  '/settings': {
-    title: 'Platform settings',
-    description: 'Tune platform-wide behaviors, notifications, and admin-facing configuration safely.',
-  },
-};
-
-const SidebarLink = ({
-  item,
-  onNavigate,
-}: {
-  item: NavItem;
-  onNavigate?: () => void;
-}) => {
-  const Icon = item.icon;
-
-  return (
-    <NavLink
-      to={item.to}
-      onClick={onNavigate}
-      end={item.to === '/'}
-      className={({ isActive }) =>
-        [
-          'group flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold transition-all duration-200',
-          isActive
-            ? 'bg-[linear-gradient(135deg,rgba(13,148,136,0.12),rgba(14,165,233,0.12))] text-slate-950 shadow-[0_16px_35px_-28px_rgba(15,23,42,0.3)] ring-1 ring-white/70'
-            : 'text-slate-600 hover:bg-white/70 hover:text-slate-950',
-        ].join(' ')
-      }
-    >
-      <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/80 text-slate-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] transition-colors group-hover:text-teal-700">
-        <Icon size={18} />
-      </span>
-      <span>{item.label}</span>
-    </NavLink>
-  );
-};
+const SidebarItem = ({ to, icon: Icon, label, onNavigate }: { to: string; icon: React.ElementType; label: string; onNavigate?: () => void }) => (
+  <NavLink
+    to={to}
+    onClick={onNavigate}
+    className={({ isActive }) =>
+      `flex items-center gap-3 rounded-lg px-4 py-3 transition-colors duration-200 ${
+        isActive ? 'bg-emerald-50 font-medium text-emerald-600' : 'text-gray-600 hover:bg-gray-50 hover:text-emerald-600'
+      }`
+    }
+  >
+    <Icon size={20} />
+    <span>{label}</span>
+  </NavLink>
+);
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showNotifications, setShowNotifications] = useState(false);
   const { user, logout } = useAuth();
   const isMentor = user?.role === 'mentor';
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarPinned, setSidebarPinned] = useState(true);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState<AdminNotification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const pageCopy = PAGE_COPY[location.pathname] ?? PAGE_COPY['/'];
-  const visibleNav = isMentor ? MENTOR_NAV : MAIN_NAV;
+  // Notification state
+  const [notifications, setNotifications] = useState<AdminNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
 
-  const userRoleLabel = useMemo(() => {
-    if (user?.role === 'super_admin') return 'Super admin';
-    if (user?.role === 'mentor') return 'Mentor reviewer';
-    return 'Admin operator';
-  }, [user?.role]);
-
-  const refreshUnreadCount = useCallback(async () => {
-    if (isMentor || typeof document === 'undefined' || document.hidden) {
+  // Fetch notifications
+  const fetchNotifications = useCallback(async () => {
+    if (isMentor) {
+      setNotifications([]);
+      setUnreadCount(0);
       return;
     }
-
-    try {
-      const count = await notificationService.getUnreadCount();
-      setUnreadCount(count);
-    } catch (error) {
-      console.error('Failed to fetch unread count:', error);
-    }
-  }, [isMentor]);
-
-  const fetchNotifications = useCallback(async () => {
-    if (isMentor) return;
-
     try {
       setIsLoadingNotifications(true);
-      const response = await notificationService.getNotifications({ limit: 12 });
-      setNotifications(response.notifications);
+      const response = await notificationService.getNotifications({ limit: 10 });
+      // Ensure title and message are strings (handle if API returns objects)
+      const sanitizedNotifications = response.notifications.map((n) => ({
+        ...n,
+        title: typeof n.title === 'object' ? JSON.stringify(n.title) : String(n.title || ''),
+        message: typeof n.message === 'object' ? JSON.stringify(n.message) : String(n.message || ''),
+      }));
+      setNotifications(sanitizedNotifications);
       setUnreadCount(response.unreadCount);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
@@ -198,16 +86,25 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   }, [isMentor]);
 
+  // Initial fetch and polling
+  useEffect(() => {
+    if (isMentor) return;
+    fetchNotifications();
+
+    // Poll for new notifications every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [fetchNotifications, isMentor]);
+
+  // Default sidebar behavior:
+  // - Desktop (lg+): sidebar shown
+  // - Mobile/tablet: sidebar hidden until toggled
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const mediaQuery = window.matchMedia('(min-width: 1280px)');
-    const sync = () => {
-      const isDesktop = mediaQuery.matches;
-      setSidebarPinned(isDesktop);
-      setSidebarOpen(isDesktop);
-    };
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
 
+    const sync = () => setSidebarOpen(mediaQuery.matches);
     sync();
 
     if (typeof mediaQuery.addEventListener === 'function') {
@@ -219,71 +116,36 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return () => mediaQuery.removeListener(sync);
   }, []);
 
-  useEffect(() => {
-    if (isMentor) return;
-
-    void refreshUnreadCount();
-
-    const handleVisibility = () => {
-      if (!document.hidden) {
-        void refreshUnreadCount();
-      }
-    };
-
-    const interval = window.setInterval(() => {
-      if (!document.hidden) {
-        void refreshUnreadCount();
-      }
-    }, 45000);
-
-    document.addEventListener('visibilitychange', handleVisibility);
-
-    return () => {
-      window.clearInterval(interval);
-      document.removeEventListener('visibilitychange', handleVisibility);
-    };
-  }, [isMentor, refreshUnreadCount]);
-
-  useEffect(() => {
-    if (!showNotifications || isMentor) return;
-    void fetchNotifications();
-  }, [fetchNotifications, isMentor, showNotifications]);
-
-  useEffect(() => {
-    setShowNotifications(false);
-    if (!sidebarPinned) {
-      setSidebarOpen(false);
-    }
-  }, [location.pathname, sidebarPinned]);
-
+  // Mark single notification as read
   const handleMarkAsRead = async (id: string) => {
     try {
       await notificationService.markAsRead(id);
-      setNotifications((prev) => prev.map((item) => (item.id === id ? { ...item, read: true } : item)));
+      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
       setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
-      console.error('Failed to mark notification as read:', error);
+      console.error('Failed to mark as read:', error);
     }
   };
 
+  // Mark all as read
   const handleMarkAllAsRead = async () => {
     try {
       await notificationService.markAllAsRead();
-      setNotifications((prev) => prev.map((item) => ({ ...item, read: true })));
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       setUnreadCount(0);
     } catch (error) {
-      console.error('Failed to mark all notifications as read:', error);
+      console.error('Failed to mark all as read:', error);
     }
   };
 
-  const handleDeleteNotification = async (id: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-
+  // Delete notification
+  const handleDeleteNotification = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     try {
       await notificationService.deleteNotification(id);
-      const deleted = notifications.find((item) => item.id === id);
-      setNotifications((prev) => prev.filter((item) => item.id !== id));
-      if (deleted && !deleted.read) {
+      const deletedNotification = notifications.find((n) => n.id === id);
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+      if (deletedNotification && !deletedNotification.read) {
         setUnreadCount((prev) => Math.max(0, prev - 1));
       }
     } catch (error) {
@@ -291,279 +153,212 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   };
 
-  const handleNotificationClick = async (notification: AdminNotification) => {
-    if (!notification.read) {
-      await handleMarkAsRead(notification.id);
-    }
-
-    setShowNotifications(false);
-
-    if (!notification.link) return;
-    if (notification.link.startsWith('/')) {
-      navigate(notification.link);
-      return;
-    }
-
-    window.open(notification.link, '_blank', 'noopener,noreferrer');
+  const handleLogout = async () => {
+    setIsLogoutConfirmOpen(true);
   };
 
-  const handleLogoutConfirm = () => setIsLogoutConfirmOpen(true);
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'success':
+        return <Check size={16} className="text-green-600" />;
+      case 'warning':
+        return <AlertTriangle size={16} className="text-orange-600" />;
+      case 'error':
+        return <XCircle size={16} className="text-red-600" />;
+      default:
+        return <Info size={16} className="text-blue-600" />;
+    }
+  };
+
+  const getNotificationBg = (type: string) => {
+    switch (type) {
+      case 'success':
+        return 'bg-green-100';
+      case 'warning':
+        return 'bg-orange-100';
+      case 'error':
+        return 'bg-red-100';
+      default:
+        return 'bg-blue-100';
+    }
+  };
 
   return (
-    <div className="admin-shell flex min-h-screen text-slate-900">
-      {!sidebarPinned && sidebarOpen ? (
-        <button
-          type="button"
-          aria-label="Close sidebar"
-          className="fixed inset-0 z-30 bg-slate-950/20 backdrop-blur-sm xl:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      ) : null}
+    <div className="flex h-screen bg-gray-50 font-sans text-gray-900">
+      {sidebarOpen && <div className="fixed inset-0 z-30 bg-black/30 lg:hidden" aria-hidden="true" onClick={() => setSidebarOpen(false)} />}
 
+      {/* Sidebar */}
       <aside
-        className={[
-          'fixed inset-y-0 left-0 z-40 flex w-[292px] flex-col border-r border-white/60 bg-white/60 px-4 py-4 shadow-[0_30px_70px_-40px_rgba(15,23,42,0.32)] backdrop-blur-2xl transition-transform duration-300 xl:sticky xl:top-0',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0',
-        ].join(' ')}
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 transform flex-col border-r border-gray-200 bg-white transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
-        <div className="admin-surface-card px-4 py-4">
-          <div className="relative flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="Blanc Logo" className="h-12 w-12 rounded-2xl object-cover shadow-sm" />
-              <div>
-                <p className="text-base font-bold text-slate-950">Blanc Admin</p>
-                <p className="text-sm text-slate-500">Light-glass control center</p>
-              </div>
-            </div>
-            {!sidebarPinned ? (
-              <button
-                type="button"
-                title="Close menu"
-                onClick={() => setSidebarOpen(false)}
-                className="rounded-2xl border border-white/70 bg-white/85 p-2 text-slate-500 transition-colors hover:text-slate-950"
-              >
-                <X size={16} />
-              </button>
-            ) : null}
-          </div>
-          <div className="mt-5 rounded-[1.35rem] border border-white/70 bg-white/70 px-4 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Current access</p>
-            <div className="mt-2 flex items-center gap-3">
-              <img
-                src={getAvatarUrl(user?.avatar, user?.name, avatarPresets.sidebar)}
-                alt={user?.name || 'Admin'}
-                className="h-11 w-11 rounded-2xl border border-white/70"
-              />
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-slate-950">{user?.name || 'Admin user'}</p>
-                <p className="truncate text-xs text-slate-500">{userRoleLabel}</p>
-              </div>
+        <div className="flex h-16 shrink-0 items-center justify-center border-b border-gray-100">
+          <div className="flex cursor-pointer items-center gap-2">
+            <img src="/logo.png" alt="Blanc Logo" className="h-10 w-10 rounded-full object-cover" />
+            <div className="flex flex-col">
+              <span className="text-lg leading-tight font-bold text-emerald-600">Blanc Admin</span>
+              <span className="text-xs leading-tight text-gray-500">Beyond Learning</span>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 flex-1 overflow-y-auto pb-4">
-          <div className="space-y-6">
-            <section className="space-y-2">
-              <p className="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Workspace</p>
-              <div className="space-y-1.5">
-                {visibleNav.map((item) => (
-                  <SidebarLink
-                    key={item.to}
-                    item={item}
-                    onNavigate={!sidebarPinned ? () => setSidebarOpen(false) : undefined}
-                  />
-                ))}
+        <nav className="flex-1 space-y-1 overflow-y-auto p-4">
+          {!isMentor && <SidebarItem to="/" icon={LayoutDashboard} label="Dashboard" onNavigate={() => setSidebarOpen(false)} />}
+          <SidebarItem to="/reports" icon={FileText} label="Reports" onNavigate={() => setSidebarOpen(false)} />
+          {!isMentor && (
+            <>
+              <SidebarItem to="/users" icon={Users} label="Students" onNavigate={() => setSidebarOpen(false)} />
+              <SidebarItem to="/contests" icon={Trophy} label="Contests" onNavigate={() => setSidebarOpen(false)} />
+              <SidebarItem to="/courses" icon={FileText} label="Documents" onNavigate={() => setSidebarOpen(false)} />
+              <SidebarItem to="/community" icon={MessageSquare} label="Community" onNavigate={() => setSidebarOpen(false)} />
+              <SidebarItem to="/recruitments" icon={Briefcase} label="Recruitments" onNavigate={() => setSidebarOpen(false)} />
+              <SidebarItem to="/news" icon={Newspaper} label="News & Tips" onNavigate={() => setSidebarOpen(false)} />
+              <SidebarItem to="/mentors" icon={Users} label="Mentor Directory" onNavigate={() => setSidebarOpen(false)} />
+              <SidebarItem to="/mentor-blogs" icon={BookOpen} label="Mentor Blogs" onNavigate={() => setSidebarOpen(false)} />
+
+              <div className="pt-8 pb-2">
+                <p className="px-4 text-xs font-semibold tracking-wider text-gray-400 uppercase">System</p>
               </div>
-            </section>
+              <SidebarItem to="/security" icon={ShieldAlert} label="Security" onNavigate={() => setSidebarOpen(false)} />
+              <SidebarItem to="/audit" icon={FileText} label="Audit Log" onNavigate={() => setSidebarOpen(false)} />
+              <SidebarItem to="/settings" icon={Settings} label="Settings" onNavigate={() => setSidebarOpen(false)} />
+            </>
+          )}
+        </nav>
 
-            {!isMentor ? (
-              <section className="space-y-2">
-                <p className="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">System</p>
-                <div className="space-y-1.5">
-                  {SYSTEM_NAV.map((item) => (
-                    <SidebarLink
-                      key={item.to}
-                      item={item}
-                      onNavigate={!sidebarPinned ? () => setSidebarOpen(false) : undefined}
-                    />
-                  ))}
-                </div>
-              </section>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <a
-            href={String(import.meta.env.VITE_PUBLIC_SITE_URL || '/').replace(/\/+$/, '') || '/'}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between rounded-2xl border border-white/70 bg-white/78 px-4 py-3 text-sm font-semibold text-slate-700 transition-colors hover:text-slate-950"
-          >
-            <span className="inline-flex items-center gap-2">
-              <ExternalLink size={16} className="text-teal-600" />
-              Open public site
-            </span>
-            <Sparkles size={16} className="text-sky-500" />
-          </a>
-
-          <button
-            type="button"
-            onClick={handleLogoutConfirm}
-            className="flex w-full items-center justify-between rounded-2xl border border-rose-100 bg-rose-50/80 px-4 py-3 text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-100/80"
-          >
-            <span className="inline-flex items-center gap-2">
-              <LogOut size={16} />
-              Sign out
-            </span>
-            <span className="text-xs font-bold uppercase tracking-[0.16em]">Secure</span>
+        <div className="w-full shrink-0 border-t border-gray-100 bg-white p-4">
+          <button onClick={handleLogout} className="flex w-full items-center gap-3 px-4 py-3 text-gray-600 transition-colors hover:text-red-600">
+            <LogOut size={20} />
+            <span>Logout</span>
           </button>
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 border-b border-white/70 bg-white/58 backdrop-blur-2xl">
-          <div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-            <div className="flex min-w-0 items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setSidebarOpen((prev) => !prev)}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/70 bg-white/75 text-slate-600 shadow-sm transition-colors hover:text-slate-950 xl:hidden"
-                title="Toggle menu"
-              >
-                <Menu size={18} />
-              </button>
+      {/* Main Content */}
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        {/* Header */}
+        <header className="relative z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6 lg:px-8">
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} title="Toggle menu" className="rounded-md p-2 text-gray-500 hover:bg-gray-100 lg:hidden">
+            <Menu size={24} />
+          </button>
 
-              <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Admin workspace</p>
-                <h1 className="truncate text-lg font-semibold text-slate-950 sm:text-xl">{pageCopy.title}</h1>
-              </div>
-            </div>
+          <div className="mx-4 hidden w-full max-w-md items-center rounded-lg bg-gray-100 px-3 py-2 sm:flex lg:mx-0">
+            <Search size={18} className="text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search anything..."
+              className="ml-2 w-full border-none bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
+            />
+          </div>
 
-            <div className="flex items-center gap-3">
-              {!isMentor ? (
+          <div className="flex items-center gap-4">
+            {!isMentor && (
+              <>
+                {/* Notification Button & Dropdown */}
                 <div className="relative">
                   <button
-                    type="button"
-                    onClick={() => setShowNotifications((prev) => !prev)}
-                    className="relative inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/70 bg-white/78 text-slate-600 shadow-sm transition-colors hover:text-slate-950"
-                    title="Notifications"
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="relative rounded-full p-2 text-gray-500 transition-colors outline-none hover:bg-gray-100"
                   >
-                    <Bell size={18} />
-                    {unreadCount > 0 ? (
-                      <span className="absolute right-2 top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                      </span>
-                    ) : null}
+                    <Bell size={20} />
+                    {unreadCount > 0 && <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-red-500"></span>}
                   </button>
 
-                  {showNotifications ? (
+                  {showNotifications && (
                     <>
-                      <button
-                        type="button"
-                        className="fixed inset-0 z-20 cursor-default"
-                        aria-label="Close notifications"
-                        onClick={() => setShowNotifications(false)}
-                      />
-                      <div className="absolute right-0 z-30 mt-3 w-[380px] overflow-hidden rounded-[1.6rem] border border-white/80 bg-white/88 shadow-[0_28px_70px_-40px_rgba(15,23,42,0.35)] backdrop-blur-2xl">
-                        <div className="flex items-center justify-between border-b border-slate-200/80 px-4 py-4">
-                          <div>
-                            <p className="text-sm font-semibold text-slate-950">Notifications</p>
-                            <p className="text-xs text-slate-500">Loaded on demand to keep the shell lighter.</p>
-                          </div>
+                      <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)}></div>
+                      <div className="animate-fade-in-up absolute right-0 z-50 mt-3 w-80 origin-top-right overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xl sm:w-96">
+                        <div className="flex items-center justify-between border-b border-gray-50 bg-gray-50/50 px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => void fetchNotifications()}
-                              title="Refresh notifications"
-                              className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/70 bg-white/80 text-slate-500 transition-colors hover:text-slate-950"
-                            >
-                              <RefreshCw size={15} className={isLoadingNotifications ? 'animate-spin' : ''} />
+                            <h3 className="font-semibold text-gray-900">Notifications</h3>
+                            <button onClick={fetchNotifications} className="rounded p-1 text-gray-400 hover:text-gray-600" title="Refresh">
+                              <RefreshCw size={14} className={isLoadingNotifications ? 'animate-spin' : ''} />
                             </button>
-                            {unreadCount > 0 ? (
-                              <button
-                                type="button"
-                                onClick={() => void handleMarkAllAsRead()}
-                                className="rounded-full border border-slate-200/80 bg-white/80 px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:text-slate-950"
-                              >
-                                Mark all read
-                              </button>
-                            ) : null}
                           </div>
+                          {unreadCount > 0 && (
+                            <button onClick={handleMarkAllAsRead} className="text-xs font-medium text-emerald-600 hover:text-emerald-700">
+                              Mark all as read
+                            </button>
+                          )}
                         </div>
-
-                        <div className="max-h-[420px] overflow-y-auto p-3">
+                        <div className="max-h-[400px] overflow-y-auto">
                           {isLoadingNotifications && notifications.length === 0 ? (
-                            <div className="flex min-h-[220px] items-center justify-center text-sm text-slate-500">
-                              <div className="flex items-center gap-3 rounded-full border border-slate-200/80 bg-white/80 px-4 py-3">
-                                <RefreshCw size={15} className="animate-spin text-teal-600" />
-                                Loading notifications
-                              </div>
+                            <div className="px-4 py-8 text-center">
+                              <RefreshCw size={24} className="mx-auto mb-2 animate-spin text-gray-400" />
+                              <p className="text-sm text-gray-500">Loading...</p>
                             </div>
                           ) : notifications.length === 0 ? (
-                            <div className="flex min-h-[220px] flex-col items-center justify-center gap-3 text-center">
-                              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
-                                <Bell size={18} />
-                              </div>
-                              <div>
-                                <p className="text-sm font-semibold text-slate-900">No notifications</p>
-                                <p className="mt-1 text-sm text-slate-500">The feed stays empty until something needs your attention.</p>
-                              </div>
+                            <div className="px-4 py-8 text-center">
+                              <Bell size={32} className="mx-auto mb-2 text-gray-300" />
+                              <p className="text-sm text-gray-500">No notifications</p>
                             </div>
                           ) : (
-                            <div className="space-y-2">
-                              {notifications.map((notification) => (
-                                <button
-                                  key={notification.id}
-                                  type="button"
-                                  onClick={() => void handleNotificationClick(notification)}
-                                  className={[
-                                    'group flex w-full items-start gap-3 rounded-[1.25rem] border px-3 py-3 text-left transition-colors',
-                                    notification.read
-                                      ? 'border-transparent bg-white/55 hover:bg-white/85'
-                                      : 'border-teal-100 bg-[linear-gradient(135deg,rgba(13,148,136,0.08),rgba(14,165,233,0.08))]',
-                                  ].join(' ')}
-                                >
-                                  <div className={`mt-1 h-2.5 w-2.5 rounded-full ${notification.read ? 'bg-slate-200' : 'bg-teal-500/70'}`} />
-                                  <div className="min-w-0 flex-1 space-y-1">
-                                    <div className="flex items-start justify-between gap-3">
-                                      <div>
-                                        <p className="truncate text-sm font-semibold text-slate-950">{notification.title}</p>
-                                        <p className="mt-1 line-clamp-2 text-sm text-slate-500">{notification.message}</p>
-                                      </div>
-                                      <button
-                                        type="button"
-                                        title="Delete notification"
-                                        onClick={(event) => void handleDeleteNotification(notification.id, event)}
-                                        className="rounded-xl p-1.5 text-slate-400 opacity-0 transition-all hover:bg-white hover:text-rose-500 group-hover:opacity-100"
-                                      >
-                                        <X size={14} />
-                                      </button>
-                                    </div>
-                                    <p className="text-xs font-medium text-slate-400">{formatRelativeTime(notification.createdAt)}</p>
+                            notifications.map((notification) => (
+                              <div
+                                key={notification.id}
+                                onClick={() => !notification.read && handleMarkAsRead(notification.id)}
+                                className={`group cursor-pointer border-b border-gray-50 px-4 py-3 transition-colors last:border-0 hover:bg-gray-50 ${!notification.read ? 'bg-emerald-50/30' : ''}`}
+                              >
+                                <div className="flex gap-3">
+                                  <div
+                                    className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${getNotificationBg(notification.type)}`}
+                                  >
+                                    {getNotificationIcon(notification.type)}
                                   </div>
-                                </button>
-                              ))}
-                            </div>
+                                  <div className="min-w-0 flex-1 space-y-1">
+                                    <div className="flex items-start justify-between gap-2">
+                                      <p className={`truncate text-sm ${!notification.read ? 'font-semibold text-gray-900' : 'text-gray-700'}`}>
+                                        {notification.title}
+                                      </p>
+                                      <div className="flex flex-shrink-0 items-center gap-1">
+                                        {!notification.read && <span className="h-2 w-2 rounded-full bg-emerald-500"></span>}
+                                        <button
+                                          onClick={(e) => handleDeleteNotification(notification.id, e)}
+                                          className="p-1 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-500"
+                                          title="Delete"
+                                        >
+                                          <Trash2 size={12} />
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <p className="line-clamp-2 text-xs text-gray-500">{notification.message}</p>
+                                    <p className="mt-1 flex items-center gap-1 text-[10px] text-gray-400">
+                                      <Clock size={10} />
+                                      {formatRelativeTime(notification.createdAt)}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))
                           )}
+                        </div>
+                        <div className="border-t border-gray-50 bg-gray-50/30 p-2 text-center">
+                          <button className="w-full py-1 text-xs font-medium text-gray-500 hover:text-gray-800">View all notifications</button>
                         </div>
                       </div>
                     </>
-                  ) : null}
+                  )}
                 </div>
-              ) : null}
+              </>
+            )}
 
-              <div className="hidden rounded-full border border-white/70 bg-white/75 px-3 py-2 text-sm font-medium text-slate-500 shadow-sm sm:block">
-                {pageCopy.description}
+            <div className={`flex items-center gap-3 ${isMentor ? '' : 'border-l border-gray-200 pl-4'}`}>
+              <div className="hidden text-right sm:block">
+                <p className="text-sm font-medium text-gray-900">{user?.name || 'Admin User'}</p>
+                <p className="text-xs text-gray-500">{user?.role === 'super_admin' ? 'Super Admin' : user?.role === 'mentor' ? 'Mentor' : 'Admin'}</p>
               </div>
+              <img
+                src={getAvatarUrl(user?.avatar, user?.name, avatarPresets.sidebar)}
+                alt="Admin"
+                className="h-9 w-9 rounded-full border-2 border-emerald-100"
+              />
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-[1600px]">{children}</div>
-        </main>
+        {/* Scrollable Area */}
+        <main className="flex-1 overflow-y-auto p-6 lg:p-8">{children}</main>
       </div>
 
       <ConfirmActionModal
@@ -571,9 +366,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         onClose={() => {
           if (!isLoggingOut) setIsLogoutConfirmOpen(false);
         }}
-        title="Sign out"
-        message="End the current admin session and require a fresh cookie-authenticated login."
-        confirmLabel="Sign out"
+        title="Logout"
+        message="Are you sure you want to logout?"
+        confirmLabel="Logout"
         variant="warning"
         onConfirm={() => {
           setIsLoggingOut(true);

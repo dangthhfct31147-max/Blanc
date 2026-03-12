@@ -1,330 +1,156 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-  AlertTriangle,
-  Bell,
-  BookOpen,
-  Clock3,
-  FolderKanban,
-  LayoutDashboard,
-  MessageSquare,
-  ShieldAlert,
-  Sparkles,
-  Trophy,
-  Users,
-} from 'lucide-react';
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
-import { dashboardService, type DashboardOverview } from '../services/dashboardService';
-import {
-  AdminEmptyState,
-  AdminPage,
-  AdminPageHeader,
-  AdminQuickActionCard,
-  AdminSectionCard,
-  AdminSectionTitle,
-  AdminStatCard,
-} from './ui/AdminPrimitives';
-import { formatRelativeTime } from '../services/notificationService';
+import React, { useState } from 'react';
+import { Users, Trophy, DollarSign, TrendingUp, Sparkles, RefreshCw } from 'lucide-react';
+import { StatCardProps } from '../types';
+import { MOCK_CONTESTS, MOCK_USERS } from '../constants';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { analyzePlatformStats } from '../services/geminiService';
+import { Dropdown } from './ui/Dropdown';
+
+const StatCard: React.FC<StatCardProps> = ({ title, value, trend, trendUp, icon: Icon }) => (
+  <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+    <div className="flex items-start justify-between">
+      <div>
+        <p className="text-sm font-medium text-gray-500">{title}</p>
+        <h3 className="mt-2 text-2xl font-bold text-gray-900">{value}</h3>
+      </div>
+      <div className="rounded-lg bg-emerald-50 p-3">
+        <Icon className="text-emerald-600" size={24} />
+      </div>
+    </div>
+    {trend && (
+      <div className="mt-4 flex items-center gap-2 text-sm">
+        <span className={trendUp ? 'flex items-center text-green-600' : 'flex items-center text-red-600'}>
+          <TrendingUp size={14} className={`mr-1 ${!trendUp && 'rotate-180'}`} />
+          {trend}
+        </span>
+        <span className="text-gray-400">vs last month</span>
+      </div>
+    )}
+  </div>
+);
 
 const DashboardHome: React.FC = () => {
-  const navigate = useNavigate();
-  const [overview, setOverview] = useState<DashboardOverview | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [aiInsight, setAiInsight] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [timeRange, setTimeRange] = useState('7days');
 
-  useEffect(() => {
-    let isMounted = true;
+  const chartData = [
+    { name: 'Mon', revenue: 4000 },
+    { name: 'Tue', revenue: 3000 },
+    { name: 'Wed', revenue: 2000 },
+    { name: 'Thu', revenue: 2780 },
+    { name: 'Fri', revenue: 1890 },
+    { name: 'Sat', revenue: 2390 },
+    { name: 'Sun', revenue: 3490 },
+  ];
 
-    const loadOverview = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const next = await dashboardService.getOverview();
-        if (isMounted) {
-          setOverview(next);
-        }
-      } catch (err) {
-        console.error('Failed to load dashboard overview:', err);
-        if (isMounted) {
-          setError('Unable to load dashboard data right now.');
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    void loadOverview();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const summary = overview?.summary;
-  const notifications = overview?.notifications ?? [];
-  const trend = overview?.trend ?? [];
-
-  const quickActions = useMemo(
-    () => [
-      {
-        title: 'Review reports',
-        description: 'Jump straight into the mentor/admin review queue without hunting through the nav.',
-        icon: LayoutDashboard,
-        onClick: () => navigate('/reports'),
-      },
-      {
-        title: 'Curate contests',
-        description: 'Keep the contest library aligned with the refreshed public experience.',
-        icon: Trophy,
-        onClick: () => navigate('/contests'),
-      },
-      {
-        title: 'Manage documents',
-        description: 'Edit courses and documents where learners will feel the change most quickly.',
-        icon: FolderKanban,
-        onClick: () => navigate('/courses'),
-      },
-      {
-        title: 'Security triage',
-        description: 'Inspect active threats, account locks, and suspicious login pressure.',
-        icon: ShieldAlert,
-        onClick: () => navigate('/security'),
-      },
-    ],
-    [navigate]
-  );
+  const handleAnalyze = async () => {
+    setIsAnalyzing(true);
+    setAiInsight('Analyzing platform data...');
+    try {
+      const stats = {
+        activeUsers: MOCK_USERS.length,
+        contests: MOCK_CONTESTS.length,
+        revenueTrend: 'Up 12%',
+      };
+      const insight = await analyzePlatformStats(stats);
+      setAiInsight(insight);
+    } catch (error) {
+      setAiInsight('Failed to analyze data. Please try again.');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   return (
-    <AdminPage>
-      <AdminPageHeader
-        eyebrow="Operations overview"
-        title="One surface for publishing, moderation, and risk"
-        description="This dashboard only shows live operational data. If a metric is not backed by the current API surface, it stays out of view."
-      />
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Overview</h2>
+        <div className="flex gap-2">
+          <div className="w-[160px]">
+            <Dropdown
+              options={[
+                { value: '7days', label: 'Last 7 Days' },
+                { value: '30days', label: 'Last 30 Days' },
+              ]}
+              value={timeRange}
+              onChange={setTimeRange}
+              placeholder="Select time range"
+              size="sm"
+            />
+          </div>
+        </div>
+      </div>
 
-      {error ? (
-        <AdminSectionCard>
-          <AdminEmptyState
-            icon={AlertTriangle}
-            title="Dashboard data unavailable"
-            description={error}
-          />
-        </AdminSectionCard>
-      ) : null}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <StatCard title="Total Students" value="2,543" trend="12.5%" trendUp={true} icon={Users} />
+        <StatCard title="Active Contests" value={MOCK_CONTESTS.length} trend="2 New" trendUp={true} icon={Trophy} />
+        <StatCard title="Total Revenue" value="₫145M" trend="4.2%" trendUp={false} icon={DollarSign} />
+        <StatCard title="Course Completion" value="84%" trend="1.2%" trendUp={true} icon={TrendingUp} />
+      </div>
 
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <AdminStatCard
-          icon={Users}
-          label="Total users"
-          value={isLoading ? '...' : summary?.totalUsers ?? 0}
-          detail={summary ? `${summary.activeUsers} active accounts` : 'Loading live account totals'}
-          tone="teal"
-        />
-        <AdminStatCard
-          icon={Trophy}
-          label="Active contests"
-          value={isLoading ? '...' : summary?.activeContests ?? 0}
-          detail={summary ? `${summary.totalCourses} learning entries published` : 'Reading shared platform stats'}
-          tone="sky"
-        />
-        <AdminStatCard
-          icon={Bell}
-          label="Unread notifications"
-          value={isLoading ? '...' : summary?.unreadNotifications ?? 0}
-          detail="Fetched from the admin feed on the current backend"
-          tone="indigo"
-        />
-        <AdminStatCard
-          icon={ShieldAlert}
-          label="Active threats"
-          value={isLoading ? '...' : summary?.activeThreatCount ?? 0}
-          detail={summary ? `${summary.lockedAccountsCount} locked accounts, ${summary.failureRate} failed-login rate` : 'Loading security pressure'}
-          tone={summary && summary.activeThreatCount > 0 ? 'rose' : 'slate'}
-        />
-      </section>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Chart Section */}
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm lg:col-span-2">
+          <h3 className="mb-6 text-lg font-bold text-gray-900">Revenue Analytics</h3>
+          <div className="h-80 min-h-[320px] w-full">
+            <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={300}>
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 12 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 12 }} />
+                <Tooltip cursor={{ fill: '#F9FAFB' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                <Bar dataKey="revenue" radius={[4, 4, 0, 0]}>
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={index === 6 ? '#059669' : '#D1FAE5'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-[1.35fr_0.95fr]">
-        <AdminSectionCard>
-          <AdminSectionTitle
-            title="Failed sign-ins in the last 24 hours"
-            description="Derived from the security analysis feed instead of placeholder revenue or mock engagement charts."
-          />
-          <div className="mt-6 h-[320px]">
-            {trend.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trend} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="failedLoginsFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#0d9488" stopOpacity={0.28} />
-                      <stop offset="100%" stopColor="#0d9488" stopOpacity={0.02} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" vertical={false} />
-                  <XAxis
-                    dataKey="label"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: '#64748b', fontSize: 12 }}
-                  />
-                  <YAxis
-                    allowDecimals={false}
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: '#64748b', fontSize: 12 }}
-                    width={30}
-                  />
-                  <Tooltip
-                    cursor={{ stroke: '#0d9488', strokeOpacity: 0.15 }}
-                    contentStyle={{
-                      borderRadius: '18px',
-                      border: '1px solid rgba(226, 232, 240, 0.9)',
-                      background: 'rgba(255,255,255,0.94)',
-                      boxShadow: '0 20px 45px -30px rgba(15,23,42,0.3)',
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="failedLogins"
-                    stroke="#0d9488"
-                    strokeWidth={3}
-                    fill="url(#failedLoginsFill)"
-                    activeDot={{ r: 5, stroke: '#0d9488', strokeWidth: 2, fill: '#ffffff' }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+        {/* AI Insight Section */}
+        <div className="relative flex flex-col justify-between overflow-hidden rounded-xl bg-gradient-to-br from-emerald-900 to-emerald-700 p-6 text-white shadow-md">
+          <div className="relative z-10">
+            <div className="mb-4 flex items-center gap-2">
+              <Sparkles className="text-yellow-300" />
+              <h3 className="text-lg font-bold">Gemini Insights</h3>
+            </div>
+
+            {aiInsight ? (
+              <>
+                <p className="mb-4 min-h-[100px] text-sm leading-relaxed text-emerald-100">{aiInsight}</p>
+                <button
+                  onClick={handleAnalyze}
+                  disabled={isAnalyzing}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <RefreshCw size={16} className={isAnalyzing ? 'animate-spin' : ''} />
+                  {isAnalyzing ? 'Analyzing...' : 'Refresh Analysis'}
+                </button>
+              </>
             ) : (
-              <AdminEmptyState
-                icon={ShieldAlert}
-                title="No trend data available"
-                description="The backend did not return enough failed-login history to draw a reliable trend."
-              />
+              <>
+                <p className="mb-4 min-h-[100px] text-sm leading-relaxed text-emerald-100">
+                  Click the button below to analyze your platform data with AI-powered insights.
+                </p>
+                <button
+                  onClick={handleAnalyze}
+                  disabled={isAnalyzing}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-emerald-900 transition-colors hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <Sparkles size={16} className={isAnalyzing ? 'animate-pulse' : ''} />
+                  {isAnalyzing ? 'Analyzing...' : 'Analyze Platform Data'}
+                </button>
+              </>
             )}
           </div>
-        </AdminSectionCard>
-
-        <div className="grid gap-6">
-          <AdminSectionCard>
-            <AdminSectionTitle
-              title="Control signals"
-              description="Operational settings pulled from live admin configuration."
-            />
-            <div className="mt-5 grid gap-3">
-              <div className="rounded-[1.4rem] border border-slate-200/80 bg-white/75 px-4 py-4">
-                <div className="flex items-center gap-3">
-                  <Clock3 className="h-5 w-5 text-teal-700" />
-                  <div>
-                    <p className="text-sm font-semibold text-slate-950">Session timeout</p>
-                    <p className="text-sm text-slate-500">{summary?.sessionTimeout ?? 30} minutes</p>
-                  </div>
-                </div>
-              </div>
-              <div className="rounded-[1.4rem] border border-slate-200/80 bg-white/75 px-4 py-4">
-                <div className="flex items-center gap-3">
-                  <ShieldAlert className="h-5 w-5 text-sky-700" />
-                  <div>
-                    <p className="text-sm font-semibold text-slate-950">Privileged 2FA</p>
-                    <p className="text-sm text-slate-500">{summary?.twoFactorRequired ? 'Required for privileged accounts' : 'Not enforced globally'}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="rounded-[1.4rem] border border-slate-200/80 bg-white/75 px-4 py-4">
-                <div className="flex items-center gap-3">
-                  <Sparkles className="h-5 w-5 text-indigo-600" />
-                  <div>
-                    <p className="text-sm font-semibold text-slate-950">Maintenance mode</p>
-                    <p className="text-sm text-slate-500">{summary?.maintenanceMode ? 'Currently enabled' : 'Currently disabled'}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </AdminSectionCard>
-
-          <AdminSectionCard>
-            <AdminSectionTitle
-              title="Recent admin notifications"
-              description="The same feed shown in the header, surfaced here for quick triage."
-            />
-            <div className="mt-5 space-y-3">
-              {notifications.length > 0 ? (
-                notifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`rounded-[1.4rem] border px-4 py-4 ${notification.read ? 'border-slate-200/80 bg-white/70' : 'border-teal-100 bg-[linear-gradient(135deg,rgba(13,148,136,0.08),rgba(14,165,233,0.08))]'}`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={`mt-1 h-2.5 w-2.5 rounded-full ${notification.read ? 'bg-slate-300' : 'bg-teal-500'}`} />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold text-slate-950">{notification.title}</p>
-                        <p className="mt-1 text-sm leading-6 text-slate-500">{notification.message}</p>
-                        <p className="mt-2 text-xs font-medium text-slate-400">{formatRelativeTime(notification.createdAt)}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <AdminEmptyState
-                  icon={Bell}
-                  title="No recent admin notifications"
-                  description="The live feed is currently quiet, so the dashboard keeps this space empty instead of fabricating activity."
-                />
-              )}
-            </div>
-          </AdminSectionCard>
+          {/* Decoration */}
+          <div className="absolute -right-10 -bottom-10 h-40 w-40 rounded-full bg-emerald-500 opacity-30 blur-3xl"></div>
         </div>
-      </section>
-
-      <AdminSectionCard>
-        <AdminSectionTitle
-          title="Quick actions"
-          description="Shortcuts to the refreshed parts of the admin workspace that most strongly affect the public experience."
-        />
-        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {quickActions.map((action) => (
-            <AdminQuickActionCard
-              key={action.title}
-              icon={action.icon}
-              title={action.title}
-              description={action.description}
-              onClick={action.onClick}
-            />
-          ))}
-        </div>
-      </AdminSectionCard>
-
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <AdminStatCard
-          icon={Users}
-          label="New users this month"
-          value={isLoading ? '...' : summary?.newUsersThisMonth ?? 0}
-          detail="Admin user stats endpoint"
-          tone="amber"
-        />
-        <AdminStatCard
-          icon={BookOpen}
-          label="Learning inventory"
-          value={isLoading ? '...' : summary?.totalCourses ?? 0}
-          detail="Combined course and document-facing catalog count from shared stats"
-          tone="sky"
-        />
-        <AdminStatCard
-          icon={MessageSquare}
-          label="Review-first workflow"
-          value="Live"
-          detail="Mentor/admin report queue remains the primary moderation lane"
-          tone="indigo"
-        />
-      </section>
-    </AdminPage>
+      </div>
+    </div>
   );
 };
 

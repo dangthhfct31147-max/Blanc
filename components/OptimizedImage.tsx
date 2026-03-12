@@ -50,7 +50,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = memo(({
                 });
             },
             {
-                rootMargin: '300px', // Start loading 300px before entering viewport
+                rootMargin: '100px', // Start loading 100px before entering viewport
                 threshold: 0.01,
             }
         );
@@ -112,7 +112,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = memo(({
                 onLoad={handleLoad}
                 onError={handleError}
                 className={cn(
-                    'w-full h-full object-cover transition-opacity duration-200 will-change-[opacity]',
+                    'w-full h-full object-cover transition-opacity duration-300',
                     isLoaded ? 'opacity-100' : 'opacity-0'
                 )}
                 {...props}

@@ -643,23 +643,23 @@ const Profile: React.FC = () => {
 
                   {/* Stats / Streak */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                     <Card className="p-4 flex items-center space-x-4">
-                        <div className="p-3 bg-orange-100 text-orange-600 rounded-lg"><Trophy className="w-6 h-6" /></div>
+                     <Card className="p-4 flex items-center space-x-4 dark:bg-slate-900/80 dark:border-slate-800">
+                        <div className="p-3 bg-orange-100 text-orange-600 rounded-lg dark:bg-orange-500/15 dark:text-orange-300"><Trophy className="w-6 h-6" /></div>
                         <div>
-                           <div className="text-2xl font-bold text-slate-900">{longestStreak} {dayLabel(longestStreak)}</div>
-                           <div className="text-xs text-slate-500">{t('profile.overview.streakRecord')}</div>
+                           <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">{longestStreak} {dayLabel(longestStreak)}</div>
+                           <div className="text-xs text-slate-500 dark:text-slate-300">{t('profile.overview.streakRecord')}</div>
                         </div>
                      </Card>
-                     <Card className={`relative overflow-hidden p-4 ${todayCheckedIn ? 'ring-2 ring-emerald-200 bg-linear-to-r from-emerald-50/80 to-white' : ''}`}>
+                     <Card className={`relative overflow-hidden p-4 dark:bg-slate-900/80 dark:border-slate-800 ${todayCheckedIn ? 'ring-2 ring-emerald-200 bg-linear-to-r from-emerald-50/80 to-white dark:ring-emerald-400/40 dark:from-emerald-500/15 dark:to-slate-900/90' : ''}`}>
                         {todayCheckedIn && currentStreak >= 3 && (
                            <span
-                              className="pointer-events-none absolute inset-y-0 left-0 w-[35%] bg-linear-to-r from-white/0 via-white/70 to-white/0 opacity-25 animate-streak-shine"
+                              className="pointer-events-none absolute inset-y-0 left-0 w-[35%] bg-linear-to-r from-white/0 via-white/70 to-white/0 opacity-25 animate-streak-shine dark:via-white/20"
                               aria-hidden="true"
                            />
                         )}
 
                         <div className="relative flex items-center space-x-4">
-                           <div className={`relative w-12 h-12 shrink-0 grid place-items-center overflow-hidden rounded-xl ring-1 ring-inset ${todayCheckedIn ? 'bg-linear-to-br from-emerald-500 to-teal-500 text-white ring-white/25 shadow-sm' : 'bg-slate-100 text-slate-400 ring-slate-200/70'}`}>
+                           <div className={`relative w-12 h-12 shrink-0 grid place-items-center overflow-hidden rounded-xl ring-1 ring-inset ${todayCheckedIn ? 'bg-linear-to-br from-emerald-500 to-teal-500 text-white ring-white/25 shadow-sm' : 'bg-slate-100 text-slate-400 ring-slate-200/70 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700'}`}>
                               {streakLoading ? (
                                  <Loader2 className="w-6 h-6 animate-spin" />
                               ) : todayCheckedIn ? (
@@ -683,19 +683,19 @@ const Profile: React.FC = () => {
                            </div>
 
                            <div>
-                              <div className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                              <div className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                                  <span className={`inline-flex items-baseline gap-1 ${isStreakCelebrating ? 'animate-streak-pop' : ''}`}>
                                     <span className="tabular-nums">{currentStreak}</span>
-                                    <span className="text-base font-semibold text-slate-600">{dayLabel(currentStreak)}</span>
+                                    <span className="text-base font-semibold text-slate-600 dark:text-slate-300">{dayLabel(currentStreak)}</span>
                                  </span>
 
                                  {/* star removed */}
                               </div>
 
-                              <div className="text-xs text-slate-500 flex items-center gap-1">
+                              <div className="text-xs text-slate-500 dark:text-slate-300 flex items-center gap-1">
                                  {todayCheckedIn ? (
                                     <>
-                                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-300" />
                                        <span>{t('profile.overview.checkedInToday')}</span>
                                     </>
                                  ) : (
@@ -705,11 +705,11 @@ const Profile: React.FC = () => {
                            </div>
                         </div>
                      </Card>
-                     <Card className="p-4 flex items-center space-x-4">
-                        <div className="p-3 bg-blue-100 text-blue-600 rounded-lg"><BookOpen className="w-6 h-6" /></div>
+                     <Card className="p-4 flex items-center space-x-4 dark:bg-slate-900/80 dark:border-slate-800">
+                        <div className="p-3 bg-blue-100 text-blue-600 rounded-lg dark:bg-blue-500/15 dark:text-blue-300"><BookOpen className="w-6 h-6" /></div>
                         <div>
-                           <div className="text-2xl font-bold text-slate-900">{activeCount + completedCount}</div>
-                           <div className="text-xs text-slate-500">{t('profile.overview.coursesRegistered')}</div>
+                           <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">{activeCount + completedCount}</div>
+                           <div className="text-xs text-slate-500 dark:text-slate-300">{t('profile.overview.coursesRegistered')}</div>
                         </div>
                      </Card>
                   </div>
@@ -720,9 +720,9 @@ const Profile: React.FC = () => {
                   )}
 
                   {/* Upcoming */}
-                  <Card className="p-6 mt-6">
-                     <h3 className="font-bold text-slate-900 mb-4 flex items-center">
-                        <CalendarIcon className="w-5 h-5 mr-2 text-primary-600" /> {t('profile.overview.upcoming')}
+                  <Card className="p-6 mt-6 dark:bg-slate-900/80 dark:border-slate-800">
+                     <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center">
+                        <CalendarIcon className="w-5 h-5 mr-2 text-primary-600 dark:text-primary-300" /> {t('profile.overview.upcoming')}
                      </h3>
                      {registrationsLoading ? (
                         <div className="flex justify-center py-8">
@@ -733,18 +733,18 @@ const Profile: React.FC = () => {
                            {registrations.slice(0, 2).map(reg => reg.contest && (
                               <div
                                  key={reg.id}
-                                 className="flex items-center p-3 rounded-lg hover:bg-slate-50 border border-slate-100 transition-colors cursor-pointer"
+                                 className="flex items-center p-3 rounded-lg hover:bg-slate-50 border border-slate-100 transition-colors cursor-pointer dark:border-slate-800 dark:hover:bg-slate-800/70"
                                  onClick={() => navigate(`/contests/${reg.contestId}`)}
                               >
-                                 <div className="w-12 h-12 rounded-lg bg-slate-200 shrink-0 flex flex-col items-center justify-center text-xs font-bold text-slate-600 mr-4">
-                                    <span className="text-primary-600">
+                                 <div className="w-12 h-12 rounded-lg bg-slate-200 shrink-0 flex flex-col items-center justify-center text-xs font-bold text-slate-600 mr-4 dark:bg-slate-800 dark:text-slate-300">
+                                    <span className="text-primary-600 dark:text-primary-300">
                                        {new Date(reg.contest.dateStart).toLocaleDateString(dateLocale, { month: 'short' }).toUpperCase()}
                                     </span>
                                     <span className="text-lg">{new Date(reg.contest.dateStart).getDate()}</span>
                                  </div>
                                  <div className="grow">
-                                    <h4 className="font-semibold text-slate-900">{reg.contest.title}</h4>
-                                    <p className="text-xs text-slate-500">
+                                    <h4 className="font-semibold text-slate-900 dark:text-slate-100">{reg.contest.title}</h4>
+                                    <p className="text-xs text-slate-500 dark:text-slate-300">
                                        {new Date(reg.contest.dateStart).toLocaleTimeString(dateLocale, { hour: '2-digit', minute: '2-digit' })} - {reg.contest.organizer}
                                     </p>
                                  </div>
@@ -752,21 +752,21 @@ const Profile: React.FC = () => {
                               </div>
                            ))}
                            {registrations.length === 0 && (
-                              <p className="text-center text-slate-500 py-4">{t('profile.overview.noUpcomingEvents')}</p>
+                              <p className="text-center text-slate-500 dark:text-slate-300 py-4">{t('profile.overview.noUpcomingEvents')}</p>
                            )}
                         </div>
                      )}
                   </Card>
 
                   {/* Learning Progress - Real data from enrollments */}
-                  <Card className="p-6 mt-6">
+                  <Card className="p-6 mt-6 dark:bg-slate-900/80 dark:border-slate-800">
                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-bold text-slate-900 flex items-center">
-                           <BookOpen className="w-5 h-5 mr-2 text-primary-600" /> {t('profile.overview.learning')}
+                        <h3 className="font-bold text-slate-900 dark:text-slate-100 flex items-center">
+                           <BookOpen className="w-5 h-5 mr-2 text-primary-600 dark:text-primary-300" /> {t('profile.overview.learning')}
                         </h3>
                         <button
                            onClick={() => setActiveTab('courses')}
-                           className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                           className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200 font-medium"
                         >
                            {t('common.viewAll')}
                         </button>
@@ -780,13 +780,13 @@ const Profile: React.FC = () => {
                            {enrollments.filter(e => e.status === 'active').slice(0, 3).map(enrollment => enrollment.course && (
                               <div key={enrollment.id}>
                                  <div className="flex justify-between text-sm">
-                                    <span className="font-medium text-slate-900 line-clamp-1">{enrollment.course.title}</span>
+                                    <span className="font-medium text-slate-900 dark:text-slate-100 line-clamp-1">{enrollment.course.title}</span>
                                  </div>
                               </div>
                            ))}
                         </div>
                      ) : (
-                        <p className="text-center text-slate-500 py-4">
+                        <p className="text-center text-slate-500 dark:text-slate-300 py-4">
                            {t('profile.overview.noEnrolledCourses')}
                         </p>
                      )}

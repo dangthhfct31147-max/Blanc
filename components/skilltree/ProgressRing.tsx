@@ -29,15 +29,6 @@ export default function ProgressRing({
     return (
         <div className={`relative inline-flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
             <svg width={size} height={size} className="absolute inset-0 -rotate-90">
-                <defs>
-                    <filter id={`progress-glow-${size}`} x="-50%" y="-50%" width="200%" height="200%">
-                        <feGaussianBlur stdDeviation="2" result="blur" />
-                        <feMerge>
-                            <feMergeNode in="blur" />
-                            <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                    </filter>
-                </defs>
                 {/* Track */}
                 <circle
                     cx={size / 2}
@@ -58,7 +49,6 @@ export default function ProgressRing({
                     strokeLinecap="round"
                     strokeDasharray={circumference}
                     strokeDashoffset={dashOffset}
-                    filter={progress > 0 ? `url(#progress-glow-${size})` : undefined}
                     style={{ transition: 'stroke-dashoffset 0.8s cubic-bezier(0.4,0,0.2,1)' }}
                 />
             </svg>

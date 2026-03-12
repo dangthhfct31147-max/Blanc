@@ -1,8 +1,9 @@
 /**
  * API Service Configuration
  * Provides secure axios instance with:
- * - Cookie-based session auth
- * - CSRF protection
+ * - JWT token management
+ * - Request/Response interceptors
+ * - Automatic token refresh
  * - Error handling
  */
 
@@ -16,11 +17,20 @@ const CSRF_COOKIE_NAME = import.meta.env.VITE_CSRF_COOKIE_NAME || 'csrf_token';
 let csrfTokenCache: string | null = null;
 let csrfTokenInFlight: Promise<string | null> | null = null;
 
+// Token storage keys
+const ACCESS_TOKEN_KEY = 'admin_access_token';
+const REFRESH_TOKEN_KEY = 'admin_refresh_token';
+
 // Types
 interface ApiResponse<T> {
     data: T;
     message?: string;
     success: boolean;
+}
+
+interface AuthTokens {
+    accessToken: string;
+    refreshToken: string;
 }
 
 interface RequestConfig extends RequestInit {
@@ -74,6 +84,90 @@ async function fetchCsrfTokenFromApi(): Promise<string | null> {
     return csrfTokenInFlight;
 }
 
+// Token management
+export const tokenManager = {
+    getAccessToken: (): string | null => {
+        return localStorage.getItem(ACCESS_TOKEN_KEY);
+    },
+
+    getRefreshToken: (): string | null => {
+        return localStorage.getItem(REFRESH_TOKEN_KEY);
+    },
+
+    setTokens: (tokens: AuthTokens): void => {
+        localStorage.setItem(ACCESS_TOKEN_KEY, tokens.accessToken);
+        localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken);
+    },
+
+    clearTokens: (): void => {
+        localStorage.removeItem(ACCESS_TOKEN_KEY);
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
+    },
+
+    isAuthenticated: (): boolean => {
+        const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+        if (!token) return false;
+
+        try {
+            // Decode JWT to check expiration
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const expirationTime = payload.exp * 1000;
+            return Date.now() < expirationTime;
+        } catch {
+            return false;
+        }
+    }
+};
+
+// Refresh token logic
+let isRefreshing = false;
+let refreshPromise: Promise<boolean> | null = null;
+
+const refreshAccessToken = async (): Promise<boolean> => {
+    if (isRefreshing && refreshPromise) {
+        return refreshPromise;
+    }
+
+    isRefreshing = true;
+    refreshPromise = (async () => {
+        try {
+            const refreshToken = tokenManager.getRefreshToken();
+            if (!refreshToken) {
+                throw new Error('No refresh token');
+            }
+
+            const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ refreshToken }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to refresh token');
+            }
+
+            const data = await response.json();
+            tokenManager.setTokens({
+                accessToken: data.accessToken,
+                refreshToken: data.refreshToken || refreshToken,
+            });
+
+            return true;
+        } catch (error) {
+            tokenManager.clearTokens();
+            window.dispatchEvent(new CustomEvent('auth:logout'));
+            return false;
+        } finally {
+            isRefreshing = false;
+            refreshPromise = null;
+        }
+    })();
+
+    return refreshPromise;
+};
+
 // Build URL with query params
 const buildUrl = (endpoint: string, params?: Record<string, string | number | boolean | undefined>): string => {
     const fallbackOrigin =
@@ -101,7 +195,7 @@ async function apiRequest<T>(
     endpoint: string,
     config: RequestConfig = {}
 ): Promise<ApiResponse<T>> {
-    const { params, skipAuth: _skipAuth, ...fetchConfig } = config;
+    const { params, skipAuth = false, ...fetchConfig } = config;
 
     const url = buildUrl(endpoint, params);
 
@@ -110,10 +204,17 @@ async function apiRequest<T>(
         ...fetchConfig.headers,
     };
 
-    // Add CSRF token for cookie-authenticated state-changing requests.
+    // Add authorization header if not skipped (legacy support)
+    const accessToken = !skipAuth ? tokenManager.getAccessToken() : null;
+    if (accessToken) {
+        (headers as Record<string, string>)['Authorization'] = `Bearer ${accessToken}`;
+    }
+
+    // Add CSRF token for cookie-based auth on state-changing requests.
+    // If the CSRF cookie isn't readable (e.g., API on sibling subdomain), fetch it via /auth/csrf.
     const method = String(fetchConfig.method || 'GET').toUpperCase();
     const isSafeMethod = method === 'GET' || method === 'HEAD' || method === 'OPTIONS';
-    if (!isSafeMethod) {
+    if (!isSafeMethod && !accessToken) {
         const csrf = getCookieValue(CSRF_COOKIE_NAME) || csrfTokenCache || (await fetchCsrfTokenFromApi());
         if (csrf) {
             (headers as Record<string, string>)['X-CSRF-Token'] = csrf;
@@ -121,14 +222,29 @@ async function apiRequest<T>(
     }
 
     try {
-        const response = await fetch(url, {
+        let response = await fetch(url, {
             ...fetchConfig,
             headers,
             credentials: 'include',
         });
 
-        if (response.status === 401) {
-            window.dispatchEvent(new CustomEvent('auth:logout'));
+        // Handle 401 - try to refresh token
+        if (response.status === 401 && !skipAuth) {
+            const hasRefreshToken = Boolean(tokenManager.getRefreshToken());
+            const refreshed = hasRefreshToken ? await refreshAccessToken() : false;
+            if (refreshed) {
+                // Retry the request with new token
+                const newAccessToken = tokenManager.getAccessToken();
+                (headers as Record<string, string>)['Authorization'] = `Bearer ${newAccessToken}`;
+
+                response = await fetch(url, {
+                    ...fetchConfig,
+                    headers,
+                    credentials: 'include',
+                });
+            } else {
+                throw new ApiError('Session expired. Please login again.', 401);
+            }
         }
 
         // Parse response

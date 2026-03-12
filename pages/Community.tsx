@@ -416,11 +416,11 @@ const Community: React.FC = () => {
 
                <Button type="submit" variant="secondary" className="hidden md:flex">
                   <Filter className="w-4 h-4 mr-2" />
-                  Lọc
+                  {copy.filter}
                </Button>
                <Button type="button" onClick={handleCreateClick}>
                   <Plus className="w-4 h-4 mr-2" />
-                  Đăng tin tìm đội
+                  {copy.postTeam}
                </Button>
             </div>
          </form>
@@ -429,14 +429,14 @@ const Community: React.FC = () => {
          {!isLoading && !error && (
             <div className="flex items-center justify-between mb-6">
                <p className="text-sm text-slate-500">
-                  {copy.found} <span className="font-semibold text-slate-900">{pagination.total}</span> bài đăng
+                  {copy.found} <span className="font-semibold text-slate-900">{pagination.total}</span> {copy.postsCount}
                </p>
                <button
                   onClick={() => fetchPosts(pagination.page)}
                   className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700"
                >
                   <RefreshCw className="w-4 h-4" />
-                  Làm mới
+                  {copy.refresh}
                </button>
             </div>
          )}
@@ -475,7 +475,7 @@ const Community: React.FC = () => {
                </p>
                <Button onClick={handleCreateClick}>
                   <Plus className="w-4 h-4 mr-2" />
-                  Đăng tin tìm đội
+                  {copy.postTeam}
                </Button>
             </Card>
          )}
@@ -567,7 +567,7 @@ const Community: React.FC = () => {
                                  className="text-primary-600 hover:text-primary-700 hover:bg-primary-50"
                                  onClick={() => setSelectedPost(post)}
                               >
-                                 Xem thêm
+                                 {copy.viewMore}
                                  <ChevronRight className="w-4 h-4 ml-1" />
                               </Button>
                            </div>
@@ -585,7 +585,7 @@ const Community: React.FC = () => {
                         disabled={pagination.page === 1}
                         onClick={() => fetchPosts(pagination.page - 1)}
                      >
-                        Trước
+                        {copy.prev}
                      </Button>
                      <span className="flex items-center px-4 text-sm text-slate-600">
                         {copy.pageOf} {pagination.page} / {pagination.totalPages}
@@ -596,7 +596,7 @@ const Community: React.FC = () => {
                         disabled={pagination.page === pagination.totalPages}
                         onClick={() => fetchPosts(pagination.page + 1)}
                      >
-                        Sau
+                        {copy.next}
                      </Button>
                   </div>
                )}
@@ -644,4 +644,3 @@ const Community: React.FC = () => {
 };
 
 export default Community;
-

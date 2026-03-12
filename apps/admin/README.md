@@ -1,10 +1,10 @@
 # Blanc Admin Dashboard
 
-A light-glass admin dashboard for managing the Blanc platform built with React, TypeScript, and Vite.
+A modern admin dashboard for managing Blanc platform built with React, TypeScript, and Vite.
 
 ## Features
 
-- 🔐 **Secure Authentication** - same-site httpOnly cookie session + CSRF only
+- 🔐 **Secure Authentication** - httpOnly cookie session + CSRF (legacy Bearer token supported)
 - 👥 **User Management** - View, edit, ban/activate users
 - 🏆 **Contest Management** - Create, edit, delete contests with AI description generation
 - 📚 **Course Management** - Manage courses with AI syllabus generation
@@ -46,17 +46,13 @@ Create `apps/admin/.env.local` (see `apps/admin/.env.example`) with the followin
 
 ```env
 # Backend API URL
-# Production should stay same-site:
-VITE_API_URL=/api
-
-# Local development can point at the API server directly:
-# VITE_API_URL=http://localhost:4000/api
+VITE_API_URL=http://localhost:4000/api
 
 # Public site base URL (for profile links)
 VITE_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-`VITE_*` values are public browser config. For AI features, set `GEMINI_API_KEY` on the backend API server, not in Vite env.
+For AI features, set `GEMINI_API_KEY` on the backend API server (not in Vite env).
 
 ## Project Structure
 
@@ -90,7 +86,7 @@ VITE_PUBLIC_SITE_URL=http://localhost:3000
 
 ## API Endpoints
 
-Base URL: `${VITE_API_URL}` (default production assumption: `/api`)
+Base URL: `${VITE_API_URL}` (default: `http://localhost:4000/api`)
 
 - Auth: `/auth/login/initiate`, `/auth/login/verify-2fa`, `/auth/me`, `/auth/logout`
 - Admin-only: `/admin/*` (users, settings, notifications, security, audit logs, email tools)
@@ -101,9 +97,7 @@ Base URL: `${VITE_API_URL}` (default production assumption: `/api`)
 - **httpOnly cookie session** + **CSRF** for state-changing requests
 - **Role-based access** enforced server-side (`admin`, `super_admin`)
 - **Protected routes** for authenticated users only
-- **No persisted admin bearer tokens** in `localStorage`
-- **No client-side API key storage** in the admin bundle
-- **CORS + credentials** enabled for cookie auth in development
+- **CORS + credentials** enabled for cookie auth
 
 ## Development
 

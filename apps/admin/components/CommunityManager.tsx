@@ -89,13 +89,9 @@ const CommunityManager: React.FC = () => {
     const isExpired = Boolean(activeItem.expiresAt && new Date(activeItem.expiresAt).getTime() <= Date.now());
     return createPortal(
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-        <div
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-          onClick={() => !isMutating && setIsViewOpen(false)}
-          aria-hidden="true"
-        />
-        <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => !isMutating && setIsViewOpen(false)} aria-hidden="true" />
+        <div className="relative w-full max-w-3xl overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl">
+          <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
             <div className="flex items-center gap-2">
               <Eye className="text-emerald-600" size={18} />
               <h3 className="text-lg font-semibold text-gray-900">Post details</h3>
@@ -103,67 +99,56 @@ const CommunityManager: React.FC = () => {
             <button
               type="button"
               onClick={() => !isMutating && setIsViewOpen(false)}
-              className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-50 rounded-lg"
+              className="rounded-lg p-2 text-gray-400 hover:bg-gray-50 hover:text-gray-700"
               title="Close"
             >
               <X size={18} />
             </button>
           </div>
-          <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+          <div className="max-h-[70vh] space-y-4 overflow-y-auto p-6">
             <div className="space-y-1">
               <h2 className="text-2xl font-bold text-gray-900">{activeItem.title}</h2>
-              <p className="text-sm text-gray-500">
-                {activeItem.contestTitle ? `Contest: ${activeItem.contestTitle}` : 'Contest: —'}
-              </p>
+              <p className="text-sm text-gray-500">{activeItem.contestTitle ? `Contest: ${activeItem.contestTitle}` : 'Contest: —'}</p>
             </div>
 
-            <div className="flex flex-wrap gap-2 items-center">
-              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${activeItem.status === 'open'
-                  ? 'bg-emerald-100 text-emerald-700'
-                  : activeItem.status === 'full'
-                    ? 'bg-amber-100 text-amber-800'
-                    : 'bg-slate-100 text-slate-700'
-                }`}>
+            <div className="flex flex-wrap items-center gap-2">
+              <span
+                className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                  activeItem.status === 'open'
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : activeItem.status === 'full'
+                      ? 'bg-amber-100 text-amber-800'
+                      : 'bg-slate-100 text-slate-700'
+                }`}
+              >
                 {activeItem.status}
               </span>
-              {activeItem.deletedAt && (
-                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
-                  deleted
-                </span>
-              )}
-              {isExpired && (
-                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">
-                  expired
-                </span>
-              )}
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+              {activeItem.deletedAt && <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700">deleted</span>}
+              {isExpired && <span className="rounded-full bg-orange-100 px-2.5 py-1 text-xs font-semibold text-orange-800">expired</span>}
+              <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
                 {activeItem.currentMembers}/{activeItem.maxMembers} members
               </span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
-                By {activeItem.createdBy?.name || 'Unknown'}
-              </span>
+              <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">By {activeItem.createdBy?.name || 'Unknown'}</span>
               {activeItem.expiresAt && (
-                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
                   Expires: {new Date(activeItem.expiresAt).toLocaleString()}
                 </span>
               )}
             </div>
 
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-2">Description</h4>
-              <pre className="whitespace-pre-wrap text-sm text-gray-800 bg-gray-50 border border-gray-100 rounded-xl p-4">
-                {activeItem.description || '—'}
-              </pre>
+              <h4 className="mb-2 text-sm font-semibold text-gray-900">Description</h4>
+              <pre className="rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm whitespace-pre-wrap text-gray-800">{activeItem.description || '—'}</pre>
             </div>
 
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-2">Roles needed</h4>
+              <h4 className="mb-2 text-sm font-semibold text-gray-900">Roles needed</h4>
               <div className="flex flex-wrap gap-2">
                 {safeArray<string>(activeItem.rolesNeeded).length === 0 ? (
                   <span className="text-sm text-gray-500">—</span>
                 ) : (
                   safeArray<string>(activeItem.rolesNeeded).map((role) => (
-                    <span key={role} className="px-2.5 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
+                    <span key={role} className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-700">
                       {role}
                     </span>
                   ))
@@ -172,25 +157,27 @@ const CommunityManager: React.FC = () => {
             </div>
 
             <div>
-              <h4 className="text-sm font-semibold text-gray-900 mb-2">Members</h4>
+              <h4 className="mb-2 text-sm font-semibold text-gray-900">Members</h4>
               <div className="space-y-2">
                 {safeArray<any>(activeItem.members).length === 0 ? (
                   <span className="text-sm text-gray-500">—</span>
                 ) : (
-                  safeArray<any>(activeItem.members).slice(0, 12).map((m: any) => (
-                    <div key={m.id} className="flex items-center justify-between bg-gray-50 border border-gray-100 rounded-xl px-4 py-2">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-semibold">
-                          {(m.name || '?').slice(0, 1).toUpperCase()}
+                  safeArray<any>(activeItem.members)
+                    .slice(0, 12)
+                    .map((m: any) => (
+                      <div key={m.id} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 px-4 py-2">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-xs font-semibold text-emerald-700">
+                            {(m.name || '?').slice(0, 1).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{m.name || 'Unknown'}</p>
+                            {m.role && <p className="text-xs text-gray-500">{m.role}</p>}
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{m.name || 'Unknown'}</p>
-                          {m.role && <p className="text-xs text-gray-500">{m.role}</p>}
-                        </div>
+                        {m.joinedAt && <span className="text-xs text-gray-400">{new Date(m.joinedAt).toLocaleDateString()}</span>}
                       </div>
-                      {m.joinedAt && <span className="text-xs text-gray-400">{new Date(m.joinedAt).toLocaleDateString()}</span>}
-                    </div>
-                  ))
+                    ))
                 )}
               </div>
             </div>
@@ -209,11 +196,13 @@ const CommunityManager: React.FC = () => {
           if (!isConfirmLoading) setPendingAction(null);
         }}
         title={pendingAction?.type === 'restore' ? 'Restore post' : 'Delete post'}
-        message={pendingAction
-          ? pendingAction.type === 'restore'
-            ? `Restore community post "${pendingAction.item.title}"?`
-            : `Soft delete community post "${pendingAction.item.title}"?`
-          : ''}
+        message={
+          pendingAction
+            ? pendingAction.type === 'restore'
+              ? `Restore community post "${pendingAction.item.title}"?`
+              : `Soft delete community post "${pendingAction.item.title}"?`
+            : ''
+        }
         confirmLabel={pendingAction?.type === 'restore' ? 'Restore' : 'Delete'}
         variant={pendingAction?.type === 'restore' ? 'success' : 'danger'}
         showReasonInput={pendingAction?.type === 'delete'}
@@ -244,14 +233,14 @@ const CommunityManager: React.FC = () => {
         }}
         isLoading={isConfirmLoading}
       />
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Community</h2>
-          <p className="text-gray-500 mt-1">Moderate team posts created by users</p>
+          <p className="mt-1 text-gray-500">Moderate team posts created by users</p>
         </div>
         <button
           onClick={fetchPosts}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gray-50 text-gray-700 hover:bg-gray-100"
+          className="flex items-center gap-2 rounded-lg bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
           disabled={isLoading}
           title="Refresh"
         >
@@ -260,18 +249,18 @@ const CommunityManager: React.FC = () => {
         </button>
       </div>
 
-      <div className="flex flex-col lg:flex-row lg:items-end gap-3">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Search</label>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">Search</label>
           <div className="relative">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search size={18} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
             <input
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
                 setPagination((p) => ({ ...p, page: 1 }));
               }}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+              className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pr-4 pl-10 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
               placeholder="Search by title, description..."
             />
           </div>
@@ -317,16 +306,12 @@ const CommunityManager: React.FC = () => {
         </div>
       </div>
 
-      {error && (
-        <div className="p-4 rounded-xl border border-red-200 bg-red-50 text-red-800 text-sm">
-          {error}
-        </div>
-      )}
+      {error && <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</div>}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 border-b border-gray-100 text-gray-900 uppercase font-semibold text-xs">
+            <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-900 uppercase">
               <tr>
                 <th className="px-6 py-4">Post</th>
                 <th className="px-6 py-4">Roles</th>
@@ -358,62 +343,59 @@ const CommunityManager: React.FC = () => {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <MessageSquare size={16} className="text-emerald-600" />
-                        <span className="font-medium text-gray-900 line-clamp-1">{item.title}</span>
+                        <span className="line-clamp-1 font-medium text-gray-900">{item.title}</span>
                       </div>
-                      <p className="text-xs text-gray-500 line-clamp-1 mt-1">
+                      <p className="mt-1 line-clamp-1 text-xs text-gray-500">
                         {item.contestTitle || '-'} - by {item.createdBy?.name || 'Unknown'}
                       </p>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">
-                        {safeArray<string>(item.rolesNeeded).slice(0, 2).map((role) => (
-                          <span key={role} className="px-2 py-0.5 rounded-full text-[11px] bg-gray-100 text-gray-700">
-                            {role}
-                          </span>
-                        ))}
+                        {safeArray<string>(item.rolesNeeded)
+                          .slice(0, 2)
+                          .map((role) => (
+                            <span key={role} className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-700">
+                              {role}
+                            </span>
+                          ))}
                         {safeArray<string>(item.rolesNeeded).length > 2 && (
-                          <span className="px-2 py-0.5 rounded-full text-[11px] bg-gray-100 text-gray-700">
+                          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-700">
                             +{safeArray<string>(item.rolesNeeded).length - 2}
                           </span>
                         )}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                      <span className="inline-flex items-center gap-2 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
                         <Users size={14} />
                         {item.currentMembers}/{item.maxMembers}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${item.status === 'open'
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : item.status === 'full'
-                              ? 'bg-amber-100 text-amber-800'
-                              : 'bg-slate-100 text-slate-700'
-                          }`}>
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                            item.status === 'open'
+                              ? 'bg-emerald-100 text-emerald-700'
+                              : item.status === 'full'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-slate-100 text-slate-700'
+                          }`}
+                        >
                           {item.status}
                         </span>
-                        {item.deletedAt && (
-                          <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
-                            deleted
-                          </span>
-                        )}
+                        {item.deletedAt && <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700">deleted</span>}
                         {item.expiresAt && new Date(item.expiresAt).getTime() <= Date.now() && (
-                          <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">
-                            expired
-                          </span>
+                          <span className="rounded-full bg-orange-100 px-2.5 py-1 text-xs font-semibold text-orange-800">expired</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-xs text-gray-500">
-                      {item.createdAt ? new Date(item.createdAt).toLocaleString() : '—'}
-                    </td>
+                    <td className="px-6 py-4 text-xs text-gray-500">{item.createdAt ? new Date(item.createdAt).toLocaleString() : '—'}</td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => openView(item)}
-                          className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
+                          className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                           title="View"
                           disabled={isMutating}
                         >
@@ -422,7 +404,7 @@ const CommunityManager: React.FC = () => {
                         {item.deletedAt ? (
                           <button
                             onClick={() => handleRestore(item)}
-                            className="p-2 text-gray-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg"
+                            className="rounded-lg p-2 text-gray-500 hover:bg-emerald-50 hover:text-emerald-700"
                             title="Restore"
                             disabled={isMutating}
                           >
@@ -431,7 +413,7 @@ const CommunityManager: React.FC = () => {
                         ) : (
                           <button
                             onClick={() => handleDelete(item)}
-                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                            className="rounded-lg p-2 text-gray-500 hover:bg-red-50 hover:text-red-600"
                             title="Delete"
                             disabled={isMutating}
                           >
@@ -447,15 +429,17 @@ const CommunityManager: React.FC = () => {
           </table>
         </div>
 
-        <div className="flex items-center justify-between px-6 py-4 text-sm text-gray-600 border-t border-gray-100">
+        <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4 text-sm text-gray-600">
           <span>
-            {pagination.total > 0 ? `Showing ${(pagination.page - 1) * pagination.limit + 1}-${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total}` : '—'}
+            {pagination.total > 0
+              ? `Showing ${(pagination.page - 1) * pagination.limit + 1}-${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total}`
+              : '—'}
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPagination((p) => ({ ...p, page: Math.max(1, p.page - 1) }))}
               disabled={pagination.page <= 1 || isLoading}
-              className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:text-gray-300 disabled:hover:bg-transparent"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:text-gray-300 disabled:hover:bg-transparent"
             >
               Prev
             </button>
@@ -465,7 +449,7 @@ const CommunityManager: React.FC = () => {
             <button
               onClick={() => setPagination((p) => ({ ...p, page: Math.min(p.totalPages, p.page + 1) }))}
               disabled={pagination.page >= pagination.totalPages || isLoading}
-              className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:text-gray-300 disabled:hover:bg-transparent"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:text-gray-300 disabled:hover:bg-transparent"
             >
               Next
             </button>

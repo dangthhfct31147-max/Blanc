@@ -1,20 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import {
-  Plus,
-  Search,
-  RefreshCw,
-  Edit2,
-  Trash2,
-  Eye,
-  X,
-  Loader2,
-  Tag,
-  Calendar,
-  CheckCircle2,
-  FileText,
-  Pin,
-} from 'lucide-react';
+import { Plus, Search, RefreshCw, Edit2, Trash2, Eye, X, Loader2, Tag, Calendar, CheckCircle2, FileText, Pin } from 'lucide-react';
 import { NewsArticle, NewsAudience, NewsType } from '../types';
 import { newsService } from '../services/newsService';
 import { useDebounce } from '../hooks/useApi';
@@ -42,16 +28,19 @@ const RELEASE_AUDIENCE_OPTIONS: Array<{ value: NewsAudience; label: string; colo
   { value: 'admins', label: 'Admins', color: 'bg-slate-600' },
 ];
 
-const NEWS_TYPE_LABELS = NEWS_TYPE_OPTIONS.reduce<Record<NewsType, string>>((acc, option) => {
-  acc[option.value] = option.label;
-  return acc;
-}, {
-  announcement: 'Announcement',
-  minigame: 'Mini game',
-  update: 'Update',
-  event: 'Event',
-  tip: 'Study tip',
-});
+const NEWS_TYPE_LABELS = NEWS_TYPE_OPTIONS.reduce<Record<NewsType, string>>(
+  (acc, option) => {
+    acc[option.value] = option.label;
+    return acc;
+  },
+  {
+    announcement: 'Announcement',
+    minigame: 'Mini game',
+    update: 'Update',
+    event: 'Event',
+    tip: 'Study tip',
+  }
+);
 
 const getTypeLabel = (value?: NewsType) => NEWS_TYPE_LABELS[value || 'announcement'] || 'Announcement';
 
@@ -182,7 +171,7 @@ const NewsManager: React.FC = () => {
         type: (full.type || 'announcement') as NewsType,
         highlight: !!full.highlight,
         actionLabel: full.actionLabel || '',
-        actionLink: full.actionLink && full.actionLink.startsWith('#') ? '' : (full.actionLink || ''),
+        actionLink: full.actionLink && full.actionLink.startsWith('#') ? '' : full.actionLink || '',
         status: full.status || 'draft',
         publishAt: toDatetimeLocal(full.publishAt),
         releaseVersion: full.release?.version || '',
@@ -250,11 +239,8 @@ const NewsManager: React.FC = () => {
 
       let release: NewsArticle['release'] | null | undefined = undefined;
       if (form.type === 'update') {
-        const hasReleaseContent = !!form.releaseVersion.trim()
-          || !!form.releaseHeadline.trim()
-          || releaseChanges.length > 0
-          || form.notifySubscribers
-          || !!activeItem?.release;
+        const hasReleaseContent =
+          !!form.releaseVersion.trim() || !!form.releaseHeadline.trim() || releaseChanges.length > 0 || form.notifySubscribers || !!activeItem?.release;
 
         if (hasReleaseContent) {
           release = {
@@ -306,13 +292,9 @@ const NewsManager: React.FC = () => {
     if (!isModalOpen) return null;
     return createPortal(
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-        <div
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-          onClick={() => !isSaving && setIsModalOpen(false)}
-          aria-hidden="true"
-        />
-        <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => !isSaving && setIsModalOpen(false)} aria-hidden="true" />
+        <div className="relative w-full max-w-3xl overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl">
+          <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
             <div className="flex items-center gap-2">
               <FileText className="text-emerald-600" size={18} />
               <h3 className="text-lg font-semibold text-gray-900">{activeItem ? 'Edit News' : 'Create News'}</h3>
@@ -320,21 +302,21 @@ const NewsManager: React.FC = () => {
             <button
               type="button"
               onClick={() => !isSaving && setIsModalOpen(false)}
-              className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-50 rounded-lg"
+              className="rounded-lg p-2 text-gray-400 hover:bg-gray-50 hover:text-gray-700"
               title="Close"
             >
               <X size={18} />
             </button>
           </div>
 
-          <form onSubmit={handleSave} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSave} className="max-h-[70vh] space-y-4 overflow-y-auto p-6">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Title *</label>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Title *</label>
                 <input
                   value={form.title}
                   onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500"
                   placeholder="News title"
                   required
                   disabled={isSaving}
@@ -342,24 +324,24 @@ const NewsManager: React.FC = () => {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Summary</label>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Summary</label>
                 <textarea
                   value={form.summary}
                   onChange={(e) => setForm((p) => ({ ...p, summary: e.target.value }))}
                   rows={2}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none"
+                  className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500"
                   placeholder="Short summary"
                   disabled={isSaving}
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Body *</label>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Body *</label>
                 <textarea
                   value={form.body}
                   onChange={(e) => setForm((p) => ({ ...p, body: e.target.value }))}
                   rows={8}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500"
                   placeholder="Full content (plain text)"
                   required
                   disabled={isSaving}
@@ -389,43 +371,43 @@ const NewsManager: React.FC = () => {
               </div>
 
               <div className="md:col-span-2">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Publish at</label>
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700">Publish at</label>
                     <div className="relative">
-                      <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <Calendar size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
                       <input
                         type="datetime-local"
                         value={form.publishAt}
                         onChange={(e) => setForm((p) => ({ ...p, publishAt: e.target.value }))}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                        className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pr-4 pl-10 outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500"
                         disabled={isSaving}
                       />
                     </div>
                   </div>
 
                   <div>
-                    <p className="block text-sm font-medium text-gray-700 mb-1.5">Highlight</p>
-                    <label className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 hover:bg-white hover:border-gray-300 transition-colors cursor-pointer">
-                      <div className="flex items-center gap-2 min-w-0">
+                    <p className="mb-1.5 block text-sm font-medium text-gray-700">Highlight</p>
+                    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 transition-colors hover:border-gray-300 hover:bg-white">
+                      <div className="flex min-w-0 items-center gap-2">
                         <span
-                          className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${form.highlight ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'
-                            }`}
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+                            form.highlight ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'
+                          }`}
                           aria-hidden="true"
                         >
                           <Pin size={16} />
                         </span>
                         <div className="min-w-0">
-                          <p className="text-sm font-semibold text-gray-900 truncate">
-                            {form.highlight ? 'Pinned to highlights' : 'Pin to highlights'}
-                          </p>
-                          <p className="text-xs text-gray-500 truncate">Show in highlighted section</p>
+                          <p className="truncate text-sm font-semibold text-gray-900">{form.highlight ? 'Pinned to highlights' : 'Pin to highlights'}</p>
+                          <p className="truncate text-xs text-gray-500">Show in highlighted section</p>
                         </div>
                       </div>
 
                       <span
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.highlight ? 'bg-emerald-600' : 'bg-gray-300'
-                          }`}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                          form.highlight ? 'bg-emerald-600' : 'bg-gray-300'
+                        }`}
                       >
                         <input
                           type="checkbox"
@@ -435,33 +417,34 @@ const NewsManager: React.FC = () => {
                           disabled={isSaving}
                         />
                         <span
-                          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${form.highlight ? 'translate-x-5' : 'translate-x-1'
-                            }`}
+                          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${
+                            form.highlight ? 'translate-x-5' : 'translate-x-1'
+                          }`}
                         />
                       </span>
                     </label>
                   </div>
                 </div>
 
-                <p className="text-xs text-gray-500 mt-1">Leave empty to publish immediately (when published)</p>
+                <p className="mt-1 text-xs text-gray-500">Leave empty to publish immediately (when published)</p>
               </div>
 
               {form.type === 'update' && (
-                <div className="md:col-span-2 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 space-y-4">
+                <div className="space-y-4 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 md:col-span-2">
                   <div>
                     <h4 className="text-sm font-semibold text-emerald-900">Release update</h4>
-                    <p className="text-xs text-emerald-700 mt-1">
+                    <p className="mt-1 text-xs text-emerald-700">
                       Publish one changelog-style update with version name, what&apos;s new, and optional email broadcast.
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Version name</label>
+                      <label className="mb-1.5 block text-sm font-medium text-gray-700">Version name</label>
                       <input
                         value={form.releaseVersion}
                         onChange={(e) => setForm((p) => ({ ...p, releaseVersion: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                        className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
                         placeholder="e.g. Blanc v1.8.0"
                         disabled={isSaving}
                       />
@@ -479,37 +462,39 @@ const NewsManager: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Release headline</label>
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700">Release headline</label>
                     <input
                       value={form.releaseHeadline}
                       onChange={(e) => setForm((p) => ({ ...p, releaseHeadline: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
                       placeholder="One short line to introduce this version"
                       disabled={isSaving}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">What&apos;s new</label>
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700">What&apos;s new</label>
                     <textarea
                       value={form.releaseChanges}
                       onChange={(e) => setForm((p) => ({ ...p, releaseChanges: e.target.value }))}
                       rows={5}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-y"
+                      className="w-full resize-y rounded-xl border border-gray-200 bg-white px-4 py-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
                       placeholder={'One bullet per line\nImproved mentor matching performance\nAdded Hall of Fame library\nFixed preview deployment issues'}
                       disabled={isSaving}
                     />
-                    <p className="text-xs text-gray-500 mt-1">Each line becomes one changelog item in the email and news detail.</p>
+                    <p className="mt-1 text-xs text-gray-500">Each line becomes one changelog item in the email and news detail.</p>
                   </div>
 
-                  <label className="flex items-start justify-between gap-3 px-4 py-3 rounded-xl border border-emerald-200 bg-white cursor-pointer">
+                  <label className="flex cursor-pointer items-start justify-between gap-3 rounded-xl border border-emerald-200 bg-white px-4 py-3">
                     <div className="space-y-1">
                       <p className="text-sm font-semibold text-gray-900">Send release email when this update is published</p>
                       <p className="text-xs text-gray-500">
                         Works like a Railway-style changelog push: publish once, post to news, and email the selected audience.
                       </p>
                     </div>
-                    <span className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.notifySubscribers ? 'bg-emerald-600' : 'bg-gray-300'}`}>
+                    <span
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.notifySubscribers ? 'bg-emerald-600' : 'bg-gray-300'}`}
+                    >
                       <input
                         type="checkbox"
                         checked={form.notifySubscribers}
@@ -517,13 +502,16 @@ const NewsManager: React.FC = () => {
                         className="sr-only"
                         disabled={isSaving}
                       />
-                      <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${form.notifySubscribers ? 'translate-x-5' : 'translate-x-1'}`} />
+                      <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${form.notifySubscribers ? 'translate-x-5' : 'translate-x-1'}`}
+                      />
                     </span>
                   </label>
 
                   {activeItem?.release?.lastNotification && (
                     <div className="rounded-xl border border-emerald-100 bg-white px-4 py-3 text-xs text-gray-600">
-                      Last send: {activeItem.release.lastNotification.notifiedAt ? new Date(activeItem.release.lastNotification.notifiedAt).toLocaleString() : '—'}
+                      Last send:{' '}
+                      {activeItem.release.lastNotification.notifiedAt ? new Date(activeItem.release.lastNotification.notifiedAt).toLocaleString() : '—'}
                       {' · '}
                       Sent {activeItem.release.lastNotification.sent}/{activeItem.release.lastNotification.total}
                       {activeItem.release.lastNotification.failed > 0 ? ` · Failed ${activeItem.release.lastNotification.failed}` : ''}
@@ -533,46 +521,46 @@ const NewsManager: React.FC = () => {
               )}
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Tags</label>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Tags</label>
                 <div className="relative">
-                  <Tag size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Tag size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
                   <input
                     value={form.tags}
                     onChange={(e) => setForm((p) => ({ ...p, tags: e.target.value }))}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pr-4 pl-10 outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500"
                     placeholder="tag1, tag2, tag3"
                     disabled={isSaving}
                   />
                 </div>
               </div>
 
-              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:col-span-2 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Cover image URL</label>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">Cover image URL</label>
                   <input
                     value={form.coverImage}
                     onChange={(e) => setForm((p) => ({ ...p, coverImage: e.target.value }))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500"
                     placeholder="https://..."
                     disabled={isSaving}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Action label</label>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">Action label</label>
                   <input
                     value={form.actionLabel}
                     onChange={(e) => setForm((p) => ({ ...p, actionLabel: e.target.value }))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500"
                     placeholder="e.g. Learn more"
                     disabled={isSaving}
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Action link (URL or /path)</label>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">Action link (URL or /path)</label>
                   <input
                     value={form.actionLink}
                     onChange={(e) => setForm((p) => ({ ...p, actionLink: e.target.value }))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500"
                     placeholder="/community or https://..."
                     disabled={isSaving}
                   />
@@ -580,11 +568,11 @@ const NewsManager: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-4 border-t border-gray-100">
+            <div className="flex items-center justify-end gap-2 border-t border-gray-100 pt-4">
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 disabled={isSaving}
               >
                 Cancel
@@ -592,7 +580,7 @@ const NewsManager: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
+                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-gray-300"
               >
                 {isSaving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
                 Save
@@ -609,13 +597,9 @@ const NewsManager: React.FC = () => {
     if (!isViewOpen || !activeItem) return null;
     return createPortal(
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-        <div
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-          onClick={() => !isSaving && setIsViewOpen(false)}
-          aria-hidden="true"
-        />
-        <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => !isSaving && setIsViewOpen(false)} aria-hidden="true" />
+        <div className="relative w-full max-w-3xl overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl">
+          <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
             <div className="flex items-center gap-2">
               <Eye className="text-emerald-600" size={18} />
               <h3 className="text-lg font-semibold text-gray-900">Preview</h3>
@@ -623,50 +607,42 @@ const NewsManager: React.FC = () => {
             <button
               type="button"
               onClick={() => !isSaving && setIsViewOpen(false)}
-              className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-50 rounded-lg"
+              className="rounded-lg p-2 text-gray-400 hover:bg-gray-50 hover:text-gray-700"
               title="Close"
             >
               <X size={18} />
             </button>
           </div>
-          <div className="p-6 space-y-3 max-h-[70vh] overflow-y-auto">
+          <div className="max-h-[70vh] space-y-3 overflow-y-auto p-6">
             <div className="flex flex-wrap items-center gap-2">
-              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${activeItem.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'}`}>
+              <span
+                className={`rounded-full px-2.5 py-1 text-xs font-semibold ${activeItem.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'}`}
+              >
                 {activeItem.status}
               </span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+              <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
                 {getTypeLabel(activeItem.type || 'announcement')}
               </span>
-              {activeItem.highlight && (
-                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
-                  highlighted
-                </span>
-              )}
+              {activeItem.highlight && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">highlighted</span>}
             </div>
             <h2 className="text-2xl font-bold text-gray-900">{activeItem.title}</h2>
             {activeItem.summary && <p className="text-gray-600">{activeItem.summary}</p>}
             {activeItem.release && (
-              <div className="rounded-xl border border-emerald-100 bg-emerald-50/70 p-4 space-y-2">
+              <div className="space-y-2 rounded-xl border border-emerald-100 bg-emerald-50/70 p-4">
                 <div className="flex flex-wrap items-center gap-2">
                   {activeItem.release.version && (
-                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-600 text-white">
-                      {activeItem.release.version}
-                    </span>
+                    <span className="rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white">{activeItem.release.version}</span>
                   )}
-                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-white text-emerald-700 border border-emerald-200">
+                  <span className="rounded-full border border-emerald-200 bg-white px-2.5 py-1 text-xs font-semibold text-emerald-700">
                     audience: {activeItem.release.audience}
                   </span>
                   {activeItem.release.notifySubscribers && (
-                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-white text-amber-700 border border-amber-200">
-                      email on publish
-                    </span>
+                    <span className="rounded-full border border-amber-200 bg-white px-2.5 py-1 text-xs font-semibold text-amber-700">email on publish</span>
                   )}
                 </div>
-                {activeItem.release.headline && (
-                  <p className="text-sm text-gray-700">{activeItem.release.headline}</p>
-                )}
+                {activeItem.release.headline && <p className="text-sm text-gray-700">{activeItem.release.headline}</p>}
                 {safeArray<string>(activeItem.release.changes).length > 0 && (
-                  <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                  <ul className="list-inside list-disc space-y-1 text-sm text-gray-700">
                     {safeArray<string>(activeItem.release.changes).map((change) => (
                       <li key={change}>{change}</li>
                     ))}
@@ -675,9 +651,7 @@ const NewsManager: React.FC = () => {
               </div>
             )}
             {activeItem.body && (
-              <pre className="whitespace-pre-wrap text-sm text-gray-800 bg-gray-50 border border-gray-100 rounded-xl p-4">
-                {activeItem.body}
-              </pre>
+              <pre className="rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm whitespace-pre-wrap text-gray-800">{activeItem.body}</pre>
             )}
           </div>
         </div>
@@ -717,15 +691,15 @@ const NewsManager: React.FC = () => {
         }}
         isLoading={isDeleteConfirmLoading}
       />
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">News & Tips</h2>
-          <p className="text-gray-500 mt-1">Manage announcements, updates, events, and study tips shown to users</p>
+          <p className="mt-1 text-gray-500">Manage announcements, updates, events, and study tips shown to users</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={fetchNews}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gray-50 text-gray-700 hover:bg-gray-100"
+            className="flex items-center gap-2 rounded-lg bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
             disabled={isLoading}
             title="Refresh"
           >
@@ -734,7 +708,7 @@ const NewsManager: React.FC = () => {
           </button>
           <button
             onClick={openCreate}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700"
+            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
           >
             <Plus size={18} />
             Create
@@ -742,18 +716,18 @@ const NewsManager: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row lg:items-end gap-3">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Search</label>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">Search</label>
           <div className="relative">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search size={18} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
             <input
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
                 setPagination((p) => ({ ...p, page: 1 }));
               }}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+              className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pr-4 pl-10 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
               placeholder="Search by title or summary..."
             />
           </div>
@@ -781,16 +755,12 @@ const NewsManager: React.FC = () => {
         </div>
       </div>
 
-      {error && (
-        <div className="p-4 rounded-xl border border-red-200 bg-red-50 text-red-800 text-sm">
-          {error}
-        </div>
-      )}
+      {error && <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</div>}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 border-b border-gray-100 text-gray-900 uppercase font-semibold text-xs">
+            <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-900 uppercase">
               <tr>
                 <th className="px-6 py-4">Title</th>
                 <th className="px-6 py-4">Type</th>
@@ -821,45 +791,38 @@ const NewsManager: React.FC = () => {
                   <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900 line-clamp-1">{item.title}</span>
-                        {item.highlight && (
-                          <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800">
-                            pin
-                          </span>
-                        )}
+                        <span className="line-clamp-1 font-medium text-gray-900">{item.title}</span>
+                        {item.highlight && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">pin</span>}
                       </div>
-                      {item.release?.version && (
-                        <p className="text-[11px] font-semibold text-emerald-700 mt-1">{item.release.version}</p>
-                      )}
-                      {item.summary && <p className="text-xs text-gray-500 line-clamp-1 mt-1">{item.summary}</p>}
+                      {item.release?.version && <p className="mt-1 text-[11px] font-semibold text-emerald-700">{item.release.version}</p>}
+                      {item.summary && <p className="mt-1 line-clamp-1 text-xs text-gray-500">{item.summary}</p>}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                      <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
                         {getTypeLabel(item.type || 'announcement')}
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${item.status === 'published'
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-slate-100 text-slate-700'
-                        }`}>
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                          item.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'
+                        }`}
+                      >
                         {item.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-xs text-gray-500">
-                      {item.publishAt ? new Date(item.publishAt).toLocaleString() : '—'}
-                    </td>
+                    <td className="px-6 py-4 text-xs text-gray-500">{item.publishAt ? new Date(item.publishAt).toLocaleString() : '—'}</td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">
-                        {safeArray<string>(item.tags).slice(0, 3).map((t) => (
-                          <span key={t} className="px-2 py-0.5 rounded-full text-[11px] bg-gray-100 text-gray-700">
-                            {t}
-                          </span>
-                        ))}
+                        {safeArray<string>(item.tags)
+                          .slice(0, 3)
+                          .map((t) => (
+                            <span key={t} className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-700">
+                              {t}
+                            </span>
+                          ))}
                         {safeArray<string>(item.tags).length > 3 && (
-                          <span className="px-2 py-0.5 rounded-full text-[11px] bg-gray-100 text-gray-700">
-                            +{safeArray<string>(item.tags).length - 3}
-                          </span>
+                          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-700">+{safeArray<string>(item.tags).length - 3}</span>
                         )}
                       </div>
                     </td>
@@ -867,7 +830,7 @@ const NewsManager: React.FC = () => {
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => openView(item)}
-                          className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
+                          className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                           title="Preview"
                           disabled={isSaving}
                         >
@@ -875,7 +838,7 @@ const NewsManager: React.FC = () => {
                         </button>
                         <button
                           onClick={() => openEdit(item)}
-                          className="p-2 text-gray-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg"
+                          className="rounded-lg p-2 text-gray-500 hover:bg-emerald-50 hover:text-emerald-700"
                           title="Edit"
                           disabled={isSaving}
                         >
@@ -883,7 +846,7 @@ const NewsManager: React.FC = () => {
                         </button>
                         <button
                           onClick={() => handleToggleStatus(item)}
-                          className="px-3 py-2 rounded-lg text-xs font-semibold bg-gray-50 text-gray-700 hover:bg-gray-100"
+                          className="rounded-lg bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-100"
                           disabled={isSaving}
                           title="Toggle status"
                         >
@@ -891,7 +854,7 @@ const NewsManager: React.FC = () => {
                         </button>
                         <button
                           onClick={() => handleDelete(item)}
-                          className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                          className="rounded-lg p-2 text-gray-500 hover:bg-red-50 hover:text-red-600"
                           title="Delete"
                           disabled={isSaving}
                         >
@@ -906,15 +869,17 @@ const NewsManager: React.FC = () => {
           </table>
         </div>
 
-        <div className="flex items-center justify-between px-6 py-4 text-sm text-gray-600 border-t border-gray-100">
+        <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4 text-sm text-gray-600">
           <span>
-            {pagination.total > 0 ? `Showing ${(pagination.page - 1) * pagination.limit + 1}-${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total}` : '—'}
+            {pagination.total > 0
+              ? `Showing ${(pagination.page - 1) * pagination.limit + 1}-${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total}`
+              : '—'}
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPagination((p) => ({ ...p, page: Math.max(1, p.page - 1) }))}
               disabled={pagination.page <= 1 || isLoading}
-              className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:text-gray-300 disabled:hover:bg-transparent"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:text-gray-300 disabled:hover:bg-transparent"
             >
               Prev
             </button>
@@ -924,7 +889,7 @@ const NewsManager: React.FC = () => {
             <button
               onClick={() => setPagination((p) => ({ ...p, page: Math.min(p.totalPages, p.page + 1) }))}
               disabled={pagination.page >= pagination.totalPages || isLoading}
-              className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:text-gray-300 disabled:hover:bg-transparent"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:text-gray-300 disabled:hover:bg-transparent"
             >
               Next
             </button>

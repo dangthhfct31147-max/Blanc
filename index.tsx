@@ -12,11 +12,6 @@ import {
   setRuntimeAppEnvironment,
   setRuntimeClerkPublishableKey,
 } from './lib/clerkConfig';
-import { initErrorTracking } from './lib/errorTracking';
-import { ThemeProvider } from './contexts/ThemeContext';
-
-// Initialize error tracking early (before React renders)
-initErrorTracking();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -110,18 +105,16 @@ const AppBootstrap: React.FC = () => {
   if (!isConfigResolved) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="inline-block h-10 w-10 rounded-full border-3 border-primary-600 border-r-transparent animate-spin" />
+        <div className="inline-block h-10 w-10 rounded-full border-[3px] border-primary-600 border-r-transparent animate-spin" />
       </div>
     );
   }
 
   return (
     <ClerkProviderWithRouter publishableKey={clerkPublishableKey}>
-      <ThemeProvider>
-        <I18nProvider>
-          <App />
-        </I18nProvider>
-      </ThemeProvider>
+      <I18nProvider>
+        <App />
+      </I18nProvider>
     </ClerkProviderWithRouter>
   );
 };

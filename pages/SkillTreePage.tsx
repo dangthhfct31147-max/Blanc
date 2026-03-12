@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2, Sparkles, Target } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAppAuth } from '../contexts/AppAuthContext';
+import { useI18n } from '../contexts/I18nContext';
 import SkillTreeV2 from '../components/skilltree/SkillTreeV2';
 import type { UserSkillTreeState, BranchId, XPActivity, UserNodeProgress, NodeState } from '../components/skilltree/types';
 import { xpToLevel } from '../components/skilltree/data';
@@ -134,10 +135,31 @@ function tierIdToNewId(tierId: string, branchId: BranchId): string {
 
 export default function SkillTreePage() {
     const { user } = useAppAuth();
+    const { locale } = useI18n();
     const navigate = useNavigate();
     const [data, setData] = useState<SkillTreeResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const isEn = locale === 'en';
+    const copy = useMemo(() => isEn ? {
+        loadFailed: 'Unable to load data',
+        loading: 'Loading skill tree...',
+        errorTitle: 'Unable to load',
+        back: 'Back',
+        badge: 'Skill Tree',
+        title: 'Skill Tree',
+        description: 'Your personal growth journey through contests and courses',
+        footer: 'Join contests and complete courses to unlock more skill branches',
+    } : {
+        loadFailed: 'Không thể tải dữ liệu',
+        loading: 'Đang tải cây kỹ năng...',
+        errorTitle: 'Không thể tải',
+        back: 'Quay lại',
+        badge: 'Skill Tree',
+        title: 'Cây Kỹ Năng',
+        description: 'Hành trình phát triển cá nhân qua các cuộc thi và khóa học',
+        footer: 'Tham gia cuộc thi và hoàn thành khóa học để mở khóa thêm nhánh kỹ năng',
+    }, [isEn]);
 
     useEffect(() => {
         if (!user?.id) return;
@@ -149,14 +171,14 @@ export default function SkillTreePage() {
                 const result = await api.get<SkillTreeResponse>(`/skill-tree/${user.id}`);
                 setData(result);
             } catch (err: any) {
-                setError(err?.message || 'Không thể tải dữ liệu');
+                setError(err?.message || copy.loadFailed);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchSkillTree();
-    }, [user?.id]);
+    }, [copy.loadFailed, user?.id]);
 
     // Convert API data to UserSkillTreeState
     const userState = useMemo<UserSkillTreeState | null>(() => {
@@ -169,7 +191,7 @@ export default function SkillTreePage() {
             <div className="min-h-[70vh] flex items-center justify-center">
                 <div className="text-center">
                     <Loader2 className="w-8 h-8 animate-spin text-indigo-400 mx-auto mb-3" />
-                    <p className="text-slate-400 text-sm">Đang tải cây kỹ năng...</p>
+                    <p className="text-slate-400 text-sm">{copy.loading}</p>
                 </div>
             </div>
         );
@@ -188,14 +210,14 @@ export default function SkillTreePage() {
                     >
                         <Target className="w-8 h-8 text-red-400" />
                     </div>
-                    <h2 className="text-xl font-bold text-slate-200 mb-2">Không thể tải</h2>
+                    <h2 className="text-xl font-bold text-slate-200 mb-2">{copy.errorTitle}</h2>
                     <p className="text-slate-400 mb-4">{error}</p>
                     <button
                         onClick={() => navigate(-1)}
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Quay lại
+                        {copy.back}
                     </button>
                 </div>
             </div>
@@ -214,7 +236,7 @@ export default function SkillTreePage() {
                         className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200 transition-colors mb-4"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Quay lại
+                        {copy.back}
                     </button>
 
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -227,25 +249,25 @@ export default function SkillTreePage() {
                                 }}
                             >
                                 <Sparkles className="w-3.5 h-3.5" />
-                                Skill Tree
+                                {copy.badge}
                             </div>
                             <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">
-                                Cây Kỹ Năng
+                                {copy.title}
                             </h1>
                             <p className="text-slate-400 text-sm">
-                                Hành trình phát triển cá nhân qua các cuộc thi và khóa học
+                                {copy.description}
                             </p>
                         </div>
                     </div>
                 </div>
 
                 {/* New Skill Tree V2 */}
-                <SkillTreeV2 userState={userState} locale={(user as any)?.locale || 'vi'} />
+                <SkillTreeV2 userState={userState} locale={locale} />
 
                 {/* Info Footer */}
                 <div className="mt-6 text-center">
                     <p className="text-xs text-slate-500">
-                        Tham gia cuộc thi và hoàn thành khóa học để mở khóa thêm nhánh kỹ năng
+                        {copy.footer}
                     </p>
                 </div>
             </div>

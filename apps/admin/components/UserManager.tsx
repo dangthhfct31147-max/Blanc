@@ -1,5 +1,24 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Search, Filter, MoreHorizontal, Mail, Shield, ShieldAlert, GraduationCap, Eye, Edit2, Trash2, Ban, CheckCircle, RefreshCw, AlertCircle, Users, Sparkles, Download as DownloadIcon, Plus } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  MoreHorizontal,
+  Mail,
+  Shield,
+  ShieldAlert,
+  GraduationCap,
+  Eye,
+  Edit2,
+  Trash2,
+  Ban,
+  CheckCircle,
+  RefreshCw,
+  AlertCircle,
+  Users,
+  Sparkles,
+  Download as DownloadIcon,
+  Plus,
+} from 'lucide-react';
 import { Dropdown } from './ui/Dropdown';
 import { ViewProfileModal, EditUserModal, ConfirmActionModal, CreateUserModal, CreateUserPayload } from './ui/UserModals';
 import { User, UserProfile, UpdateUserPayload } from '../types';
@@ -32,7 +51,12 @@ const UserManager: React.FC = () => {
   const [selectAll, setSelectAll] = useState(false);
 
   // Stats
-  const [stats, setStats] = useState<{ totalUsers: number; activeUsers: number; bannedUsers: number; newUsersThisMonth: number }>({ totalUsers: 0, activeUsers: 0, bannedUsers: 0, newUsersThisMonth: 0 });
+  const [stats, setStats] = useState<{ totalUsers: number; activeUsers: number; bannedUsers: number; newUsersThisMonth: number }>({
+    totalUsers: 0,
+    activeUsers: 0,
+    bannedUsers: 0,
+    newUsersThisMonth: 0,
+  });
 
   // Modal States
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -59,59 +83,62 @@ const UserManager: React.FC = () => {
   const debouncedSearch = useDebounce(searchTerm, 300);
 
   // Fetch users with abort controller support
-  const fetchUsers = useCallback(async (skipCache = false) => {
-    // Cancel previous request if still pending
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
-    // Create new abort controller
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const filters: UserFilters = {
-        search: debouncedSearch || undefined,
-        role: filterRole !== 'all' ? filterRole : undefined,
-        status: filterStatus !== 'all' ? filterStatus : undefined,
-        page: pagination.page,
-        limit: pagination.limit,
-      };
-
-      const response = await userService.getAll(filters, {
-        signal: controller.signal,
-        skipCache,
-      });
-
-      // Only update state if this request wasn't aborted
-      if (!controller.signal.aborted) {
-        setUsers(response.items);
-        setPagination(prev => ({
-          ...prev,
-          total: response.total,
-          totalPages: response.totalPages,
-        }));
-        setError(null);
-      }
-    } catch (err: any) {
-      // Ignore abort errors
-      if (err.name === 'AbortError' || controller.signal.aborted) {
-        return;
+  const fetchUsers = useCallback(
+    async (skipCache = false) => {
+      // Cancel previous request if still pending
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
 
-      console.error('Failed to fetch users:', err);
-      setError(err.message || 'Failed to load users. Please check your connection and try again.');
-      setUsers([]);
-    } finally {
-      // Only set loading false if this controller is still the current one
-      if (abortControllerRef.current === controller) {
-        setIsLoading(false);
+      // Create new abort controller
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const filters: UserFilters = {
+          search: debouncedSearch || undefined,
+          role: filterRole !== 'all' ? filterRole : undefined,
+          status: filterStatus !== 'all' ? filterStatus : undefined,
+          page: pagination.page,
+          limit: pagination.limit,
+        };
+
+        const response = await userService.getAll(filters, {
+          signal: controller.signal,
+          skipCache,
+        });
+
+        // Only update state if this request wasn't aborted
+        if (!controller.signal.aborted) {
+          setUsers(response.items);
+          setPagination((prev) => ({
+            ...prev,
+            total: response.total,
+            totalPages: response.totalPages,
+          }));
+          setError(null);
+        }
+      } catch (err: any) {
+        // Ignore abort errors
+        if (err.name === 'AbortError' || controller.signal.aborted) {
+          return;
+        }
+
+        console.error('Failed to fetch users:', err);
+        setError(err.message || 'Failed to load users. Please check your connection and try again.');
+        setUsers([]);
+      } finally {
+        // Only set loading false if this controller is still the current one
+        if (abortControllerRef.current === controller) {
+          setIsLoading(false);
+        }
       }
-    }
-  }, [debouncedSearch, filterRole, filterStatus, pagination.page, pagination.limit]);
+    },
+    [debouncedSearch, filterRole, filterStatus, pagination.page, pagination.limit]
+  );
 
   // Initial fetch and cleanup
   useEffect(() => {
@@ -163,18 +190,19 @@ const UserManager: React.FC = () => {
 
   // Selection helpers
   const toggleSelect = (id: string) => {
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
 
   const toggleSelectAll = () => {
-    setSelectAll(prev => !prev);
-    setSelectedIds(prev => {
+    setSelectAll((prev) => !prev);
+    setSelectedIds((prev) => {
       if (!selectAll) {
-        return new Set(users.map(u => u.id));
+        return new Set(users.map((u) => u.id));
       }
       return new Set();
     });
@@ -250,11 +278,7 @@ const UserManager: React.FC = () => {
       userService.invalidateCache();
 
       // Update local state
-      setUsers(users.map(u =>
-        u.id === selectedUser.id
-          ? { ...u, ...updatedUser }
-          : u
-      ));
+      setUsers(users.map((u) => (u.id === selectedUser.id ? { ...u, ...updatedUser } : u)));
 
       toast.success('User updated successfully');
       setShowEditModal(false);
@@ -266,7 +290,6 @@ const UserManager: React.FC = () => {
       setActionLoading(false);
     }
   };
-
 
   // Handle Status Change (Ban/Activate)
   const handleStatusAction = (user: User, newStatus: 'active' | 'inactive' | 'banned') => {
@@ -299,11 +322,7 @@ const UserManager: React.FC = () => {
       userService.invalidateCache();
 
       // Update local state
-      setUsers(users.map(u =>
-        u.id === selectedUser.id
-          ? { ...u, status: updated.status }
-          : u
-      ));
+      setUsers(users.map((u) => (u.id === selectedUser.id ? { ...u, status: updated.status } : u)));
 
       setShowStatusConfirm(false);
       setSelectedUser(null);
@@ -342,8 +361,8 @@ const UserManager: React.FC = () => {
       userService.invalidateCache();
 
       // Remove from local state
-      setUsers(users.filter(u => u.id !== selectedUser.id));
-      setPagination(prev => ({ ...prev, total: prev.total - 1 }));
+      setUsers(users.filter((u) => u.id !== selectedUser.id));
+      setPagination((prev) => ({ ...prev, total: prev.total - 1 }));
 
       toast.success('User deleted successfully');
       setShowDeleteConfirm(false);
@@ -380,7 +399,7 @@ const UserManager: React.FC = () => {
   };
 
   const handlePageChange = (newPage: number) => {
-    setPagination(prev => ({ ...prev, page: newPage }));
+    setPagination((prev) => ({ ...prev, page: newPage }));
   };
 
   // Visible users after local sort
@@ -405,16 +424,18 @@ const UserManager: React.FC = () => {
 
   // Bulk actions
   const exportSelectedCSV = () => {
-    const rows = visibleUsers.filter(u => selectedIds.has(u.id)).map(u => ({
-      id: u.id,
-      name: u.name,
-      email: u.email,
-      role: u.role,
-      status: u.status,
-      balance: u.balance,
-    }));
+    const rows = visibleUsers
+      .filter((u) => selectedIds.has(u.id))
+      .map((u) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        status: u.status,
+        balance: u.balance,
+      }));
     const header = 'id,name,email,role,status,balance';
-    const csv = [header, ...rows.map(r => `${r.id},"${r.name.replace(/"/g, '"')}",${r.email},${r.role},${r.status},${r.balance}`)].join('\n');
+    const csv = [header, ...rows.map((r) => `${r.id},"${r.name.replace(/"/g, '"')}",${r.email},${r.role},${r.status},${r.balance}`)].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -425,7 +446,10 @@ const UserManager: React.FC = () => {
   };
 
   const copySelectedEmails = () => {
-    const emails = visibleUsers.filter(u => selectedIds.has(u.id)).map(u => u.email).join(', ');
+    const emails = visibleUsers
+      .filter((u) => selectedIds.has(u.id))
+      .map((u) => u.email)
+      .join(', ');
     navigator.clipboard.writeText(emails).then(() => toast.success('Copied emails to clipboard'));
   };
 
@@ -459,28 +483,28 @@ const UserManager: React.FC = () => {
       <section className="relative overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl shadow-sky-100/60">
         <div className="absolute inset-0 bg-linear-to-br from-sky-50 via-white to-emerald-50 opacity-90" aria-hidden="true" />
         <div className="relative p-6 md:p-8 lg:p-10">
-          <div className="grid grid-cols-1 lg:grid-cols-[1.35fr_1fr] gap-8 items-center">
+          <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[1.35fr_1fr]">
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-white/70 text-xs font-semibold text-sky-700 shadow-sm">
-                <Users className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-xs font-semibold text-sky-700 shadow-sm">
+                <Users className="h-3.5 w-3.5" />
                 Quản trị người dùng
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Quản lý tài khoản, vai trò và trạng thái</h2>
-              <p className="text-gray-600 text-sm md:text-base">Bộ công cụ toàn diện: lọc, sắp xếp, thao tác hàng loạt, xuất CSV, xem hồ sơ và nhật ký.</p>
+              <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">Quản lý tài khoản, vai trò và trạng thái</h2>
+              <p className="text-sm text-gray-600 md:text-base">Bộ công cụ toàn diện: lọc, sắp xếp, thao tác hàng loạt, xuất CSV, xem hồ sơ và nhật ký.</p>
               <div className="flex flex-wrap gap-3">
-                <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-gray-100 px-3 py-2 text-xs text-gray-600 shadow-sm">
-                  <Search className="w-4 h-4 text-sky-500" />
+                <div className="flex items-center gap-2 rounded-xl border border-gray-100 bg-white/90 px-3 py-2 text-xs text-gray-600 shadow-sm">
+                  <Search className="h-4 w-4 text-sky-500" />
                   Tìm kiếm nhanh
                 </div>
-                <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-gray-100 px-3 py-2 text-xs text-gray-600 shadow-sm">
-                  <Sparkles className="w-4 h-4 text-emerald-500" />
+                <div className="flex items-center gap-2 rounded-xl border border-gray-100 bg-white/90 px-3 py-2 text-xs text-gray-600 shadow-sm">
+                  <Sparkles className="h-4 w-4 text-emerald-500" />
                   Lọc & sắp xếp
                 </div>
               </div>
             </div>
             <div className="space-y-4">
               <div className="rounded-2xl border border-white/80 bg-white/80 p-5 shadow-md">
-                <div className="text-xs font-semibold uppercase tracking-widest text-gray-400">Tổng quan</div>
+                <div className="text-xs font-semibold tracking-widest text-gray-400 uppercase">Tổng quan</div>
                 <div className="mt-3 flex items-end gap-2">
                   <span className="text-3xl font-bold text-gray-900">{stats.totalUsers || 0}</span>
                   <span className="text-sm text-gray-500">người dùng</span>
@@ -505,10 +529,10 @@ const UserManager: React.FC = () => {
           </div>
         </div>
       </section>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Students & Admins</h2>
-          <p className="text-gray-500 mt-1">Manage user roles and permissions</p>
+          <p className="mt-1 text-gray-500">Manage user roles and permissions</p>
         </div>
         <div className="flex flex-wrap items-end justify-end gap-2">
           <button
@@ -516,8 +540,8 @@ const UserManager: React.FC = () => {
             disabled={!canCreateUsers || createLoading}
             className={
               canCreateUsers
-                ? 'inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50'
-                : 'inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                ? 'inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50'
+                : 'inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-400'
             }
             title={canCreateUsers ? 'Add user' : 'Only admin/super admin can create users'}
           >
@@ -525,18 +549,18 @@ const UserManager: React.FC = () => {
             Add User
           </button>
           <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <Search className="absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400" size={18} />
             <input
               type="text"
               placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none w-full"
+              className="w-full rounded-lg border border-gray-300 py-2 pr-4 pl-10 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
             />
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`p-2 border rounded-lg transition-colors ${showFilters ? 'border-emerald-500 bg-emerald-50 text-emerald-600' : 'border-gray-300 hover:bg-gray-50 text-gray-600'}`}
+            className={`rounded-lg border p-2 transition-colors ${showFilters ? 'border-emerald-500 bg-emerald-50 text-emerald-600' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}
             title="Toggle filters"
           >
             <Filter size={18} />
@@ -544,7 +568,7 @@ const UserManager: React.FC = () => {
           <button
             onClick={() => fetchUsers(true)}
             disabled={isLoading}
-            className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600 disabled:opacity-50"
+            className="rounded-lg border border-gray-300 p-2 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
             title="Refresh"
           >
             <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} />
@@ -557,7 +581,7 @@ const UserManager: React.FC = () => {
                 { value: 'student', label: 'Student', color: 'bg-gray-400' },
                 { value: 'mentor', label: 'Mentor', color: 'bg-emerald-500' },
                 { value: 'admin', label: 'Admin', color: 'bg-purple-500' },
-                { value: 'super_admin', label: 'Super Admin', color: 'bg-red-500' }
+                { value: 'super_admin', label: 'Super Admin', color: 'bg-red-500' },
               ]}
               value={filterRole}
               onChange={(val) => setFilterRole(val as typeof filterRole)}
@@ -585,25 +609,45 @@ const UserManager: React.FC = () => {
 
       {/* Bulk actions toolbar */}
       {selectedIds.size > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-4 flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-gray-200 bg-white p-4">
           <span className="text-sm text-gray-600">Đã chọn {selectedIds.size} người dùng</span>
-          <button onClick={() => bulkUpdateStatus('active')} disabled={actionLoading} className="px-3 py-1.5 text-sm rounded bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50">Activate</button>
-          <button onClick={() => bulkUpdateStatus('banned')} disabled={actionLoading} className="px-3 py-1.5 text-sm rounded bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-50">Ban</button>
-          <button onClick={exportSelectedCSV} className="px-3 py-1.5 text-sm rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 inline-flex items-center gap-2"><DownloadIcon className="w-4 h-4" />Export CSV</button>
-          <button onClick={copySelectedEmails} className="px-3 py-1.5 text-sm rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50">Copy Emails</button>
+          <button
+            onClick={() => bulkUpdateStatus('active')}
+            disabled={actionLoading}
+            className="rounded bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-700 disabled:opacity-50"
+          >
+            Activate
+          </button>
+          <button
+            onClick={() => bulkUpdateStatus('banned')}
+            disabled={actionLoading}
+            className="rounded bg-amber-600 px-3 py-1.5 text-sm text-white hover:bg-amber-700 disabled:opacity-50"
+          >
+            Ban
+          </button>
+          <button
+            onClick={exportSelectedCSV}
+            className="inline-flex items-center gap-2 rounded border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+          >
+            <DownloadIcon className="h-4 w-4" />
+            Export CSV
+          </button>
+          <button onClick={copySelectedEmails} className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
+            Copy Emails
+          </button>
         </div>
       )}
 
       {/* Filters */}
       {showFilters && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-wrap gap-4 animate-fade-in-up">
+        <div className="animate-fade-in-up flex flex-wrap gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
           <div className="min-w-40">
             <Dropdown
               label="Status"
               options={[
                 { value: 'all', label: 'All Status' },
                 { value: 'active', label: 'Active', color: 'bg-green-500' },
-                { value: 'banned', label: 'Banned', color: 'bg-red-500' }
+                { value: 'banned', label: 'Banned', color: 'bg-red-500' },
               ]}
               value={filterStatus}
               onChange={(val) => setFilterStatus(val as typeof filterStatus)}
@@ -616,19 +660,26 @@ const UserManager: React.FC = () => {
 
       {/* Error Alert */}
       {error && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center gap-3">
+        <div className="flex items-center gap-3 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
           <AlertCircle className="text-yellow-500" size={20} />
-          <span className="text-yellow-700 text-sm">{error}</span>
+          <span className="text-sm text-yellow-700">{error}</span>
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="overflow-x-auto min-h-[300px]"> {/* min-h ensure dropdown has space if few items */}
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="min-h-[300px] overflow-x-auto">
+          {' '}
+          {/* min-h ensure dropdown has space if few items */}
           <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 border-b border-gray-100 text-gray-900 uppercase font-semibold text-xs">
+            <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-900 uppercase">
               <tr>
                 <th className="px-6 py-4">
-                  <input type="checkbox" aria-label="Select all" checked={selectAll && selectedIds.size === users.length && users.length > 0} onChange={toggleSelectAll} />
+                  <input
+                    type="checkbox"
+                    aria-label="Select all"
+                    checked={selectAll && selectedIds.size === users.length && users.length > 0}
+                    onChange={toggleSelectAll}
+                  />
                 </th>
                 <th className="px-6 py-4">User</th>
                 <th className="px-6 py-4">Role</th>
@@ -641,7 +692,7 @@ const UserManager: React.FC = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
-                    <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                    <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent"></div>
                     <p className="text-gray-500">Loading users...</p>
                   </td>
                 </tr>
@@ -651,121 +702,142 @@ const UserManager: React.FC = () => {
                     No users found matching your criteria.
                   </td>
                 </tr>
-              ) : visibleUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <input type="checkbox" aria-label={`Select ${user.name}`} checked={selectedIds.has(user.id)} onChange={() => toggleSelect(user.id)} />
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-4">
-                      <img src={getAvatarUrl(user.avatar, user.name, avatarPresets.table)} alt="" className="h-10 w-10 rounded-full border border-gray-200" />
-                      <div>
-                        <p className="font-semibold text-gray-900">{user.name}</p>
-                        <p className="text-xs text-gray-500 flex items-center gap-1">
-                          <Mail size={10} /> {user.email}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-1.5">
-                      {user.role === 'super_admin' ? (
-                        <ShieldAlert size={16} className="text-red-600" />
-                      ) : user.role === 'admin' ? (
-                        <ShieldAlert size={16} className="text-purple-600" />
-                      ) : user.role === 'mentor' ? (
-                        <GraduationCap size={16} className="text-emerald-600" />
-                      ) : (
-                        <Shield size={16} className="text-gray-400" />
-                      )}
-                      <span className={`capitalize ${user.role === 'super_admin'
-                        ? 'text-red-700 font-medium'
-                        : user.role === 'admin'
-                          ? 'text-purple-700 font-medium'
-                          : user.role === 'mentor'
-                            ? 'text-emerald-700 font-medium'
-                            : 'text-gray-700'
-                        }`}>
-                        {user.role === 'super_admin' ? 'super admin' : user.role}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.status === 'active'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-red-100 text-red-800'
-                      }`}>
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 font-mono text-gray-700">
-                    ₫{user.balance.toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="relative action-dropdown inline-block text-left">
-                      <button
-                        onClick={() => setOpenActionId(openActionId === user.id ? null : user.id)}
-                        title="User actions"
-                        className={`p-2 rounded-lg border transition-all duration-200 ${openActionId === user.id
-                          ? 'border-emerald-500 bg-emerald-50 text-emerald-600 shadow-sm'
-                          : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300'
-                          }`}
-                      >
-                        <MoreHorizontal size={18} />
-                      </button>
-
-                      {/* Dropdown Menu */}
-                      {openActionId === user.id && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden animate-fade-in-up origin-top-right">
-                          <div className="py-1">
-                            <button onClick={() => handleAction('view', user)} className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors">
-                              <Eye size={16} className="text-gray-400" />
-                              <span>View Profile</span>
-                            </button>
-                            <button onClick={() => handleAction('edit', user)} className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors">
-                              <Edit2 size={16} className="text-gray-400" />
-                              <span>Edit Details</span>
-                            </button>
-
-                            <div className="border-t border-gray-50 my-1"></div>
-
-                            {user.status === 'active' ? (
-                              <button onClick={() => handleAction('ban', user)} className="w-full text-left px-4 py-2.5 text-sm text-amber-600 hover:bg-amber-50 flex items-center gap-2 transition-colors">
-                                <Ban size={16} />
-                                <span>Ban User</span>
-                              </button>
-                            ) : (
-                              <button onClick={() => handleAction('activate', user)} className="w-full text-left px-4 py-2.5 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 transition-colors">
-                                <CheckCircle size={16} />
-                                <span>Activate</span>
-                              </button>
-                            )}
-
-                            {!isProtectedUser(user.email) && (
-                              <button onClick={() => handleAction('delete', user)} className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors">
-                                <Trash2 size={16} />
-                                <span>Delete User</span>
-                              </button>
-                            )}
-                          </div>
+              ) : (
+                visibleUsers.map((user) => (
+                  <tr key={user.id} className="transition-colors hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <input type="checkbox" aria-label={`Select ${user.name}`} checked={selectedIds.has(user.id)} onChange={() => toggleSelect(user.id)} />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4">
+                        <img src={getAvatarUrl(user.avatar, user.name, avatarPresets.table)} alt="" className="h-10 w-10 rounded-full border border-gray-200" />
+                        <div>
+                          <p className="font-semibold text-gray-900">{user.name}</p>
+                          <p className="flex items-center gap-1 text-xs text-gray-500">
+                            <Mail size={10} /> {user.email}
+                          </p>
                         </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1.5">
+                        {user.role === 'super_admin' ? (
+                          <ShieldAlert size={16} className="text-red-600" />
+                        ) : user.role === 'admin' ? (
+                          <ShieldAlert size={16} className="text-purple-600" />
+                        ) : user.role === 'mentor' ? (
+                          <GraduationCap size={16} className="text-emerald-600" />
+                        ) : (
+                          <Shield size={16} className="text-gray-400" />
+                        )}
+                        <span
+                          className={`capitalize ${
+                            user.role === 'super_admin'
+                              ? 'font-medium text-red-700'
+                              : user.role === 'admin'
+                                ? 'font-medium text-purple-700'
+                                : user.role === 'mentor'
+                                  ? 'font-medium text-emerald-700'
+                                  : 'text-gray-700'
+                          }`}
+                        >
+                          {user.role === 'super_admin' ? 'super admin' : user.role}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                          user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}
+                      >
+                        {user.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 font-mono text-gray-700">₫{user.balance.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="action-dropdown relative inline-block text-left">
+                        <button
+                          onClick={() => setOpenActionId(openActionId === user.id ? null : user.id)}
+                          title="User actions"
+                          className={`rounded-lg border p-2 transition-all duration-200 ${
+                            openActionId === user.id
+                              ? 'border-emerald-500 bg-emerald-50 text-emerald-600 shadow-sm'
+                              : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          <MoreHorizontal size={18} />
+                        </button>
+
+                        {/* Dropdown Menu */}
+                        {openActionId === user.id && (
+                          <div className="animate-fade-in-up absolute right-0 z-50 mt-2 w-48 origin-top-right overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xl">
+                            <div className="py-1">
+                              <button
+                                onClick={() => handleAction('view', user)}
+                                className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                              >
+                                <Eye size={16} className="text-gray-400" />
+                                <span>View Profile</span>
+                              </button>
+                              <button
+                                onClick={() => handleAction('edit', user)}
+                                className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                              >
+                                <Edit2 size={16} className="text-gray-400" />
+                                <span>Edit Details</span>
+                              </button>
+
+                              <div className="my-1 border-t border-gray-50"></div>
+
+                              {user.status === 'active' ? (
+                                <button
+                                  onClick={() => handleAction('ban', user)}
+                                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-amber-600 transition-colors hover:bg-amber-50"
+                                >
+                                  <Ban size={16} />
+                                  <span>Ban User</span>
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleAction('activate', user)}
+                                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-emerald-600 transition-colors hover:bg-emerald-50"
+                                >
+                                  <CheckCircle size={16} />
+                                  <span>Activate</span>
+                                </button>
+                              )}
+
+                              {!isProtectedUser(user.email) && (
+                                <button
+                                  onClick={() => handleAction('delete', user)}
+                                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
+                                >
+                                  <Trash2 size={16} />
+                                  <span>Delete User</span>
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
-        <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+        <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-6 py-4">
           <span className="text-sm text-gray-500">
-            Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} entries
+            Showing {(pagination.page - 1) * pagination.limit + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}{' '}
+            entries
           </span>
           <div className="flex gap-2">
             <button
               onClick={() => handlePageChange(pagination.page - 1)}
               disabled={pagination.page <= 1 || isLoading}
-              className="px-3 py-1 border border-gray-300 rounded bg-white text-sm text-gray-600 disabled:opacity-50 hover:bg-gray-50 disabled:cursor-not-allowed"
+              className="rounded border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Previous
             </button>
@@ -775,7 +847,7 @@ const UserManager: React.FC = () => {
             <button
               onClick={() => handlePageChange(pagination.page + 1)}
               disabled={pagination.page >= pagination.totalPages || isLoading}
-              className="px-3 py-1 border border-gray-300 rounded bg-white text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Next
             </button>
@@ -824,13 +896,7 @@ const UserManager: React.FC = () => {
           setShowStatusConfirm(false);
           setSelectedUser(null);
         }}
-        title={
-          pendingStatus === 'active'
-            ? 'Activate User'
-            : pendingStatus === 'banned'
-              ? 'Ban User'
-              : 'Deactivate User'
-        }
+        title={pendingStatus === 'active' ? 'Activate User' : pendingStatus === 'banned' ? 'Ban User' : 'Deactivate User'}
         message={
           pendingStatus === 'active'
             ? `Are you sure you want to activate "${selectedUser?.name}"? They will regain full access to the platform.`
@@ -838,20 +904,8 @@ const UserManager: React.FC = () => {
               ? `Are you sure you want to ban "${selectedUser?.name}"? They will lose access to the platform.`
               : `Are you sure you want to deactivate "${selectedUser?.name}"?`
         }
-        confirmLabel={
-          pendingStatus === 'active'
-            ? 'Activate'
-            : pendingStatus === 'banned'
-              ? 'Ban User'
-              : 'Deactivate'
-        }
-        variant={
-          pendingStatus === 'active'
-            ? 'success'
-            : pendingStatus === 'banned'
-              ? 'danger'
-              : 'warning'
-        }
+        confirmLabel={pendingStatus === 'active' ? 'Activate' : pendingStatus === 'banned' ? 'Ban User' : 'Deactivate'}
+        variant={pendingStatus === 'active' ? 'success' : pendingStatus === 'banned' ? 'danger' : 'warning'}
         showReasonInput={pendingStatus === 'banned'}
         reasonRequired={pendingStatus === 'banned'}
         onConfirm={handleConfirmStatus}

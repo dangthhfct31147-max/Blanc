@@ -123,38 +123,31 @@ const MentorDirectory: React.FC = () => {
     return (
       <div className="flex flex-wrap gap-1">
         {visible.map((value) => (
-          <span key={value} className="px-2 py-0.5 rounded-full text-[11px] bg-gray-100 text-gray-700">
+          <span key={value} className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-700">
             {value}
           </span>
         ))}
-        {extra > 0 && (
-          <span className="px-2 py-0.5 rounded-full text-[11px] bg-gray-100 text-gray-700">
-            +{extra}
-          </span>
-        )}
+        {extra > 0 && <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] text-gray-700">+{extra}</span>}
       </div>
     );
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div className="space-y-6 p-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Mentor Directory</h1>
           <p className="text-sm text-gray-500">Browse public mentor profiles and verify public data.</p>
         </div>
-        <button
-          onClick={fetchMentors}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
-        >
+        <button onClick={fetchMentors} className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700">
           <RefreshCw size={16} />
           Refresh
         </button>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex flex-col gap-4 lg:flex-row">
         <div className="relative w-full lg:flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+          <Search className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" size={16} />
           <input
             type="text"
             value={search}
@@ -162,7 +155,7 @@ const MentorDirectory: React.FC = () => {
               setSearch(e.target.value);
               setPagination((prev) => ({ ...prev, page: 1 }));
             }}
-            className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
             placeholder="Search mentor by name, email, or skills..."
           />
         </div>
@@ -190,16 +183,12 @@ const MentorDirectory: React.FC = () => {
         </div>
       </div>
 
-      {error && (
-        <div className="p-4 rounded-xl border border-red-200 bg-red-50 text-red-800 text-sm">
-          {error}
-        </div>
-      )}
+      {error && <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</div>}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 border-b border-gray-100 text-gray-900 uppercase font-semibold text-xs">
+            <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-900 uppercase">
               <tr>
                 <th className="px-6 py-4">Mentor</th>
                 <th className="px-6 py-4">Fields</th>
@@ -231,25 +220,19 @@ const MentorDirectory: React.FC = () => {
                     <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <img src={avatarUrl} alt={item.name} className="w-8 h-8 rounded-full object-cover" />
+                          <img src={avatarUrl} alt={item.name} className="h-8 w-8 rounded-full object-cover" />
                           <div>
                             <p className="font-medium text-gray-900">{item.name}</p>
                             <p className="text-xs text-gray-500">ID: {item.id}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        {renderFields(item.fields)}
-                      </td>
-                      <td className="px-6 py-4 text-xs text-gray-500">
-                        {formatDate(item.joinedAt)}
-                      </td>
+                      <td className="px-6 py-4">{renderFields(item.fields)}</td>
+                      <td className="px-6 py-4 text-xs text-gray-500">{formatDate(item.joinedAt)}</td>
                       <td className="px-6 py-4">
                         <span
-                          className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                            item.mentorBlogCompleted
-                              ? 'bg-emerald-100 text-emerald-700'
-                              : 'bg-amber-100 text-amber-700'
+                          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                            item.mentorBlogCompleted ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
                           }`}
                         >
                           {item.mentorBlogCompleted ? 'Completed' : 'Incomplete'}
@@ -259,7 +242,7 @@ const MentorDirectory: React.FC = () => {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => openDetail(item)}
-                            className="p-2 text-gray-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg"
+                            className="rounded-lg p-2 text-gray-500 hover:bg-emerald-50 hover:text-emerald-700"
                             title="View details"
                           >
                             <Eye size={16} />
@@ -268,7 +251,7 @@ const MentorDirectory: React.FC = () => {
                             href={buildPublicMentorUrl(item.id)}
                             target="_blank"
                             rel="noreferrer"
-                            className="p-2 text-gray-500 hover:text-sky-600 hover:bg-sky-50 rounded-lg"
+                            className="rounded-lg p-2 text-gray-500 hover:bg-sky-50 hover:text-sky-600"
                             title="View public profile"
                           >
                             <ExternalLink size={16} />
@@ -283,13 +266,13 @@ const MentorDirectory: React.FC = () => {
           </table>
         </div>
 
-        <div className="flex items-center justify-between px-6 py-4 text-sm text-gray-600 border-t border-gray-100">
+        <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4 text-sm text-gray-600">
           <span>{showingText}</span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPagination((p) => ({ ...p, page: Math.max(1, p.page - 1) }))}
               disabled={pagination.page <= 1 || isLoading}
-              className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:text-gray-300 disabled:hover:bg-transparent"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:text-gray-300 disabled:hover:bg-transparent"
             >
               Prev
             </button>
@@ -299,7 +282,7 @@ const MentorDirectory: React.FC = () => {
             <button
               onClick={() => setPagination((p) => ({ ...p, page: Math.min(p.totalPages, p.page + 1) }))}
               disabled={pagination.page >= pagination.totalPages || isLoading}
-              className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:text-gray-300 disabled:hover:bg-transparent"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:text-gray-300 disabled:hover:bg-transparent"
             >
               Next
             </button>
@@ -308,7 +291,7 @@ const MentorDirectory: React.FC = () => {
       </div>
 
       <Modal isOpen={isModalOpen} onClose={closeDetail} title="Mentor Profile">
-        <div className="p-6 space-y-4">
+        <div className="space-y-4 p-6">
           {isDetailLoading ? (
             <div className="flex items-center justify-center py-10 text-gray-500">
               <Loader2 size={20} className="animate-spin" />
@@ -322,7 +305,7 @@ const MentorDirectory: React.FC = () => {
                 <img
                   src={activeMentor.bannerUrl || `https://picsum.photos/seed/mentor-${activeMentor.id}/800/400`}
                   alt={activeMentor.name}
-                  className="w-full h-40 object-cover"
+                  className="h-40 w-full object-cover"
                 />
               </div>
 
@@ -330,7 +313,7 @@ const MentorDirectory: React.FC = () => {
                 <img
                   src={getAvatarUrl(activeMentor.avatar, activeMentor.name, avatarPresets.detail)}
                   alt={activeMentor.name}
-                  className="w-12 h-12 rounded-full object-cover"
+                  className="h-12 w-12 rounded-full object-cover"
                 />
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">{activeMentor.name}</h3>
@@ -340,19 +323,15 @@ const MentorDirectory: React.FC = () => {
 
               <div className="flex flex-wrap gap-2">
                 {activeMentor.mentorBlogCompleted ? (
-                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
-                    Blog completed
-                  </span>
+                  <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">Blog completed</span>
                 ) : (
-                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-                    Blog incomplete
-                  </span>
+                  <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700">Blog incomplete</span>
                 )}
                 <a
                   href={buildPublicMentorUrl(activeMentor.id)}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-700"
+                  className="rounded-full bg-sky-100 px-2.5 py-1 text-xs font-semibold text-sky-700"
                 >
                   View public profile
                 </a>
@@ -361,7 +340,7 @@ const MentorDirectory: React.FC = () => {
               {activeMentor.fields && activeMentor.fields.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {activeMentor.fields.map((value) => (
-                    <span key={value} className="px-2.5 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
+                    <span key={value} className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-700">
                       {value}
                     </span>
                   ))}
@@ -370,16 +349,12 @@ const MentorDirectory: React.FC = () => {
 
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold text-gray-900">Bio</h4>
-                <p className="text-sm text-gray-700 whitespace-pre-line">
-                  {activeMentor.bio || '-'}
-                </p>
+                <p className="text-sm whitespace-pre-line text-gray-700">{activeMentor.bio || '-'}</p>
               </div>
 
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold text-gray-900">Mentor blog</h4>
-                <p className="text-sm text-gray-700 whitespace-pre-line">
-                  {activeMentor.mentorBlog?.body || '-'}
-                </p>
+                <p className="text-sm whitespace-pre-line text-gray-700">{activeMentor.mentorBlog?.body || '-'}</p>
               </div>
             </>
           ) : (

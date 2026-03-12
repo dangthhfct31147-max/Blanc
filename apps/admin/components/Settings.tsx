@@ -1,122 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import {
-  AlertCircle,
-  Bell,
-  Check,
-  Clock3,
-  Copy,
-  Globe,
-  Loader2,
-  Mail,
-  Megaphone,
-  Save,
-  Send,
-  Shield,
-  ShieldCheck,
-  Sparkles,
-  ToggleLeft,
-  ToggleRight,
-  Users,
-  Wrench,
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Globe, Bell, Shield, Megaphone, Save, Sparkles, ToggleLeft, ToggleRight, Mail, Copy, Check, Loader2, Send, Users, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { generateSystemAnnouncement } from '../services/geminiService';
 import { settingsService } from '../services/settingsService';
 import { Dropdown } from './ui/Dropdown';
 import { ConfirmActionModal } from './ui/UserModals';
-import {
-  AdminPage,
-  AdminPageHeader,
-  AdminSectionCard,
-  AdminSectionTitle,
-  AdminStatCard,
-} from './ui/AdminPrimitives';
-
-type TabId = 'general' | 'notifications' | 'security' | 'announcements';
-
-type PendingConfirm = {
-  title: string;
-  message: string;
-  confirmLabel: string;
-  variant?: 'danger' | 'warning' | 'success' | 'info';
-  onConfirm: () => Promise<void>;
-};
-
-const inputClassName =
-  'w-full rounded-[1.15rem] border border-slate-200/80 bg-white/75 px-4 py-3 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] outline-none transition focus:border-teal-400 focus:ring-4 focus:ring-teal-100';
-
-const panelClassName =
-  'rounded-[1.3rem] border border-slate-200/80 bg-white/70 px-4 py-4 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.28)]';
-
-const ToggleRow = ({
-  title,
-  description,
-  checked,
-  onToggle,
-  icon: Icon,
-  tone = 'teal',
-}: {
-  title: string;
-  description: string;
-  checked: boolean;
-  onToggle: () => void;
-  icon?: React.ElementType;
-  tone?: 'teal' | 'sky' | 'indigo' | 'amber';
-}) => {
-  const toneClass =
-    tone === 'sky'
-      ? 'bg-sky-50 text-sky-700'
-      : tone === 'indigo'
-        ? 'bg-indigo-50 text-indigo-700'
-        : tone === 'amber'
-          ? 'bg-amber-50 text-amber-700'
-          : 'bg-teal-50 text-teal-700';
-
-  return (
-    <div className="flex items-center justify-between gap-4 rounded-[1.35rem] border border-slate-200/80 bg-white/78 px-4 py-4">
-      <div className="flex min-w-0 items-start gap-3">
-        {Icon ? (
-          <div className={`mt-0.5 flex h-10 w-10 items-center justify-center rounded-2xl ${toneClass}`}>
-            <Icon size={18} />
-          </div>
-        ) : null}
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-slate-950">{title}</p>
-          <p className="mt-1 text-sm leading-6 text-slate-500">{description}</p>
-        </div>
-      </div>
-      <button
-        type="button"
-        onClick={onToggle}
-        className={checked ? 'text-teal-600' : 'text-slate-300'}
-        aria-pressed={checked}
-        aria-label={title}
-      >
-        {checked ? <ToggleRight size={40} /> : <ToggleLeft size={40} />}
-      </button>
-    </div>
-  );
-};
-
-const getErrorMessage = (error: unknown, fallback: string) => {
-  if (typeof error === 'object' && error !== null) {
-    const typed = error as { response?: { data?: { error?: string } }; message?: string };
-    return typed.response?.data?.error || typed.message || fallback;
-  }
-  return fallback;
-};
 
 const Settings: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TabId>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'notifications' | 'security' | 'announcements'>('general');
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isResetting, setIsResetting] = useState(false);
+
+  // AI State
   const [announceTopic, setAnnounceTopic] = useState('');
   const [announceAudience, setAnnounceAudience] = useState('All Users');
   const [generatedAnnouncement, setGeneratedAnnouncement] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Email State
   const [testEmail, setTestEmail] = useState('');
   const [isSendingTest, setIsSendingTest] = useState(false);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
@@ -124,6 +28,8 @@ const Settings: React.FC = () => {
   const [broadcastContent, setBroadcastContent] = useState('');
   const [broadcastAudience, setBroadcastAudience] = useState<'all' | 'students' | 'admins'>('all');
   const [emailResult, setEmailResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  // Settings State - loaded from settingsService
   const [settings, setSettings] = useState({
     siteName: 'Blanc',
     supportEmail: 'support@blanc.edu.vn',
@@ -134,9 +40,19 @@ const Settings: React.FC = () => {
     twoFactor: true,
     sessionTimeout: '30',
   });
+
+  type PendingConfirm = {
+    title: string;
+    message: string;
+    confirmLabel: string;
+    variant?: 'danger' | 'warning' | 'success' | 'info';
+    onConfirm: () => Promise<void>;
+  };
+
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
   const [isConfirmLoading, setIsConfirmLoading] = useState(false);
 
+  // Load settings on mount
   useEffect(() => {
     const loadSettings = async () => {
       try {
@@ -157,12 +73,13 @@ const Settings: React.FC = () => {
         setIsLoading(false);
       }
     };
-    void loadSettings();
+    loadSettings();
   }, []);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      // Save all settings
       await settingsService.updateGeneral({
         siteName: settings.siteName,
         supportEmail: settings.supportEmail,
@@ -175,11 +92,11 @@ const Settings: React.FC = () => {
       });
       await settingsService.updateSecurity({
         twoFactorRequired: settings.twoFactor,
-        sessionTimeout: parseInt(settings.sessionTimeout, 10),
+        sessionTimeout: parseInt(settings.sessionTimeout),
       });
+
       setIsSaved(true);
-      window.setTimeout(() => setIsSaved(false), 2000);
-      toast.success('Settings saved');
+      setTimeout(() => setIsSaved(false), 2000);
     } catch (error) {
       console.error('Failed to save settings:', error);
       toast.error('Không thể lưu cài đặt. Vui lòng thử lại.');
@@ -216,18 +133,15 @@ const Settings: React.FC = () => {
   const handleGenerateAI = async () => {
     if (!announceTopic) return;
     setIsGenerating(true);
-    try {
-      const result = await generateSystemAnnouncement(announceTopic, announceAudience);
-      setGeneratedAnnouncement(result);
-    } finally {
-      setIsGenerating(false);
-    }
+    const result = await generateSystemAnnouncement(announceTopic, announceAudience);
+    setGeneratedAnnouncement(result);
+    setIsGenerating(false);
   };
 
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(generatedAnnouncement);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(generatedAnnouncement);
     setCopied(true);
-    window.setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleSendTestEmail = async () => {
@@ -237,8 +151,9 @@ const Settings: React.FC = () => {
     try {
       const result = await settingsService.sendTestEmail(testEmail);
       setEmailResult({ success: true, message: result.message });
-    } catch (error) {
-      setEmailResult({ success: false, message: getErrorMessage(error, 'Không thể gửi email test') });
+    } catch (error: any) {
+      const message = error.response?.data?.error || error.message || 'Không thể gửi email test';
+      setEmailResult({ success: false, message });
     } finally {
       setIsSendingTest(false);
     }
@@ -249,6 +164,7 @@ const Settings: React.FC = () => {
       toast.error('Vui lòng nhập tiêu đề và nội dung');
       return;
     }
+
     setPendingConfirm({
       title: 'Broadcast email',
       message: 'Bạn có chắc muốn gửi email này tới tất cả người dùng?',
@@ -267,8 +183,8 @@ const Settings: React.FC = () => {
           setBroadcastSubject('');
           setBroadcastContent('');
           toast.success('Broadcast sent');
-        } catch (error) {
-          const message = getErrorMessage(error, 'Không thể gửi broadcast');
+        } catch (error: any) {
+          const message = error.response?.data?.error || error.message || 'Không thể gửi broadcast';
           setEmailResult({ success: false, message });
           toast.error(message);
         } finally {
@@ -279,34 +195,30 @@ const Settings: React.FC = () => {
   };
 
   const handleUseAnnouncement = () => {
-    if (!generatedAnnouncement) return;
-    setBroadcastSubject(announceTopic || 'Thông báo từ Blanc');
-    setBroadcastContent(generatedAnnouncement);
-    setActiveTab('notifications');
+    if (generatedAnnouncement) {
+      setBroadcastSubject(announceTopic || 'Thông báo từ Blanc');
+      setBroadcastContent(generatedAnnouncement);
+      setActiveTab('notifications');
+    }
   };
 
-  const tabs: { id: TabId; label: string; icon: React.ElementType; description: string }[] = [
-    { id: 'general', label: 'General', icon: Globe, description: 'Brand, contact, and maintenance state' },
-    { id: 'notifications', label: 'Notifications', icon: Bell, description: 'Email delivery, tests, and broadcasts' },
-    { id: 'security', label: 'Security', icon: Shield, description: '2FA, session lifetime, and resets' },
-    { id: 'announcements', label: 'AI Announcements', icon: Megaphone, description: 'Generate broadcast-ready drafts' },
+  const tabs = [
+    { id: 'general', label: 'General', icon: Globe },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'security', label: 'Security', icon: Shield },
+    { id: 'announcements', label: 'Announcements (AI)', icon: Megaphone },
   ];
 
   if (isLoading) {
     return (
-      <AdminPage>
-        <AdminSectionCard className="flex min-h-[420px] items-center justify-center">
-          <div className="flex items-center gap-3 text-sm font-medium text-slate-500">
-            <Loader2 className="h-5 w-5 animate-spin text-teal-600" />
-            Loading platform settings
-          </div>
-        </AdminSectionCard>
-      </AdminPage>
+      <div className="flex h-64 items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+      </div>
     );
   }
 
   return (
-    <AdminPage>
+    <div className="space-y-6">
       <ConfirmActionModal
         isOpen={Boolean(pendingConfirm)}
         onClose={() => {
@@ -326,366 +238,344 @@ const Settings: React.FC = () => {
         }}
         isLoading={isConfirmLoading}
       />
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
+          <p className="mt-1 text-gray-500">Manage platform preferences and system configuration</p>
+        </div>
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className={`flex items-center gap-2 rounded-lg px-6 py-2 font-medium text-white shadow-sm transition-all ${
+            isSaved ? 'bg-green-600' : isSaving ? 'bg-emerald-400' : 'bg-emerald-600 hover:bg-emerald-700'
+          } disabled:cursor-not-allowed`}
+        >
+          {isSaving ? <Loader2 size={18} className="animate-spin" /> : isSaved ? <Check size={18} /> : <Save size={18} />}
+          {isSaving ? 'Đang lưu...' : isSaved ? 'Đã lưu!' : 'Lưu thay đổi'}
+        </button>
+      </div>
 
-      <AdminPageHeader
-        eyebrow="Platform control"
-        title="System settings, communications, and security defaults"
-        description="This workspace now assumes same-site deployment with cookie + CSRF auth. Every `VITE_*` value remains public client config only, so secrets stay on the backend."
-        actions={
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isSaving}
-            className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white shadow-[0_20px_45px_-28px_rgba(13,148,136,0.75)] transition ${
-              isSaved ? 'bg-emerald-600' : isSaving ? 'bg-teal-400' : 'bg-[linear-gradient(135deg,#0f766e,#0ea5e9)] hover:brightness-105'
-            } disabled:cursor-not-allowed`}
-          >
-            {isSaving ? <Loader2 size={16} className="animate-spin" /> : isSaved ? <Check size={16} /> : <Save size={16} />}
-            {isSaving ? 'Đang lưu...' : isSaved ? 'Đã lưu' : 'Lưu thay đổi'}
-          </button>
-        }
-      />
+      <div className="flex flex-col gap-6 lg:flex-row">
+        {/* Sidebar Navigation */}
+        <div className="w-full flex-shrink-0 lg:w-64">
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+            <nav className="flex flex-col">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className={`flex items-center gap-3 border-l-4 px-4 py-3 text-sm font-medium transition-colors ${
+                      activeTab === tab.id
+                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                        : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                  >
+                    <Icon size={18} />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+        </div>
 
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <AdminStatCard icon={Wrench} label="Maintenance mode" value={settings.maintenanceMode ? 'On' : 'Off'} detail="Public traffic can be paused without changing admin access." tone={settings.maintenanceMode ? 'amber' : 'teal'} />
-        <AdminStatCard icon={Mail} label="Email delivery" value={settings.emailNotifs ? 'Enabled' : 'Disabled'} detail="Admin test mail and broadcasts respect this switch." tone="sky" />
-        <AdminStatCard icon={ShieldCheck} label="Privileged 2FA" value={settings.twoFactor ? 'Required' : 'Optional'} detail="Applies to privileged account flows handled by the backend." tone="indigo" />
-        <AdminStatCard icon={Clock3} label="Session timeout" value={`${settings.sessionTimeout}m`} detail="Cookie session expiry window configured server-side." tone="slate" />
-      </section>
-
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
-        <AdminSectionCard className="p-3">
-          <nav className="grid gap-2">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const active = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`rounded-[1.35rem] px-4 py-4 text-left transition ${active ? 'bg-[linear-gradient(135deg,rgba(13,148,136,0.1),rgba(14,165,233,0.12))] text-slate-950 shadow-[0_18px_40px_-32px_rgba(15,23,42,0.35)] ring-1 ring-white/70' : 'text-slate-600 hover:bg-white/75'}`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/85 text-teal-700">
-                      <Icon size={18} />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold">{tab.label}</p>
-                      <p className="mt-1 text-xs leading-5 text-slate-500">{tab.description}</p>
-                    </div>
+        {/* Content Area */}
+        <div className="flex-1">
+          <div className="min-h-[500px] rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            {/* General Tab */}
+            {activeTab === 'general' && (
+              <div className="animate-fade-in-up space-y-6">
+                <h3 className="border-b border-gray-100 pb-2 text-lg font-semibold text-gray-900">General Information</h3>
+                <div className="grid max-w-xl gap-6">
+                  <div>
+                    <label htmlFor="platform-name" className="mb-1 block text-sm font-medium text-gray-700">
+                      Platform Name
+                    </label>
+                    <input
+                      id="platform-name"
+                      type="text"
+                      value={settings.siteName}
+                      onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
+                      placeholder="Enter platform name"
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
                   </div>
-                </button>
-              );
-            })}
-          </nav>
-        </AdminSectionCard>
-
-        <AdminSectionCard className="space-y-6">
-          {activeTab === 'general' ? (
-            <>
-              <AdminSectionTitle
-                title="General platform settings"
-                description="Keep brand-facing values and maintenance behaviour aligned with the refreshed frontend."
-              />
-              <div className="grid gap-5 lg:grid-cols-2">
-                <div>
-                  <label htmlFor="platform-name" className="mb-2 block text-sm font-semibold text-slate-700">
-                    Platform name
-                  </label>
-                  <input
-                    id="platform-name"
-                    type="text"
-                    value={settings.siteName}
-                    onChange={(event) => setSettings({ ...settings, siteName: event.target.value })}
-                    placeholder="Enter platform name"
-                    className={inputClassName}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="support-email" className="mb-2 block text-sm font-semibold text-slate-700">
-                    Support email
-                  </label>
-                  <input
-                    id="support-email"
-                    type="email"
-                    value={settings.supportEmail}
-                    onChange={(event) => setSettings({ ...settings, supportEmail: event.target.value })}
-                    placeholder="support@example.com"
-                    className={inputClassName}
-                  />
+                  <div>
+                    <label htmlFor="support-email" className="mb-1 block text-sm font-medium text-gray-700">
+                      Support Email
+                    </label>
+                    <input
+                      id="support-email"
+                      type="email"
+                      value={settings.supportEmail}
+                      onChange={(e) => setSettings({ ...settings, supportEmail: e.target.value })}
+                      placeholder="support@example.com"
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-4">
+                    <div>
+                      <p className="font-medium text-gray-900">Maintenance Mode</p>
+                      <p className="text-xs text-gray-500">Disable access for non-admin users</p>
+                    </div>
+                    <button
+                      onClick={() => handleToggle('maintenanceMode')}
+                      className={`text-2xl transition-colors ${settings.maintenanceMode ? 'text-emerald-600' : 'text-gray-300'}`}
+                    >
+                      {settings.maintenanceMode ? <ToggleRight size={40} /> : <ToggleLeft size={40} />}
+                    </button>
+                  </div>
                 </div>
               </div>
-              <ToggleRow
-                title="Maintenance mode"
-                description="Pause learner-facing access while keeping the admin workspace available for controlled operations."
-                checked={settings.maintenanceMode}
-                onToggle={() => handleToggle('maintenanceMode')}
-                icon={Wrench}
-                tone="amber"
-              />
-              <div className={panelClassName}>
-                <p className="text-sm font-semibold text-slate-950">Client configuration rule</p>
-                <p className="mt-2 text-sm leading-6 text-slate-500">
-                  `VITE_*` variables are readable in the browser bundle. API keys and secret delivery settings stay on the backend only.
-                </p>
-              </div>
-            </>
-          ) : null}
+            )}
 
-          {activeTab === 'notifications' ? (
-            <>
-              <AdminSectionTitle
-                title="Notification delivery"
-                description="Control admin email tooling without storing keys or credentials in browser state."
-              />
-              <div className="grid gap-4">
-                <ToggleRow
-                  title="Email notifications"
-                  description="Enable system updates and outbound email tooling from the admin backend."
-                  checked={settings.emailNotifs}
-                  onToggle={() => handleToggle('emailNotifs')}
-                  icon={Mail}
-                  tone="sky"
-                />
-                <ToggleRow
-                  title="Push notifications"
-                  description="Keep browser or device push delivery aligned with the notification service."
-                  checked={settings.pushNotifs}
-                  onToggle={() => handleToggle('pushNotifs')}
-                  icon={Bell}
-                  tone="teal"
-                />
-                <ToggleRow
-                  title="Marketing emails"
-                  description="Allow promotional campaigns in addition to operational system mail."
-                  checked={settings.marketingEmails}
-                  onToggle={() => handleToggle('marketingEmails')}
-                  icon={Megaphone}
-                  tone="indigo"
-                />
-              </div>
+            {/* Notifications Tab */}
+            {activeTab === 'notifications' && (
+              <div className="animate-fade-in-up space-y-6">
+                <h3 className="border-b border-gray-100 pb-2 text-lg font-semibold text-gray-900">Notification Preferences</h3>
+                <div className="max-w-xl space-y-4">
+                  <div className="flex items-center justify-between border-b border-gray-50 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-lg bg-blue-50 p-2 text-blue-600">
+                        <Mail size={20} />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">Email Notifications</p>
+                        <p className="text-xs text-gray-500">Receive system updates via email</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleToggle('emailNotifs')}
+                      className={`text-2xl transition-colors ${settings.emailNotifs ? 'text-emerald-600' : 'text-gray-300'}`}
+                    >
+                      {settings.emailNotifs ? <ToggleRight size={40} /> : <ToggleLeft size={40} />}
+                    </button>
+                  </div>
+                </div>
 
-              {emailResult ? (
-                <div className={`rounded-[1.3rem] border px-4 py-4 text-sm ${emailResult.success ? 'border-emerald-200 bg-emerald-50/80 text-emerald-800' : 'border-rose-200 bg-rose-50/85 text-rose-800'}`}>
-                  <div className="flex items-center gap-3">
-                    {emailResult.success ? <Check size={18} /> : <AlertCircle size={18} />}
-                    <span>{emailResult.message}</span>
-                    <button type="button" onClick={() => setEmailResult(null)} className="ml-auto text-current/70 transition hover:text-current">
+                {/* Email Result Alert */}
+                {emailResult && (
+                  <div
+                    className={`flex items-center gap-3 rounded-lg p-4 ${emailResult.success ? 'border border-green-200 bg-green-50 text-green-800' : 'border border-red-200 bg-red-50 text-red-800'}`}
+                  >
+                    {emailResult.success ? <Check size={20} /> : <AlertCircle size={20} />}
+                    <p className="text-sm">{emailResult.message}</p>
+                    <button onClick={() => setEmailResult(null)} className="ml-auto text-gray-400 hover:text-gray-600">
                       ×
                     </button>
                   </div>
-                </div>
-              ) : null}
+                )}
 
-              <div className="grid gap-6 xl:grid-cols-2">
-                <div className={panelClassName}>
-                  <div className="mb-4 flex items-center gap-2">
-                    <Mail size={18} className="text-sky-700" />
-                    <h3 className="text-sm font-semibold text-slate-950">Gửi email test</h3>
-                  </div>
-                  <div className="space-y-3">
+                {/* Test Email Section */}
+                <div className="mt-6 border-t border-gray-100 pt-6">
+                  <h4 className="mb-4 font-medium text-gray-900">Gửi Email Test</h4>
+                  <div className="flex max-w-xl gap-3">
                     <input
                       type="email"
                       value={testEmail}
-                      onChange={(event) => setTestEmail(event.target.value)}
+                      onChange={(e) => setTestEmail(e.target.value)}
                       placeholder="Nhập email để test..."
-                      className={inputClassName}
+                      className="flex-1 rounded-lg border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                     <button
-                      type="button"
                       onClick={handleSendTestEmail}
                       disabled={!testEmail || isSendingTest || !settings.emailNotifs}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-[1.1rem] bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                      className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                     >
                       {isSendingTest ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                      Gửi test
+                      Gửi Test
                     </button>
-                    {!settings.emailNotifs ? (
-                      <p className="flex items-center gap-1 text-xs text-amber-700">
-                        <AlertCircle size={12} />
-                        Bật Email Notifications để gửi email.
-                      </p>
-                    ) : null}
                   </div>
+                  {!settings.emailNotifs && (
+                    <p className="mt-2 flex items-center gap-1 text-xs text-amber-600">
+                      <AlertCircle size={12} />
+                      Bật Email Notifications để gửi email
+                    </p>
+                  )}
                 </div>
 
-                <div className={panelClassName}>
-                  <div className="mb-4 flex items-center gap-2">
-                    <Users size={18} className="text-teal-700" />
-                    <h3 className="text-sm font-semibold text-slate-950">Broadcast email</h3>
-                  </div>
-                  <div className="space-y-3">
-                    <Dropdown
-                      label="Đối tượng"
-                      options={[
-                        { value: 'all', label: 'Tất cả người dùng', color: 'bg-blue-500' },
-                        { value: 'students', label: 'Chỉ sinh viên', color: 'bg-green-500' },
-                        { value: 'admins', label: 'Chỉ admin', color: 'bg-purple-500' },
-                      ]}
-                      value={broadcastAudience}
-                      onChange={(value) => setBroadcastAudience(value as typeof broadcastAudience)}
-                      placeholder="Chọn đối tượng"
-                    />
-                    <input
-                      type="text"
-                      value={broadcastSubject}
-                      onChange={(event) => setBroadcastSubject(event.target.value)}
-                      placeholder="Tiêu đề email..."
-                      className={inputClassName}
-                    />
-                    <textarea
-                      value={broadcastContent}
-                      onChange={(event) => setBroadcastContent(event.target.value)}
-                      placeholder="Nội dung email... (Dùng {{name}} để chèn tên người nhận)"
-                      rows={5}
-                      className={`${inputClassName} min-h-[150px] resize-none`}
-                    />
+                {/* Broadcast Email Section */}
+                <div className="mt-6 border-t border-gray-100 pt-6">
+                  <h4 className="mb-4 flex items-center gap-2 font-medium text-gray-900">
+                    <Users size={18} />
+                    Broadcast Email cho Users
+                  </h4>
+                  <div className="max-w-xl space-y-4">
+                    <div>
+                      <Dropdown
+                        label="Đối tượng"
+                        options={[
+                          { value: 'all', label: 'Tất cả người dùng', color: 'bg-blue-500' },
+                          { value: 'students', label: 'Chỉ sinh viên', color: 'bg-green-500' },
+                          { value: 'admins', label: 'Chỉ admin', color: 'bg-purple-500' },
+                        ]}
+                        value={broadcastAudience}
+                        onChange={(val) => setBroadcastAudience(val as any)}
+                        placeholder="Chọn đối tượng"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Tiêu đề</label>
+                      <input
+                        type="text"
+                        value={broadcastSubject}
+                        onChange={(e) => setBroadcastSubject(e.target.value)}
+                        placeholder="Tiêu đề email..."
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Nội dung</label>
+                      <textarea
+                        value={broadcastContent}
+                        onChange={(e) => setBroadcastContent(e.target.value)}
+                        placeholder="Nội dung email... (Dùng {{name}} để chèn tên người nhận)"
+                        rows={5}
+                        className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
                     <button
-                      type="button"
                       onClick={handleBroadcast}
                       disabled={!broadcastSubject || !broadcastContent || isBroadcasting || !settings.emailNotifs}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-[1.1rem] bg-[linear-gradient(135deg,#0f766e,#0ea5e9)] px-4 py-3 text-sm font-semibold text-white transition hover:brightness-105 disabled:cursor-not-allowed disabled:bg-slate-300"
+                      className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                     >
-                      {isBroadcasting ? <Loader2 size={16} className="animate-spin" /> : <Megaphone size={16} />}
-                      {isBroadcasting ? 'Đang gửi...' : 'Gửi broadcast'}
+                      {isBroadcasting ? <Loader2 size={18} className="animate-spin" /> : <Megaphone size={18} />}
+                      {isBroadcasting ? 'Đang gửi...' : 'Gửi Broadcast'}
                     </button>
                   </div>
                 </div>
               </div>
-            </>
-          ) : null}
+            )}
 
-          {activeTab === 'security' ? (
-            <>
-              <AdminSectionTitle
-                title="Security defaults"
-                description="These controls reinforce the cookie + CSRF model by tightening account protection and session lifetime."
-              />
-              <div className="grid gap-4">
-                <ToggleRow
-                  title="Require privileged 2FA"
-                  description="Require authenticator-app based 2FA for privileged accounts handled by the backend."
-                  checked={settings.twoFactor}
-                  onToggle={() => handleToggle('twoFactor')}
-                  icon={ShieldCheck}
-                  tone="indigo"
-                />
-                <div className={panelClassName}>
-                  <Dropdown
-                    label="Session timeout (minutes)"
-                    options={[
-                      { value: '15', label: '15 Minutes' },
-                      { value: '30', label: '30 Minutes' },
-                      { value: '60', label: '1 Hour' },
-                      { value: '120', label: '2 Hours' },
-                    ]}
-                    value={settings.sessionTimeout}
-                    onChange={(value) => setSettings({ ...settings, sessionTimeout: value })}
-                    placeholder="Select timeout"
-                  />
-                </div>
-                <div className="rounded-[1.35rem] border border-rose-200 bg-rose-50/80 px-4 py-4">
-                  <p className="text-sm font-semibold text-rose-900">Reset all sessions</p>
-                  <p className="mt-1 text-sm leading-6 text-rose-700">
-                    Force a fresh login for every active account. Useful after credential incidents or policy changes.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleResetSessions}
-                    disabled={isResetting}
-                    className="mt-4 inline-flex items-center gap-2 rounded-full border border-rose-300 bg-white px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {isResetting ? <Loader2 size={14} className="animate-spin" /> : <Shield size={14} />}
-                    {isResetting ? 'Đang reset...' : 'Reset all sessions'}
-                  </button>
-                </div>
-              </div>
-            </>
-          ) : null}
-
-          {activeTab === 'announcements' ? (
-            <>
-              <AdminSectionTitle
-                title="AI announcement generator"
-                description="Generate polished admin-ready copy, then move it straight into the broadcast composer."
-              />
-              <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-                <div className="space-y-4">
-                  <div className={panelClassName}>
-                    <p className="text-sm leading-6 text-slate-500">
-                      Use Gemini to draft maintenance notices, campaign messages, or product updates in the same tone as the refreshed frontend.
-                    </p>
+            {/* Security Tab */}
+            {activeTab === 'security' && (
+              <div className="animate-fade-in-up space-y-6">
+                <h3 className="border-b border-gray-100 pb-2 text-lg font-semibold text-gray-900">Security Settings</h3>
+                <div className="max-w-xl space-y-6">
+                  <div className="flex items-center justify-between rounded-lg border border-emerald-100 bg-emerald-50 p-4">
+                    <div>
+                      <p className="font-medium text-gray-900">Two-Factor Authentication (TOTP)</p>
+                      <p className="text-xs text-gray-500">Require authenticator app (Google Authenticator/Authy) for privileged accounts</p>
+                    </div>
+                    <button
+                      onClick={() => handleToggle('twoFactor')}
+                      className={`text-2xl transition-colors ${settings.twoFactor ? 'text-emerald-600' : 'text-gray-300'}`}
+                    >
+                      {settings.twoFactor ? <ToggleRight size={40} /> : <ToggleLeft size={40} />}
+                    </button>
                   </div>
                   <div>
-                    <label className="mb-2 block text-sm font-semibold text-slate-700">Topic / Key message</label>
-                    <textarea
-                      value={announceTopic}
-                      onChange={(event) => setAnnounceTopic(event.target.value)}
-                      placeholder="e.g., Scheduled maintenance on Saturday night from 10 PM to 2 AM..."
-                      className={`${inputClassName} min-h-[170px] resize-none`}
+                    <Dropdown
+                      label="Session Timeout (minutes)"
+                      options={[
+                        { value: '15', label: '15 Minutes' },
+                        { value: '30', label: '30 Minutes' },
+                        { value: '60', label: '1 Hour' },
+                        { value: '120', label: '2 Hours' },
+                      ]}
+                      value={settings.sessionTimeout}
+                      onChange={(val) => setSettings({ ...settings, sessionTimeout: val })}
+                      placeholder="Select timeout"
                     />
                   </div>
-                  <Dropdown
-                    label="Target audience"
-                    options={[
-                      { value: 'All Users', label: 'All Users', color: 'bg-blue-500' },
-                      { value: 'Students Only', label: 'Students Only', color: 'bg-green-500' },
-                      { value: 'Instructors Only', label: 'Instructors Only', color: 'bg-amber-500' },
-                      { value: 'Admins Only', label: 'Admins Only', color: 'bg-purple-500' },
-                    ]}
-                    value={announceAudience}
-                    onChange={(value) => setAnnounceAudience(value)}
-                    placeholder="Select audience"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleGenerateAI}
-                    disabled={!announceTopic || isGenerating}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-[1.2rem] bg-[linear-gradient(135deg,#0f766e,#0ea5e9)] px-4 py-3 text-sm font-semibold text-white transition hover:brightness-105 disabled:cursor-not-allowed disabled:bg-slate-300"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <Loader2 size={16} className="animate-spin" />
-                        Drafting...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles size={16} />
-                        Generate draft
-                      </>
-                    )}
-                  </button>
-                </div>
-                <div className="rounded-[1.6rem] border border-slate-200/80 bg-white/75 p-5 shadow-[0_20px_48px_-36px_rgba(15,23,42,0.35)]">
-                  <div className="mb-4 flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Preview</p>
-                      <p className="mt-1 text-sm text-slate-500">Review before sending through the live broadcast flow.</p>
-                    </div>
-                    {generatedAnnouncement ? (
-                      <div className="flex flex-wrap gap-2">
-                        <button type="button" onClick={handleUseAnnouncement} className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-sky-700 transition hover:bg-sky-50">
-                          <Send size={13} />
-                          Dùng cho broadcast
-                        </button>
-                        <button type="button" onClick={handleCopy} className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-teal-700 transition hover:bg-teal-50">
-                          {copied ? <Check size={13} /> : <Copy size={13} />}
-                          {copied ? 'Copied' : 'Copy text'}
-                        </button>
-                      </div>
-                    ) : null}
-                  </div>
-                  <div className="min-h-[320px] rounded-[1.3rem] border border-slate-200/80 bg-slate-50/80 px-4 py-4 text-sm leading-7 text-slate-700">
-                    {generatedAnnouncement ? <div className="whitespace-pre-wrap">{generatedAnnouncement}</div> : <span className="italic text-slate-400">Your generated announcement will appear here...</span>}
+                  <div className="pt-4">
+                    <button
+                      onClick={handleResetSessions}
+                      disabled={isResetting}
+                      className="flex items-center gap-2 text-sm font-medium text-red-600 hover:text-red-700 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {isResetting && <Loader2 size={14} className="animate-spin" />}
+                      {isResetting ? 'Đang reset...' : 'Reset all sessions'}
+                    </button>
                   </div>
                 </div>
               </div>
-            </>
-          ) : null}
-        </AdminSectionCard>
-      </section>
-    </AdminPage>
+            )}
+
+            {/* AI Announcements Tab */}
+            {activeTab === 'announcements' && (
+              <div className="animate-fade-in-up flex h-full flex-col space-y-6">
+                <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
+                  <Sparkles className="text-emerald-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">AI Announcement Generator</h3>
+                </div>
+
+                <div className="grid flex-1 gap-8 lg:grid-cols-2">
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-600">Use Gemini to quickly draft system-wide announcements, maintenance notices, or marketing messages.</p>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Topic / Key Message</label>
+                      <textarea
+                        value={announceTopic}
+                        onChange={(e) => setAnnounceTopic(e.target.value)}
+                        placeholder="e.g., Scheduled maintenance on Saturday night from 10 PM to 2 AM..."
+                        className="h-32 w-full resize-none rounded-lg border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                    <div>
+                      <Dropdown
+                        label="Target Audience"
+                        options={[
+                          { value: 'All Users', label: 'All Users', color: 'bg-blue-500' },
+                          { value: 'Students Only', label: 'Students Only', color: 'bg-green-500' },
+                          { value: 'Instructors Only', label: 'Instructors Only', color: 'bg-amber-500' },
+                          { value: 'Admins Only', label: 'Admins Only', color: 'bg-purple-500' },
+                        ]}
+                        value={announceAudience}
+                        onChange={(val) => setAnnounceAudience(val)}
+                        placeholder="Select audience"
+                      />
+                    </div>
+                    <button
+                      onClick={handleGenerateAI}
+                      disabled={!announceTopic || isGenerating}
+                      className={`flex w-full items-center justify-center gap-2 rounded-lg py-2.5 font-medium text-white transition-all ${
+                        !announceTopic || isGenerating ? 'cursor-not-allowed bg-emerald-300' : 'bg-emerald-600 shadow-md hover:bg-emerald-700'
+                      }`}
+                    >
+                      {isGenerating ? (
+                        <>
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                          Drafting...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles size={18} />
+                          Generate Draft
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="text-xs font-semibold tracking-wider text-gray-500 uppercase">Preview</span>
+                      {generatedAnnouncement && (
+                        <div className="flex gap-2">
+                          <button onClick={handleUseAnnouncement} className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700">
+                            <Send size={14} />
+                            Dùng cho Broadcast
+                          </button>
+                          <button onClick={handleCopy} className="flex items-center gap-1 text-xs font-medium text-emerald-600 hover:text-emerald-700">
+                            {copied ? <Check size={14} /> : <Copy size={14} />}
+                            {copied ? 'Copied' : 'Copy Text'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="max-h-[400px] flex-1 overflow-y-auto rounded-lg border border-gray-200 bg-white p-4 text-sm leading-relaxed whitespace-pre-wrap text-gray-700">
+                      {generatedAnnouncement || <span className="text-gray-400 italic">Your generated announcement will appear here...</span>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

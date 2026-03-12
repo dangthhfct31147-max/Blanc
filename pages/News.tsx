@@ -37,19 +37,19 @@ interface Suggestion {
 }
 
 const NEWS_TYPE_META_VI: Record<NewsType, { label: string; color: string; Icon: React.ComponentType<{ className?: string }> }> = {
-  announcement: { label: 'Thông báo', color: 'bg-indigo-50 text-indigo-700 border-indigo-100 dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-200', Icon: Megaphone },
-  minigame: { label: 'Mini game', color: 'bg-amber-50 text-amber-700 border-amber-100 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200', Icon: Trophy },
-  update: { label: 'Cập nhật', color: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200', Icon: Sparkles },
-  event: { label: 'Sự kiện', color: 'bg-sky-50 text-sky-700 border-sky-100 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-200', Icon: Calendar },
-  tip: { label: 'Mẹo học tập', color: 'bg-teal-50 text-teal-700 border-teal-100 dark:border-teal-500/20 dark:bg-teal-500/10 dark:text-teal-200', Icon: Lightbulb },
+  announcement: { label: 'Thông báo', color: 'bg-indigo-50 text-indigo-700 border-indigo-100', Icon: Megaphone },
+  minigame: { label: 'Mini game', color: 'bg-amber-50 text-amber-700 border-amber-100', Icon: Trophy },
+  update: { label: 'Cập nhật', color: 'bg-emerald-50 text-emerald-700 border-emerald-100', Icon: Sparkles },
+  event: { label: 'Sự kiện', color: 'bg-sky-50 text-sky-700 border-sky-100', Icon: Calendar },
+  tip: { label: 'Mẹo học tập', color: 'bg-teal-50 text-teal-700 border-teal-100', Icon: Lightbulb },
 };
 
 const NEWS_TYPE_META_EN: Record<NewsType, { label: string; color: string; Icon: React.ComponentType<{ className?: string }> }> = {
-  announcement: { label: 'Announcement', color: 'bg-indigo-50 text-indigo-700 border-indigo-100 dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-200', Icon: Megaphone },
-  minigame: { label: 'Mini game', color: 'bg-amber-50 text-amber-700 border-amber-100 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200', Icon: Trophy },
-  update: { label: 'Update', color: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200', Icon: Sparkles },
-  event: { label: 'Event', color: 'bg-sky-50 text-sky-700 border-sky-100 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-200', Icon: Calendar },
-  tip: { label: 'Study tips', color: 'bg-teal-50 text-teal-700 border-teal-100 dark:border-teal-500/20 dark:bg-teal-500/10 dark:text-teal-200', Icon: Lightbulb },
+  announcement: { label: 'Announcement', color: 'bg-indigo-50 text-indigo-700 border-indigo-100', Icon: Megaphone },
+  minigame: { label: 'Mini game', color: 'bg-amber-50 text-amber-700 border-amber-100', Icon: Trophy },
+  update: { label: 'Update', color: 'bg-emerald-50 text-emerald-700 border-emerald-100', Icon: Sparkles },
+  event: { label: 'Event', color: 'bg-sky-50 text-sky-700 border-sky-100', Icon: Calendar },
+  tip: { label: 'Study tips', color: 'bg-teal-50 text-teal-700 border-teal-100', Icon: Lightbulb },
 };
 
 const UPDATE_TYPES: NewsType[] = ['announcement', 'minigame', 'update', 'event'];
@@ -614,20 +614,20 @@ const News: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-      <section className="relative overflow-hidden rounded-3xl border border-slate-100 bg-gradient-to-r from-sky-50 via-white to-emerald-50 p-6 shadow-sm dark:border-slate-800 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:shadow-[0_20px_60px_rgba(2,6,23,0.45)] md:p-8">
+      <section className="relative overflow-hidden rounded-3xl border border-slate-100 bg-gradient-to-r from-sky-50 via-white to-emerald-50 shadow-sm p-6 md:p-8">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -left-10 -top-12 h-40 w-40 rounded-full bg-primary-200/40 blur-3xl dark:bg-primary-500/10"></div>
-          <div className="absolute right-0 top-10 h-64 w-64 rounded-full bg-amber-100/60 blur-3xl dark:bg-amber-400/10"></div>
+          <div className="absolute -left-10 -top-12 w-40 h-40 bg-primary-200/40 blur-3xl rounded-full"></div>
+          <div className="absolute right-0 top-10 w-64 h-64 bg-amber-100/60 blur-3xl rounded-full"></div>
         </div>
         <div className="relative flex flex-col md:flex-row justify-between gap-6 md:gap-8 items-start md:items-center">
           <div className="space-y-4 max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary-100 bg-white/70 px-3 py-1 text-primary-700 shadow-sm dark:border-primary-500/20 dark:bg-primary-500/10 dark:text-primary-200">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 text-primary-700 border border-primary-100 shadow-sm">
               <Sparkles className="w-4 h-4" />
               <span className="text-sm font-semibold">{copy.badge}</span>
             </div>
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold leading-tight text-slate-900 dark:text-slate-50 md:text-4xl">{copy.heroTitle}</h1>
-              <p className="text-base text-slate-600 dark:text-slate-300 md:text-lg">
+              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">{copy.heroTitle}</h1>
+              <p className="text-slate-600 text-base md:text-lg">
                 {copy.heroDescription}
               </p>
             </div>
@@ -639,20 +639,20 @@ const News: React.FC = () => {
             </div>
           </div>
           <div className="w-full md:w-auto">
-            <Card className="border-slate-100 bg-white/80 p-5 shadow-md dark:border-slate-800 dark:bg-slate-950/70">
+            <Card className="p-5 bg-white/80 border-slate-100 shadow-md">
               <div className="flex items-center gap-3 mb-3">
                 <Megaphone className="w-5 h-5 text-primary-600" />
                 <div>
                   <p className="text-xs uppercase tracking-wide text-primary-600 font-semibold">{copy.overview}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">{copy.runningNews}</p>
+                  <p className="text-sm text-slate-500">{copy.runningNews}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4 text-center">
-                <div className="rounded-xl bg-primary-50 px-3 py-2 text-primary-700 dark:bg-primary-500/10 dark:text-primary-200">
+                <div className="rounded-xl bg-primary-50 text-primary-700 px-3 py-2">
                   <p className="text-2xl font-bold">{newsItems.length}</p>
                   <p className="text-xs font-medium">{copy.displayedCount}</p>
                 </div>
-                <div className="rounded-xl bg-amber-50 px-3 py-2 text-amber-700 dark:bg-amber-500/10 dark:text-amber-200">
+                <div className="rounded-xl bg-amber-50 text-amber-700 px-3 py-2">
                   <p className="text-2xl font-bold">{suggestionCount}</p>
                   <p className="text-xs font-medium">{copy.newSuggestions}</p>
                 </div>
@@ -667,7 +667,7 @@ const News: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-primary-600 font-semibold">{copy.highlighted}</p>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">{copy.pinnedTitle}</h2>
+              <h2 className="text-xl font-bold text-slate-900">{copy.pinnedTitle}</h2>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -679,7 +679,7 @@ const News: React.FC = () => {
               return (
                 <Card
                   key={item.id || item.slug}
-                  className="relative cursor-pointer overflow-hidden border-primary-100 dark:border-slate-800 dark:bg-slate-950/80"
+                  className="relative overflow-hidden border-primary-100 cursor-pointer"
                   onClick={() => openDetail(item)}
                   role="button"
                   tabIndex={0}
@@ -687,7 +687,7 @@ const News: React.FC = () => {
                     if (e.key === 'Enter' || e.key === ' ') openDetail(item);
                   }}
                 >
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary-50/60 via-white to-amber-50/40 dark:from-slate-950/90 dark:via-slate-950/80 dark:to-slate-900/80" aria-hidden="true" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary-50/60 via-white to-amber-50/40 pointer-events-none" aria-hidden="true" />
                   <div className="relative p-6 space-y-3">
                     <div className="flex items-center gap-3">
                       <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-sm font-semibold ${meta.color}`}>
@@ -699,16 +699,16 @@ const News: React.FC = () => {
                           {release.version}
                         </span>
                       )}
-                      <span className="text-xs text-slate-500 dark:text-slate-400">{timeAgo(getNewsDate(item))}</span>
+                      <span className="text-xs text-slate-500">{timeAgo(getNewsDate(item))}</span>
                     </div>
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{item.title}</h3>
-                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">{getNewsSummary(item)}</p>
+                    <h3 className="text-lg font-bold text-slate-900">{item.title}</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">{getNewsSummary(item)}</p>
                     {release?.changes.length ? (
-                      <div className="rounded-2xl border border-emerald-100 bg-white/90 px-4 py-3 dark:border-emerald-500/20 dark:bg-slate-900/80">
-                        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                      <div className="rounded-2xl border border-emerald-100 bg-white/90 px-4 py-3">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700 mb-2">
                           {isEn ? "What's new" : 'Điểm mới'}
                         </p>
-                        <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-200">
+                        <ul className="space-y-1 text-sm text-slate-700">
                           {release.changes.slice(0, 3).map((change) => (
                             <li key={change}>• {change}</li>
                           ))}
@@ -717,8 +717,8 @@ const News: React.FC = () => {
                     ) : null}
                     <div className="flex flex-wrap gap-2">
                       {tags.map(tag => (
-                        <span key={tag} className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
-                          <Tag className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                        <span key={tag} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-slate-200 text-xs text-slate-600">
+                          <Tag className="w-3 h-3 text-slate-400" />
                           {tag}
                         </span>
                       ))}
@@ -741,24 +741,24 @@ const News: React.FC = () => {
       )}
 
       <section className="space-y-4">
-        <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/70 md:p-5">
+        <div className="rounded-2xl border border-slate-200 bg-white/80 shadow-sm p-4 md:p-5">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{copy.latestLabel}</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 font-semibold">{copy.latestLabel}</p>
                 <div className="flex items-center gap-3 flex-wrap">
-                  <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">{copy.adminNews}</h2>
-                  <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+                  <h2 className="text-xl font-bold text-slate-900">{copy.adminNews}</h2>
+                  <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 border border-slate-200">
                     <Sparkles className="w-4 h-4 text-primary-600" />
                     {filteredNews.length} {copy.availableCount}
                   </span>
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-300">{copy.filterHint}</p>
+                <p className="text-sm text-slate-600">{copy.filterHint}</p>
               </div>
 
               <div className="flex flex-col gap-2 w-full md:w-auto">
                 <div className="relative w-full md:w-80">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <Input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -778,8 +778,8 @@ const News: React.FC = () => {
                     key={value}
                     onClick={() => setGroup(value)}
                     className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold border transition shadow-sm ${group === value
-                      ? 'border-primary-600 bg-primary-600 text-white'
-                      : 'border-slate-200 bg-white text-slate-600 hover:border-primary-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300'
+                      ? 'bg-primary-600 text-white border-primary-600'
+                      : 'bg-white text-slate-600 border-slate-200 hover:border-primary-200'
                       }`}
                   >
                     {label}
@@ -790,7 +790,7 @@ const News: React.FC = () => {
               {group !== 'tips' && (
                 <div className="flex flex-wrap items-center gap-2 md:gap-3 lg:col-span-2 lg:justify-end">
                   {(['all', ...UPDATE_TYPES] as Array<'all' | NewsType>).map(type => {
-                    const meta = type === 'all' ? { label: copy.allFilter, color: 'bg-slate-100 text-slate-700 border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200' } : NEWS_TYPE_META[type];
+                    const meta = type === 'all' ? { label: copy.allFilter, color: 'bg-slate-100 text-slate-700 border-slate-200' } : NEWS_TYPE_META[type];
                     const isActive = filter === type;
                     return (
                       <button
@@ -813,13 +813,13 @@ const News: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {isLoadingNews && (
-            <div className="col-span-full flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+            <div className="col-span-full flex items-center gap-2 text-sm text-slate-500">
               <Loader2 className="w-4 h-4 animate-spin" />
               {copy.loading}
             </div>
           )}
           {!isLoadingNews && filteredNews.length === 0 && (
-            <p className="col-span-full text-sm text-slate-500 dark:text-slate-400">
+            <p className="col-span-full text-sm text-slate-500">
               {hasActiveFilters ? copy.noResultsFiltered : copy.noResultsEmpty}
             </p>
           )}
@@ -831,7 +831,7 @@ const News: React.FC = () => {
             return (
               <Card
                 key={item.id || item.slug}
-                className="flex h-full cursor-pointer flex-col p-5 dark:border-slate-800 dark:bg-slate-950/80"
+                className="p-5 flex flex-col h-full cursor-pointer"
                 onClick={() => openDetail(item)}
                 role="button"
                 tabIndex={0}
@@ -840,22 +840,22 @@ const News: React.FC = () => {
                 }}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className={`flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-semibold ${meta.color}`}>
-                    <meta.Icon className="w-4 h-4" />
-                    <span>{meta.label}</span>
+                  <div className="flex items-center gap-2 px-2.5 py-1 rounded-full border text-xs font-semibold bg-white">
+                    <meta.Icon className="w-4 h-4 text-slate-500" />
+                    <span className="text-slate-700">{meta.label}</span>
                   </div>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">{timeAgo(getNewsDate(item))}</span>
+                  <span className="text-xs text-slate-500">{timeAgo(getNewsDate(item))}</span>
                 </div>
                 <div className="mt-3 space-y-2 flex-1">
                   {release?.version && (
-                    <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full border border-emerald-200 bg-emerald-50 text-[11px] font-bold text-emerald-700">
                       {release.version}
                     </span>
                   )}
-                  <h3 className="text-lg font-semibold leading-snug text-slate-900 dark:text-slate-100">{item.title}</h3>
-                  <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">{getNewsSummary(item)}</p>
+                  <h3 className="text-lg font-semibold text-slate-900 leading-snug">{item.title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{getNewsSummary(item)}</p>
                   {release?.changes.length ? (
-                    <ul className="space-y-1 pt-1 text-xs text-slate-600 dark:text-slate-300">
+                    <ul className="space-y-1 text-xs text-slate-600 pt-1">
                       {release.changes.slice(0, 2).map((change) => (
                         <li key={change}>• {change}</li>
                       ))}
@@ -864,12 +864,12 @@ const News: React.FC = () => {
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {tags.map(tag => (
-                    <span key={tag} className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                    <span key={tag} className="px-2.5 py-1 rounded-full bg-slate-50 text-slate-600 text-xs border border-slate-200">
                       {tag}
                     </span>
                   ))}
                 </div>
-                <div className="mt-4 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
                   <span>{getNewsAuthorName(item)}</span>
                   {actionLink && (
                     <a
@@ -896,25 +896,25 @@ const News: React.FC = () => {
             onClick={closeDetail}
             aria-hidden="true"
           />
-          <Card className="relative w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
-            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-slate-800">
-              <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
+          <Card className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-slate-900">
                 <Megaphone className="w-5 h-5 text-primary-600" />
                 <span className="font-semibold">{copy.detailTitle}</span>
               </div>
               <button
                 type="button"
                 onClick={closeDetail}
-                className="rounded-lg p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-900 dark:hover:text-slate-200"
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg"
                 aria-label={copy.close}
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="max-h-[75vh] space-y-4 overflow-y-auto p-6">
+            <div className="p-6 max-h-[75vh] overflow-y-auto space-y-4">
               {isLoadingDetail && (
-                <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                <div className="flex items-center gap-2 text-sm text-slate-500">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   {copy.loadingContent}
                 </div>
@@ -925,26 +925,26 @@ const News: React.FC = () => {
                   {(() => {
                     const release = getNewsRelease(detailItem);
                     return release ? (
-                      <div className="space-y-3 rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-5 dark:border-emerald-500/20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+                      <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-5 space-y-3">
                         <div className="flex flex-wrap items-center gap-2">
                           {release.version && (
                             <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-bold">
                               {release.version}
                             </span>
                           )}
-                          <span className="inline-flex items-center rounded-full border border-emerald-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:border-emerald-500/20 dark:bg-slate-900 dark:text-emerald-200">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full border border-emerald-200 bg-white text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
                             {isEn ? 'Release note' : 'Ghi chú phát hành'}
                           </span>
                         </div>
                         {release.headline && (
-                          <p className="text-sm text-slate-700 dark:text-slate-200">{release.headline}</p>
+                          <p className="text-sm text-slate-700">{release.headline}</p>
                         )}
                         {release.changes.length > 0 && (
                           <div>
-                            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 mb-2">
                               {isEn ? "What's new" : 'Điểm mới'}
                             </p>
-                            <ul className="space-y-2 text-sm text-slate-700 dark:text-slate-200">
+                            <ul className="space-y-2 text-sm text-slate-700">
                               {release.changes.map((change) => (
                                 <li key={change} className="flex gap-2">
                                   <span className="text-emerald-600">•</span>
@@ -962,32 +962,32 @@ const News: React.FC = () => {
                     <img
                       src={detailItem.coverImage}
                       alt={detailItem.title}
-                      className="h-56 w-full rounded-xl border border-slate-100 object-cover dark:border-slate-800"
+                      className="w-full h-56 object-cover rounded-xl border border-slate-100"
                       loading="lazy"
                     />
                   )}
 
                   <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-50 text-slate-600 border border-slate-200">
                       {NEWS_TYPE_META[getNewsType(detailItem)].label}
                     </span>
-                    <span className="text-slate-500 dark:text-slate-400">{formatDate(getNewsDate(detailItem))}</span>
-                    <span className="text-slate-500 dark:text-slate-400">•</span>
-                    <span className="text-slate-500 dark:text-slate-400">{getNewsAuthorName(detailItem)}</span>
+                    <span className="text-slate-500">{formatDate(getNewsDate(detailItem))}</span>
+                    <span className="text-slate-500">•</span>
+                    <span className="text-slate-500">{getNewsAuthorName(detailItem)}</span>
                   </div>
 
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{detailItem.title}</h2>
+                  <h2 className="text-2xl font-bold text-slate-900">{detailItem.title}</h2>
 
                   {getNewsSummary(detailItem) && (
-                    <p className="text-slate-600 dark:text-slate-300">{getNewsSummary(detailItem)}</p>
+                    <p className="text-slate-600">{getNewsSummary(detailItem)}</p>
                   )}
 
                   {(detailItem.body || '').trim() ? (
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800 dark:text-slate-200">
+                    <div className="text-slate-800 whitespace-pre-wrap leading-relaxed text-sm">
                       {detailItem.body}
                     </div>
                   ) : (
-                    <p className="text-sm text-slate-500 dark:text-slate-400">{copy.noContent}</p>
+                    <p className="text-sm text-slate-500">{copy.noContent}</p>
                   )}
 
                   {getNewsTags(detailItem).length > 0 && (
@@ -995,9 +995,9 @@ const News: React.FC = () => {
                       {getNewsTags(detailItem).map((tag) => (
                         <span
                           key={tag}
-                          className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white border border-slate-200 text-xs text-slate-600"
                         >
-                          <Tag className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                          <Tag className="w-3 h-3 text-slate-400" />
                           {tag}
                         </span>
                       ))}
@@ -1028,7 +1028,7 @@ const News: React.FC = () => {
             onClick={() => setShowFeedbackForm(false)}
             aria-hidden="true"
           />
-          <Card className="relative w-full max-w-2xl space-y-4 p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-950 md:p-7">
+          <Card className="relative w-full max-w-2xl p-6 md:p-7 space-y-4 shadow-2xl">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2 text-primary-700 font-semibold">
                 <Lightbulb className="w-5 h-5" />
@@ -1037,41 +1037,41 @@ const News: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowFeedbackForm(false)}
-                className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-200"
+                className="text-slate-400 hover:text-slate-600"
                 aria-label={copy.close}
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <p className="text-sm text-slate-600 dark:text-slate-300">
+            <p className="text-sm text-slate-600">
               {copy.feedbackDescription}
             </p>
             <form className="space-y-4" onSubmit={handleFeedbackSubmit}>
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">{copy.feedbackLabel}</label>
+                <label className="text-sm font-medium text-slate-700 block mb-2">{copy.feedbackLabel}</label>
                 <textarea
                   value={feedback.idea}
                   onChange={e => setFeedback(prev => ({ ...prev, idea: e.target.value }))}
                   rows={4}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition"
                   placeholder={copy.feedbackPlaceholder}
                   required
                   disabled={isSubmitting}
                 />
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">{copy.contactLabel}</label>
+                <label className="text-sm font-medium text-slate-700 block mb-2">{copy.contactLabel}</label>
                 <input
                   type="text"
                   value={feedback.contact}
                   onChange={e => setFeedback(prev => ({ ...prev, contact: e.target.value }))}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 transition focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary-500 transition"
                   placeholder={copy.contactPlaceholder}
                   disabled={isSubmitting}
                 />
               </div>
               <div className="flex items-center justify-between">
-                <p className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   {copy.feedbackNote}
                 </p>
@@ -1086,26 +1086,26 @@ const News: React.FC = () => {
                 </div>
               </div>
               <div className="pt-1 space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{copy.recentFeedback}</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 font-semibold">{copy.recentFeedback}</p>
                 <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
                   {isLoadingSuggestions && (
-                    <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
                       <Loader2 className="w-4 h-4 animate-spin" />
                       {copy.loadingFeedback}
                     </div>
                   )}
                   {!isLoadingSuggestions && suggestions.length === 0 && (
-                    <p className="text-sm text-slate-500 dark:text-slate-400">{copy.noFeedbackYet}</p>
+                    <p className="text-sm text-slate-500">{copy.noFeedbackYet}</p>
                   )}
                   {!isLoadingSuggestions &&
                     suggestions.slice(0, 5).map((suggestion) => (
-                      <div key={suggestion.id} className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-900">
-                        <div className="mb-1 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                      <div key={suggestion.id} className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
+                        <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1">
                           <span>{formatDate(suggestion.createdAt)}</span>
                           {suggestion.contact && <span className="text-primary-700 font-medium">{suggestion.contact}</span>}
                           {!suggestion.contact && suggestion.userEmail && <span className="text-primary-700 font-medium">{suggestion.userEmail}</span>}
                         </div>
-                        <p className="text-sm leading-relaxed text-slate-800 dark:text-slate-200">{suggestion.idea}</p>
+                        <p className="text-sm text-slate-800 leading-relaxed">{suggestion.idea}</p>
                       </div>
                     ))}
                 </div>

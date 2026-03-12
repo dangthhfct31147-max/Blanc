@@ -133,7 +133,7 @@ export const PinnedNewsSlider: React.FC<Props> = ({
                     {coverImage && (
                       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
                         <img src={coverImage} alt="" className="absolute inset-0 h-full w-full object-cover opacity-20" />
-                        <div className="absolute inset-0 bg-linear-to-b from-white/85 via-white/75 to-white/90 dark:from-slate-950/90 dark:via-slate-950/80 dark:to-slate-950/90" />
+                        <div className="absolute inset-0 bg-linear-to-b from-white/85 via-white/75 to-white/90" />
                       </div>
                     )}
 
@@ -144,19 +144,19 @@ export const PinnedNewsSlider: React.FC<Props> = ({
 
                     <div className="relative w-full max-w-4xl mx-auto text-center">
                       <div className="flex items-center justify-center gap-3 flex-wrap">
-                        <span className="inline-flex items-center gap-2 rounded-full border border-primary-100 bg-white px-4 py-1.5 text-primary-700 shadow-sm dark:border-primary-500/20 dark:bg-slate-900/80 dark:text-primary-200">
+                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/70 text-primary-700 border border-primary-100 shadow-sm">
                           <Pin className="w-4 h-4" />
                           <span className="text-sm font-semibold">Tin được ghim</span>
                         </span>
-                        {dateLabel && <span className="text-xs text-slate-500 dark:text-slate-400">{dateLabel}</span>}
+                        {dateLabel && <span className="text-xs text-slate-500">{dateLabel}</span>}
                       </div>
 
-                      <h2 className="mt-6 text-3xl font-extrabold leading-tight tracking-tight text-slate-900 dark:text-slate-50 sm:text-4xl md:text-5xl">
+                      <h2 className="mt-6 text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
                         {title || 'Bản tin ghim'}
                       </h2>
 
                       {summary && (
-                        <p className="mx-auto mt-4 max-w-3xl line-clamp-3 text-base leading-relaxed text-slate-600 dark:text-slate-300 sm:text-lg">
+                        <p className="mt-4 text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed line-clamp-3">
                           {summary}
                         </p>
                       )}
@@ -166,7 +166,7 @@ export const PinnedNewsSlider: React.FC<Props> = ({
                           {tags.map((tag) => (
                             <span
                               key={tag}
-                              className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-300"
+                              className="inline-flex items-center px-3 py-1 rounded-full bg-white/70 border border-slate-200 text-xs font-medium text-slate-600"
                             >
                               {tag}
                             </span>
@@ -185,7 +185,7 @@ export const PinnedNewsSlider: React.FC<Props> = ({
                         </Link>
                         <Link
                           to={viewAllHref}
-                          className="text-sm font-semibold text-slate-600 transition-colors hover:text-primary-700 dark:text-slate-300"
+                          className="text-sm font-semibold text-slate-600 hover:text-primary-700 transition-colors"
                         >
                           Xem tất cả tin
                         </Link>
@@ -203,7 +203,7 @@ export const PinnedNewsSlider: React.FC<Props> = ({
             <button
               type="button"
               onClick={goPrev}
-              className="absolute left-2 top-1/2 z-10 h-10 w-10 -translate-y-1/2 rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-white hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 sm:left-4"
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/85 border border-slate-200 shadow-sm text-slate-700 hover:bg-white hover:shadow-md transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 z-10"
               aria-label="Slide trước"
             >
               <ChevronLeft className="w-5 h-5 mx-auto" />
@@ -211,7 +211,7 @@ export const PinnedNewsSlider: React.FC<Props> = ({
             <button
               type="button"
               onClick={goNext}
-              className="absolute right-2 top-1/2 z-10 h-10 w-10 -translate-y-1/2 rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-white hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 sm:right-4"
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/85 border border-slate-200 shadow-sm text-slate-700 hover:bg-white hover:shadow-md transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 z-10"
               aria-label="Slide tiếp theo"
             >
               <ChevronRight className="w-5 h-5 mx-auto" />
@@ -230,7 +230,7 @@ export const PinnedNewsSlider: React.FC<Props> = ({
                 onClick={() => goTo(idx)}
                 className={cn(
                   'h-2.5 rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500',
-                  idx === activeIndex ? 'w-7 bg-primary-600' : 'w-2.5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-700',
+                  idx === activeIndex ? 'w-7 bg-primary-600' : 'w-2.5 bg-slate-300 hover:bg-slate-400',
                 )}
                 aria-label={`Đến slide ${idx + 1}`}
                 aria-current={idx === activeIndex ? 'true' : undefined}

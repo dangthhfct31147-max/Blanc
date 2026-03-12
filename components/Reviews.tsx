@@ -4,6 +4,7 @@ import { Button } from './ui/Common';
 import { api } from '../lib/api';
 import toast from 'react-hot-toast';
 import { useAppAuth } from '../contexts/AppAuthContext';
+import { useI18n } from '../contexts/I18nContext';
 
 // ============ TYPES ============
 
@@ -43,6 +44,19 @@ interface ReviewsProps {
     showTitle?: boolean;
 }
 
+const getTargetLabels = (isEn: boolean) => ({
+    contest: isEn ? 'contest' : 'cuộc thi',
+    course: isEn ? 'course' : 'khóa học',
+    document: isEn ? 'document' : 'tài liệu',
+});
+
+const getRatingText = (rating: number, isEn: boolean) => {
+    const labels = isEn
+        ? ['Very poor', 'Poor', 'Average', 'Good', 'Excellent']
+        : ['Rất tệ', 'Tệ', 'Bình thường', 'Tốt', 'Xuất sắc'];
+    return labels[rating - 1] || '';
+};
+
 // ============ STAR RATING COMPONENT ============
 
 interface StarRatingProps {
@@ -60,6 +74,8 @@ const StarRating: React.FC<StarRatingProps> = ({
     interactive = false,
     onChange
 }) => {
+    const { locale } = useI18n();
+    const isEn = locale === 'en';
     const [hoverRating, setHoverRating] = useState(0);
 
     const sizeClasses = {
@@ -89,8 +105,8 @@ const StarRating: React.FC<StarRatingProps> = ({
                         onMouseEnter={() => interactive && setHoverRating(starIndex)}
                         onMouseLeave={() => interactive && setHoverRating(0)}
                         className={`${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : 'cursor-default'} focus:outline-none`}
-                        title={`${starIndex} sao`}
-                        aria-label={`Đánh giá ${starIndex} sao`}
+                        title={isEn ? `${starIndex} star` : `${starIndex} sao`}
+                        aria-label={isEn ? `Rate ${starIndex} star` : `Đánh giá ${starIndex} sao`}
                     >
                         <Star
                             className={`${sizeClasses[size]} ${isFilled
@@ -145,6 +161,8 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
     onHelpful,
     onDelete
 }) => {
+    const { locale } = useI18n();
+    const isEn = locale === 'en';
     const [isExpanded, setIsExpanded] = useState(false);
     const isLongComment = review.comment.length > 300;
     const displayComment = isExpanded ? review.comment : review.comment.slice(0, 300);
@@ -156,12 +174,12 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
         const diffMs = now.getTime() - date.getTime();
         const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-        if (diffDays === 0) return 'Hôm nay';
-        if (diffDays === 1) return 'Hôm qua';
-        if (diffDays < 7) return `${diffDays} ngày trước`;
-        if (diffDays < 30) return `${Math.floor(diffDays / 7)} tuần trước`;
+        if (diffDays === 0) return isEn ? 'Today' : 'Hôm nay';
+        if (diffDays === 1) return isEn ? 'Yesterday' : 'Hôm qua';
+        if (diffDays < 7) return isEn ? `${diffDays} day(s) ago` : `${diffDays} ngày trước`;
+        if (diffDays < 30) return isEn ? `${Math.floor(diffDays / 7)} week(s) ago` : `${Math.floor(diffDays / 7)} tuần trước`;
 
-        return date.toLocaleDateString('vi-VN', {
+        return date.toLocaleDateString(isEn ? 'en-US' : 'vi-VN', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric'
@@ -194,7 +212,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                             {review.isVerified && (
                                 <span className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-1.5 py-0.5 rounded">
                                     <Shield className="w-3 h-3" />
-                                    Đã xác minh
+                                    {isEn ? 'Verified' : 'Đã xác minh'}
                                 </span>
                             )}
                         </div>
@@ -220,12 +238,12 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                             {isExpanded ? (
                                 <>
                                     <ChevronUp className="w-4 h-4" />
-                                    Thu gọn
+                                    {isEn ? 'Show less' : 'Thu gọn'}
                                 </>
                             ) : (
                                 <>
                                     <ChevronDown className="w-4 h-4" />
-                                    Xem thêm
+                                    {isEn ? 'Read more' : 'Xem thêm'}
                                 </>
                             )}
                         </button>
@@ -238,7 +256,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                             className="flex items-center gap-1 text-xs text-slate-500 hover:text-primary-600 transition-colors"
                         >
                             <ThumbsUp className="w-3.5 h-3.5" />
-                            Hữu ích ({review.helpfulCount})
+                            {isEn ? 'Helpful' : 'Hữu ích'} ({review.helpfulCount})
                         </button>
 
                         {isOwner && onDelete && (
@@ -246,7 +264,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                                 onClick={() => onDelete(review.id)}
                                 className="text-xs text-red-500 hover:text-red-600 transition-colors"
                             >
-                                Xóa
+                                {isEn ? 'Delete' : 'Xóa'}
                             </button>
                         )}
                     </div>
@@ -271,32 +289,30 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
     onSubmit,
     isSubmitting = false
 }) => {
+    const { locale } = useI18n();
+    const isEn = locale === 'en';
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
     const [error, setError] = useState('');
 
-    const targetLabels = {
-        contest: 'cuộc thi',
-        course: 'khóa học',
-        document: 'tài liệu'
-    };
+    const targetLabels = getTargetLabels(isEn);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
         if (rating === 0) {
-            setError('Vui lòng chọn số sao đánh giá');
+            setError(isEn ? 'Please select a rating.' : 'Vui lòng chọn số sao đánh giá');
             return;
         }
 
         if (comment.trim().length < 10) {
-            setError('Đánh giá phải có ít nhất 10 ký tự');
+            setError(isEn ? 'Your review must contain at least 10 characters.' : 'Đánh giá phải có ít nhất 10 ký tự');
             return;
         }
 
         if (comment.length > 1000) {
-            setError('Đánh giá không được quá 1000 ký tự');
+            setError(isEn ? 'Your review cannot exceed 1000 characters.' : 'Đánh giá không được quá 1000 ký tự');
             return;
         }
 
@@ -305,19 +321,19 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
             setRating(0);
             setComment('');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Có lỗi xảy ra');
+            setError(err instanceof Error ? err.message : (isEn ? 'Something went wrong.' : 'Có lỗi xảy ra'));
         }
     };
 
     return (
         <form onSubmit={handleSubmit} className="bg-slate-50 rounded-lg p-4 border border-slate-100">
             <h4 className="font-medium text-slate-900 mb-3">
-                Đánh giá {targetLabels[targetType]} này
+                {isEn ? `Review this ${targetLabels[targetType]}` : `Đánh giá ${targetLabels[targetType]} này`}
             </h4>
 
             {/* Star Rating */}
             <div className="mb-4">
-                <label className="block text-sm text-slate-600 mb-2">Đánh giá của bạn</label>
+                <label className="block text-sm text-slate-600 mb-2">{isEn ? 'Your rating' : 'Đánh giá của bạn'}</label>
                 <StarRating
                     rating={rating}
                     size="lg"
@@ -326,11 +342,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                 />
                 {rating > 0 && (
                     <span className="text-sm text-slate-500 ml-2">
-                        {rating === 1 && 'Rất tệ'}
-                        {rating === 2 && 'Tệ'}
-                        {rating === 3 && 'Bình thường'}
-                        {rating === 4 && 'Tốt'}
-                        {rating === 5 && 'Xuất sắc'}
+                        {getRatingText(rating, isEn)}
                     </span>
                 )}
             </div>
@@ -338,18 +350,18 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
             {/* Comment */}
             <div className="mb-4">
                 <label className="block text-sm text-slate-600 mb-2">
-                    Nhận xét của bạn
+                    {isEn ? 'Your review' : 'Nhận xét của bạn'}
                 </label>
                 <textarea
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    placeholder="Chia sẻ trải nghiệm của bạn..."
+                    placeholder={isEn ? 'Share your experience...' : 'Chia sẻ trải nghiệm của bạn...'}
                     rows={4}
                     maxLength={1000}
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none"
                 />
                 <div className="flex justify-between text-xs text-slate-400 mt-1">
-                    <span>Tối thiểu 10 ký tự</span>
+                    <span>{isEn ? 'Minimum 10 characters' : 'Tối thiểu 10 ký tự'}</span>
                     <span>{comment.length}/1000</span>
                 </div>
             </div>
@@ -371,12 +383,12 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                 {isSubmitting ? (
                     <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Đang gửi...
+                        {isEn ? 'Submitting...' : 'Đang gửi...'}
                     </>
                 ) : (
                     <>
                         <Send className="w-4 h-4 mr-2" />
-                        Gửi đánh giá
+                        {isEn ? 'Submit review' : 'Gửi đánh giá'}
                     </>
                 )}
             </Button>
@@ -394,6 +406,8 @@ const Reviews: React.FC<ReviewsProps> = ({
     currentUserId,
     showTitle = true
 }) => {
+    const { locale } = useI18n();
+    const isEn = locale === 'en';
     const { authStatus, syncError, user } = useAppAuth();
     const [reviews, setReviews] = useState<Review[]>([]);
     const [stats, setStats] = useState<ReviewStats | null>(null);
@@ -404,6 +418,7 @@ const Reviews: React.FC<ReviewsProps> = ({
 
     // Check if user is logged in
     const isLoggedIn = authStatus === 'authenticated' && Boolean(user);
+    const targetLabels = getTargetLabels(isEn);
 
     const INITIAL_REVIEWS_COUNT = 3;
 
@@ -440,10 +455,10 @@ const Reviews: React.FC<ReviewsProps> = ({
                 comment
             });
 
-            toast.success('Đánh giá của bạn đã được gửi!');
+            toast.success(isEn ? 'Your review has been submitted!' : 'Đánh giá của bạn đã được gửi!');
             await fetchReviews();
         } catch (error) {
-            const message = error instanceof Error ? error.message : 'Không thể gửi đánh giá';
+            const message = error instanceof Error ? error.message : (isEn ? 'Unable to submit review.' : 'Không thể gửi đánh giá');
             toast.error(message);
             throw error;
         } finally {
@@ -463,32 +478,26 @@ const Reviews: React.FC<ReviewsProps> = ({
                 )
             );
         } catch (error) {
-            toast.error('Không thể đánh dấu hữu ích');
+            toast.error(isEn ? 'Unable to mark this review as helpful.' : 'Không thể đánh dấu hữu ích');
         }
     };
 
     // Delete review
     const handleDeleteReview = async (reviewId: string) => {
-        if (!confirm('Bạn có chắc muốn xóa đánh giá này?')) return;
+        if (!confirm(isEn ? 'Are you sure you want to delete this review?' : 'Bạn có chắc muốn xóa đánh giá này?')) return;
 
         try {
             await api.delete(`/reviews/${reviewId}`);
-            toast.success('Đã xóa đánh giá');
+            toast.success(isEn ? 'Review deleted.' : 'Đã xóa đánh giá');
             await fetchReviews();
         } catch (error) {
-            toast.error('Không thể xóa đánh giá');
+            toast.error(isEn ? 'Unable to delete review.' : 'Không thể xóa đánh giá');
         }
     };
 
     const visibleReviews = showAllReviews
         ? reviews
         : reviews.slice(0, INITIAL_REVIEWS_COUNT);
-
-    const targetLabels = {
-        contest: 'cuộc thi',
-        course: 'khóa học',
-        document: 'tài liệu'
-    };
 
     if (isLoading) {
         return (
@@ -505,7 +514,7 @@ const Reviews: React.FC<ReviewsProps> = ({
                 <div className="flex items-center justify-between">
                     <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                         <MessageCircle className="w-5 h-5" />
-                        Đánh giá {targetTitle ? `"${targetTitle}"` : ''}
+                        {isEn ? `Reviews ${targetTitle ? `"${targetTitle}"` : ''}` : `Đánh giá ${targetTitle ? `"${targetTitle}"` : ''}`}
                     </h3>
                 </div>
             )}
@@ -521,7 +530,7 @@ const Reviews: React.FC<ReviewsProps> = ({
                             </div>
                             <StarRating rating={Math.round(stats.averageRating)} size="md" />
                             <div className="text-sm text-slate-500 mt-1">
-                                {stats.totalReviews} đánh giá
+                                {stats.totalReviews} {isEn ? 'reviews' : 'đánh giá'}
                             </div>
                         </div>
 
@@ -554,21 +563,21 @@ const Reviews: React.FC<ReviewsProps> = ({
             {authStatus === 'signed_out' && (
                 <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-slate-600 text-sm text-center">
                     <User className="w-8 h-8 mx-auto mb-2 text-slate-400" />
-                    <p>Vui lòng <a href="/login" className="text-primary-600 font-medium hover:underline">đăng nhập</a> để viết đánh giá</p>
+                    <p>{isEn ? <>Please <a href="/login" className="text-primary-600 font-medium hover:underline">sign in</a> to write a review.</> : <>Vui lòng <a href="/login" className="text-primary-600 font-medium hover:underline">đăng nhập</a> để viết đánh giá</>}</p>
                 </div>
             )}
 
             {authStatus === 'sync_error' && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-amber-900 text-sm text-center">
                     <User className="w-8 h-8 mx-auto mb-2 text-amber-500" />
-                    <p className="font-medium">Tài khoản của bạn chưa đồng bộ xong</p>
-                    <p className="mt-1">{syncError?.message || 'Hãy đồng bộ lại tài khoản trước khi gửi đánh giá.'}</p>
+                    <p className="font-medium">{isEn ? 'Your account has not finished syncing yet.' : 'Tài khoản của bạn chưa đồng bộ xong'}</p>
+                    <p className="mt-1">{syncError?.message || (isEn ? 'Please sync your account before submitting a review.' : 'Hãy đồng bộ lại tài khoản trước khi gửi đánh giá.')}</p>
                 </div>
             )}
 
             {hasUserReviewed && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 text-sm">
-                    ✓ Bạn đã đánh giá {targetLabels[targetType]} này
+                    ✓ {isEn ? `You have already reviewed this ${targetLabels[targetType]}.` : `Bạn đã đánh giá ${targetLabels[targetType]} này`}
                 </div>
             )}
 
@@ -591,17 +600,17 @@ const Reviews: React.FC<ReviewsProps> = ({
                             className="w-full py-3 text-center text-primary-600 hover:bg-primary-50 rounded-lg transition-colors font-medium"
                         >
                             {showAllReviews
-                                ? `Thu gọn`
-                                : `Xem tất cả ${reviews.length} đánh giá`}
+                                ? (isEn ? 'Show less' : 'Thu gọn')
+                                : (isEn ? `View all ${reviews.length} reviews` : `Xem tất cả ${reviews.length} đánh giá`)}
                         </button>
                     )}
                 </div>
             ) : (
                 <div className="text-center py-8 text-slate-500">
                     <MessageCircle className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-                    <p>Chưa có đánh giá nào</p>
+                    <p>{isEn ? 'No reviews yet.' : 'Chưa có đánh giá nào'}</p>
                     {isLoggedIn && !hasUserReviewed && (
-                        <p className="text-sm mt-1">Hãy là người đầu tiên đánh giá!</p>
+                        <p className="text-sm mt-1">{isEn ? 'Be the first to leave a review!' : 'Hãy là người đầu tiên đánh giá!'}</p>
                     )}
                 </div>
             )}

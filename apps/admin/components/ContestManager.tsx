@@ -1,10 +1,34 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  Plus, Edit2, Trash2, Calendar, Users, Sparkles, MoreHorizontal, Eye, RefreshCw,
-  AlertCircle, Search, Filter, MapPin, Trophy, Clock, Target, FileText, Building2,
-  X, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Image as ImageIcon, Star, MessageSquare,
-  Globe, ExternalLink
+  Plus,
+  Edit2,
+  Trash2,
+  Calendar,
+  Users,
+  Sparkles,
+  MoreHorizontal,
+  Eye,
+  RefreshCw,
+  AlertCircle,
+  Search,
+  Filter,
+  MapPin,
+  Trophy,
+  Clock,
+  Target,
+  FileText,
+  Building2,
+  X,
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  Image as ImageIcon,
+  Star,
+  MessageSquare,
+  Globe,
+  ExternalLink,
 } from 'lucide-react';
 import { Contest, ContestPrize, ContestScheduleItem, OrganizerDetails } from '../types';
 import { MOCK_CONTESTS } from '../constants';
@@ -67,30 +91,24 @@ interface CollapsibleSectionProps {
   badge?: string;
 }
 
-const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
-  title, icon, children, defaultOpen = true, badge
-}) => {
+const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ title, icon, children, defaultOpen = true, badge }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="border border-gray-200 rounded-lg">
+    <div className="rounded-lg border border-gray-200">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-3 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
+        className="flex w-full items-center justify-between bg-gray-50 px-4 py-3 transition-colors hover:bg-gray-100"
       >
         <div className="flex items-center gap-2 font-medium text-gray-700">
           {icon}
           <span>{title}</span>
-          {badge && (
-            <span className="px-2 py-0.5 text-xs bg-emerald-100 text-emerald-700 rounded-full">
-              {badge}
-            </span>
-          )}
+          {badge && <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">{badge}</span>}
         </div>
         {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </button>
-      {isOpen && <div className="p-4 space-y-4">{children}</div>}
+      {isOpen && <div className="space-y-4 p-4">{children}</div>}
     </div>
   );
 };
@@ -188,7 +206,7 @@ const ContestManager: React.FC = () => {
 
       const response = await contestService.getAll(filters);
       setContests(response.items);
-      setPagination(prev => ({
+      setPagination((prev) => ({
         ...prev,
         total: response.total,
         totalPages: response.totalPages,
@@ -275,7 +293,7 @@ const ContestManager: React.FC = () => {
   const handleGenerateAI = async () => {
     if (!newTitle) return;
     setIsGenerating(true);
-    const tagsArray = newTags.split(',').map(t => t.trim());
+    const tagsArray = newTags.split(',').map((t) => t.trim());
     const description = await generateContestDescription(newTitle, tagsArray);
     setGeneratedDesc(description);
     setIsGenerating(false);
@@ -325,17 +343,13 @@ const ContestManager: React.FC = () => {
           setConfirmModal(null);
         } catch (err) {
           console.error('Failed to delete all contests:', err);
-          const message = err instanceof ApiError
-            ? err.message
-            : err instanceof Error
-              ? err.message
-              : 'Failed to delete all contests. Please try again.';
+          const message = err instanceof ApiError ? err.message : err instanceof Error ? err.message : 'Failed to delete all contests. Please try again.';
           toast.error(message);
         } finally {
           setIsBulkDeleting(false);
           setConfirmLoading(false);
         }
-      }
+      },
     });
   };
 
@@ -381,9 +395,7 @@ const ContestManager: React.FC = () => {
       };
 
       const normalizedContestImage = newImage ? convertGoogleDriveImageUrl(newImage) : '';
-      const normalizedOrganizerLogo = syncedOrganizerDetails.logo
-        ? convertGoogleDriveImageUrl(syncedOrganizerDetails.logo)
-        : '';
+      const normalizedOrganizerLogo = syncedOrganizerDetails.logo ? convertGoogleDriveImageUrl(syncedOrganizerDetails.logo) : '';
 
       const contestData = {
         title: newTitle,
@@ -393,7 +405,10 @@ const ContestManager: React.FC = () => {
         dateStart: newDateStart,
         endDate: newEndDate || undefined,
         deadline: newDeadline,
-        tags: newTags.split(',').map(t => t.trim()).filter(Boolean),
+        tags: newTags
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean),
         description: generatedDesc,
         image: normalizedContestImage || newImage || undefined,
         category: newCategory || undefined,
@@ -405,9 +420,7 @@ const ContestManager: React.FC = () => {
         eligibility: newEligibility || undefined,
         prizes: prizes.length > 0 ? prizes : undefined,
         schedule: schedule.length > 0 ? schedule : undefined,
-        organizerDetails: syncedOrganizerDetails.name
-          ? { ...syncedOrganizerDetails, logo: normalizedOrganizerLogo || syncedOrganizerDetails.logo }
-          : undefined,
+        organizerDetails: syncedOrganizerDetails.name ? { ...syncedOrganizerDetails, logo: normalizedOrganizerLogo || syncedOrganizerDetails.logo } : undefined,
       };
 
       if (editingContest) {
@@ -416,7 +429,7 @@ const ContestManager: React.FC = () => {
           ...(updated as Contest),
           tags: safeStringArray((updated as any).tags),
         };
-        setContests(contests.map(c => c.id === editingContest.id ? normalizedUpdated : c));
+        setContests(contests.map((c) => (c.id === editingContest.id ? normalizedUpdated : c)));
       } else {
         const created = await contestService.create(contestData);
         const normalizedCreated: Contest = {
@@ -437,10 +450,14 @@ const ContestManager: React.FC = () => {
 
   const getStatusColor = (status: Contest['status']) => {
     switch (status) {
-      case 'OPEN': return 'bg-emerald-100 text-emerald-800';
-      case 'FULL': return 'bg-yellow-100 text-yellow-800';
-      case 'CLOSED': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'OPEN':
+        return 'bg-emerald-100 text-emerald-800';
+      case 'FULL':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'CLOSED':
+        return 'bg-gray-100 text-gray-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -463,21 +480,17 @@ const ContestManager: React.FC = () => {
               setConfirmLoading(true);
               try {
                 await contestService.delete(contest.id);
-                setContests(contests.filter(c => c.id !== contest.id));
+                setContests(contests.filter((c) => c.id !== contest.id));
                 toast.success('Contest deleted');
                 setConfirmModal(null);
               } catch (err) {
                 console.error('Failed to delete contest:', err);
-                const message = err instanceof ApiError
-                  ? err.message
-                  : err instanceof Error
-                    ? err.message
-                    : 'Failed to delete contest. Please try again.';
+                const message = err instanceof ApiError ? err.message : err instanceof Error ? err.message : 'Failed to delete contest. Please try again.';
                 toast.error(message);
               } finally {
                 setConfirmLoading(false);
               }
-            }
+            },
           });
           break;
         case 'edit':
@@ -505,17 +518,21 @@ const ContestManager: React.FC = () => {
           setPrizes(contest.prizes || []);
           setSchedule(contest.schedule || []);
           // Sync organizerDetails.name with contest.organizer if empty
-          setOrganizerDetails(contest.organizerDetails ? {
-            ...contest.organizerDetails,
-            name: contest.organizerDetails.name || contest.organizer,
-          } : {
-            name: contest.organizer,
-            school: '',
-            logo: '',
-            description: '',
-            contact: '',
-            website: '',
-          });
+          setOrganizerDetails(
+            contest.organizerDetails
+              ? {
+                  ...contest.organizerDetails,
+                  name: contest.organizerDetails.name || contest.organizer,
+                }
+              : {
+                  name: contest.organizer,
+                  school: '',
+                  logo: '',
+                  description: '',
+                  contact: '',
+                  website: '',
+                }
+          );
           setIsModalOpen(true);
           break;
         case 'view':
@@ -525,11 +542,7 @@ const ContestManager: React.FC = () => {
       }
     } catch (err) {
       console.error(`Failed to ${action} contest:`, err);
-      const message = err instanceof ApiError
-        ? err.message
-        : err instanceof Error
-          ? err.message
-          : `Failed to ${action} contest. Please try again.`;
+      const message = err instanceof ApiError ? err.message : err instanceof Error ? err.message : `Failed to ${action} contest. Please try again.`;
       toast.error(message);
     }
   };
@@ -566,26 +579,26 @@ const ContestManager: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Contests</h2>
-          <p className="text-gray-500 mt-1">Manage competitions and events</p>
+          <p className="mt-1 text-gray-500">Manage competitions and events</p>
         </div>
         <div className="flex gap-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <Search className="absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400" size={18} />
             <input
               type="text"
               placeholder="Search contests..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none w-48"
+              className="w-48 rounded-lg border border-gray-300 py-2 pr-4 pl-10 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
             />
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
             title="Toggle filters"
-            className={`p-2 border rounded-lg transition-colors ${showFilters ? 'border-emerald-500 bg-emerald-50 text-emerald-600' : 'border-gray-300 hover:bg-gray-50 text-gray-600'}`}
+            className={`rounded-lg border p-2 transition-colors ${showFilters ? 'border-emerald-500 bg-emerald-50 text-emerald-600' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}
           >
             <Filter size={18} />
           </button>
@@ -593,14 +606,14 @@ const ContestManager: React.FC = () => {
             onClick={() => fetchContests()}
             disabled={isLoading}
             title="Refresh"
-            className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600 disabled:opacity-50"
+            className="rounded-lg border border-gray-300 p-2 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
           >
             <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} />
           </button>
           <button
             onClick={handleDeleteAllContests}
             disabled={!canManageContests || isLoading || isBulkDeleting}
-            className="bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-sm"
+            className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-white shadow-sm transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
             title="Delete all contests"
           >
             <Trash2 size={18} />
@@ -612,7 +625,7 @@ const ContestManager: React.FC = () => {
               setIsModalOpen(true);
             }}
             disabled={!canManageContests}
-            className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-sm"
+            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-white shadow-sm transition-all hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Plus size={18} />
             Create Contest
@@ -622,7 +635,7 @@ const ContestManager: React.FC = () => {
 
       {/* Filters */}
       {showFilters && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-wrap gap-4 animate-fade-in-up">
+        <div className="animate-fade-in-up flex flex-wrap gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
           <div className="min-w-40">
             <Dropdown
               label="Status"
@@ -630,7 +643,7 @@ const ContestManager: React.FC = () => {
                 { value: 'all', label: 'All Status' },
                 { value: 'OPEN', label: 'Open', color: 'bg-emerald-500' },
                 { value: 'FULL', label: 'Full', color: 'bg-yellow-500' },
-                { value: 'CLOSED', label: 'Closed', color: 'bg-gray-500' }
+                { value: 'CLOSED', label: 'Closed', color: 'bg-gray-500' },
               ]}
               value={filterStatus}
               onChange={(val) => setFilterStatus(val as typeof filterStatus)}
@@ -643,17 +656,17 @@ const ContestManager: React.FC = () => {
 
       {/* Error Alert */}
       {error && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center gap-3">
+        <div className="flex items-center gap-3 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
           <AlertCircle className="text-yellow-500" size={20} />
-          <span className="text-yellow-700 text-sm">{error}</span>
+          <span className="text-sm text-yellow-700">{error}</span>
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 relative">
+      <div className="relative rounded-xl border border-gray-200 bg-white shadow-sm">
         {/* Keep table layer above footer so dropdowns can overlap pagination */}
-        <div className="overflow-x-auto overflow-visible relative z-10">
+        <div className="relative z-10 overflow-visible overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 border-b border-gray-100 text-gray-900 uppercase font-semibold text-xs">
+            <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-900 uppercase">
               <tr>
                 <th className="px-6 py-4">Contest</th>
                 <th className="px-6 py-4">Status</th>
@@ -667,7 +680,7 @@ const ContestManager: React.FC = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center">
-                    <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                    <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent"></div>
                     <p className="text-gray-500">Loading contests...</p>
                   </td>
                 </tr>
@@ -677,81 +690,86 @@ const ContestManager: React.FC = () => {
                     No contests found matching your criteria.
                   </td>
                 </tr>
-              ) : contests.map((contest, index) => (
-                <tr key={contest.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-4">
-                      <img src={contest.image || 'https://via.placeholder.com/64x40'} alt="" className="h-10 w-16 object-cover rounded-md" />
-                      <div>
-                        <p className="font-semibold text-gray-900">{contest.title}</p>
-                        <div className="flex gap-2 mt-1">
-                          {safeStringArray((contest as any).tags).slice(0, 3).map(tag => (
-                            <span key={tag} className="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-600">{tag}</span>
-                          ))}
-                          {safeStringArray((contest as any).tags).length > 3 && (
-                            <span className="text-xs text-gray-400">+{safeStringArray((contest as any).tags).length - 3}</span>
-                          )}
+              ) : (
+                contests.map((contest, index) => (
+                  <tr key={contest.id} className="transition-colors hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4">
+                        <img src={contest.image || 'https://via.placeholder.com/64x40'} alt="" className="h-10 w-16 rounded-md object-cover" />
+                        <div>
+                          <p className="font-semibold text-gray-900">{contest.title}</p>
+                          <div className="mt-1 flex gap-2">
+                            {safeStringArray((contest as any).tags)
+                              .slice(0, 3)
+                              .map((tag) => (
+                                <span key={tag} className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                                  {tag}
+                                </span>
+                              ))}
+                            {safeStringArray((contest as any).tags).length > 3 && (
+                              <span className="text-xs text-gray-400">+{safeStringArray((contest as any).tags).length - 3}</span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(contest.status)}`}>
-                      {contest.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-gray-600 capitalize">{contest.category || '-'}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-1.5">
-                      <Users size={16} className="text-gray-400" />
-                      <span>{contest.registrationCount ?? contest.participants ?? 0}</span>
-                      {contest.maxParticipants && contest.maxParticipants > 0 && (
-                        <span className="text-gray-400">/ {contest.maxParticipants}</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-1.5">
-                      <Calendar size={16} className="text-gray-400" />
-                      <span>{new Date(contest.deadline).toLocaleDateString('vi-VN')}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="relative action-dropdown inline-block text-left">
-                      <button
-                        ref={(el) => {
-                          actionButtonRefs.current[String(contest.id)] = el;
-                        }}
-                        onClick={() => openActionMenu(contest.id)}
-                        title="Contest actions"
-                        className={`p-2 rounded-lg border transition-all duration-200 ${openActionId === String(contest.id)
-                          ? 'border-emerald-500 bg-emerald-50 text-emerald-600 shadow-sm'
-                          : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300'
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(contest.status)}`}>
+                        {contest.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-gray-600 capitalize">{contest.category || '-'}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1.5">
+                        <Users size={16} className="text-gray-400" />
+                        <span>{contest.registrationCount ?? contest.participants ?? 0}</span>
+                        {contest.maxParticipants && contest.maxParticipants > 0 && <span className="text-gray-400">/ {contest.maxParticipants}</span>}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar size={16} className="text-gray-400" />
+                        <span>{new Date(contest.deadline).toLocaleDateString('vi-VN')}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="action-dropdown relative inline-block text-left">
+                        <button
+                          ref={(el) => {
+                            actionButtonRefs.current[String(contest.id)] = el;
+                          }}
+                          onClick={() => openActionMenu(contest.id)}
+                          title="Contest actions"
+                          className={`rounded-lg border p-2 transition-all duration-200 ${
+                            openActionId === String(contest.id)
+                              ? 'border-emerald-500 bg-emerald-50 text-emerald-600 shadow-sm'
+                              : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50'
                           }`}
-                      >
-                        <MoreHorizontal size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        >
+                          <MoreHorizontal size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
-        <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between relative z-0">
+        <div className="relative z-0 flex items-center justify-between border-t border-gray-200 bg-gray-50 px-6 py-4">
           <span className="text-sm text-gray-500">
             {pagination.total === 0
               ? 'Showing 0 to 0 of 0 contests'
-              : `Showing ${((pagination.page - 1) * pagination.limit) + 1} to ${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} contests`}
+              : `Showing ${(pagination.page - 1) * pagination.limit + 1} to ${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} contests`}
           </span>
           <div className="flex gap-2">
             <button
               onClick={() => handlePageChange(pagination.page - 1)}
               disabled={pagination.page <= 1 || isLoading}
-              className="px-3 py-1 border border-gray-300 rounded bg-white text-sm text-gray-600 disabled:opacity-50 hover:bg-gray-50 disabled:cursor-not-allowed"
+              className="rounded border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Previous
             </button>
@@ -761,7 +779,7 @@ const ContestManager: React.FC = () => {
             <button
               onClick={() => handlePageChange(pagination.page + 1)}
               disabled={!pagination.totalPages || pagination.page >= pagination.totalPages || isLoading}
-              className="px-3 py-1 border border-gray-300 rounded bg-white text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded border border-gray-300 bg-white px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Next
             </button>
@@ -770,892 +788,863 @@ const ContestManager: React.FC = () => {
       </div>
 
       {/* Action dropdown menu rendered in a portal to avoid being clipped by scroll/overflow containers */}
-      {openActionId != null && actionMenuPos && (() => {
-        const openContest = contests.find((c) => String(c.id) === openActionId);
-        if (!openContest) return null;
+      {openActionId != null &&
+        actionMenuPos &&
+        (() => {
+          const openContest = contests.find((c) => String(c.id) === openActionId);
+          if (!openContest) return null;
 
-        return createPortal(
-          <div
-            className="action-menu-portal w-52 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 animate-fade-in-up"
-            onMouseDown={(e) => e.stopPropagation()}
-          >
-            <div className="py-1">
-              <button
-                onClick={() => handleAction('view', openContest)}
-                className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
-              >
-                <Eye size={16} className="text-gray-400" />
-                <span>View Details</span>
-              </button>
-              {canManageContests && (
-                <>
-                  <button
-                    onClick={() => handleAction('edit', openContest)}
-                    className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
-                  >
-                    <Edit2 size={16} className="text-gray-400" />
-                    <span>Edit Contest</span>
-                  </button>
-                  <div className="border-t border-gray-50 my-1"></div>
-                  <button
-                    onClick={() => handleAction('delete', openContest)}
-                    className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
-                  >
-                    <Trash2 size={16} />
-                    <span>Delete Contest</span>
-                  </button>
-                </>
-              )}
-            </div>
-          </div>,
-          document.body
-        );
-      })()}
+          return createPortal(
+            <div
+              className="action-menu-portal animate-fade-in-up z-50 w-52 rounded-xl border border-gray-200 bg-white shadow-2xl"
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <div className="py-1">
+                <button
+                  onClick={() => handleAction('view', openContest)}
+                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                >
+                  <Eye size={16} className="text-gray-400" />
+                  <span>View Details</span>
+                </button>
+                {canManageContests && (
+                  <>
+                    <button
+                      onClick={() => handleAction('edit', openContest)}
+                      className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                    >
+                      <Edit2 size={16} className="text-gray-400" />
+                      <span>Edit Contest</span>
+                    </button>
+                    <div className="my-1 border-t border-gray-50"></div>
+                    <button
+                      onClick={() => handleAction('delete', openContest)}
+                      className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
+                    >
+                      <Trash2 size={16} />
+                      <span>Delete Contest</span>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>,
+            document.body
+          );
+        })()}
 
       {/* Create/Edit Modal */}
-      {isModalOpen && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden animate-fade-in-up max-h-[90vh] flex flex-col">
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-              <h3 className="font-semibold text-gray-900 text-lg">
-                {editingContest ? 'Edit Contest' : 'Create New Contest'}
-              </h3>
-              <button onClick={() => setIsModalOpen(false)} title="Close modal" className="text-gray-400 hover:text-gray-600 p-1">
-                <X size={20} />
-              </button>
-            </div>
+      {isModalOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
+            <div className="animate-fade-in-up relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl">
+              <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-6 py-4">
+                <h3 className="text-lg font-semibold text-gray-900">{editingContest ? 'Edit Contest' : 'Create New Contest'}</h3>
+                <button onClick={() => setIsModalOpen(false)} title="Close modal" className="p-1 text-gray-400 hover:text-gray-600">
+                  <X size={20} />
+                </button>
+              </div>
 
-            <div className="p-6 space-y-4 overflow-y-auto flex-1">
-              {/* Basic Information */}
-              <CollapsibleSection title="Basic Information" icon={<FileText size={18} />} defaultOpen={true}>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      placeholder="e.g., Summer Hackathon 2024"
-                      value={newTitle}
-                      onChange={(e) => setNewTitle(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Dropdown
-                      label="Category"
-                      options={CONTEST_CATEGORIES}
-                      value={newCategory}
-                      onChange={setNewCategory}
-                      placeholder="Select category"
-                      headerText="Contest Category"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      placeholder="e.g., AI, Web, Mobile"
-                      value={newTags}
-                      onChange={(e) => setNewTags(e.target.value)}
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <ImageIcon size={14} className="inline mr-1" />
-                      Image URL
-                    </label>
-                    <input
-                      type="url"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      placeholder="https://example.com/image.jpg"
-                      value={newImage}
-                      onChange={(e) => setNewImage(e.target.value)}
-                      onBlur={() => {
-                        if (!newImage) return;
-                        const converted = convertGoogleDriveImageUrl(newImage);
-                        if (converted !== newImage) {
-                          setNewImage(converted);
-                          toast.success('Converted Google Drive link');
-                        }
-                      }}
-                    />
-                    {newImage && (
-                      <div className="mt-2">
-                        <img src={newImage} alt="Preview" className="h-24 w-auto rounded-lg object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </CollapsibleSection>
-
-              {/* Date & Location */}
-              <CollapsibleSection title="Date & Location" icon={<MapPin size={18} />} defaultOpen={true}>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                    <input
-                      type="date"
-                      title="Contest start date"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      value={newDateStart}
-                      onChange={(e) => setNewDateStart(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                    <input
-                      type="date"
-                      title="Contest end date"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      value={newEndDate}
-                      onChange={(e) => setNewEndDate(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Registration Deadline</label>
-                    <input
-                      type="date"
-                      title="Registration deadline"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      value={newDeadline}
-                      onChange={(e) => setNewDeadline(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Dropdown
-                      label="Location Type"
-                      options={LOCATION_TYPES}
-                      value={newLocationType}
-                      onChange={(val) => setNewLocationType(val as 'online' | 'offline' | 'hybrid')}
-                      placeholder="Select location type"
-                      headerText="Location Type"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Location Details</label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      placeholder={newLocationType === 'online' ? 'e.g., Zoom, Google Meet' : 'e.g., 268 Lý Thường Kiệt, Q.10'}
-                      value={newLocation}
-                      onChange={(e) => setNewLocation(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Registration Fee (VND)</label>
-                    <input
-                      type="number"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      placeholder="0 = Free"
-                      value={newFee}
-                      onChange={(e) => setNewFee(Number(e.target.value))}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Max Participants</label>
-                    <input
-                      type="number"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      placeholder="0 = Unlimited"
-                      value={newMaxParticipants}
-                      onChange={(e) => setNewMaxParticipants(Number(e.target.value))}
-                    />
-                  </div>
-                </div>
-              </CollapsibleSection>
-
-              {/* Organizer */}
-              <CollapsibleSection title="Organizer Details" icon={<Building2 size={18} />} defaultOpen={true}>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Organizer Name *</label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      placeholder="e.g., TechGen Z Club"
-                      value={newOrganizer}
-                      onChange={(e) => setNewOrganizer(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">School/University</label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      placeholder="e.g., Học viện Bưu chính Viễn thông"
-                      value={organizerDetails.school}
-                      onChange={(e) => setOrganizerDetails({ ...organizerDetails, school: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL</label>
-                    <input
-                      type="url"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      placeholder="https://example.com/logo.png"
-                      value={organizerDetails.logo}
-                      onChange={(e) => setOrganizerDetails({ ...organizerDetails, logo: e.target.value })}
-                      onBlur={() => {
-                        const currentLogo = organizerDetails.logo;
-                        if (!currentLogo) return;
-                        const converted = convertGoogleDriveImageUrl(currentLogo);
-                        if (converted !== currentLogo) {
-                          setOrganizerDetails((prev) => ({ ...prev, logo: converted }));
-                          toast.success('Converted Google Drive link');
-                        }
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
-                    <input
-                      type="url"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      placeholder="https://techgenz.com"
-                      value={organizerDetails.website}
-                      onChange={(e) => setOrganizerDetails({ ...organizerDetails, website: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Contact</label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      placeholder="email@example.com or phone"
-                      value={organizerDetails.contact}
-                      onChange={(e) => setOrganizerDetails({ ...organizerDetails, contact: e.target.value })}
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Organizer Description</label>
-                    <textarea
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none"
-                      rows={2}
-                      placeholder="Brief description about the organizer..."
-                      value={organizerDetails.description}
-                      onChange={(e) => setOrganizerDetails({ ...organizerDetails, description: e.target.value })}
-                    />
-                  </div>
-                </div>
-              </CollapsibleSection>
-
-              {/* Content - Description, Objectives, Eligibility, Rules */}
-              <CollapsibleSection title="Content" icon={<Target size={18} />} defaultOpen={false}>
-                <div className="space-y-4">
-                  {/* AI Description Generator */}
-                  <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="block text-sm font-semibold text-emerald-800">AI Description Generator</label>
-                      <Sparkles size={16} className="text-emerald-600" />
+              <div className="flex-1 space-y-4 overflow-y-auto p-6">
+                {/* Basic Information */}
+                <CollapsibleSection title="Basic Information" icon={<FileText size={18} />} defaultOpen={true}>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-2">
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Title *</label>
+                      <input
+                        type="text"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        placeholder="e.g., Summer Hackathon 2024"
+                        value={newTitle}
+                        onChange={(e) => setNewTitle(e.target.value)}
+                      />
                     </div>
-                    <p className="text-xs text-emerald-700 mb-3">
-                      Enter a title and tags above, then click generate to have Gemini AI write your contest description.
-                    </p>
-                    <button
-                      onClick={handleGenerateAI}
-                      disabled={isGenerating || !newTitle}
-                      className={`w-full py-2 px-4 rounded-md text-sm font-medium transition-all flex items-center justify-center gap-2 ${isGenerating || !newTitle
-                        ? 'bg-emerald-200 text-emerald-500 cursor-not-allowed'
-                        : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'
-                        }`}
-                    >
-                      {isGenerating ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles size={16} />
-                          Generate with Gemini
-                        </>
+                    <div>
+                      <Dropdown
+                        label="Category"
+                        options={CONTEST_CATEGORIES}
+                        value={newCategory}
+                        onChange={setNewCategory}
+                        placeholder="Select category"
+                        headerText="Contest Category"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Tags (comma separated)</label>
+                      <input
+                        type="text"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        placeholder="e.g., AI, Web, Mobile"
+                        value={newTags}
+                        onChange={(e) => setNewTags(e.target.value)}
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="mb-1 block text-sm font-medium text-gray-700">
+                        <ImageIcon size={14} className="mr-1 inline" />
+                        Image URL
+                      </label>
+                      <input
+                        type="url"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        placeholder="https://example.com/image.jpg"
+                        value={newImage}
+                        onChange={(e) => setNewImage(e.target.value)}
+                        onBlur={() => {
+                          if (!newImage) return;
+                          const converted = convertGoogleDriveImageUrl(newImage);
+                          if (converted !== newImage) {
+                            setNewImage(converted);
+                            toast.success('Converted Google Drive link');
+                          }
+                        }}
+                      />
+                      {newImage && (
+                        <div className="mt-2">
+                          <img
+                            src={newImage}
+                            alt="Preview"
+                            className="h-24 w-auto rounded-lg object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
                       )}
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Date & Location */}
+                <CollapsibleSection title="Date & Location" icon={<MapPin size={18} />} defaultOpen={true}>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Start Date</label>
+                      <input
+                        type="date"
+                        title="Contest start date"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        value={newDateStart}
+                        onChange={(e) => setNewDateStart(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">End Date</label>
+                      <input
+                        type="date"
+                        title="Contest end date"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        value={newEndDate}
+                        onChange={(e) => setNewEndDate(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Registration Deadline</label>
+                      <input
+                        type="date"
+                        title="Registration deadline"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        value={newDeadline}
+                        onChange={(e) => setNewDeadline(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Dropdown
+                        label="Location Type"
+                        options={LOCATION_TYPES}
+                        value={newLocationType}
+                        onChange={(val) => setNewLocationType(val as 'online' | 'offline' | 'hybrid')}
+                        placeholder="Select location type"
+                        headerText="Location Type"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Location Details</label>
+                      <input
+                        type="text"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        placeholder={newLocationType === 'online' ? 'e.g., Zoom, Google Meet' : 'e.g., 268 Lý Thường Kiệt, Q.10'}
+                        value={newLocation}
+                        onChange={(e) => setNewLocation(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Registration Fee (VND)</label>
+                      <input
+                        type="number"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        placeholder="0 = Free"
+                        value={newFee}
+                        onChange={(e) => setNewFee(Number(e.target.value))}
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Max Participants</label>
+                      <input
+                        type="number"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        placeholder="0 = Unlimited"
+                        value={newMaxParticipants}
+                        onChange={(e) => setNewMaxParticipants(Number(e.target.value))}
+                      />
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Organizer */}
+                <CollapsibleSection title="Organizer Details" icon={<Building2 size={18} />} defaultOpen={true}>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Organizer Name *</label>
+                      <input
+                        type="text"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        placeholder="e.g., TechGen Z Club"
+                        value={newOrganizer}
+                        onChange={(e) => setNewOrganizer(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">School/University</label>
+                      <input
+                        type="text"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        placeholder="e.g., Học viện Bưu chính Viễn thông"
+                        value={organizerDetails.school}
+                        onChange={(e) => setOrganizerDetails({ ...organizerDetails, school: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Logo URL</label>
+                      <input
+                        type="url"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        placeholder="https://example.com/logo.png"
+                        value={organizerDetails.logo}
+                        onChange={(e) => setOrganizerDetails({ ...organizerDetails, logo: e.target.value })}
+                        onBlur={() => {
+                          const currentLogo = organizerDetails.logo;
+                          if (!currentLogo) return;
+                          const converted = convertGoogleDriveImageUrl(currentLogo);
+                          if (converted !== currentLogo) {
+                            setOrganizerDetails((prev) => ({ ...prev, logo: converted }));
+                            toast.success('Converted Google Drive link');
+                          }
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Website</label>
+                      <input
+                        type="url"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        placeholder="https://techgenz.com"
+                        value={organizerDetails.website}
+                        onChange={(e) => setOrganizerDetails({ ...organizerDetails, website: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Contact</label>
+                      <input
+                        type="text"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        placeholder="email@example.com or phone"
+                        value={organizerDetails.contact}
+                        onChange={(e) => setOrganizerDetails({ ...organizerDetails, contact: e.target.value })}
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Organizer Description</label>
+                      <textarea
+                        className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        rows={2}
+                        placeholder="Brief description about the organizer..."
+                        value={organizerDetails.description}
+                        onChange={(e) => setOrganizerDetails({ ...organizerDetails, description: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Content - Description, Objectives, Eligibility, Rules */}
+                <CollapsibleSection title="Content" icon={<Target size={18} />} defaultOpen={false}>
+                  <div className="space-y-4">
+                    {/* AI Description Generator */}
+                    <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-4">
+                      <div className="mb-2 flex items-center justify-between">
+                        <label className="block text-sm font-semibold text-emerald-800">AI Description Generator</label>
+                        <Sparkles size={16} className="text-emerald-600" />
+                      </div>
+                      <p className="mb-3 text-xs text-emerald-700">
+                        Enter a title and tags above, then click generate to have Gemini AI write your contest description.
+                      </p>
+                      <button
+                        onClick={handleGenerateAI}
+                        disabled={isGenerating || !newTitle}
+                        className={`flex w-full items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
+                          isGenerating || !newTitle
+                            ? 'cursor-not-allowed bg-emerald-200 text-emerald-500'
+                            : 'bg-emerald-600 text-white shadow-sm hover:bg-emerald-700'
+                        }`}
+                      >
+                        {isGenerating ? (
+                          <>
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles size={16} />
+                            Generate with Gemini
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Description</label>
+                      <textarea
+                        className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        rows={4}
+                        placeholder="Contest description..."
+                        value={generatedDesc}
+                        onChange={(e) => setGeneratedDesc(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Objectives (Mục tiêu)</label>
+                      <textarea
+                        className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        rows={3}
+                        placeholder="Khơi dậy niềm đam mê sáng tạo và cung cấp sân chơi chuyên nghiệp cho các bạn trẻ..."
+                        value={newObjectives}
+                        onChange={(e) => setNewObjectives(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Eligibility (Đối tượng tham gia)</label>
+                      <textarea
+                        className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        rows={3}
+                        placeholder="• Sinh viên các trường đại học, cao đẳng.&#10;• Yêu thích thiết kế giao diện và trải nghiệm người dùng.&#10;• Có thể tham gia cá nhân hoặc đội nhóm (tối đa 3 người)."
+                        value={newEligibility}
+                        onChange={(e) => setNewEligibility(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-700">Rules (Thể lệ)</label>
+                      <textarea
+                        className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                        rows={5}
+                        placeholder="1. Mỗi đội chỉ được nộp tối đa 1 bài dự thi.&#10;2. Bài thi phải là sản phẩm mới, chưa được công bố trước đây.&#10;3. Nghiêm cấm sao chép từ nguồn khác..."
+                        value={newRules}
+                        onChange={(e) => setNewRules(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Prizes */}
+                <CollapsibleSection
+                  title="Prizes (Giải thưởng)"
+                  icon={<Trophy size={18} />}
+                  defaultOpen={false}
+                  badge={prizes.length > 0 ? `${prizes.length}` : undefined}
+                >
+                  <div className="space-y-3">
+                    {prizes.map((prize, index) => (
+                      <div key={index} className="flex items-start gap-3 rounded-lg bg-gray-50 p-3">
+                        <div className="w-16">
+                          <label className="mb-1 block text-xs font-medium text-gray-500">Rank</label>
+                          <input
+                            type="number"
+                            min="1"
+                            title="Prize rank"
+                            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                            value={prize.rank}
+                            onChange={(e) => updatePrize(index, 'rank', Number(e.target.value))}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="mb-1 block text-xs font-medium text-gray-500">Title</label>
+                          <input
+                            type="text"
+                            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                            placeholder="e.g., Giải Nhất"
+                            value={prize.title}
+                            onChange={(e) => updatePrize(index, 'title', e.target.value)}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="mb-1 block text-xs font-medium text-gray-500">Value</label>
+                          <input
+                            type="text"
+                            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                            placeholder="e.g., 10,000,000 VND"
+                            value={prize.value}
+                            onChange={(e) => updatePrize(index, 'value', e.target.value)}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="mb-1 block text-xs font-medium text-gray-500">Description</label>
+                          <input
+                            type="text"
+                            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                            placeholder="Optional"
+                            value={prize.description || ''}
+                            onChange={(e) => updatePrize(index, 'description', e.target.value)}
+                          />
+                        </div>
+                        <button
+                          onClick={() => removePrize(index)}
+                          className="mt-5 rounded p-1.5 text-red-500 transition-colors hover:bg-red-50"
+                          title="Remove prize"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={addPrize}
+                      className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 py-2 text-gray-500 transition-colors hover:border-emerald-400 hover:text-emerald-600"
+                    >
+                      <Plus size={16} />
+                      Add Prize
                     </button>
                   </div>
+                </CollapsibleSection>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none"
-                      rows={4}
-                      placeholder="Contest description..."
-                      value={generatedDesc}
-                      onChange={(e) => setGeneratedDesc(e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Objectives (Mục tiêu)</label>
-                    <textarea
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none"
-                      rows={3}
-                      placeholder="Khơi dậy niềm đam mê sáng tạo và cung cấp sân chơi chuyên nghiệp cho các bạn trẻ..."
-                      value={newObjectives}
-                      onChange={(e) => setNewObjectives(e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Eligibility (Đối tượng tham gia)</label>
-                    <textarea
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none"
-                      rows={3}
-                      placeholder="• Sinh viên các trường đại học, cao đẳng.&#10;• Yêu thích thiết kế giao diện và trải nghiệm người dùng.&#10;• Có thể tham gia cá nhân hoặc đội nhóm (tối đa 3 người)."
-                      value={newEligibility}
-                      onChange={(e) => setNewEligibility(e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Rules (Thể lệ)</label>
-                    <textarea
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none"
-                      rows={5}
-                      placeholder="1. Mỗi đội chỉ được nộp tối đa 1 bài dự thi.&#10;2. Bài thi phải là sản phẩm mới, chưa được công bố trước đây.&#10;3. Nghiêm cấm sao chép từ nguồn khác..."
-                      value={newRules}
-                      onChange={(e) => setNewRules(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </CollapsibleSection>
-
-              {/* Prizes */}
-              <CollapsibleSection
-                title="Prizes (Giải thưởng)"
-                icon={<Trophy size={18} />}
-                defaultOpen={false}
-                badge={prizes.length > 0 ? `${prizes.length}` : undefined}
-              >
-                <div className="space-y-3">
-                  {prizes.map((prize, index) => (
-                    <div key={index} className="flex gap-3 items-start p-3 bg-gray-50 rounded-lg">
-                      <div className="w-16">
-                        <label className="block text-xs font-medium text-gray-500 mb-1">Rank</label>
-                        <input
-                          type="number"
-                          min="1"
-                          title="Prize rank"
-                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                          value={prize.rank}
-                          onChange={(e) => updatePrize(index, 'rank', Number(e.target.value))}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-xs font-medium text-gray-500 mb-1">Title</label>
-                        <input
-                          type="text"
-                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                          placeholder="e.g., Giải Nhất"
-                          value={prize.title}
-                          onChange={(e) => updatePrize(index, 'title', e.target.value)}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-xs font-medium text-gray-500 mb-1">Value</label>
-                        <input
-                          type="text"
-                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                          placeholder="e.g., 10,000,000 VND"
-                          value={prize.value}
-                          onChange={(e) => updatePrize(index, 'value', e.target.value)}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
-                        <input
-                          type="text"
-                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                          placeholder="Optional"
-                          value={prize.description || ''}
-                          onChange={(e) => updatePrize(index, 'description', e.target.value)}
-                        />
-                      </div>
-                      <button
-                        onClick={() => removePrize(index)}
-                        className="mt-5 p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors"
-                        title="Remove prize"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    onClick={addPrize}
-                    className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-emerald-400 hover:text-emerald-600 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <Plus size={16} />
-                    Add Prize
-                  </button>
-                </div>
-              </CollapsibleSection>
-
-              {/* Schedule */}
-              <CollapsibleSection
-                title="Schedule (Lịch trình)"
-                icon={<Clock size={18} />}
-                defaultOpen={false}
-                badge={schedule.length > 0 ? `${schedule.length}` : undefined}
-              >
-                <div className="space-y-3">
-                  {schedule.map((item, index) => (
-                    <div key={index} className="flex gap-3 items-start p-3 bg-gray-50 rounded-lg">
-                      <div className="w-36">
-                        <label className="block text-xs font-medium text-gray-500 mb-1">Date</label>
-                        <input
-                          type="date"
-                          title="Schedule item date"
-                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                          value={item.date?.split('T')[0] || ''}
-                          onChange={(e) => updateScheduleItem(index, 'date', e.target.value)}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-xs font-medium text-gray-500 mb-1">Title</label>
-                        <input
-                          type="text"
-                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                          placeholder="e.g., Mở đăng ký"
-                          value={item.title}
-                          onChange={(e) => updateScheduleItem(index, 'title', e.target.value)}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
-                        <input
-                          type="text"
-                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                          placeholder="Optional"
-                          value={item.description || ''}
-                          onChange={(e) => updateScheduleItem(index, 'description', e.target.value)}
-                        />
-                      </div>
-                      <button
-                        onClick={() => removeScheduleItem(index)}
-                        className="mt-5 p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors"
-                        title="Remove item"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    onClick={addScheduleItem}
-                    className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-emerald-400 hover:text-emerald-600 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <Plus size={16} />
-                    Add Schedule Item
-                  </button>
-                </div>
-              </CollapsibleSection>
-            </div>
-
-            <div className="px-6 py-4 bg-gray-50 flex justify-end gap-3 border-t border-gray-100">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveContest}
-                disabled={isSaving || !newTitle || !newOrganizer}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                {isSaving ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Saving...
-                  </>
-                ) : (
-                  editingContest ? 'Update Contest' : 'Create Contest'
-                )}
-              </button>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
-      {/* View Contest Details Modal */}
-      {isViewModalOpen && viewingContest && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsViewModalOpen(false)} />
-          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden animate-fade-in-up max-h-[90vh] flex flex-col">
-            {/* Header with Image */}
-            <div className="relative h-48 bg-gradient-to-r from-emerald-600 to-teal-600">
-              {viewingContest.image && (
-                <img
-                  src={viewingContest.image}
-                  alt={viewingContest.title}
-                  className="absolute inset-0 w-full h-full object-cover opacity-30"
-                />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-              <button
-                onClick={() => setIsViewModalOpen(false)}
-                title="Close modal"
-                className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 rounded-lg text-white transition-colors backdrop-blur-sm"
-              >
-                <X size={20} />
-              </button>
-              <div className="absolute bottom-4 left-6 right-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(viewingContest.status)}`}>
-                    {viewingContest.status}
-                  </span>
-                  {viewingContest.category && (
-                    <span className="bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded-full text-xs font-medium capitalize">
-                      {viewingContest.category}
-                    </span>
-                  )}
-                  {viewingContest.fee === 0 ? (
-                    <span className="bg-green-500 text-white px-2.5 py-0.5 rounded-full text-xs font-medium">
-                      Free
-                    </span>
-                  ) : (
-                    <span className="bg-amber-500 text-white px-2.5 py-0.5 rounded-full text-xs font-medium">
-                      ₫{viewingContest.fee.toLocaleString()}
-                    </span>
-                  )}
-                </div>
-                <h2 className="text-2xl font-bold text-white">{viewingContest.title}</h2>
-                <p className="text-white/80 mt-1">by {viewingContest.organizer}</p>
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="p-6 overflow-y-auto flex-1 space-y-6">
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <Users size={24} className="mx-auto text-emerald-600 mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">{viewingContest.registrationCount ?? viewingContest.participants ?? 0}</p>
-                  <p className="text-xs text-gray-500">
-                    Participants{viewingContest.maxParticipants && viewingContest.maxParticipants > 0 ? ` / ${viewingContest.maxParticipants}` : ''}
-                  </p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <Calendar size={24} className="mx-auto text-blue-600 mb-2" />
-                  <p className="text-lg font-bold text-gray-900">
-                    {viewingContest.deadline ? new Date(viewingContest.deadline).toLocaleDateString('vi-VN') : 'N/A'}
-                  </p>
-                  <p className="text-xs text-gray-500">Deadline</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <MapPin size={24} className="mx-auto text-purple-600 mb-2" />
-                  <p className="text-lg font-bold text-gray-900 capitalize">{viewingContest.locationType || 'Online'}</p>
-                  <p className="text-xs text-gray-500">Location Type</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <Trophy size={24} className="mx-auto text-yellow-500 mb-2" />
-                  <p className="text-lg font-bold text-gray-900">{viewingContest.prizes?.length || 0}</p>
-                  <p className="text-xs text-gray-500">Prizes</p>
-                </div>
-              </div>
-
-              {/* Tags */}
-              {viewingContest.tags && viewingContest.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {viewingContest.tags.map((tag, index) => (
-                    <span key={index} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Organizer Info */}
-              {viewingContest.organizerDetails && (
-                <div className="bg-emerald-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-emerald-900 mb-3 flex items-center gap-2">
-                    <Building2 size={18} />
-                    Organizer Details
-                  </h4>
-                  <div className="flex items-start gap-4">
-                    {viewingContest.organizerDetails.logo && (
-                      <img
-                        src={viewingContest.organizerDetails.logo}
-                        alt={viewingContest.organizerDetails.name}
-                        className="w-16 h-16 rounded-lg object-cover"
-                      />
-                    )}
-                    <div className="flex-1 space-y-2 text-sm">
-                      <p><span className="font-medium text-emerald-800">Name:</span> {viewingContest.organizerDetails.name}</p>
-                      {viewingContest.organizerDetails.school && (
-                        <p><span className="font-medium text-emerald-800">School:</span> {viewingContest.organizerDetails.school}</p>
-                      )}
-                      {viewingContest.organizerDetails.contact && (
-                        <p><span className="font-medium text-emerald-800">Contact:</span> {viewingContest.organizerDetails.contact}</p>
-                      )}
-                      {viewingContest.organizerDetails.website && (
-                        <a
-                          href={viewingContest.organizerDetails.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-emerald-700 hover:underline flex items-center gap-1"
-                        >
-                          <Globe size={14} />
-                          {viewingContest.organizerDetails.website}
-                          <ExternalLink size={12} />
-                        </a>
-                      )}
-                      {viewingContest.organizerDetails.description && (
-                        <p className="text-gray-600">{viewingContest.organizerDetails.description}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Schedule */}
-              {viewingContest.dateStart && (
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
-                    <Calendar size={18} />
-                    Schedule
-                  </h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                    {viewingContest.dateStart && (
-                      <div>
-                        <span className="text-blue-700">Start Date:</span>
-                        <span className="ml-2 font-medium text-blue-900">
-                          {new Date(viewingContest.dateStart).toLocaleDateString('vi-VN')}
-                        </span>
-                      </div>
-                    )}
-                    {(viewingContest as any).endDate && (
-                      <div>
-                        <span className="text-blue-700">End Date:</span>
-                        <span className="ml-2 font-medium text-blue-900">
-                          {new Date((viewingContest as any).endDate).toLocaleDateString('vi-VN')}
-                        </span>
-                      </div>
-                    )}
-                    {viewingContest.deadline && (
-                      <div>
-                        <span className="text-blue-700">Deadline:</span>
-                        <span className="ml-2 font-medium text-blue-900">
-                          {new Date(viewingContest.deadline).toLocaleDateString('vi-VN')}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Location */}
-              {viewingContest.location && (
-                <div className="bg-purple-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
-                    <MapPin size={18} />
-                    Location
-                  </h4>
-                  <p className="text-purple-800">{viewingContest.location}</p>
-                </div>
-              )}
-
-              {/* Description */}
-              {viewingContest.description && (
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                    <FileText size={18} className="text-gray-600" />
-                    Description
-                  </h4>
-                  <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-wrap">
-                    {viewingContest.description}
-                  </div>
-                </div>
-              )}
-
-              {/* Objectives */}
-              {viewingContest.objectives && (
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                    <Target size={18} className="text-emerald-600" />
-                    Objectives
-                  </h4>
-                  <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-wrap">
-                    {viewingContest.objectives}
-                  </div>
-                </div>
-              )}
-
-              {/* Eligibility */}
-              {viewingContest.eligibility && (
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                    <Users size={18} className="text-blue-600" />
-                    Eligibility
-                  </h4>
-                  <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-wrap">
-                    {viewingContest.eligibility}
-                  </div>
-                </div>
-              )}
-
-              {/* Rules */}
-              {viewingContest.rules && (
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                    <FileText size={18} className="text-orange-600" />
-                    Rules
-                  </h4>
-                  <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-wrap">
-                    {viewingContest.rules}
-                  </div>
-                </div>
-              )}
-
-              {/* Prizes */}
-              {viewingContest.prizes && viewingContest.prizes.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <Trophy size={18} className="text-yellow-500" />
-                    Prizes ({viewingContest.prizes.length})
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {viewingContest.prizes.map((prize, index) => (
-                      <div key={index} className="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-lg p-4 border border-yellow-200">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="w-8 h-8 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                            {prize.rank}
-                          </span>
-                          <span className="font-semibold text-gray-900">{prize.title}</span>
-                        </div>
-                        <p className="text-lg font-bold text-amber-600">{prize.value}</p>
-                        {prize.description && (
-                          <p className="text-sm text-gray-600 mt-1">{prize.description}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Schedule Items */}
-              {viewingContest.schedule && viewingContest.schedule.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <Clock size={18} className="text-blue-600" />
-                    Timeline ({viewingContest.schedule.length} events)
-                  </h4>
-                  <div className="space-y-2">
-                    {viewingContest.schedule.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3 bg-gray-50 rounded-lg p-3">
-                        <div className="w-24 flex-shrink-0">
-                          <p className="text-sm font-medium text-blue-600">
-                            {item.date ? new Date(item.date).toLocaleDateString('vi-VN') : 'TBD'}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{item.title}</p>
-                          {item.description && (
-                            <p className="text-sm text-gray-500">{item.description}</p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Comments/Reviews */}
-              {viewingContest.comments && viewingContest.comments.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <MessageSquare size={18} className="text-purple-600" />
-                    Comments ({viewingContest.comments.length})
-                  </h4>
-                  <div className="space-y-3 max-h-64 overflow-y-auto">
-                    {viewingContest.comments.map((comment) => (
-                      <div key={comment.id} className="bg-gray-50 rounded-lg p-4">
-                        <div className="flex items-start gap-3">
-                          {comment.userAvatar ? (
-                            <img
-                              src={comment.userAvatar}
-                              alt={comment.userName}
-                              className="w-10 h-10 rounded-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                              <span className="text-purple-600 font-medium text-sm">
-                                {comment.userName.charAt(0).toUpperCase()}
-                              </span>
-                            </div>
-                          )}
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <p className="font-medium text-gray-900">{comment.userName}</p>
-                              <span className="text-xs text-gray-400">
-                                {new Date(comment.createdAt).toLocaleDateString('vi-VN')}
-                              </span>
-                            </div>
-                            {comment.rating && (
-                              <div className="flex items-center gap-0.5 mt-1">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                  <Star
-                                    key={star}
-                                    size={12}
-                                    className={star <= comment.rating! ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
-                                  />
-                                ))}
-                              </div>
-                            )}
-                            <p className="text-sm text-gray-600 mt-2">{comment.content}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* No Comments State */}
-              {(!viewingContest.comments || viewingContest.comments.length === 0) && (
-                <div className="bg-gray-50 rounded-lg p-6 text-center">
-                  <MessageSquare size={32} className="mx-auto text-gray-300 mb-2" />
-                  <p className="text-sm text-gray-500">No comments yet</p>
-                </div>
-              )}
-
-              {/* Metadata */}
-              <div className="text-xs text-gray-400 pt-4 border-t border-gray-100 flex flex-wrap gap-4">
-                {viewingContest.createdAt && (
-                  <span>Created: {new Date(viewingContest.createdAt).toLocaleDateString('vi-VN')}</span>
-                )}
-                {viewingContest.updatedAt && (
-                  <span>Updated: {new Date(viewingContest.updatedAt).toLocaleDateString('vi-VN')}</span>
-                )}
-                <span>ID: {viewingContest.id}</span>
-              </div>
-            </div>
-
-            {/* Footer Actions */}
-            <div className="px-6 py-4 bg-gray-50 flex justify-between items-center border-t border-gray-100">
-              <button
-                onClick={() => setIsViewModalOpen(false)}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
-              >
-                Close
-              </button>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    setIsViewModalOpen(false);
-                    handleAction('edit', viewingContest);
-                  }}
-                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium shadow-sm transition-colors flex items-center gap-2"
+                {/* Schedule */}
+                <CollapsibleSection
+                  title="Schedule (Lịch trình)"
+                  icon={<Clock size={18} />}
+                  defaultOpen={false}
+                  badge={schedule.length > 0 ? `${schedule.length}` : undefined}
                 >
-                  <Edit2 size={16} />
-                  Edit Contest
+                  <div className="space-y-3">
+                    {schedule.map((item, index) => (
+                      <div key={index} className="flex items-start gap-3 rounded-lg bg-gray-50 p-3">
+                        <div className="w-36">
+                          <label className="mb-1 block text-xs font-medium text-gray-500">Date</label>
+                          <input
+                            type="date"
+                            title="Schedule item date"
+                            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                            value={item.date?.split('T')[0] || ''}
+                            onChange={(e) => updateScheduleItem(index, 'date', e.target.value)}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="mb-1 block text-xs font-medium text-gray-500">Title</label>
+                          <input
+                            type="text"
+                            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                            placeholder="e.g., Mở đăng ký"
+                            value={item.title}
+                            onChange={(e) => updateScheduleItem(index, 'title', e.target.value)}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="mb-1 block text-xs font-medium text-gray-500">Description</label>
+                          <input
+                            type="text"
+                            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                            placeholder="Optional"
+                            value={item.description || ''}
+                            onChange={(e) => updateScheduleItem(index, 'description', e.target.value)}
+                          />
+                        </div>
+                        <button
+                          onClick={() => removeScheduleItem(index)}
+                          className="mt-5 rounded p-1.5 text-red-500 transition-colors hover:bg-red-50"
+                          title="Remove item"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={addScheduleItem}
+                      className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 py-2 text-gray-500 transition-colors hover:border-emerald-400 hover:text-emerald-600"
+                    >
+                      <Plus size={16} />
+                      Add Schedule Item
+                    </button>
+                  </div>
+                </CollapsibleSection>
+              </div>
+
+              <div className="flex justify-end gap-3 border-t border-gray-100 bg-gray-50 px-6 py-4">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveContest}
+                  disabled={isSaving || !newTitle || !newOrganizer}
+                  className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isSaving ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                      Saving...
+                    </>
+                  ) : editingContest ? (
+                    'Update Contest'
+                  ) : (
+                    'Create Contest'
+                  )}
                 </button>
               </div>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </div>,
+          document.body
+        )}
+
+      {/* View Contest Details Modal */}
+      {isViewModalOpen &&
+        viewingContest &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsViewModalOpen(false)} />
+            <div className="animate-fade-in-up relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl">
+              {/* Header with Image */}
+              <div className="relative h-48 bg-gradient-to-r from-emerald-600 to-teal-600">
+                {viewingContest.image && (
+                  <img src={viewingContest.image} alt={viewingContest.title} className="absolute inset-0 h-full w-full object-cover opacity-30" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                <button
+                  onClick={() => setIsViewModalOpen(false)}
+                  title="Close modal"
+                  className="absolute top-4 right-4 rounded-lg bg-white/20 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
+                >
+                  <X size={20} />
+                </button>
+                <div className="absolute right-6 bottom-4 left-6">
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(viewingContest.status)}`}>
+                      {viewingContest.status}
+                    </span>
+                    {viewingContest.category && (
+                      <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800 capitalize">{viewingContest.category}</span>
+                    )}
+                    {viewingContest.fee === 0 ? (
+                      <span className="rounded-full bg-green-500 px-2.5 py-0.5 text-xs font-medium text-white">Free</span>
+                    ) : (
+                      <span className="rounded-full bg-amber-500 px-2.5 py-0.5 text-xs font-medium text-white">₫{viewingContest.fee.toLocaleString()}</span>
+                    )}
+                  </div>
+                  <h2 className="text-2xl font-bold text-white">{viewingContest.title}</h2>
+                  <p className="mt-1 text-white/80">by {viewingContest.organizer}</p>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 space-y-6 overflow-y-auto p-6">
+                {/* Quick Stats */}
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                  <div className="rounded-lg bg-gray-50 p-4 text-center">
+                    <Users size={24} className="mx-auto mb-2 text-emerald-600" />
+                    <p className="text-2xl font-bold text-gray-900">{viewingContest.registrationCount ?? viewingContest.participants ?? 0}</p>
+                    <p className="text-xs text-gray-500">
+                      Participants{viewingContest.maxParticipants && viewingContest.maxParticipants > 0 ? ` / ${viewingContest.maxParticipants}` : ''}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-gray-50 p-4 text-center">
+                    <Calendar size={24} className="mx-auto mb-2 text-blue-600" />
+                    <p className="text-lg font-bold text-gray-900">
+                      {viewingContest.deadline ? new Date(viewingContest.deadline).toLocaleDateString('vi-VN') : 'N/A'}
+                    </p>
+                    <p className="text-xs text-gray-500">Deadline</p>
+                  </div>
+                  <div className="rounded-lg bg-gray-50 p-4 text-center">
+                    <MapPin size={24} className="mx-auto mb-2 text-purple-600" />
+                    <p className="text-lg font-bold text-gray-900 capitalize">{viewingContest.locationType || 'Online'}</p>
+                    <p className="text-xs text-gray-500">Location Type</p>
+                  </div>
+                  <div className="rounded-lg bg-gray-50 p-4 text-center">
+                    <Trophy size={24} className="mx-auto mb-2 text-yellow-500" />
+                    <p className="text-lg font-bold text-gray-900">{viewingContest.prizes?.length || 0}</p>
+                    <p className="text-xs text-gray-500">Prizes</p>
+                  </div>
+                </div>
+
+                {/* Tags */}
+                {viewingContest.tags && viewingContest.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {viewingContest.tags.map((tag, index) => (
+                      <span key={index} className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Organizer Info */}
+                {viewingContest.organizerDetails && (
+                  <div className="rounded-lg bg-emerald-50 p-4">
+                    <h4 className="mb-3 flex items-center gap-2 font-semibold text-emerald-900">
+                      <Building2 size={18} />
+                      Organizer Details
+                    </h4>
+                    <div className="flex items-start gap-4">
+                      {viewingContest.organizerDetails.logo && (
+                        <img
+                          src={viewingContest.organizerDetails.logo}
+                          alt={viewingContest.organizerDetails.name}
+                          className="h-16 w-16 rounded-lg object-cover"
+                        />
+                      )}
+                      <div className="flex-1 space-y-2 text-sm">
+                        <p>
+                          <span className="font-medium text-emerald-800">Name:</span> {viewingContest.organizerDetails.name}
+                        </p>
+                        {viewingContest.organizerDetails.school && (
+                          <p>
+                            <span className="font-medium text-emerald-800">School:</span> {viewingContest.organizerDetails.school}
+                          </p>
+                        )}
+                        {viewingContest.organizerDetails.contact && (
+                          <p>
+                            <span className="font-medium text-emerald-800">Contact:</span> {viewingContest.organizerDetails.contact}
+                          </p>
+                        )}
+                        {viewingContest.organizerDetails.website && (
+                          <a
+                            href={viewingContest.organizerDetails.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-emerald-700 hover:underline"
+                          >
+                            <Globe size={14} />
+                            {viewingContest.organizerDetails.website}
+                            <ExternalLink size={12} />
+                          </a>
+                        )}
+                        {viewingContest.organizerDetails.description && <p className="text-gray-600">{viewingContest.organizerDetails.description}</p>}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Schedule */}
+                {viewingContest.dateStart && (
+                  <div className="rounded-lg bg-blue-50 p-4">
+                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-blue-900">
+                      <Calendar size={18} />
+                      Schedule
+                    </h4>
+                    <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-3">
+                      {viewingContest.dateStart && (
+                        <div>
+                          <span className="text-blue-700">Start Date:</span>
+                          <span className="ml-2 font-medium text-blue-900">{new Date(viewingContest.dateStart).toLocaleDateString('vi-VN')}</span>
+                        </div>
+                      )}
+                      {(viewingContest as any).endDate && (
+                        <div>
+                          <span className="text-blue-700">End Date:</span>
+                          <span className="ml-2 font-medium text-blue-900">{new Date((viewingContest as any).endDate).toLocaleDateString('vi-VN')}</span>
+                        </div>
+                      )}
+                      {viewingContest.deadline && (
+                        <div>
+                          <span className="text-blue-700">Deadline:</span>
+                          <span className="ml-2 font-medium text-blue-900">{new Date(viewingContest.deadline).toLocaleDateString('vi-VN')}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Location */}
+                {viewingContest.location && (
+                  <div className="rounded-lg bg-purple-50 p-4">
+                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-purple-900">
+                      <MapPin size={18} />
+                      Location
+                    </h4>
+                    <p className="text-purple-800">{viewingContest.location}</p>
+                  </div>
+                )}
+
+                {/* Description */}
+                {viewingContest.description && (
+                  <div>
+                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-gray-900">
+                      <FileText size={18} className="text-gray-600" />
+                      Description
+                    </h4>
+                    <div className="rounded-lg bg-gray-50 p-4 text-sm whitespace-pre-wrap text-gray-700">{viewingContest.description}</div>
+                  </div>
+                )}
+
+                {/* Objectives */}
+                {viewingContest.objectives && (
+                  <div>
+                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-gray-900">
+                      <Target size={18} className="text-emerald-600" />
+                      Objectives
+                    </h4>
+                    <div className="rounded-lg bg-gray-50 p-4 text-sm whitespace-pre-wrap text-gray-700">{viewingContest.objectives}</div>
+                  </div>
+                )}
+
+                {/* Eligibility */}
+                {viewingContest.eligibility && (
+                  <div>
+                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-gray-900">
+                      <Users size={18} className="text-blue-600" />
+                      Eligibility
+                    </h4>
+                    <div className="rounded-lg bg-gray-50 p-4 text-sm whitespace-pre-wrap text-gray-700">{viewingContest.eligibility}</div>
+                  </div>
+                )}
+
+                {/* Rules */}
+                {viewingContest.rules && (
+                  <div>
+                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-gray-900">
+                      <FileText size={18} className="text-orange-600" />
+                      Rules
+                    </h4>
+                    <div className="rounded-lg bg-gray-50 p-4 text-sm whitespace-pre-wrap text-gray-700">{viewingContest.rules}</div>
+                  </div>
+                )}
+
+                {/* Prizes */}
+                {viewingContest.prizes && viewingContest.prizes.length > 0 && (
+                  <div>
+                    <h4 className="mb-3 flex items-center gap-2 font-semibold text-gray-900">
+                      <Trophy size={18} className="text-yellow-500" />
+                      Prizes ({viewingContest.prizes.length})
+                    </h4>
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                      {viewingContest.prizes.map((prize, index) => (
+                        <div key={index} className="rounded-lg border border-yellow-200 bg-gradient-to-r from-yellow-50 to-amber-50 p-4">
+                          <div className="mb-2 flex items-center gap-2">
+                            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-500 text-sm font-bold text-white">
+                              {prize.rank}
+                            </span>
+                            <span className="font-semibold text-gray-900">{prize.title}</span>
+                          </div>
+                          <p className="text-lg font-bold text-amber-600">{prize.value}</p>
+                          {prize.description && <p className="mt-1 text-sm text-gray-600">{prize.description}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Schedule Items */}
+                {viewingContest.schedule && viewingContest.schedule.length > 0 && (
+                  <div>
+                    <h4 className="mb-3 flex items-center gap-2 font-semibold text-gray-900">
+                      <Clock size={18} className="text-blue-600" />
+                      Timeline ({viewingContest.schedule.length} events)
+                    </h4>
+                    <div className="space-y-2">
+                      {viewingContest.schedule.map((item, index) => (
+                        <div key={index} className="flex items-start gap-3 rounded-lg bg-gray-50 p-3">
+                          <div className="w-24 flex-shrink-0">
+                            <p className="text-sm font-medium text-blue-600">{item.date ? new Date(item.date).toLocaleDateString('vi-VN') : 'TBD'}</p>
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">{item.title}</p>
+                            {item.description && <p className="text-sm text-gray-500">{item.description}</p>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Comments/Reviews */}
+                {viewingContest.comments && viewingContest.comments.length > 0 && (
+                  <div>
+                    <h4 className="mb-3 flex items-center gap-2 font-semibold text-gray-900">
+                      <MessageSquare size={18} className="text-purple-600" />
+                      Comments ({viewingContest.comments.length})
+                    </h4>
+                    <div className="max-h-64 space-y-3 overflow-y-auto">
+                      {viewingContest.comments.map((comment) => (
+                        <div key={comment.id} className="rounded-lg bg-gray-50 p-4">
+                          <div className="flex items-start gap-3">
+                            {comment.userAvatar ? (
+                              <img src={comment.userAvatar} alt={comment.userName} className="h-10 w-10 rounded-full object-cover" />
+                            ) : (
+                              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
+                                <span className="text-sm font-medium text-purple-600">{comment.userName.charAt(0).toUpperCase()}</span>
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <p className="font-medium text-gray-900">{comment.userName}</p>
+                                <span className="text-xs text-gray-400">{new Date(comment.createdAt).toLocaleDateString('vi-VN')}</span>
+                              </div>
+                              {comment.rating && (
+                                <div className="mt-1 flex items-center gap-0.5">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star key={star} size={12} className={star <= comment.rating! ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'} />
+                                  ))}
+                                </div>
+                              )}
+                              <p className="mt-2 text-sm text-gray-600">{comment.content}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* No Comments State */}
+                {(!viewingContest.comments || viewingContest.comments.length === 0) && (
+                  <div className="rounded-lg bg-gray-50 p-6 text-center">
+                    <MessageSquare size={32} className="mx-auto mb-2 text-gray-300" />
+                    <p className="text-sm text-gray-500">No comments yet</p>
+                  </div>
+                )}
+
+                {/* Metadata */}
+                <div className="flex flex-wrap gap-4 border-t border-gray-100 pt-4 text-xs text-gray-400">
+                  {viewingContest.createdAt && <span>Created: {new Date(viewingContest.createdAt).toLocaleDateString('vi-VN')}</span>}
+                  {viewingContest.updatedAt && <span>Updated: {new Date(viewingContest.updatedAt).toLocaleDateString('vi-VN')}</span>}
+                  <span>ID: {viewingContest.id}</span>
+                </div>
+              </div>
+
+              {/* Footer Actions */}
+              <div className="flex items-center justify-between border-t border-gray-100 bg-gray-50 px-6 py-4">
+                <button
+                  onClick={() => setIsViewModalOpen(false)}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                >
+                  Close
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setIsViewModalOpen(false);
+                      handleAction('edit', viewingContest);
+                    }}
+                    className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-emerald-700"
+                  >
+                    <Edit2 size={16} />
+                    Edit Contest
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
 
       <ConfirmActionModal
         isOpen={!!confirmModal}

@@ -11,7 +11,7 @@ import {
   RefreshCw,
   ChevronLeft,
   ChevronRight,
-  Loader2
+  Loader2,
 } from 'lucide-react';
 import { analyzeAuditLogs } from '../services/geminiService';
 import { auditLogService, AUDIT_ACTIONS } from '../services/auditLogService';
@@ -43,7 +43,7 @@ const AuditLog: React.FC = () => {
         page,
         limit,
         search: searchTerm || undefined,
-        status: statusFilter as any || undefined,
+        status: (statusFilter as any) || undefined,
         action: actionFilter || undefined,
       });
       setLogs(result.items);
@@ -77,33 +77,41 @@ const AuditLog: React.FC = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'Success': return <CheckCircle size={16} className="text-green-500" />;
-      case 'Failed': return <XCircle size={16} className="text-red-500" />;
-      case 'Warning': return <AlertTriangle size={16} className="text-orange-500" />;
-      default: return <FileText size={16} className="text-gray-400" />;
+      case 'Success':
+        return <CheckCircle size={16} className="text-green-500" />;
+      case 'Failed':
+        return <XCircle size={16} className="text-red-500" />;
+      case 'Warning':
+        return <AlertTriangle size={16} className="text-orange-500" />;
+      default:
+        return <FileText size={16} className="text-gray-400" />;
     }
   };
 
   const getStatusStyle = (status: string) => {
     switch (status) {
-      case 'Success': return 'bg-green-50 text-green-700 border-green-100';
-      case 'Failed': return 'bg-red-50 text-red-700 border-red-100';
-      case 'Warning': return 'bg-orange-50 text-orange-700 border-orange-100';
-      default: return 'bg-gray-50 text-gray-700 border-gray-100';
+      case 'Success':
+        return 'bg-green-50 text-green-700 border-green-100';
+      case 'Failed':
+        return 'bg-red-50 text-red-700 border-red-100';
+      case 'Warning':
+        return 'bg-orange-50 text-orange-700 border-orange-100';
+      default:
+        return 'bg-gray-50 text-gray-700 border-gray-100';
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Audit Logs</h2>
-          <p className="text-gray-500 mt-1">Track system activities and security events</p>
+          <p className="mt-1 text-gray-500">Track system activities and security events</p>
         </div>
         <button
           onClick={handleAnalyze}
           disabled={isAnalyzing}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-sm"
+          className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-white shadow-sm transition-all hover:bg-emerald-700"
         >
           {isAnalyzing ? <RefreshCw size={18} className="animate-spin" /> : <Sparkles size={18} />}
           AI Security Insight
@@ -112,76 +120,78 @@ const AuditLog: React.FC = () => {
 
       {/* AI Analysis Panel */}
       {aiAnalysis && (
-        <div className="bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-xl p-6 shadow-md border-l-4 border-emerald-500 animate-fade-in-up">
-          <div className="flex items-center gap-2 mb-3">
+        <div className="animate-fade-in-up rounded-xl border-l-4 border-emerald-500 bg-gradient-to-r from-slate-800 to-slate-900 p-6 text-white shadow-md">
+          <div className="mb-3 flex items-center gap-2">
             <ShieldAlert className="text-emerald-400" />
-            <h3 className="font-bold text-lg">Gemini Security Analysis</h3>
+            <h3 className="text-lg font-bold">Gemini Security Analysis</h3>
           </div>
-          <div className="text-slate-200 text-sm leading-relaxed whitespace-pre-line">
-            {aiAnalysis}
-          </div>
+          <div className="text-sm leading-relaxed whitespace-pre-line text-slate-200">{aiAnalysis}</div>
         </div>
       )}
 
       {/* Search Bar */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 bg-white p-2 rounded-xl shadow-sm border border-gray-200 flex-1 min-w-[300px] max-w-md">
-          <Search size={20} className="text-gray-400 ml-2" />
+        <div className="flex max-w-md min-w-[300px] flex-1 items-center gap-2 rounded-xl border border-gray-200 bg-white p-2 shadow-sm">
+          <Search size={20} className="ml-2 text-gray-400" />
           <input
             type="text"
             placeholder="Search by action, user, or details..."
-            className="flex-1 outline-none text-sm text-gray-700 p-1"
+            className="flex-1 p-1 text-sm text-gray-700 outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <button
             title="Toggle filters"
-            className={`p-1.5 rounded-lg ${showFilters ? 'bg-emerald-100 text-emerald-600' : 'hover:bg-gray-50 text-gray-500'}`}
+            className={`rounded-lg p-1.5 ${showFilters ? 'bg-emerald-100 text-emerald-600' : 'text-gray-500 hover:bg-gray-50'}`}
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter size={18} />
           </button>
         </div>
-        <button
-          onClick={fetchLogs}
-          className="p-2 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600"
-          title="Refresh"
-        >
+        <button onClick={fetchLogs} className="rounded-lg border border-gray-200 bg-white p-2 text-gray-600 hover:bg-gray-50" title="Refresh">
           <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} />
         </button>
       </div>
 
       {/* Filters */}
       {showFilters && (
-        <div className="flex flex-wrap gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
+        <div className="flex flex-wrap gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
           <div className="min-w-[150px]">
             <Dropdown
               options={[
                 { value: '', label: 'All Status' },
                 { value: 'Success', label: 'Success', color: 'bg-green-500' },
                 { value: 'Failed', label: 'Failed', color: 'bg-red-500' },
-                { value: 'Warning', label: 'Warning', color: 'bg-orange-500' }
+                { value: 'Warning', label: 'Warning', color: 'bg-orange-500' },
               ]}
               value={statusFilter}
-              onChange={(val) => { setStatusFilter(val); setPage(1); }}
+              onChange={(val) => {
+                setStatusFilter(val);
+                setPage(1);
+              }}
               placeholder="All Status"
               size="sm"
             />
           </div>
           <div className="min-w-[180px]">
             <Dropdown
-              options={[
-                { value: '', label: 'All Actions' },
-                ...Object.values(AUDIT_ACTIONS).map(action => ({ value: action, label: action }))
-              ]}
+              options={[{ value: '', label: 'All Actions' }, ...Object.values(AUDIT_ACTIONS).map((action) => ({ value: action, label: action }))]}
               value={actionFilter}
-              onChange={(val) => { setActionFilter(val); setPage(1); }}
+              onChange={(val) => {
+                setActionFilter(val);
+                setPage(1);
+              }}
               placeholder="All Actions"
               size="sm"
             />
           </div>
           <button
-            onClick={() => { setStatusFilter(''); setActionFilter(''); setSearchTerm(''); setPage(1); }}
+            onClick={() => {
+              setStatusFilter('');
+              setActionFilter('');
+              setSearchTerm('');
+              setPage(1);
+            }}
             className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900"
           >
             Clear filters
@@ -189,10 +199,10 @@ const AuditLog: React.FC = () => {
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 border-b border-gray-100 text-gray-900 uppercase font-semibold text-xs">
+            <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-900 uppercase">
               <tr>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Action / Target</th>
@@ -205,14 +215,14 @@ const AuditLog: React.FC = () => {
             <tbody className="divide-y divide-gray-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-10">
-                    <Loader2 className="animate-spin inline-block text-emerald-600 mb-2" size={24} />
+                  <td colSpan={6} className="py-10 text-center">
+                    <Loader2 className="mb-2 inline-block animate-spin text-emerald-600" size={24} />
                     <p className="text-gray-400">Loading audit logs...</p>
                   </td>
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-10 text-gray-400">
+                  <td colSpan={6} className="py-10 text-center text-gray-400">
                     No logs found matching your criteria.
                   </td>
                 </tr>
@@ -226,9 +236,9 @@ const AuditLog: React.FC = () => {
                   };
 
                   return (
-                    <tr key={log.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={log.id} className="transition-colors hover:bg-gray-50">
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusStyle(log.status)}`}>
+                        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${getStatusStyle(log.status)}`}>
                           {getStatusIcon(log.status)}
                           {log.status}
                         </span>
@@ -238,17 +248,11 @@ const AuditLog: React.FC = () => {
                         <div className="text-xs text-gray-500">{safeStr(log.target)}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded text-gray-700">
-                          {safeStr(log.user)}
-                        </span>
+                        <span className="rounded bg-gray-100 px-2 py-1 font-mono text-xs text-gray-700">{safeStr(log.user)}</span>
                       </td>
-                      <td className="px-6 py-4 font-mono text-xs text-gray-500">
-                        {safeStr(log.ip)}
-                      </td>
-                      <td className="px-6 py-4 text-gray-500 text-xs">
-                        {new Date(log.timestamp).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 max-w-xs truncate text-gray-600" title={safeStr(log.details)}>
+                      <td className="px-6 py-4 font-mono text-xs text-gray-500">{safeStr(log.ip)}</td>
+                      <td className="px-6 py-4 text-xs text-gray-500">{new Date(log.timestamp).toLocaleString()}</td>
+                      <td className="max-w-xs truncate px-6 py-4 text-gray-600" title={safeStr(log.details)}>
                         {safeStr(log.details)}
                       </td>
                     </tr>
@@ -258,26 +262,24 @@ const AuditLog: React.FC = () => {
             </tbody>
           </table>
         </div>
-        <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-          <span className="text-sm text-gray-500">
-            {isLoading ? 'Loading...' : `Showing ${logs.length} of ${total} entries`}
-          </span>
+        <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-6 py-4">
+          <span className="text-sm text-gray-500">{isLoading ? 'Loading...' : `Showing ${logs.length} of ${total} entries`}</span>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1 || isLoading}
-              className="p-2 border border-gray-300 rounded bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded border border-gray-300 bg-white p-2 text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
               title="Previous page"
             >
               <ChevronLeft size={16} />
             </button>
-            <span className="text-sm text-gray-600 px-2">
+            <span className="px-2 text-sm text-gray-600">
               Page {page} of {totalPages}
             </span>
             <button
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages || isLoading}
-              className="p-2 border border-gray-300 rounded bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded border border-gray-300 bg-white p-2 text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
               title="Next page"
             >
               <ChevronRight size={16} />
