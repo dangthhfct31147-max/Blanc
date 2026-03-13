@@ -4,14 +4,16 @@ import { Button, Input, Card } from './ui/Common';
 import { api, API_BASE_URL } from '../lib/api';
 import { clientStorage } from '../lib/cache';
 import { useI18n } from '../contexts/I18nContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { AppLocale, DEFAULT_LOCALE, normalizeLocale, TranslationKey } from '../lib/i18n';
 import { QrCode } from './QrCode';
 import {
     User, Mail, Lock, Bell, Shield, Eye, EyeOff,
     Camera, Loader2, CheckCircle, AlertCircle, Save,
-    ChevronDown, Check, X, Search, Crown
+    ChevronDown, Check, X, Search, Crown, Palette
 } from 'lucide-react';
 import MembershipManager from './MembershipManager';
+import ThemeToggle from './ThemeToggle';
 import {
     ROLES, ROLE_COLORS, EXPERIENCE_LEVELS, YEARS_EXPERIENCE,
     TIMEZONES, LANGUAGES, SKILLS, TECH_STACK, COMMUNICATION_TOOLS,
@@ -448,6 +450,7 @@ const Toast: React.FC<{
 // ============ MAIN SETTINGS COMPONENT ============
 const UserSettings: React.FC = () => {
     const { locale: uiLocale, setLocale: setUiLocale, t } = useI18n();
+    const { mode, resolved } = useTheme();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const settingsTabFromUrl = searchParams.get('settingsTab') as SettingsTab | null;
@@ -481,6 +484,11 @@ const UserSettings: React.FC = () => {
     const privacyRequestIdRef = useRef(0);
 
     const isEnglish = uiLocale === 'en';
+    const themeLabel = mode === 'system'
+        ? `Hệ thống (${resolved === 'dark' ? 'đang tối' : 'đang sáng'})`
+        : mode === 'dark'
+            ? 'Tối'
+            : 'Sáng';
     const experienceOptions = useMemo(() => {
         const labels: Record<string, string> = {
             beginner: 'Beginner',
@@ -2182,6 +2190,22 @@ const UserSettings: React.FC = () => {
 
     return (
         <div className="space-y-6">
+            <Card className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                    <div className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-100">
+                        <Palette className="h-5 w-5 text-primary-600 dark:text-primary-300" />
+                        <span>Giao diện trang web</span>
+                    </div>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        Chọn chế độ sáng, tối hoặc theo hệ thống cho toàn bộ trang web.
+                    </p>
+                </div>
+                <div className="flex items-center gap-3 self-start sm:self-center">
+                    <span className="text-sm font-medium text-slate-600 dark:text-slate-300">{themeLabel}</span>
+                    <ThemeToggle />
+                </div>
+            </Card>
+
             <Card className="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="min-w-0">
                     <div className="flex items-center gap-2 font-semibold text-slate-900">
@@ -2251,7 +2275,6 @@ function getPasswordStrengthText(t: (key: TranslationKey, params?: Record<string
 }
 
 export default UserSettings;
-
 
 
 

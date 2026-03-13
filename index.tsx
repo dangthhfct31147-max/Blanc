@@ -6,6 +6,7 @@ import App from './App';
 import './index.css';
 import { I18nProvider } from './contexts/I18nContext';
 import { AppAuthProvider } from './contexts/AppAuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import {
   getApiBaseUrl,
   getClerkPublishableKey,
@@ -47,7 +48,7 @@ const ClerkProviderWithRouter: React.FC<{ children: React.ReactNode; publishable
       } as Record<string, unknown>)}
     >
       <AppAuthProvider>
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </AppAuthProvider>
     </ClerkProvider>
   );
@@ -104,7 +105,7 @@ const AppBootstrap: React.FC = () => {
 
   if (!isConfigResolved) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="inline-block h-10 w-10 rounded-full border-[3px] border-primary-600 border-r-transparent animate-spin" />
       </div>
     );

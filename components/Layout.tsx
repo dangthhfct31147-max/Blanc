@@ -10,6 +10,7 @@ import type { AppAuthStatus, AppAuthSyncError } from '../contexts/AppAuthContext
 import StreakBadge from './StreakBadge';
 import MentorBlogPrompt from './MentorBlogPrompt';
 import AuthSyncNotice from './AuthSyncNotice';
+import ThemeToggle from './ThemeToggle';
 
 interface LayoutProps {
   user: User | null;
@@ -78,48 +79,54 @@ const Layout: React.FC<LayoutProps> = ({
 
   const desktopNavLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      'inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
+      'inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950',
       isActive
-        ? 'bg-primary-50 text-primary-700 shadow-sm shadow-primary-100/70'
-        : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
+        ? 'bg-primary-50 text-primary-700 shadow-sm shadow-primary-100/70 dark:bg-primary-500/10 dark:text-primary-200 dark:shadow-none'
+        : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70 dark:hover:text-primary-200'
     );
 
   const desktopNavDropdownButtonClass = (isActive: boolean, isOpen: boolean) =>
     cn(
-      'inline-flex items-center gap-1 px-4 py-2 rounded-full text-sm font-semibold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
+      'inline-flex items-center gap-1 px-4 py-2 rounded-full text-sm font-semibold leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950',
       isActive
-        ? 'bg-primary-50 text-primary-700 shadow-sm shadow-primary-100/70'
+        ? 'bg-primary-50 text-primary-700 shadow-sm shadow-primary-100/70 dark:bg-primary-500/10 dark:text-primary-200 dark:shadow-none'
         : isOpen
-          ? 'bg-slate-50 text-primary-600'
-          : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
+          ? 'bg-slate-50 text-primary-600 dark:bg-slate-800 dark:text-primary-200'
+          : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70 dark:hover:text-primary-200'
     );
 
   const desktopDropdownLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      'flex items-center w-full px-3 py-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
-      isActive ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50 hover:text-primary-700'
+      'flex items-center w-full px-3 py-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900',
+      isActive
+        ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-200'
+        : 'text-slate-700 hover:bg-slate-50 hover:text-primary-700 dark:text-slate-200 dark:hover:bg-slate-800/70 dark:hover:text-primary-200'
     );
 
   const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      'block px-4 py-2 rounded-lg text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
-      isActive ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
+      'block px-4 py-2 rounded-lg text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950',
+      isActive
+        ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-200'
+        : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70 dark:hover:text-primary-200'
     );
 
   const mobileNavDropdownButtonClass = (isActive: boolean, isOpen: boolean) =>
     cn(
-      'w-full flex items-center justify-between px-4 py-2 rounded-lg text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
+      'w-full flex items-center justify-between px-4 py-2 rounded-lg text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950',
       isActive
-        ? 'bg-primary-50 text-primary-700'
+        ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-200'
         : isOpen
-          ? 'bg-slate-50 text-primary-600'
-          : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
+          ? 'bg-slate-50 text-primary-600 dark:bg-slate-800 dark:text-primary-200'
+          : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70 dark:hover:text-primary-200'
     );
 
   const mobileNavSubLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      'block px-4 py-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
-      isActive ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50'
+      'block px-4 py-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950',
+      isActive
+        ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-200'
+        : 'text-slate-600 hover:text-primary-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800/70 dark:hover:text-primary-200'
     );
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
@@ -332,22 +339,22 @@ const Layout: React.FC<LayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
+    <div className="min-h-screen flex flex-col bg-slate-50 font-sans dark:bg-slate-950 dark:text-slate-100">
       <MentorBlogPrompt
         isOpen={isMentorPromptOpen}
         onClose={() => setIsMentorPromptOpen(false)}
         onUpdate={handleMentorPromptUpdate}
       />
       {/* Sticky Header */}
-      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200">
+      <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-center">
             {/* Logo - Absolute left */}
             <div className="absolute left-0 top-1/2 -translate-y-1/2 flex flex-row items-center cursor-pointer" onClick={() => navigate('/')}>
               <img src="/logo.png" alt="Blanc Logo" className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover shrink-0" />
               <div className="ml-2 md:ml-3 flex-col hidden sm:flex">
-                <span className="text-sm font-semibold text-slate-800 leading-tight">Beyond Learning</span>
-                <span className="text-xs text-slate-500 leading-tight">And New Challenges</span>
+                <span className="text-sm font-semibold text-slate-800 leading-tight dark:text-slate-100">Beyond Learning</span>
+                <span className="text-xs text-slate-500 leading-tight dark:text-slate-400">And New Challenges</span>
               </div>
             </div>
 
@@ -394,7 +401,7 @@ const Layout: React.FC<LayoutProps> = ({
                     id="learning-menu"
                     role="menu"
                     aria-label={t('nav.learning')}
-                    className="absolute left-1/2 -translate-x-1/2 mt-3 w-52 bg-white rounded-xl shadow-xl border border-slate-100 p-1 animation-fade-in z-50"
+                    className="absolute left-1/2 z-50 mt-3 w-52 -translate-x-1/2 rounded-xl border border-slate-100 bg-white p-1 shadow-xl animation-fade-in dark:border-slate-800 dark:bg-slate-900"
                   >
                     {learningItems.map((item) => (
                       <NavLink
@@ -441,7 +448,7 @@ const Layout: React.FC<LayoutProps> = ({
                     id="community-menu"
                     role="menu"
                     aria-label={t('nav.community')}
-                    className="absolute left-1/2 -translate-x-1/2 mt-3 w-52 bg-white rounded-xl shadow-xl border border-slate-100 p-1 animation-fade-in z-50"
+                    className="absolute left-1/2 z-50 mt-3 w-52 -translate-x-1/2 rounded-xl border border-slate-100 bg-white p-1 shadow-xl animation-fade-in dark:border-slate-800 dark:bg-slate-900"
                   >
                     {communityItems.map((item) => (
                       <NavLink
@@ -471,9 +478,10 @@ const Layout: React.FC<LayoutProps> = ({
             </nav>
 
             {/* Auth/Profile Actions - Absolute right */}
-            <div className="absolute right-0 hidden md:flex items-center space-x-4">
+            <div className="absolute right-0 hidden md:flex items-center gap-3">
+              <ThemeToggle />
               {user ? (
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-3">
                   {/* Streak Indicator */}
                   <StreakBadge userId={user.id} />
 
@@ -481,23 +489,23 @@ const Layout: React.FC<LayoutProps> = ({
                   <div className="relative" ref={notifRef}>
                     <button
                       onClick={() => setIsNotifOpen(!isNotifOpen)}
-                      className={`relative p-2 transition-colors rounded-full hover:bg-slate-100 ${isNotifOpen ? 'bg-slate-100 text-slate-800' : 'text-slate-500'}`}
+                      className={`relative rounded-full p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 ${isNotifOpen ? 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100' : 'text-slate-500 dark:text-slate-300'}`}
                     >
                       <Bell className="w-5 h-5" />
                       {unreadCount > 0 && (
-                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white ring-1 ring-white"></span>
+                        <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-red-500 ring-1 ring-white dark:border-slate-900 dark:ring-slate-900"></span>
                       )}
                     </button>
 
                     {/* Notification Dropdown Panel */}
                     {isNotifOpen && (
-                      <div className="absolute right-0 mt-3 w-80 md:w-96 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden animation-fade-in z-50 origin-top-right">
-                        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-white">
-                          <h3 className="font-bold text-slate-900">{t('layout.notifications.title')}</h3>
+                      <div className="absolute right-0 z-50 mt-3 w-80 origin-top-right overflow-hidden rounded-xl border border-slate-100 bg-white shadow-xl animation-fade-in md:w-96 dark:border-slate-800 dark:bg-slate-900">
+                        <div className="flex items-center justify-between border-b border-slate-100 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+                          <h3 className="font-bold text-slate-900 dark:text-slate-100">{t('layout.notifications.title')}</h3>
                           {unreadCount > 0 && (
                             <button
                               onClick={markAllAsRead}
-                              className="text-xs font-medium text-primary-600 hover:text-primary-700 flex items-center"
+                              className="flex items-center text-xs font-medium text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200"
                             >
                               <Check className="w-3 h-3 mr-1" /> {t('layout.notifications.markAllRead')}
                             </button>
@@ -515,25 +523,25 @@ const Layout: React.FC<LayoutProps> = ({
                                 <div
                                   key={notif.id}
                                   onClick={() => handleNotificationClick(notif)}
-                                  className={`px-4 py-3 hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-50 last:border-0 ${!notif.isRead ? 'bg-primary-50/30' : ''}`}
+                                  className={`cursor-pointer border-b border-slate-50 px-4 py-3 transition-colors last:border-0 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/70 ${!notif.isRead ? 'bg-primary-50/30 dark:bg-primary-500/10' : ''}`}
                                 >
                                   <div className="flex gap-3">
-                                    <div className={`mt-1 w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${!notif.isRead ? 'bg-white shadow-sm' : 'bg-slate-100'}`}>
+                                    <div className={`mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${!notif.isRead ? 'bg-white shadow-sm dark:bg-slate-800 dark:shadow-none' : 'bg-slate-100 dark:bg-slate-800'}`}>
                                       {getIconByType(notif.type)}
                                     </div>
                                     <div className="flex-1 space-y-1">
                                       <div className="flex justify-between items-start">
-                                        <p className={`text-sm ${!notif.isRead ? 'font-bold text-slate-900' : 'font-medium text-slate-700'}`}>
+                                        <p className={`text-sm ${!notif.isRead ? 'font-bold text-slate-900 dark:text-slate-100' : 'font-medium text-slate-700 dark:text-slate-200'}`}>
                                           {notif.title}
                                         </p>
                                         {!notif.isRead && (
                                           <span className="w-2 h-2 bg-primary-500 rounded-full mt-1.5"></span>
                                         )}
                                       </div>
-                                      <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                                      <p className="line-clamp-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
                                         {notif.message}
                                       </p>
-                                      <p className="text-[10px] text-slate-400 font-medium pt-1">
+                                      <p className="pt-1 text-[10px] font-medium text-slate-400 dark:text-slate-500">
                                         {notif.time || formatTimeAgo(notif.createdAt)}
                                       </p>
                                     </div>
@@ -542,17 +550,17 @@ const Layout: React.FC<LayoutProps> = ({
                               ))}
                             </div>
                           ) : (
-                            <div className="p-8 text-center text-slate-500">
-                              <Bell className="w-8 h-8 mx-auto mb-3 text-slate-300" />
+                            <div className="p-8 text-center text-slate-500 dark:text-slate-400">
+                              <Bell className="mx-auto mb-3 h-8 w-8 text-slate-300 dark:text-slate-600" />
                               <p className="text-sm">{t('layout.notifications.empty')}</p>
                             </div>
                           )}
                         </div>
 
-                        <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
+                        <div className="border-t border-slate-100 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-900/80">
                           <button
                             onClick={handleViewAllNotifications}
-                            className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                            className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200"
                           >
                             {t('common.viewAll')}
                           </button>
@@ -568,24 +576,24 @@ const Layout: React.FC<LayoutProps> = ({
                         alt="Avatar"
                         className="w-8 h-8 rounded-full border border-slate-200 object-cover"
                       />
-                      <span className="text-sm font-medium text-slate-700">{user.name}</span>
-                      <ChevronDown className="w-4 h-4 text-slate-400" />
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{user.name}</span>
+                      <ChevronDown className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                     </button>
 
                     {/* Dropdown */}
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-1 border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right z-40">
-                      <div className="px-4 py-3 border-b border-slate-100 mb-1">
-                        <p className="text-xs text-slate-500">{t('layout.userMenu.signedInAs')}</p>
-                        <p className="text-sm font-bold text-slate-900 truncate">{user.email}</p>
+                    <div className="invisible absolute right-0 z-40 mt-2 w-48 origin-top-right rounded-xl border border-slate-100 bg-white py-1 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100 dark:border-slate-800 dark:bg-slate-900">
+                      <div className="mb-1 border-b border-slate-100 px-4 py-3 dark:border-slate-800">
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{t('layout.userMenu.signedInAs')}</p>
+                        <p className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">{user.email}</p>
                       </div>
-                      <NavLink to="/profile" className="flex px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 items-center">
-                        <UserIcon className="w-4 h-4 mr-2 text-slate-400" /> {t('layout.userMenu.profile')}
+                      <NavLink to="/profile" className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800">
+                        <UserIcon className="mr-2 w-4 h-4 text-slate-400 dark:text-slate-500" /> {t('layout.userMenu.profile')}
                       </NavLink>
-                      <NavLink to="/my-team-posts" className="flex px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 items-center">
-                        <FileText className="w-4 h-4 mr-2 text-slate-400" /> {t('layout.userMenu.myPosts')}
+                      <NavLink to="/my-team-posts" className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800">
+                        <FileText className="mr-2 w-4 h-4 text-slate-400 dark:text-slate-500" /> {t('layout.userMenu.myPosts')}
                       </NavLink>
-                      <button onClick={onLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center">
-                        <LogOut className="w-4 h-4 mr-2" /> {t('layout.userMenu.logout')}
+                      <button onClick={onLogout} className="flex w-full items-center px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10">
+                        <LogOut className="mr-2 w-4 h-4" /> {t('layout.userMenu.logout')}
                       </button>
                     </div>
                   </div>
@@ -614,10 +622,11 @@ const Layout: React.FC<LayoutProps> = ({
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden absolute right-0 top-1/2 -translate-y-1/2 flex items-center">
+            <div className="absolute right-0 top-1/2 flex -translate-y-1/2 items-center gap-2 md:hidden">
+              <ThemeToggle />
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-slate-500 hover:text-slate-700 focus:outline-none p-2"
+                className="p-2 text-slate-500 hover:text-slate-700 focus:outline-none dark:text-slate-300 dark:hover:text-slate-100"
               >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -627,7 +636,7 @@ const Layout: React.FC<LayoutProps> = ({
 
         {/* Mobile Nav */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-b border-slate-200">
+          <div className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {leadingNavItems.map((item) => (
                 <NavLink
@@ -659,7 +668,7 @@ const Layout: React.FC<LayoutProps> = ({
                 </button>
 
                 {isLearningMobileOpen && (
-                  <div id="learning-menu-mobile" className="mt-1 space-y-1 pl-4 border-l border-slate-100 ml-4">
+                  <div id="learning-menu-mobile" className="mt-1 ml-4 space-y-1 border-l border-slate-100 pl-4 dark:border-slate-800">
                     {learningItems.map((item) => (
                       <NavLink
                         key={item.path}
@@ -695,7 +704,7 @@ const Layout: React.FC<LayoutProps> = ({
                 </button>
 
                 {isCommunityMobileOpen && (
-                  <div id="community-menu-mobile" className="mt-1 space-y-1 pl-4 border-l border-slate-100 ml-4">
+                  <div id="community-menu-mobile" className="mt-1 ml-4 space-y-1 border-l border-slate-100 pl-4 dark:border-slate-800">
                     {communityItems.map((item) => (
                       <NavLink
                         key={item.path}

@@ -29,10 +29,11 @@ function getStoredMode(): ThemeMode {
 function applyTheme(resolved: ResolvedTheme) {
     const root = document.documentElement;
     root.classList.toggle('dark', resolved === 'dark');
+    root.style.colorScheme = resolved;
     // Update meta theme-color for mobile browsers
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
-        meta.setAttribute('content', resolved === 'dark' ? '#0f172a' : '#ffffff');
+        meta.setAttribute('content', resolved === 'dark' ? '#020617' : '#ffffff');
     }
 }
 
