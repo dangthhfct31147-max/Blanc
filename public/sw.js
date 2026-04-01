@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 // @ts-nocheck
-const CACHE_NAME = 'blanc-v1';
+const CACHE_NAME = 'contesthub-v1';
 
 const PRECACHE_URLS = [
     '/',

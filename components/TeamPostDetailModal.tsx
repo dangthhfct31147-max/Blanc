@@ -18,21 +18,21 @@ interface TeamPostDetailModalProps {
 }
 
 const ROLE_COLORS: Record<string, string> = {
-    'Frontend Dev': 'bg-blue-50 text-blue-700 border-blue-200',
-    'Backend Dev': 'bg-green-50 text-green-700 border-green-200',
-    'Fullstack Dev': 'bg-indigo-50 text-indigo-700 border-indigo-200',
-    'Mobile Dev': 'bg-cyan-50 text-cyan-700 border-cyan-200',
-    'UI/UX Designer': 'bg-purple-50 text-purple-700 border-purple-200',
-    'Graphic Designer': 'bg-pink-50 text-pink-700 border-pink-200',
-    'Business Analyst': 'bg-amber-50 text-amber-700 border-amber-200',
-    'Product Manager': 'bg-orange-50 text-orange-700 border-orange-200',
-    'Data Analyst': 'bg-teal-50 text-teal-700 border-teal-200',
-    'DevOps': 'bg-slate-100 text-slate-700 border-slate-200',
-    'QA/Tester': 'bg-lime-50 text-lime-700 border-lime-200',
-    'Pitching': 'bg-rose-50 text-rose-700 border-rose-200',
-    'Content Writer': 'bg-violet-50 text-violet-700 border-violet-200',
-    'Marketing': 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200',
-    'Other': 'bg-gray-50 text-gray-700 border-gray-200'
+    'Frontend Dev': 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+    'Backend Dev': 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
+    'Fullstack Dev': 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+    'Mobile Dev': 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800',
+    'UI/UX Designer': 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800',
+    'Graphic Designer': 'bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 border-pink-200 dark:border-pink-800',
+    'Business Analyst': 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+    'Product Manager': 'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800',
+    'Data Analyst': 'bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800',
+    'DevOps': 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
+    'QA/Tester': 'bg-lime-50 dark:bg-lime-900/30 text-lime-700 dark:text-lime-300 border-lime-200 dark:border-lime-800',
+    'Pitching': 'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800',
+    'Content Writer': 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800',
+    'Marketing': 'bg-fuchsia-50 dark:bg-fuchsia-900/30 text-fuchsia-700 dark:text-fuchsia-300 border-fuchsia-200 dark:border-fuchsia-800',
+    'Other': 'bg-gray-50 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-800'
 };
 
 const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
@@ -134,7 +134,7 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
 
             {/* Modal */}
             <div className="flex min-h-full items-center justify-center p-4">
-                <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
                     {/* Header */}
                     <div className="relative bg-linear-to-r from-primary-500 to-primary-600 px-6 py-8 text-white">
                         <button
@@ -180,41 +180,41 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                     <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
                         {/* Status Banner */}
                         {isFull ? (
-                            <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                            <div className="bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 rounded-xl p-4 flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
                                     <Users className="w-5 h-5 text-orange-600" />
                                 </div>
                                 <div>
-                                    <p className="font-medium text-orange-800">{t('teamPostDetail.status.full.title')}</p>
-                                    <p className="text-sm text-orange-600">{t('teamPostDetail.status.full.description')}</p>
+                                    <p className="font-medium text-orange-800 dark:text-orange-300">{t('teamPostDetail.status.full.title')}</p>
+                                    <p className="text-sm text-orange-600 dark:text-orange-300">{t('teamPostDetail.status.full.description')}</p>
                                 </div>
                             </div>
                         ) : (
-                            <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                            <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl p-4 flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                                     <UserPlus className="w-5 h-5 text-green-600" />
                                 </div>
                                 <div>
-                                    <p className="font-medium text-green-800">{t('teamPostDetail.status.open.title')}</p>
-                                    <p className="text-sm text-green-600">{t('teamPostDetail.status.open.description', { count: spotsLeft })}</p>
+                                    <p className="font-medium text-green-800 dark:text-green-300">{t('teamPostDetail.status.open.title')}</p>
+                                    <p className="text-sm text-green-600 dark:text-green-300">{t('teamPostDetail.status.open.description', { count: spotsLeft })}</p>
                                 </div>
                             </div>
                         )}
 
                         {/* Description */}
                         <div>
-                            <h3 className="font-semibold text-slate-900 mb-2 flex items-center gap-2">
+                            <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-2 flex items-center gap-2">
                                 <Briefcase className="w-4 h-4 text-slate-400" />
                                 {t('teamPostDetail.sections.description')}
                             </h3>
-                            <p className="text-slate-600 whitespace-pre-wrap leading-relaxed">
+                            <p className="text-slate-600 dark:text-slate-400 whitespace-pre-wrap leading-relaxed">
                                 {post.description}
                             </p>
                         </div>
 
                         {/* Roles Needed */}
                         <div>
-                            <h3 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                            <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
                                 <Users className="w-4 h-4 text-slate-400" />
                                 {t('teamPostDetail.sections.rolesNeeded')}
                             </h3>
@@ -227,11 +227,11 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                                         const hasDetails = slot.description || (slot.skills && slot.skills.length > 0);
 
                                         return (
-                                            <div key={slot.role} className="border border-slate-200 rounded-xl overflow-hidden">
+                                            <div key={slot.role} className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
                                                 <button
                                                     type="button"
                                                     onClick={() => hasDetails && toggleRoleExpanded(slot.role)}
-                                                    className={`w-full flex items-center justify-between p-3 ${hasDetails ? 'hover:bg-slate-50 cursor-pointer' : 'cursor-default'} transition-colors`}
+                                                    className={`w-full flex items-center justify-between p-3 ${hasDetails ? 'hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer' : 'cursor-default'} transition-colors`}
                                                     disabled={!hasDetails}
                                                     aria-label={hasDetails
                                                         ? (isExpanded
@@ -243,7 +243,7 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                                                         <Badge className={`${ROLE_COLORS[slot.role] || ROLE_COLORS['Other']} px-3 py-1 text-sm border`}>
                                                             {slot.role}
                                                         </Badge>
-                                                        <span className="text-sm text-slate-500">
+                                                        <span className="text-sm text-slate-500 dark:text-slate-400">
                                                             {t('teamPostDetail.role.needCount', { count: slot.count })}
                                                         </span>
                                                     </div>
@@ -257,19 +257,19 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                                                 </button>
 
                                                 {isExpanded && hasDetails && (
-                                                    <div className="px-4 pb-4 pt-2 bg-slate-50 border-t border-slate-100 space-y-3">
+                                                    <div className="px-4 pb-4 pt-2 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-800 space-y-3">
                                                         {slot.description && (
                                                             <div>
-                                                                <p className="text-xs font-medium text-slate-500 mb-1">{t('teamPostDetail.role.tasksLabel')}</p>
-                                                                <p className="text-sm text-slate-700">{slot.description}</p>
+                                                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{t('teamPostDetail.role.tasksLabel')}</p>
+                                                                <p className="text-sm text-slate-700 dark:text-slate-300">{slot.description}</p>
                                                             </div>
                                                         )}
                                                         {slot.skills && slot.skills.length > 0 && (
                                                             <div>
-                                                                <p className="text-xs font-medium text-slate-500 mb-1">{t('teamPostDetail.role.skillsLabel')}</p>
+                                                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{t('teamPostDetail.role.skillsLabel')}</p>
                                                                 <div className="flex flex-wrap gap-1.5">
                                                                     {slot.skills.map(skill => (
-                                                                        <span key={skill} className="inline-flex items-center px-2 py-0.5 bg-primary-50 text-primary-700 rounded-md text-xs">
+                                                                        <span key={skill} className="inline-flex items-center px-2 py-0.5 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-md text-xs">
                                                                             {skill}
                                                                         </span>
                                                                     ))}
@@ -299,7 +299,7 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                         {/* General Skills */}
                         {post.skills && post.skills.length > 0 && (
                             <div>
-                                <h3 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                                <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
                                     <Tag className="w-4 h-4 text-slate-400" />
                                     {t('teamPostDetail.sections.generalSkills')}
                                 </h3>
@@ -307,7 +307,7 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                                     {post.skills.map(skill => (
                                         <span
                                             key={skill}
-                                            className="inline-flex items-center px-3 py-1.5 bg-primary-50 text-primary-700 rounded-lg text-sm font-medium"
+                                            className="inline-flex items-center px-3 py-1.5 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-lg text-sm font-medium"
                                         >
                                             {skill}
                                         </span>
@@ -318,13 +318,13 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
 
                         {/* Deadline */}
                         {post.deadline && (
-                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                            <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4 flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
                                     <Calendar className="w-5 h-5 text-amber-600" />
                                 </div>
                                 <div>
-                                    <p className="font-medium text-amber-800">{t('teamPostDetail.deadline.title')}</p>
-                                    <p className="text-sm text-amber-600">{formatDate(post.deadline)}</p>
+                                    <p className="font-medium text-amber-800 dark:text-amber-300">{t('teamPostDetail.deadline.title')}</p>
+                                    <p className="text-sm text-amber-600 dark:text-amber-300">{formatDate(post.deadline)}</p>
                                 </div>
                             </div>
                         )}
@@ -332,14 +332,14 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                         {/* Current Members */}
                         <div>
                             <div className="flex items-center justify-between mb-3">
-                                <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+                                <h3 className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                                     <Users className="w-4 h-4 text-slate-400" />
                                     {t('teamPostDetail.members.title', { count: post.members.length })}
                                 </h3>
                                 {isOwner && onManageMembers && (
                                     <button
                                         onClick={onManageMembers}
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors"
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
                                         title={t('teamPostDetail.members.manageTitle')}
                                     >
                                         <Settings className="w-4 h-4" />
@@ -349,7 +349,7 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                             </div>
                             <div className="space-y-2">
                                 {post.members.map((member, index) => (
-                                    <div key={member.id} className="p-3 bg-slate-50 rounded-xl">
+                                    <div key={member.id} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
                                         <div className="flex items-center gap-3">
                                             <Link
                                                 to={`/user/${member.id}`}
@@ -366,17 +366,17 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                                                 <div className="flex items-center gap-2">
                                                     <Link
                                                         to={`/user/${member.id}`}
-                                                        className="font-medium text-slate-900 truncate hover:text-primary-600 transition-colors"
+                                                        className="font-medium text-slate-900 dark:text-slate-100 truncate hover:text-primary-600 transition-colors"
                                                     >
                                                         {member.name}
                                                     </Link>
                                                     {index === 0 && (
-                                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-xs font-medium">
+                                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded text-xs font-medium">
                                                             <Crown className="w-3 h-3" />
                                                         </span>
                                                     )}
                                                 </div>
-                                                <p className="text-xs text-slate-500">
+                                                <p className="text-xs text-slate-500 dark:text-slate-400">
                                                     {index === 0 ? t('teamPostDetail.members.leader') : t('teamPostDetail.members.member')}
                                                 </p>
                                             </div>
@@ -389,8 +389,8 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                                         {/* Show task if available */}
                                         {member.task && (
                                             <div className="mt-2 ml-13 pl-13">
-                                                <p className="text-xs font-medium text-slate-500">{t('teamPostDetail.role.tasksLabel')}</p>
-                                                <p className="text-sm text-slate-600 mt-0.5">{member.task}</p>
+                                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{t('teamPostDetail.role.tasksLabel')}</p>
+                                                <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">{member.task}</p>
                                             </div>
                                         )}
                                     </div>
@@ -401,7 +401,7 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                         {/* Invited Members */}
                         {post.invitedMembers && post.invitedMembers.length > 0 && (
                             <div>
-                                <h3 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                                <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
                                     <UserPlus className="w-4 h-4 text-slate-400" />
                                     {t('teamPostDetail.invited.title', { count: post.invitedMembers.length })}
                                 </h3>
@@ -409,7 +409,7 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                                     {post.invitedMembers.map((member) => (
                                         <div
                                             key={member.id}
-                                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-full"
+                                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-full"
                                             title={member.email || member.name}
                                         >
                                             {member.avatar ? (
@@ -419,14 +419,14 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                                                     className="w-5 h-5 rounded-full object-cover"
                                                 />
                                             ) : (
-                                                <div className="w-5 h-5 rounded-full bg-amber-200 flex items-center justify-center">
-                                                    <span className="text-xs font-medium text-amber-700">
+                                                <div className="w-5 h-5 rounded-full bg-amber-200 dark:bg-amber-800 flex items-center justify-center">
+                                                    <span className="text-xs font-medium text-amber-700 dark:text-amber-300">
                                                         {member.name.charAt(0).toUpperCase()}
                                                     </span>
                                                 </div>
                                             )}
-                                            <span className="text-sm font-medium text-amber-800">{member.name}</span>
-                                            <span className="text-xs text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded">{t('teamPostDetail.invited.pending')}</span>
+                                            <span className="text-sm font-medium text-amber-800 dark:text-amber-300">{member.name}</span>
+                                            <span className="text-xs text-amber-600 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/30 px-1.5 py-0.5 rounded">{t('teamPostDetail.invited.pending')}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -435,8 +435,8 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
 
                         {/* Contact / Join Section */}
                         {!requestSent ? (
-                            <div className="bg-slate-50 rounded-xl p-4 space-y-4">
-                                <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+                            <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 space-y-4">
+                                <h3 className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                                     <MessageCircle className="w-4 h-4 text-slate-400" />
                                     {t('teamPostDetail.join.title')}
                                 </h3>
@@ -444,7 +444,7 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     placeholder={t('teamPostDetail.join.placeholder')}
-                                    className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none"
+                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none resize-none dark:bg-slate-900"
                                     rows={3}
                                 />
                                 <div className="flex gap-3">
@@ -482,12 +482,12 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                                 </div>
                             </div>
                         ) : (
-                            <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
-                                <div className="w-12 h-12 mx-auto mb-3 bg-green-100 rounded-full flex items-center justify-center">
+                            <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-xl p-6 text-center">
+                                <div className="w-12 h-12 mx-auto mb-3 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
                                     <UserPlus className="w-6 h-6 text-green-600" />
                                 </div>
-                                <h4 className="font-semibold text-green-800 mb-1">{t('teamPostDetail.join.sentTitle')}</h4>
-                                <p className="text-sm text-green-600">
+                                <h4 className="font-semibold text-green-800 dark:text-green-300 mb-1">{t('teamPostDetail.join.sentTitle')}</h4>
+                                <p className="text-sm text-green-600 dark:text-green-300">
                                     {t('teamPostDetail.join.sentDescription')}
                                 </p>
                             </div>
@@ -495,8 +495,8 @@ const TeamPostDetailModal: React.FC<TeamPostDetailModalProps> = ({
                     </div>
 
                     {/* Footer */}
-                    <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                        <div className="text-sm text-slate-500 flex items-center gap-2">
+                    <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
                             {t('teamPostDetail.footer.postedBy')}{' '}
                             <UserAvatar
                                 userId={post.createdBy.id}

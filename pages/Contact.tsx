@@ -176,16 +176,16 @@ const Contact: React.FC = () => {
     const userPhone = user?.phone || (isLoadingUser ? copy.loading : '—');
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-800">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-primary-50 text-primary-700 flex items-center justify-center border border-primary-100">
+                        <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/30 text-primary-700 flex items-center justify-center border border-primary-100 dark:border-primary-800">
                             <UserIcon className="w-5 h-5" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900">{copy.pageTitle}</h1>
-                            <p className="text-sm text-slate-500">{copy.pageDesc}</p>
+                            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{copy.pageTitle}</h1>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">{copy.pageDesc}</p>
                         </div>
                     </div>
                     <Button type="button" variant="ghost" className="gap-2 self-start" onClick={() => navigate(-1)}>
@@ -199,9 +199,9 @@ const Contact: React.FC = () => {
                         <div className="flex items-start justify-between gap-3">
                             <div className="flex items-center gap-2">
                                 <UserIcon className="w-5 h-5 text-slate-400" />
-                                <h2 className="font-semibold text-slate-900">{copy.yourInfo}</h2>
+                                <h2 className="font-semibold text-slate-900 dark:text-slate-100">{copy.yourInfo}</h2>
                             </div>
-                            <Badge className="bg-primary-50 text-primary-700 border border-primary-100">{copy.loggedIn}</Badge>
+                            <Badge className="bg-primary-50 dark:bg-primary-900/30 text-primary-700 border border-primary-100 dark:border-primary-800">{copy.loggedIn}</Badge>
                         </div>
 
                         <div className="mt-6 flex justify-center">
@@ -215,22 +215,22 @@ const Contact: React.FC = () => {
 
                         <div className="mt-6 space-y-3 text-sm">
                             <div className="flex items-start justify-between gap-3">
-                                <span className="text-slate-500">{copy.account}</span>
-                                <span className="text-slate-900 font-semibold text-right">{userName}</span>
+                                <span className="text-slate-500 dark:text-slate-400">{copy.account}</span>
+                                <span className="text-slate-900 dark:text-slate-100 font-semibold text-right">{userName}</span>
                             </div>
                             <div className="flex items-start justify-between gap-3">
-                                <span className="text-slate-500">Email</span>
-                                <span className="text-slate-900 font-semibold text-right">{userEmail}</span>
+                                <span className="text-slate-500 dark:text-slate-400">Email</span>
+                                <span className="text-slate-900 dark:text-slate-100 font-semibold text-right">{userEmail}</span>
                             </div>
                             <div className="flex items-start justify-between gap-3">
-                                <span className="text-slate-500">{copy.phone}</span>
-                                <span className="text-slate-900 font-semibold text-right">{userPhone}</span>
+                                <span className="text-slate-500 dark:text-slate-400">{copy.phone}</span>
+                                <span className="text-slate-900 dark:text-slate-100 font-semibold text-right">{userPhone}</span>
                             </div>
                         </div>
 
-                        <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 relative">
-                            <Info className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                            <div className="text-xs text-slate-600 text-center px-8">
+                        <div className="mt-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-4 relative">
+                            <Info className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-400" />
+                            <div className="text-xs text-slate-600 dark:text-slate-400 text-center px-8">
                                 <div className="font-medium">{copy.infoNote}</div>
                                 <button
                                     type="button"
@@ -256,9 +256,9 @@ const Contact: React.FC = () => {
                         <div className="flex items-start justify-between gap-3">
                             <div className="flex items-center gap-2">
                                 <UserIcon className="w-5 h-5 text-slate-400" />
-                                <h2 className="font-semibold text-slate-900">{copy.devInfo}</h2>
+                                <h2 className="font-semibold text-slate-900 dark:text-slate-100">{copy.devInfo}</h2>
                             </div>
-                            <Badge className="bg-pink-50 text-pink-700 border border-pink-100">Admin</Badge>
+                            <Badge className="bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 border border-pink-100 dark:border-pink-800">Admin</Badge>
                         </div>
 
                         <div className="mt-6 flex justify-center">
@@ -272,22 +272,22 @@ const Contact: React.FC = () => {
 
                         <div className="mt-6 space-y-3 text-sm">
                             <div className="flex items-start justify-between gap-3">
-                                <span className="text-slate-500">{copy.name}</span>
-                                <span className="text-slate-900 font-semibold text-right">{DEVELOPER.name}</span>
+                                <span className="text-slate-500 dark:text-slate-400">{copy.name}</span>
+                                <span className="text-slate-900 dark:text-slate-100 font-semibold text-right">{DEVELOPER.name}</span>
                             </div>
                             <div className="flex items-start justify-between gap-3">
-                                <span className="text-slate-500">Email</span>
-                                <span className="text-slate-900 font-semibold text-right">{DEVELOPER.email}</span>
+                                <span className="text-slate-500 dark:text-slate-400">Email</span>
+                                <span className="text-slate-900 dark:text-slate-100 font-semibold text-right">{DEVELOPER.email}</span>
                             </div>
                             <div className="flex items-start justify-between gap-3">
-                                <span className="text-slate-500">Zalo</span>
-                                <span className="text-slate-900 font-semibold text-right">{DEVELOPER.zalo}</span>
+                                <span className="text-slate-500 dark:text-slate-400">Zalo</span>
+                                <span className="text-slate-900 dark:text-slate-100 font-semibold text-right">{DEVELOPER.zalo}</span>
                             </div>
                         </div>
 
-                        <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 relative">
-                            <Info className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                            <div className="text-xs text-slate-600 text-center px-8">
+                        <div className="mt-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-4 relative">
+                            <Info className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-400" />
+                            <div className="text-xs text-slate-600 dark:text-slate-400 text-center px-8">
                                 <div className="font-medium">{copy.devNote}</div>
                                 <div className="text-primary-700 font-semibold">{copy.devSubNote}</div>
                             </div>
@@ -296,7 +296,7 @@ const Contact: React.FC = () => {
                 </div>
 
                 <Card className="mt-6 p-6">
-                    <h2 className="text-lg font-bold text-slate-900">{copy.sendFeedback}</h2>
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">{copy.sendFeedback}</h2>
 
                     <form className="mt-5 space-y-5" onSubmit={handleSubmit}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -311,17 +311,17 @@ const Contact: React.FC = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">{copy.content}</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{copy.content}</label>
                             <textarea
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 rows={6}
                                 maxLength={2000}
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition"
+                                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-slate-900 transition"
                                 placeholder={copy.contentPlaceholder}
                                 disabled={isSubmitting}
                             />
-                            <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
+                            <div className="mt-2 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                                 <span>{copy.minChars}</span>
                                 <span>{message.length}/2000</span>
                             </div>

@@ -37,8 +37,7 @@ const SidebarItem = ({ to, icon: Icon, label, onNavigate }: { to: string; icon: 
     to={to}
     onClick={onNavigate}
     className={({ isActive }) =>
-      `flex items-center gap-3 rounded-lg px-4 py-3 transition-colors duration-200 ${
-        isActive ? 'bg-emerald-50 font-medium text-emerald-600' : 'text-gray-600 hover:bg-gray-50 hover:text-emerald-600'
+      `flex items-center gap-3 rounded-lg px-4 py-3 transition-colors duration-200 ${isActive ? 'bg-emerald-50 font-medium text-emerald-600' : 'text-gray-600 hover:bg-gray-50 hover:text-emerald-600'
       }`
     }
   >
@@ -189,15 +188,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 transform flex-col border-r border-gray-200 bg-white transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 transform flex-col border-r border-gray-200 bg-white transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <div className="flex h-16 shrink-0 items-center justify-center border-b border-gray-100">
           <div className="flex cursor-pointer items-center gap-2">
-            <img src="/logo.png" alt="Blanc Logo" className="h-10 w-10 rounded-full object-cover" />
+            <img src="/logo.png" alt="ContestHub Logo" className="h-10 w-10 rounded-full object-cover" />
             <div className="flex flex-col">
-              <span className="text-lg leading-tight font-bold text-emerald-600">Blanc Admin</span>
+              <span className="text-lg leading-tight font-bold text-emerald-600">ContestHub Admin</span>
               <span className="text-xs leading-tight text-gray-500">Beyond Learning</span>
             </div>
           </div>

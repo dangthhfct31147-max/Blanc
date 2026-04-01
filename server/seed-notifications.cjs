@@ -59,7 +59,7 @@ async function seedNotifications() {
             },
             {
                 title: 'User Milestone Reached',
-                message: 'Congratulations! Blanc has reached 1,000 active students!',
+                message: 'Congratulations! ContestHub has reached 1,000 active students!',
                 type: 'success',
                 category: 'system',
                 read: true,

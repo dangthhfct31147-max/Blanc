@@ -16,7 +16,7 @@ Edit with:
 ```env
 NODE_ENV=production
 JWT_SECRET=<paste from step 1>
-FRONTEND_ORIGIN=https://blanc.up.railway.app
+FRONTEND_ORIGIN=https://contesthub.up.railway.app
 DATABASE_URL=<your-production-uri>
 ```
 

@@ -5,7 +5,7 @@ interface MaintenancePageProps {
     siteName?: string;
 }
 
-const MaintenancePage: React.FC<MaintenancePageProps> = ({ siteName = 'Blanc' }) => {
+const MaintenancePage: React.FC<MaintenancePageProps> = ({ siteName = 'ContestHub' }) => {
     return (
         <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
             <div className="max-w-md w-full text-center">

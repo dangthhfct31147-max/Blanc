@@ -40,7 +40,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```env
 NODE_ENV=production
 JWT_SECRET=<generated-above>
-FRONTEND_ORIGIN=https://blanc.up.railway.app,https://admin-blanc.up.railway.app
+FRONTEND_ORIGIN=https://contesthub.up.railway.app,https://admin-contesthub.up.railway.app
 DATABASE_URL=postgresql://<user>:<pass>@<host>:26257/<db>?sslmode=verify-full
 ```
 

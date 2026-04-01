@@ -162,10 +162,10 @@ Users can control their notification preferences in Settings > Notifications:
 - Marketing emails
 
 ## Seed/Migrate data
-1. Ensure `.env` has `DATABASE_URL` (example: `postgresql://user:pass@host:26257/Blanc?sslmode=verify-full`).
+1. Ensure `.env` has `DATABASE_URL` (example: `postgresql://user:pass@host:26257/ContestHub?sslmode=verify-full`).
 2. Run migration to insert/update sample users, contests, and courses:
    `npm run seed`
-   - Creates default admin `admin@blanc.dev` (password `Admin123!`) and student `student@blanc.dev` (password `Student123!`).
+   - Creates default admin `admin@contesthub.dev` (password `Admin123!`) and student `student@contesthub.dev` (password `Student123!`).
    - Upserts demo contests and courses with timestamps so the frontend can be wired to the API easily.
 3. (Optional) Populate a larger demo dataset (users/contests/courses/team posts/registrations/enrollments/reviews/reports):
    - `npm run seed:large`

@@ -95,12 +95,12 @@ const OnboardingWizard: React.FC<Props> = ({ userName, onComplete }) => {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.92, opacity: 0 }}
                 transition={{ type: 'spring', duration: 0.5 }}
-                className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl"
+                className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-2xl"
             >
                 {/* Close / skip */}
                 <button
                     onClick={skip}
-                    className="absolute right-3 top-3 z-10 rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+                    className="absolute right-3 top-3 z-10 rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-300"
                     aria-label="Skip"
                 >
                     <X className="h-4 w-4" />
@@ -111,7 +111,7 @@ const OnboardingWizard: React.FC<Props> = ({ userName, onComplete }) => {
                     {Array.from({ length: totalSteps }).map((_, i) => (
                         <div
                             key={i}
-                            className={`h-1.5 rounded-full transition-all duration-300 ${i === step ? 'w-6 bg-indigo-500' : i < step ? 'w-3 bg-indigo-300' : 'w-3 bg-slate-200'
+                            className={`h-1.5 rounded-full transition-all duration-300 ${i === step ? 'w-6 bg-indigo-500' : i < step ? 'w-3 bg-indigo-300' : 'w-3 bg-slate-200 dark:bg-slate-700'
                                 }`}
                         />
                     ))}
@@ -131,16 +131,16 @@ const OnboardingWizard: React.FC<Props> = ({ userName, onComplete }) => {
                                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                                 className="flex flex-col items-center text-center"
                             >
-                                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 to-violet-500 shadow-lg shadow-indigo-200">
+                                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 to-violet-500 shadow-lg shadow-indigo-200 dark:shadow-indigo-900">
                                     <Rocket className="h-8 w-8 text-white" />
                                 </div>
-                                <h2 className="text-xl font-bold text-slate-800">
+                                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
                                     {isVi ? `Chào mừng${userName ? `, ${userName}` : ''}! 🎉` : `Welcome${userName ? `, ${userName}` : ''}! 🎉`}
                                 </h2>
-                                <p className="mt-2 text-sm leading-relaxed text-slate-500">
+                                <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                                     {isVi
-                                        ? 'Blanc là nền tảng giúp bạn phát triển kỹ năng, tham gia cuộc thi và kết nối cộng đồng.'
-                                        : 'Blanc helps you grow your skills, compete in contests, and connect with a vibrant community.'}
+                                        ? 'ContestHub là nền tảng giúp bạn phát triển kỹ năng, tham gia cuộc thi và kết nối cộng đồng.'
+                                        : 'ContestHub helps you grow your skills, compete in contests, and connect with a vibrant community.'}
                                 </p>
                             </motion.div>
                         )}
@@ -156,10 +156,10 @@ const OnboardingWizard: React.FC<Props> = ({ userName, onComplete }) => {
                                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                                 className="flex flex-col items-center"
                             >
-                                <h2 className="text-lg font-bold text-slate-800">
+                                <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
                                     {isVi ? 'Bạn quan tâm đến gì?' : 'What are you interested in?'}
                                 </h2>
-                                <p className="mt-1 text-sm text-slate-500">
+                                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                                     {isVi ? 'Chọn để cá nhân hoá trải nghiệm' : 'Select to personalise your experience'}
                                 </p>
                                 <div className="mt-5 grid grid-cols-2 gap-3 w-full">
@@ -170,8 +170,8 @@ const OnboardingWizard: React.FC<Props> = ({ userName, onComplete }) => {
                                                 key={item.id}
                                                 onClick={() => toggleInterest(item.id)}
                                                 className={`flex items-center gap-2.5 rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-all ${selected
-                                                        ? 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm'
-                                                        : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                                                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 shadow-sm'
+                                                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'
                                                     }`}
                                             >
                                                 <span className={selected ? 'text-indigo-500' : 'text-slate-400'}>{item.icon}</span>
@@ -195,13 +195,13 @@ const OnboardingWizard: React.FC<Props> = ({ userName, onComplete }) => {
                                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                                 className="flex flex-col items-center text-center"
                             >
-                                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-200">
+                                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-200 dark:shadow-emerald-900">
                                     <Sparkles className="h-8 w-8 text-white" />
                                 </div>
-                                <h2 className="text-xl font-bold text-slate-800">
+                                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
                                     {isVi ? 'Bạn đã sẵn sàng!' : "You're all set!"}
                                 </h2>
-                                <p className="mt-2 text-sm leading-relaxed text-slate-500">
+                                <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                                     {isVi
                                         ? 'Khám phá cuộc thi, khóa học và kết nối cộng đồng ngay bây giờ.'
                                         : 'Explore contests, courses, and connect with the community now.'}
@@ -212,8 +212,8 @@ const OnboardingWizard: React.FC<Props> = ({ userName, onComplete }) => {
                 </div>
 
                 {/* Bottom action */}
-                <div className="flex items-center justify-between border-t border-slate-100 px-6 py-4">
-                    <button onClick={skip} className="text-sm text-slate-400 hover:text-slate-600 transition">
+                <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 px-6 py-4">
+                    <button onClick={skip} className="text-sm text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition">
                         {isVi ? 'Bỏ qua' : 'Skip'}
                     </button>
                     <button

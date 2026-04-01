@@ -38,8 +38,8 @@ export function createDefaultPlatformSettings() {
     return {
         _id: SETTINGS_DOCUMENT_ID,
         general: {
-            siteName: 'Blanc',
-            supportEmail: 'support@blanc.com',
+            siteName: 'ContestHub',
+            supportEmail: 'support@contesthub.com',
             maintenanceMode: false,
             defaultLanguage: 'vi',
             timezone: 'Asia/Ho_Chi_Minh',
@@ -81,21 +81,21 @@ export async function getPlatformSettings(options = {}) {
     }
 
     cachedSettingsInFlight = (async () => {
-    await connectToDatabase();
-    const collection = getCollection(SETTINGS_COLLECTION);
+        await connectToDatabase();
+        const collection = getCollection(SETTINGS_COLLECTION);
 
-    let settings = await collection.findOne({ _id: SETTINGS_DOCUMENT_ID });
-    if (!settings) {
-        const defaults = createDefaultPlatformSettings();
-        await collection.insertOne(defaults);
-        settings = defaults;
-    }
+        let settings = await collection.findOne({ _id: SETTINGS_DOCUMENT_ID });
+        if (!settings) {
+            const defaults = createDefaultPlatformSettings();
+            await collection.insertOne(defaults);
+            settings = defaults;
+        }
 
-    const paymentsEnabledOverride = readBooleanEnv('PAYMENTS_ENABLED', 'FEATURE_PAYMENTS_ENABLED');
-    if (paymentsEnabledOverride !== undefined) {
-        settings.features = settings.features || {};
-        settings.features.paymentsEnabled = paymentsEnabledOverride;
-    }
+        const paymentsEnabledOverride = readBooleanEnv('PAYMENTS_ENABLED', 'FEATURE_PAYMENTS_ENABLED');
+        if (paymentsEnabledOverride !== undefined) {
+            settings.features = settings.features || {};
+            settings.features.paymentsEnabled = paymentsEnabledOverride;
+        }
 
         if (ttlMs > 0) {
             cachedSettings = settings;
@@ -105,7 +105,7 @@ export async function getPlatformSettings(options = {}) {
             cachedSettingsExpiresAt = 0;
         }
 
-    return settings;
+        return settings;
     })();
 
     try {

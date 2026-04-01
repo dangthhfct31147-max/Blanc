@@ -7,7 +7,7 @@ const API_BASE_URL = getApiBaseUrl();
 
 // Optional Bearer token support (fallback when cookies are blocked in cross-site deployments)
 const ACCESS_TOKEN_KEY = 'access_token';
-const LOCALE_STORAGE_KEY = 'blanc:locale';
+const LOCALE_STORAGE_KEY = 'contesthub:locale';
 type AccessTokenProvider = (() => Promise<string | null> | string | null) | null;
 let accessTokenProvider: AccessTokenProvider = null;
 

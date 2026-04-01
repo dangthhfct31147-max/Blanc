@@ -149,7 +149,7 @@ const TOTP_SETUP_TTL_MINUTES = 15; // Pending TOTP setup expires in 15 minutes
 const TOTP_DIGITS = 6;
 const TOTP_PERIOD_SECONDS = 30;
 const TOTP_VERIFY_WINDOW = 1; // allow +/- 1 time-step for clock skew
-const TOTP_ISSUER = String(process.env.TOTP_ISSUER || process.env.SITE_NAME || 'Blanc').trim() || 'Blanc';
+const TOTP_ISSUER = String(process.env.TOTP_ISSUER || process.env.SITE_NAME || 'ContestHub').trim() || 'ContestHub';
 
 function isTotpEncryptionConfigured() {
   return Boolean(String(process.env.TOTP_ENCRYPTION_KEY || '').trim());
@@ -175,7 +175,7 @@ const OTP_BYPASS_EMAILS = (() => {
   const raw = String(process.env.OTP_BYPASS_EMAILS || '').trim();
   const list = raw
     ? raw.split(',').map((v) => v.trim().toLowerCase()).filter(Boolean)
-    : ['admin@blanc.dev', 'admin@contesthub.dev'];
+    : ['admin@contesthub.dev', 'admin@contesthub.dev'];
 
   return Array.from(new Set(list));
 })();

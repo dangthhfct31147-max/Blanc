@@ -107,7 +107,7 @@ const MentorReviewPanel: React.FC = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Tìm theo tiêu đề / user..."
-              className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
+              className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
             />
           </div>
 
@@ -133,25 +133,24 @@ const MentorReviewPanel: React.FC = () => {
 
         <div className="mt-4 space-y-2">
           {loading ? (
-            <div className="py-10 flex items-center justify-center text-slate-500">
+            <div className="py-10 flex items-center justify-center text-slate-500 dark:text-slate-400">
               <Loader2 className="w-5 h-5 animate-spin mr-2" />
               Đang tải...
             </div>
           ) : filteredItems.length === 0 ? (
-            <div className="py-10 text-center text-slate-500 text-sm">Không có report nào phù hợp.</div>
+            <div className="py-10 text-center text-slate-500 dark:text-slate-400 text-sm">Không có report nào phù hợp.</div>
           ) : (
             filteredItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => void openDetail(item.id)}
-                className={`w-full text-left p-3 rounded-xl border transition-colors ${
-                  selectedId === item.id ? 'bg-primary-50 border-primary-200' : 'bg-white border-slate-100 hover:border-slate-200'
-                }`}
+                className={`w-full text-left p-3 rounded-xl border transition-colors ${selectedId === item.id ? 'bg-primary-50 dark:bg-primary-900/30 border-primary-200 dark:border-primary-800' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700'
+                  }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-medium text-slate-900 truncate">{item.title}</p>
-                    <p className="text-xs text-slate-500 mt-0.5 truncate">
+                    <p className="font-medium text-slate-900 dark:text-slate-100 truncate">{item.title}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
                       {item.user?.name || 'Unknown'} • {formatDateTime(item.submittedAt)}
                     </p>
                   </div>
@@ -167,17 +166,17 @@ const MentorReviewPanel: React.FC = () => {
 
       <Card className="lg:col-span-8 p-4">
         {!selectedId ? (
-          <div className="py-16 text-center text-slate-500">
+          <div className="py-16 text-center text-slate-500 dark:text-slate-400">
             <ShieldCheck className="w-10 h-10 mx-auto opacity-20" />
             <p className="mt-3 font-medium">Chọn một report để review</p>
           </div>
         ) : detailLoading ? (
-          <div className="py-16 flex items-center justify-center text-slate-500">
+          <div className="py-16 flex items-center justify-center text-slate-500 dark:text-slate-400">
             <Loader2 className="w-5 h-5 animate-spin mr-2" />
             Đang tải chi tiết...
           </div>
         ) : !detail?.report ? (
-          <div className="py-16 text-center text-slate-500">Không thể tải report.</div>
+          <div className="py-16 text-center text-slate-500 dark:text-slate-400">Không thể tải report.</div>
         ) : (
           <MentorReviewDetail
             report={detail.report}
@@ -209,9 +208,9 @@ const MentorReviewDetail: React.FC<{
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs text-slate-500">Người gửi</p>
-          <p className="font-semibold text-slate-900 truncate">{report.user?.name || 'Unknown'}</p>
-          <p className="text-xs text-slate-500 truncate">{report.user?.email || ''}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Người gửi</p>
+          <p className="font-semibold text-slate-900 dark:text-slate-100 truncate">{report.user?.name || 'Unknown'}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{report.user?.email || ''}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary" size="sm" onClick={onNeedsChanges} disabled={actionLoading} className="gap-2">
@@ -225,50 +224,50 @@ const MentorReviewDetail: React.FC<{
         </div>
       </div>
 
-      <Card className="p-4 border-slate-100">
+      <Card className="p-4 border-slate-100 dark:border-slate-800">
         <div className="flex items-center justify-between">
           <div className="min-w-0">
-            <p className="font-semibold text-slate-900 truncate">{report.title}</p>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="font-semibold text-slate-900 dark:text-slate-100 truncate">{report.title}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Template: {report.template} • Status: {report.status} • Review: {reviewStatusLabel(report.reviewStatus)}
             </p>
           </div>
           <ChevronRight className="w-5 h-5 text-slate-300" />
         </div>
         <div className="mt-4">
-          <p className="text-sm text-slate-700 whitespace-pre-wrap">{report.content || '-'}</p>
+          <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{report.content || '-'}</p>
         </div>
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="p-4 border-slate-100">
-          <p className="font-semibold text-slate-900">Thành tích</p>
+        <Card className="p-4 border-slate-100 dark:border-slate-800">
+          <p className="font-semibold text-slate-900 dark:text-slate-100">Thành tích</p>
           <div className="mt-3 space-y-2">
             {(report.activities || []).length === 0 ? (
-              <p className="text-sm text-slate-500">-</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">-</p>
             ) : (
               report.activities.map((a) => (
-                <div key={a.id} className="border border-slate-200 rounded-xl p-3 bg-slate-50">
-                  <p className="font-medium text-slate-900">{a.title}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{formatDateTime(a.occurredAt)}</p>
-                  {a.description && <p className="text-sm text-slate-700 mt-2 whitespace-pre-wrap">{a.description}</p>}
+                <div key={a.id} className="border border-slate-200 dark:border-slate-700 rounded-xl p-3 bg-slate-50 dark:bg-slate-800">
+                  <p className="font-medium text-slate-900 dark:text-slate-100">{a.title}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{formatDateTime(a.occurredAt)}</p>
+                  {a.description && <p className="text-sm text-slate-700 dark:text-slate-300 mt-2 whitespace-pre-wrap">{a.description}</p>}
                 </div>
               ))
             )}
           </div>
         </Card>
 
-        <Card className="p-4 border-slate-100">
-          <p className="font-semibold text-slate-900">Minh chứng</p>
+        <Card className="p-4 border-slate-100 dark:border-slate-800">
+          <p className="font-semibold text-slate-900 dark:text-slate-100">Minh chứng</p>
           <div className="mt-3 space-y-2">
             {(report.evidence || []).length === 0 ? (
-              <p className="text-sm text-slate-500">-</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">-</p>
             ) : (
               report.evidence.map((ev) => (
-                <div key={ev.id} className="border border-slate-200 rounded-xl p-3 bg-slate-50 flex items-start justify-between gap-3">
+                <div key={ev.id} className="border border-slate-200 dark:border-slate-700 rounded-xl p-3 bg-slate-50 dark:bg-slate-800 flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-medium text-slate-900 truncate">{ev.fileName}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{formatDateTime(ev.uploadedAt)}</p>
+                    <p className="font-medium text-slate-900 dark:text-slate-100 truncate">{ev.fileName}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{formatDateTime(ev.uploadedAt)}</p>
                   </div>
                   <a
                     href={ev.url || '#'}
@@ -285,19 +284,19 @@ const MentorReviewDetail: React.FC<{
         </Card>
       </div>
 
-      <Card className="p-4 border-slate-100">
-        <p className="font-semibold text-slate-900">Feedback</p>
+      <Card className="p-4 border-slate-100 dark:border-slate-800">
+        <p className="font-semibold text-slate-900 dark:text-slate-100">Feedback</p>
         <div className="mt-3 space-y-2 max-h-64 overflow-y-auto">
           {feedback.length === 0 ? (
-            <p className="text-sm text-slate-500">Chưa có feedback.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Chưa có feedback.</p>
           ) : (
             feedback.map((item) => (
-              <div key={item.id} className="border border-slate-100 rounded-xl p-3 bg-slate-50">
+              <div key={item.id} className="border border-slate-100 dark:border-slate-800 rounded-xl p-3 bg-slate-50 dark:bg-slate-800">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs font-medium text-slate-700 truncate">{item.authorName ? item.authorName : item.authorRole}</p>
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">{item.authorName ? item.authorName : item.authorRole}</p>
                   <p className="text-xs text-slate-400">{formatDateTime(item.createdAt || null)}</p>
                 </div>
-                <p className="text-sm text-slate-800 mt-2 whitespace-pre-wrap">{item.message}</p>
+                <p className="text-sm text-slate-800 dark:text-slate-100 mt-2 whitespace-pre-wrap">{item.message}</p>
               </div>
             ))
           )}
@@ -305,12 +304,12 @@ const MentorReviewDetail: React.FC<{
 
         <div className="mt-4 flex items-end gap-2">
           <div className="w-full">
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Gửi feedback</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Gửi feedback</label>
             <textarea
               value={message}
               onChange={(e) => onMessageChange(e.target.value)}
               rows={3}
-              className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
               placeholder="Nhận xét, góp ý, yêu cầu chỉnh sửa..."
               disabled={actionLoading}
             />

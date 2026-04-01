@@ -1,10 +1,10 @@
-# Test script for Blanc API
+# Test script for ContestHub API
 # Usage: .\test-api.ps1
 
 $baseUrl = "http://localhost:4000/api"
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Blanc API Test Script" -ForegroundColor Cyan
+Write-Host "ContestHub API Test Script" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
 # Test 1: Health Check

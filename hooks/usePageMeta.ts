@@ -7,7 +7,7 @@ interface PageMeta {
     ogImage?: string;
 }
 
-const SITE_NAME = 'Blanc';
+const SITE_NAME = 'ContestHub';
 const DEFAULT_DESCRIPTION = 'Nền tảng thi đấu và học tập trực tuyến hàng đầu';
 
 const ROUTE_META: Record<string, PageMeta> = {
@@ -22,8 +22,9 @@ const ROUTE_META: Record<string, PageMeta> = {
     '/mentors': { title: 'Mentors', description: 'Tìm mentor phù hợp' },
     '/reports': { title: 'Báo cáo', description: 'Quản lý báo cáo cá nhân' },
     '/profile': { title: 'Hồ sơ', description: 'Hồ sơ cá nhân và cài đặt' },
-    '/contact': { title: 'Liên hệ', description: 'Liên hệ với đội ngũ Blanc' },
+    '/contact': { title: 'Liên hệ', description: 'Liên hệ với đội ngũ ContestHub' },
     '/skill-tree': { title: 'Skill Tree', description: 'Cây kỹ năng và lộ trình học tập' },
+    '/university-fit': { title: 'University Fit', description: 'Tìm trường phù hợp và các mục tiêu học bổng rõ ràng hơn' },
     '/my-team-posts': { title: 'Bài viết nhóm', description: 'Quản lý bài viết nhóm' },
     '/terms': { title: 'Điều khoản', description: 'Điều khoản sử dụng' },
     '/privacy': { title: 'Quyền riêng tư', description: 'Chính sách quyền riêng tư' },

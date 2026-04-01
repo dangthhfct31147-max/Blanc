@@ -136,32 +136,32 @@ const Documents: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Intro hero section */}
-      <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-sky-100/60 mb-10">
-        <div className="absolute inset-0 bg-linear-to-br from-sky-50 via-white to-emerald-50 opacity-90" aria-hidden="true" />
-        <div className="absolute -top-24 right-8 h-48 w-48 rounded-full bg-sky-200/40 blur-3xl" aria-hidden="true" />
-        <div className="absolute -bottom-28 left-6 h-56 w-56 rounded-full bg-emerald-200/40 blur-3xl" aria-hidden="true" />
+      <section className="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl shadow-sky-100/60 dark:shadow-sky-900/60 mb-10">
+        <div className="absolute inset-0 bg-linear-to-br from-sky-50 dark:from-sky-950/30 via-white dark:via-slate-950 to-emerald-50 dark:to-emerald-950/30 opacity-90" aria-hidden="true" />
+        <div className="absolute -top-24 right-8 h-48 w-48 rounded-full bg-sky-200/40 dark:bg-sky-800/20 blur-3xl" aria-hidden="true" />
+        <div className="absolute -bottom-28 left-6 h-56 w-56 rounded-full bg-emerald-200/40 dark:bg-emerald-800/20 blur-3xl" aria-hidden="true" />
         <div className="relative p-6 md:p-8 lg:p-10">
           <div className="grid grid-cols-1 lg:grid-cols-[1.35fr_1fr] gap-8 items-center">
             <div className="space-y-4 animate-fade-in-up">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-white/70 text-xs font-semibold text-sky-700 shadow-sm">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 dark:bg-slate-900/80 border border-white/70 dark:border-slate-700 text-xs font-semibold text-sky-700 dark:text-sky-300 shadow-sm">
                 <FileText className="w-3.5 h-3.5" />
                 {copy.badge}
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 leading-tight">
                 {copy.heroTitle}
               </h2>
-              <p className="text-sm md:text-base text-slate-600 leading-relaxed max-w-xl md:max-w-none">
+              <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl md:max-w-none">
                 {copy.heroDesc}
               </p>
               <div className="flex flex-wrap gap-3">
-                <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
+                <div className="flex items-center gap-2 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-slate-100 dark:border-slate-800 px-3 py-2 text-xs text-slate-600 dark:text-slate-400 shadow-sm">
                   <Search className="w-4 h-4 text-sky-500" />
                   {copy.searchByKeyword}
                 </div>
-                <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
+                <div className="flex items-center gap-2 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-slate-100 dark:border-slate-800 px-3 py-2 text-xs text-slate-600 dark:text-slate-400 shadow-sm">
                   {copy.diverseCategories}
                 </div>
-                <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
+                <div className="flex items-center gap-2 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-slate-100 dark:border-slate-800 px-3 py-2 text-xs text-slate-600 dark:text-slate-400 shadow-sm">
                   {copy.filterByField}
                 </div>
               </div>
@@ -174,27 +174,27 @@ const Documents: React.FC = () => {
               const resultLabel = debouncedSearch || activeCategory || activeField ? copy.matchingResults : copy.totalDocs;
               return (
                 <div className="space-y-4 animate-fade-in-up">
-                  <div className="rounded-2xl border border-white/80 bg-white/80 p-5 shadow-md">
+                  <div className="rounded-2xl border border-white/80 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 p-5 shadow-md">
                     <div className="text-xs font-semibold uppercase tracking-widest text-slate-400">{resultLabel}</div>
                     <div className="mt-3 flex items-end gap-2">
-                      <span className="text-3xl font-bold text-slate-900">{isLoading ? '--' : meta.total}</span>
-                      <span className="text-sm text-slate-500">{copy.documents}</span>
+                      <span className="text-3xl font-bold text-slate-900 dark:text-slate-100">{isLoading ? '--' : meta.total}</span>
+                      <span className="text-sm text-slate-500 dark:text-slate-400">{copy.documents}</span>
                     </div>
-                    <p className="mt-2 text-xs text-slate-500">{copy.updatedContinuously}</p>
+                    <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{copy.updatedContinuously}</p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
-                    <div className="rounded-xl border border-sky-100 bg-sky-50/80 px-4 py-3">
-                      <div className="text-xs font-semibold text-sky-700">{copy.displaying}</div>
-                      <div className="mt-1 text-2xl font-bold text-sky-800">{isLoading ? '--' : visibleCount}</div>
+                    <div className="rounded-xl border border-sky-100 dark:border-sky-800 bg-sky-50/80 dark:bg-sky-900/30 px-4 py-3">
+                      <div className="text-xs font-semibold text-sky-700 dark:text-sky-300">{copy.displaying}</div>
+                      <div className="mt-1 text-2xl font-bold text-sky-800 dark:text-sky-200">{isLoading ? '--' : visibleCount}</div>
                     </div>
-                    <div className="rounded-xl border border-emerald-100 bg-emerald-50/80 px-4 py-3">
-                      <div className="text-xs font-semibold text-emerald-700">{copy.fields}</div>
-                      <div className="mt-1 text-2xl font-bold text-emerald-800">{fieldCount}</div>
+                    <div className="rounded-xl border border-emerald-100 dark:border-emerald-800 bg-emerald-50/80 dark:bg-emerald-900/30 px-4 py-3">
+                      <div className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">{copy.fields}</div>
+                      <div className="mt-1 text-2xl font-bold text-emerald-800 dark:text-emerald-200">{fieldCount}</div>
                     </div>
-                    <div className="rounded-xl border border-amber-100 bg-amber-50/80 px-4 py-3">
-                      <div className="text-xs font-semibold text-amber-700">{copy.pages}</div>
-                      <div className="mt-1 text-2xl font-bold text-amber-800">{isLoading ? '--' : pageCount}</div>
+                    <div className="rounded-xl border border-amber-100 dark:border-amber-800 bg-amber-50/80 dark:bg-amber-900/30 px-4 py-3">
+                      <div className="text-xs font-semibold text-amber-700 dark:text-amber-300">{copy.pages}</div>
+                      <div className="mt-1 text-2xl font-bold text-amber-800 dark:text-amber-200">{isLoading ? '--' : pageCount}</div>
                     </div>
                   </div>
                 </div>
@@ -213,13 +213,13 @@ const Documents: React.FC = () => {
             placeholder={copy.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-12 pl-12 pr-10 rounded-full border border-slate-200 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+            className="w-full h-12 pl-12 pr-10 rounded-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
               title={copy.clearSearch}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
             >
               <X className="w-5 h-5" />
             </button>

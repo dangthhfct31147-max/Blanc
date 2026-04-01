@@ -274,15 +274,15 @@ export const ReportActivityEvidenceModal: React.FC<ReportActivityEvidenceModalPr
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative bg-white w-full max-w-5xl sm:rounded-2xl shadow-2xl max-h-[92vh] overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
+      <div className="relative bg-white dark:bg-slate-900 w-full max-w-5xl sm:rounded-2xl shadow-2xl max-h-[92vh] overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
           <div className="min-w-0">
-            <h2 className="font-semibold text-slate-900 truncate">Activities & Evidence</h2>
-            <p className="text-xs text-slate-500 truncate">{report?.title || ''}</p>
+            <h2 className="font-semibold text-slate-900 dark:text-slate-100 truncate">Activities & Evidence</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{report?.title || ''}</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-full text-slate-500"
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-500 dark:text-slate-400"
             title="Close"
             aria-label="Close"
           >
@@ -291,25 +291,25 @@ export const ReportActivityEvidenceModal: React.FC<ReportActivityEvidenceModalPr
         </div>
 
         {isLoading ? (
-          <div className="p-10 flex items-center justify-center gap-2 text-slate-500">
+          <div className="p-10 flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400">
             <Loader2 className="w-5 h-5 animate-spin" />
             Loading...
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-            <div className="p-6 border-b lg:border-b-0 lg:border-r border-slate-100 overflow-y-auto max-h-[78vh]">
+            <div className="p-6 border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-slate-800 overflow-y-auto max-h-[78vh]">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-slate-900">Activities</h3>
+                <h3 className="font-semibold text-slate-900 dark:text-slate-100">Activities</h3>
                 <button
                   onClick={resetActivityForm}
-                  className="text-sm text-slate-600 hover:text-slate-900"
+                  className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
                   disabled={isSaving}
                 >
                   Clear
                 </button>
               </div>
 
-              <div className="space-y-3 bg-slate-50 border border-slate-200 rounded-2xl p-4">
+              <div className="space-y-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4">
                 <div className="grid grid-cols-1 gap-3">
                   <label className="sr-only" htmlFor="report-activity-title">Activity title</label>
                   <input
@@ -317,7 +317,7 @@ export const ReportActivityEvidenceModal: React.FC<ReportActivityEvidenceModalPr
                     value={activityTitle}
                     onChange={(e) => setActivityTitle(e.target.value)}
                     placeholder="Activity title"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-sm focus:ring-2 focus:ring-primary-100 focus:border-primary-400 outline-none"
+                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-primary-100 focus:border-primary-400 outline-none"
                     disabled={isSaving}
                   />
                   <label className="sr-only" htmlFor="report-activity-occurred">Activity date</label>
@@ -326,7 +326,7 @@ export const ReportActivityEvidenceModal: React.FC<ReportActivityEvidenceModalPr
                     type="datetime-local"
                     value={activityOccurredAt}
                     onChange={(e) => setActivityOccurredAt(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-sm focus:ring-2 focus:ring-primary-100 focus:border-primary-400 outline-none"
+                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-primary-100 focus:border-primary-400 outline-none"
                     disabled={isSaving}
                   />
                   <label className="sr-only" htmlFor="report-activity-description">Activity description</label>
@@ -336,7 +336,7 @@ export const ReportActivityEvidenceModal: React.FC<ReportActivityEvidenceModalPr
                     onChange={(e) => setActivityDescription(e.target.value)}
                     placeholder="Description (optional)"
                     rows={3}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-sm focus:ring-2 focus:ring-primary-100 focus:border-primary-400 outline-none resize-none"
+                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-primary-100 focus:border-primary-400 outline-none resize-none"
                     disabled={isSaving}
                   />
                 </div>
@@ -353,22 +353,22 @@ export const ReportActivityEvidenceModal: React.FC<ReportActivityEvidenceModalPr
 
               <div className="mt-6">
                 {sortedActivities.length === 0 ? (
-                  <div className="text-sm text-slate-500 py-8 text-center border border-dashed border-slate-200 rounded-2xl">
+                  <div className="text-sm text-slate-500 dark:text-slate-400 py-8 text-center border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl">
                     No activities yet.
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {sortedActivities.map((a) => (
-                      <div key={a.id} className="border border-slate-200 rounded-2xl p-4 bg-white">
+                      <div key={a.id} className="border border-slate-200 dark:border-slate-700 rounded-2xl p-4 bg-white dark:bg-slate-900">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="font-medium text-slate-900 truncate">{a.title}</p>
-                            <p className="text-xs text-slate-500 mt-0.5">{formatDateTime(a.occurredAt)}</p>
+                            <p className="font-medium text-slate-900 dark:text-slate-100 truncate">{a.title}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{formatDateTime(a.occurredAt)}</p>
                           </div>
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => handleEditActivity(a)}
-                              className="p-2 rounded-lg hover:bg-slate-50 text-slate-500"
+                              className="p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400"
                               title="Edit"
                               disabled={isSaving}
                             >
@@ -376,7 +376,7 @@ export const ReportActivityEvidenceModal: React.FC<ReportActivityEvidenceModalPr
                             </button>
                             <button
                               onClick={() => handleDeleteActivity(a.id)}
-                              className="p-2 rounded-lg hover:bg-red-50 text-red-600"
+                              className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-300"
                               title="Delete"
                               disabled={isSaving}
                             >
@@ -385,7 +385,7 @@ export const ReportActivityEvidenceModal: React.FC<ReportActivityEvidenceModalPr
                           </div>
                         </div>
                         {a.description ? (
-                          <p className="text-sm text-slate-700 whitespace-pre-wrap mt-3">{a.description}</p>
+                          <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap mt-3">{a.description}</p>
                         ) : null}
                       </div>
                     ))}
@@ -396,7 +396,7 @@ export const ReportActivityEvidenceModal: React.FC<ReportActivityEvidenceModalPr
 
             <div className="p-6 overflow-y-auto max-h-[78vh]">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-slate-900">Evidence</h3>
+                <h3 className="font-semibold text-slate-900 dark:text-slate-100">Evidence</h3>
                 <div className="flex items-center gap-2">
                   <input
                     ref={fileInputRef}
@@ -420,28 +420,28 @@ export const ReportActivityEvidenceModal: React.FC<ReportActivityEvidenceModalPr
                 </div>
               </div>
 
-              <p className="text-xs text-slate-500 mb-4">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
                 Allowed: images and PDF. The platform does not validate user-submitted evidence content.
               </p>
 
               {sortedEvidence.length === 0 ? (
-                <div className="text-sm text-slate-500 py-8 text-center border border-dashed border-slate-200 rounded-2xl">
+                <div className="text-sm text-slate-500 dark:text-slate-400 py-8 text-center border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl">
                   No evidence yet.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {sortedEvidence.map((ev) => (
-                    <div key={ev.id} className="border border-slate-200 rounded-2xl bg-white overflow-hidden">
+                    <div key={ev.id} className="border border-slate-200 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 overflow-hidden">
                       <div className="p-4 flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-slate-900 truncate">{ev.fileName}</p>
-                          <p className="text-xs text-slate-500 mt-0.5">
+                          <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">{ev.fileName}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                             {evidenceLabel(ev)} - {formatDateTime(ev.uploadedAt)}
                           </p>
                         </div>
                         <button
                           onClick={() => handleDeleteEvidence(ev.id)}
-                          className="p-2 rounded-lg hover:bg-red-50 text-red-600"
+                          className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-300"
                           title="Delete"
                           disabled={isSaving}
                         >
@@ -454,13 +454,13 @@ export const ReportActivityEvidenceModal: React.FC<ReportActivityEvidenceModalPr
                           <img
                             src={ev.url}
                             alt={ev.fileName}
-                            className="w-full h-44 object-cover bg-slate-50 border-t border-slate-100"
+                            className="w-full h-44 object-cover bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-800"
                             loading="lazy"
                           />
                         </a>
                       ) : (
-                        <div className="border-t border-slate-100 p-4 flex items-center justify-between gap-3 bg-slate-50">
-                          <div className="flex items-center gap-2 text-slate-600">
+                        <div className="border-t border-slate-100 dark:border-slate-800 p-4 flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800">
+                          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                             <FileText className="w-4 h-4" />
                             <span className="text-sm">Open file</span>
                           </div>
@@ -486,13 +486,13 @@ export const ReportActivityEvidenceModal: React.FC<ReportActivityEvidenceModalPr
           </div>
         )}
 
-        <div className="px-6 py-4 border-t border-slate-100 bg-white flex items-center justify-between">
-          <div className="text-xs text-slate-500">
+        <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between">
+          <div className="text-xs text-slate-500 dark:text-slate-400">
             {isSaving ? 'Saving...' : ''}
           </div>
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium"
+            className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium"
             disabled={isSaving}
           >
             Close

@@ -29,38 +29,38 @@ export interface ContestHubStory {
 
 // Swap these classes to re-theme the section without touching layout or content.
 export const contestHubStoryTheme = {
-  sectionGlow: 'from-primary-100/70 via-transparent to-emerald-100/70',
-  sectionBadge: 'border-primary-100 bg-white/90 text-primary-700',
-  sectionTitle: 'from-slate-900 via-slate-800 to-primary-700',
+  sectionGlow: 'from-primary-100/70 via-transparent to-emerald-100/70 dark:from-primary-900/30 dark:to-emerald-900/30',
+  sectionBadge: 'border-primary-100 bg-white/90 text-primary-700 dark:border-primary-800 dark:bg-slate-900/90 dark:text-primary-300',
+  sectionTitle: 'from-slate-900 via-slate-800 to-primary-700 dark:from-slate-100 dark:via-slate-200 dark:to-primary-300',
 };
 
 const storyTonePresets: Record<'gold' | 'teal' | 'mint', StoryTone> = {
   gold: {
-    badge: 'border-amber-200/70 bg-amber-50 text-amber-900',
+    badge: 'border-amber-200/70 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-200',
     bulletDot: 'bg-amber-400',
-    divider: 'border-amber-100/80',
-    imageBorder: 'border-amber-100/80',
-    imageGlow: 'from-amber-200/60 via-amber-100/10 to-primary-100/50',
-    promise: 'text-amber-900',
-    surfaceTint: 'from-amber-50/60 via-white to-white',
+    divider: 'border-amber-100/80 dark:border-amber-800/50',
+    imageBorder: 'border-amber-100/80 dark:border-amber-800/50',
+    imageGlow: 'from-amber-200/60 via-amber-100/10 to-primary-100/50 dark:from-amber-800/30 dark:via-amber-900/10 dark:to-primary-900/30',
+    promise: 'text-amber-900 dark:text-amber-200',
+    surfaceTint: 'from-amber-50/60 via-white to-white dark:from-amber-950/30 dark:via-slate-900 dark:to-slate-900',
   },
   teal: {
-    badge: 'border-primary-100 bg-primary-50 text-primary-800',
+    badge: 'border-primary-100 bg-primary-50 text-primary-800 dark:border-primary-800 dark:bg-primary-900/30 dark:text-primary-200',
     bulletDot: 'bg-primary-500',
-    divider: 'border-primary-100/80',
-    imageBorder: 'border-primary-100/80',
-    imageGlow: 'from-primary-200/60 via-primary-100/10 to-emerald-100/55',
-    promise: 'text-primary-800',
-    surfaceTint: 'from-primary-50/55 via-white to-white',
+    divider: 'border-primary-100/80 dark:border-primary-800/50',
+    imageBorder: 'border-primary-100/80 dark:border-primary-800/50',
+    imageGlow: 'from-primary-200/60 via-primary-100/10 to-emerald-100/55 dark:from-primary-800/30 dark:via-primary-900/10 dark:to-emerald-900/30',
+    promise: 'text-primary-800 dark:text-primary-200',
+    surfaceTint: 'from-primary-50/55 via-white to-white dark:from-primary-950/25 dark:via-slate-900 dark:to-slate-900',
   },
   mint: {
-    badge: 'border-emerald-100 bg-emerald-50 text-emerald-900',
+    badge: 'border-emerald-100 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200',
     bulletDot: 'bg-emerald-400',
-    divider: 'border-emerald-100/80',
-    imageBorder: 'border-emerald-100/80',
-    imageGlow: 'from-emerald-200/60 via-white to-primary-100/50',
-    promise: 'text-emerald-900',
-    surfaceTint: 'from-emerald-50/60 via-white to-white',
+    divider: 'border-emerald-100/80 dark:border-emerald-800/50',
+    imageBorder: 'border-emerald-100/80 dark:border-emerald-800/50',
+    imageGlow: 'from-emerald-200/60 via-white to-primary-100/50 dark:from-emerald-800/30 dark:via-slate-900 dark:to-primary-900/30',
+    promise: 'text-emerald-900 dark:text-emerald-200',
+    surfaceTint: 'from-emerald-50/60 via-white to-white dark:from-emerald-950/30 dark:via-slate-900 dark:to-slate-900',
   },
 };
 
@@ -293,8 +293,8 @@ const WhyContestHubNeedsToExist: React.FC = () => {
           contestHubStoryTheme.sectionGlow,
         )}
       />
-      <div className="pointer-events-none absolute left-8 top-24 h-40 w-40 rounded-full bg-primary-100/60 blur-3xl md:left-20" />
-      <div className="pointer-events-none absolute right-4 top-1/3 h-44 w-44 rounded-full bg-amber-100/60 blur-3xl md:right-16" />
+      <div className="pointer-events-none absolute left-8 top-24 h-40 w-40 rounded-full bg-primary-100/60 dark:bg-primary-900/30 blur-3xl md:left-20" />
+      <div className="pointer-events-none absolute right-4 top-1/3 h-44 w-44 rounded-full bg-amber-100/60 dark:bg-amber-900/30 blur-3xl md:right-16" />
 
       <div className="text-center" style={getRevealStyle(revealed, reduceMotion)}>
         <span
@@ -307,14 +307,14 @@ const WhyContestHubNeedsToExist: React.FC = () => {
         </span>
         <h2
           className={cn(
-            'mt-5 text-3xl font-black tracking-tight text-slate-900 md:text-5xl',
+            'mt-5 text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100 md:text-5xl',
             'bg-linear-to-r bg-clip-text text-transparent',
             contestHubStoryTheme.sectionTitle,
           )}
         >
           {isEnglish ? 'The real stories behind every competition.' : 'Những câu chuyện phía sau mỗi cuộc thi.'}
         </h2>
-        <p className="mx-auto mt-5 max-w-3xl text-base leading-8 text-slate-600 md:text-lg">
+        <p className="mx-auto mt-5 max-w-3xl text-base leading-8 text-slate-600 dark:text-slate-400 md:text-lg">
           {isEnglish
             ? 'Across Vietnam, ambitious students still navigate competitions through scattered information, informal networks, and achievements that live in too many places. ContestHub is being built to make that journey clearer, more connected, and more meaningful over time.'
             : 'Trên khắp Việt Nam, nhiều học sinh vẫn phải tìm đường đến các cuộc thi qua thông tin rời rạc, các mối quan hệ không chính thức và những thành quả bị cắt nhỏ ở quá nhiều nơi. ContestHub được xây dựng để làm cho hành trình đó rõ ràng hơn, liên kết hơn và có ý nghĩa hơn theo thời gian.'}
@@ -328,11 +328,11 @@ const WhyContestHubNeedsToExist: React.FC = () => {
           return (
             <article
               key={story.id}
-              className="group relative overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/90 shadow-[0_24px_80px_-40px_rgba(15,23,42,0.2)] ring-1 ring-white/70 backdrop-blur-sm transition-transform duration-500 hover:-translate-y-1 hover:shadow-[0_28px_90px_-36px_rgba(15,23,42,0.24)]"
+              className="group relative overflow-hidden rounded-[2rem] border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-900/90 shadow-[0_24px_80px_-40px_rgba(15,23,42,0.2)] ring-1 ring-white/70 dark:ring-slate-800/70 backdrop-blur-sm transition-transform duration-500 hover:-translate-y-1 hover:shadow-[0_28px_90px_-36px_rgba(15,23,42,0.24)]"
               style={getRevealStyle(revealed, reduceMotion, 140 + index * 120)}
             >
               <div className={cn('absolute inset-0 bg-linear-to-br opacity-80', story.tone.surfaceTint)} />
-              <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-slate-200/90 to-transparent" />
+              <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-slate-200/90 dark:via-slate-700/90 to-transparent" />
 
               <div className="relative grid gap-8 px-6 py-6 md:gap-10 md:px-8 md:py-8 lg:grid-cols-[1.1fr_0.9fr] lg:px-10 lg:py-10">
                 <div className={cn('order-1 flex flex-col justify-center', reverseOnDesktop ? 'lg:order-2' : 'lg:order-1')}>
@@ -345,18 +345,18 @@ const WhyContestHubNeedsToExist: React.FC = () => {
                     </span>
                   </div>
 
-                  <h3 className="mt-5 text-2xl font-black leading-tight tracking-tight text-slate-900 md:text-[2rem]">
+                  <h3 className="mt-5 text-2xl font-black leading-tight tracking-tight text-slate-900 dark:text-slate-100 md:text-[2rem]">
                     <span className="block">{story.titleLines[0]}</span>
-                    <span className="block text-slate-700">{story.titleLines[1]}</span>
+                    <span className="block text-slate-700 dark:text-slate-300">{story.titleLines[1]}</span>
                   </h3>
 
-                  <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
+                  <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600 dark:text-slate-400">
                     {story.description}
                   </p>
 
                   <ul className="mt-6 space-y-3">
                     {story.bullets.map((point) => (
-                      <li key={point} className="flex items-start gap-3 text-sm leading-7 text-slate-600 md:text-[0.95rem]">
+                      <li key={point} className="flex items-start gap-3 text-sm leading-7 text-slate-600 dark:text-slate-400 md:text-[0.95rem]">
                         <span className={cn('mt-2.5 h-2.5 w-2.5 shrink-0 rounded-full', story.tone.bulletDot)} />
                         <span>{point}</span>
                       </li>
@@ -373,7 +373,7 @@ const WhyContestHubNeedsToExist: React.FC = () => {
                 <div className={cn('order-2 flex items-center', reverseOnDesktop ? 'lg:order-1' : 'lg:order-2')}>
                   <div className="relative w-full">
                     <div className={cn('pointer-events-none absolute inset-4 rounded-[2rem] bg-linear-to-br opacity-90 blur-2xl transition-opacity duration-500 group-hover:opacity-100', story.tone.imageGlow)} />
-                    <div className={cn('relative overflow-hidden rounded-[1.75rem] border bg-slate-100 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.35)]', story.tone.imageBorder)}>
+                    <div className={cn('relative overflow-hidden rounded-[1.75rem] border bg-slate-100 dark:bg-slate-800 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.35)]', story.tone.imageBorder)}>
                       <OptimizedImage
                         src={story.image}
                         alt={story.imageAlt}
@@ -382,8 +382,8 @@ const WhyContestHubNeedsToExist: React.FC = () => {
                         lazy={true}
                       />
                       <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-slate-950/18 via-transparent to-white/15" />
-                      <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/50 bg-white/78 px-4 py-3 shadow-lg shadow-slate-900/5 backdrop-blur">
-                        <p className="text-sm font-medium leading-6 text-slate-700">
+                      <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/50 dark:border-slate-700/50 bg-white/78 dark:bg-slate-900/78 px-4 py-3 shadow-lg shadow-slate-900/5 backdrop-blur">
+                        <p className="text-sm font-medium leading-6 text-slate-700 dark:text-slate-300">
                           {story.imageCaption}
                         </p>
                       </div>

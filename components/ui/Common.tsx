@@ -22,8 +22,8 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variants = {
     primary: "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-sm",
-    secondary: "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 focus:ring-slate-200 shadow-sm",
-    ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+    secondary: "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 focus:ring-slate-200 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-slate-600",
+    ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100",
     danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
   };
 
@@ -45,18 +45,18 @@ export const Button: React.FC<ButtonProps> = ({
 
 // Card
 export const Card: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, children, ...props }) => (
-  <div className={cn("bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden", className)} {...props}>
+  <div className={cn("bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden dark:bg-slate-900 dark:border-slate-800", className)} {...props}>
     {children}
   </div>
 );
 
 // Badge/Chip
 export const Badge: React.FC<{ status?: string; children: React.ReactNode; className?: string }> = ({ status, children, className }) => {
-  let variantStyles = "bg-slate-100 text-slate-700";
+  let variantStyles = "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300";
 
-  if (status === 'OPEN') variantStyles = "bg-emerald-50 text-emerald-700 border border-emerald-100";
-  if (status === 'FULL') variantStyles = "bg-amber-50 text-amber-700 border border-amber-100";
-  if (status === 'CLOSED') variantStyles = "bg-slate-100 text-slate-500 border border-slate-200";
+  if (status === 'OPEN') variantStyles = "bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800";
+  if (status === 'FULL') variantStyles = "bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800";
+  if (status === 'CLOSED') variantStyles = "bg-slate-100 text-slate-500 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700";
 
   return (
     <span className={cn("inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium", variantStyles, className)}>
@@ -73,10 +73,10 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const Input: React.FC<InputProps> = ({ label, error, className, ...props }) => (
   <div className="w-full">
-    {label && <label className="block text-sm font-medium text-slate-700 mb-1.5">{label}</label>}
+    {label && <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{label}</label>}
     <input
       className={cn(
-        "flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 transition-all",
+        "flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 transition-all dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500",
         error && "border-red-500 focus:ring-red-500",
         className
       )}
@@ -94,10 +94,10 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 
 export const Select: React.FC<SelectProps> = ({ label, error, className, children, ...props }) => (
   <div className="w-full">
-    {label && <label className="block text-sm font-medium text-slate-700 mb-1.5">{label}</label>}
+    {label && <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{label}</label>}
     <select
       className={cn(
-        "flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 transition-all appearance-none cursor-pointer",
+        "flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50 transition-all appearance-none cursor-pointer dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100",
         "bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg%20xmlns%3d%22http%3a%2f%2fwww.w3.org%2f2000%2fsvg%22%20width%3d%2224%22%20height%3d%2224%22%20viewBox%3d%220%200%2024%2024%22%20fill%3d%22none%22%20stroke%3d%22%2364748b%22%20stroke-width%3d%222%22%20stroke-linecap%3d%22round%22%20stroke-linejoin%3d%22round%22%3e%3cpolyline%20points%3d%226%209%2012%2015%2018%209%22%3e%3c%2fpolyline%3e%3c%2fsvg%3e')] bg-size-[20px] bg-position-[right_8px_center] bg-no-repeat pr-10",
         error && "border-red-500 focus:ring-red-500",
         className
@@ -158,17 +158,17 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   return (
     <div className={cn("w-full", className)}>
-      {label && <label className="block text-sm font-medium text-slate-700 mb-2">{label}</label>}
+      {label && <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{label}</label>}
       <div ref={dropdownRef} className="relative">
         <button
           type="button"
           onClick={() => !disabled && setIsOpen(!isOpen)}
           disabled={disabled}
           className={cn(
-            "w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-left transition-all outline-none flex items-center justify-between gap-2",
-            "hover:bg-white hover:border-slate-300",
-            "focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500",
-            isOpen && "bg-white ring-2 ring-primary-500 border-primary-500",
+            "w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-left transition-all outline-none flex items-center justify-between gap-2 dark:bg-slate-800 dark:border-slate-700",
+            "hover:bg-white hover:border-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-600",
+            "focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:bg-slate-800",
+            isOpen && "bg-white ring-2 ring-primary-500 border-primary-500 dark:bg-slate-800",
             disabled && "opacity-50 cursor-not-allowed",
             error && "border-red-500 focus:ring-red-500",
             !disabled && "cursor-pointer"
@@ -176,7 +176,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         >
           <span className={cn(
             "truncate",
-            selectedOption ? "text-slate-900" : "text-slate-400"
+            selectedOption ? "text-slate-900 dark:text-slate-100" : "text-slate-400 dark:text-slate-500"
           )}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
@@ -187,9 +187,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
         </button>
 
         {isOpen && !disabled && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-slate-200 shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-slate-200 shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 dark:bg-slate-900 dark:border-slate-700">
             {headerText && (
-              <div className="p-2 border-b border-slate-100">
+              <div className="p-2 border-b border-slate-100 dark:border-slate-800">
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-2">{headerText}</p>
               </div>
             )}
@@ -207,8 +207,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
                     className={cn(
                       "w-full px-3 py-2.5 rounded-lg text-sm text-left transition-all flex items-center justify-between group",
                       isSelected
-                        ? "bg-primary-50 text-primary-700 font-medium"
-                        : "text-slate-600 hover:bg-slate-50"
+                        ? "bg-primary-50 text-primary-700 font-medium dark:bg-primary-900/30 dark:text-primary-300"
+                        : "text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
                     )}
                   >
                     <div className="flex items-center gap-2">
@@ -235,24 +235,24 @@ export const Dropdown: React.FC<DropdownProps> = ({
 type TabItem = string | { value: string; label: string };
 
 export const Tabs: React.FC<{ tabs: TabItem[]; activeTab: string; onChange: (tab: string) => void }> = ({ tabs, activeTab, onChange }) => (
-  <div className="border-b border-slate-200 mb-6">
+  <div className="border-b border-slate-200 dark:border-slate-700 mb-6">
     <nav className="-mb-px flex space-x-8 overflow-x-auto no-scrollbar" aria-label="Tabs">
       {tabs.map((tab) => {
         const value = typeof tab === 'string' ? tab : tab.value;
         const label = typeof tab === 'string' ? tab : tab.label;
         return (
-        <button
-          key={value}
-          onClick={() => onChange(value)}
-          className={cn(
-            "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors",
-            activeTab === value
-              ? "border-primary-600 text-primary-600"
-              : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700"
-          )}
-        >
-          {label}
-        </button>
+          <button
+            key={value}
+            onClick={() => onChange(value)}
+            className={cn(
+              "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors",
+              activeTab === value
+                ? "border-primary-600 text-primary-600"
+                : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200"
+            )}
+          >
+            {label}
+          </button>
         );
       })}
     </nav>
@@ -262,9 +262,9 @@ export const Tabs: React.FC<{ tabs: TabItem[]; activeTab: string; onChange: (tab
 // Skeleton Card (using Skeleton from below)
 export const SkeletonCard: React.FC<{ lines?: number }> = ({ lines = 3 }) => (
   <Card className="p-4 space-y-3">
-    <div className="animate-pulse bg-slate-200 rounded h-4 w-3/4" />
+    <div className="animate-pulse bg-slate-200 dark:bg-slate-700 rounded h-4 w-3/4" />
     {Array.from({ length: lines - 1 }).map((_, i) => (
-      <div key={i} className="animate-pulse bg-slate-200 rounded h-3 w-full" />
+      <div key={i} className="animate-pulse bg-slate-200 dark:bg-slate-700 rounded h-3 w-full" />
     ))}
   </Card>
 );
@@ -291,7 +291,7 @@ export const Avatar: React.FC<AvatarProps> = ({ src, name = 'User', size = 'md',
     <img
       src={src || fallbackUrl}
       alt={`Avatar of ${name}`}
-      className={cn('rounded-full object-cover border border-slate-200', sizes[size], className)}
+      className={cn('rounded-full object-cover border border-slate-200 dark:border-slate-700', sizes[size], className)}
       onError={(e) => {
         (e.target as HTMLImageElement).src = fallbackUrl;
       }}
@@ -309,9 +309,9 @@ interface EmptyStateProps {
 
 export const EmptyState: React.FC<EmptyStateProps> = ({ icon, title, description, action }) => (
   <div className="text-center py-12">
-    {icon && <div className="mx-auto mb-4 text-slate-300">{icon}</div>}
-    <h3 className="text-lg font-medium text-slate-900 mb-2">{title}</h3>
-    {description && <p className="text-slate-500 mb-4">{description}</p>}
+    {icon && <div className="mx-auto mb-4 text-slate-300 dark:text-slate-600">{icon}</div>}
+    <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">{title}</h3>
+    {description && <p className="text-slate-500 dark:text-slate-400 mb-4">{description}</p>}
     {action}
   </div>
 );
@@ -335,7 +335,7 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, children, position = 
     <div className="relative group inline-block">
       {children}
       <div className={cn(
-        'absolute z-50 px-2 py-1 text-xs text-white bg-slate-900 rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all',
+        'absolute z-50 px-2 py-1 text-xs text-white bg-slate-900 rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all dark:bg-slate-200 dark:text-slate-900',
         positions[position]
       )}>
         {content}
@@ -365,9 +365,9 @@ export const Progress: React.FC<ProgressProps> = ({ value, max = 100, color = 'p
   return (
     <div className="w-full">
       <div className="flex justify-between mb-1">
-        {showLabel && <span className="text-sm text-slate-700">{Math.round(percentage)}%</span>}
+        {showLabel && <span className="text-sm text-slate-700 dark:text-slate-300">{Math.round(percentage)}%</span>}
       </div>
-      <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+      <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
         <div
           className={cn('h-full rounded-full transition-all duration-300', colors[color], `w-[${Math.min(100, Math.max(0, percentage))}%]`)}
         />
@@ -418,10 +418,10 @@ const ToastItem: React.FC<ToastItemProps> = ({ id, type, message, duration = 400
   };
 
   const styles = {
-    success: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    error: 'bg-red-50 text-red-800 border-red-200',
-    warning: 'bg-amber-50 text-amber-800 border-amber-200',
-    info: 'bg-blue-50 text-blue-800 border-blue-200',
+    success: 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800',
+    error: 'bg-red-50 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800',
+    warning: 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-800',
+    info: 'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-800',
   };
 
   const iconStyles = {
@@ -504,7 +504,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   width,
   height
 }) => {
-  const baseStyles = 'animate-pulse bg-slate-200';
+  const baseStyles = 'animate-pulse bg-slate-200 dark:bg-slate-700';
 
   const variants = {
     text: 'rounded h-4',
@@ -522,7 +522,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 
 // Report Card Skeleton
 export const ReportCardSkeleton: React.FC = () => (
-  <tr className="border-b border-slate-100">
+  <tr className="border-b border-slate-100 dark:border-slate-800">
     <td className="px-6 py-4">
       <div className="flex items-center gap-3">
         <Skeleton variant="rectangular" className="w-8 h-8" />

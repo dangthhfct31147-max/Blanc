@@ -329,7 +329,7 @@ time node -e "require('dotenv').config(); ..."
 
 4. **MUST set FRONTEND_ORIGIN without localhost**
    ```env
-   FRONTEND_ORIGIN=https://blanc.up.railway.app
+   FRONTEND_ORIGIN=https://contesthub.up.railway.app
    ```
 
 ---

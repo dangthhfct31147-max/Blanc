@@ -31,8 +31,8 @@ const Settings: React.FC = () => {
 
   // Settings State - loaded from settingsService
   const [settings, setSettings] = useState({
-    siteName: 'Blanc',
-    supportEmail: 'support@blanc.edu.vn',
+    siteName: 'ContestHub',
+    supportEmail: 'support@contesthub.edu.vn',
     maintenanceMode: false,
     emailNotifs: true,
     pushNotifs: false,
@@ -196,7 +196,7 @@ const Settings: React.FC = () => {
 
   const handleUseAnnouncement = () => {
     if (generatedAnnouncement) {
-      setBroadcastSubject(announceTopic || 'Thông báo từ Blanc');
+      setBroadcastSubject(announceTopic || 'Thông báo từ ContestHub');
       setBroadcastContent(generatedAnnouncement);
       setActiveTab('notifications');
     }
@@ -246,9 +246,8 @@ const Settings: React.FC = () => {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className={`flex items-center gap-2 rounded-lg px-6 py-2 font-medium text-white shadow-sm transition-all ${
-            isSaved ? 'bg-green-600' : isSaving ? 'bg-emerald-400' : 'bg-emerald-600 hover:bg-emerald-700'
-          } disabled:cursor-not-allowed`}
+          className={`flex items-center gap-2 rounded-lg px-6 py-2 font-medium text-white shadow-sm transition-all ${isSaved ? 'bg-green-600' : isSaving ? 'bg-emerald-400' : 'bg-emerald-600 hover:bg-emerald-700'
+            } disabled:cursor-not-allowed`}
         >
           {isSaving ? <Loader2 size={18} className="animate-spin" /> : isSaved ? <Check size={18} /> : <Save size={18} />}
           {isSaving ? 'Đang lưu...' : isSaved ? 'Đã lưu!' : 'Lưu thay đổi'}
@@ -266,11 +265,10 @@ const Settings: React.FC = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex items-center gap-3 border-l-4 px-4 py-3 text-sm font-medium transition-colors ${
-                      activeTab === tab.id
+                    className={`flex items-center gap-3 border-l-4 px-4 py-3 text-sm font-medium transition-colors ${activeTab === tab.id
                         ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
                         : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
+                      }`}
                   >
                     <Icon size={18} />
                     {tab.label}
@@ -531,9 +529,8 @@ const Settings: React.FC = () => {
                     <button
                       onClick={handleGenerateAI}
                       disabled={!announceTopic || isGenerating}
-                      className={`flex w-full items-center justify-center gap-2 rounded-lg py-2.5 font-medium text-white transition-all ${
-                        !announceTopic || isGenerating ? 'cursor-not-allowed bg-emerald-300' : 'bg-emerald-600 shadow-md hover:bg-emerald-700'
-                      }`}
+                      className={`flex w-full items-center justify-center gap-2 rounded-lg py-2.5 font-medium text-white transition-all ${!announceTopic || isGenerating ? 'cursor-not-allowed bg-emerald-300' : 'bg-emerald-600 shadow-md hover:bg-emerald-700'
+                        }`}
                     >
                       {isGenerating ? (
                         <>

@@ -154,7 +154,7 @@ const UserProfile: React.FC = () => {
     if (!profile) {
         return (
             <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-                <p className="text-slate-500">{t('userProfile.notFound')}</p>
+                <p className="text-slate-500 dark:text-slate-400">{t('userProfile.notFound')}</p>
                 <Button onClick={() => navigate(-1)}>
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     {t('common.back')}
@@ -173,11 +173,11 @@ const UserProfile: React.FC = () => {
                 </Button>
 
                 <Card className="p-8 text-center">
-                    <div className="w-24 h-24 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center">
+                    <div className="w-24 h-24 mx-auto mb-4 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
                         <Lock className="w-10 h-10 text-slate-400" />
                     </div>
-                    <h2 className="text-xl font-bold text-slate-900 mb-2">{profile.name}</h2>
-                    <p className="text-slate-500">{profile.message}</p>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">{profile.name}</h2>
+                    <p className="text-slate-500 dark:text-slate-400">{profile.message}</p>
                 </Card>
             </div>
         );
@@ -200,7 +200,7 @@ const UserProfile: React.FC = () => {
                             <img
                                 src={profile.avatar}
                                 alt={profile.name}
-                                className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg"
+                                className="w-28 h-28 rounded-full object-cover border-4 border-white dark:border-slate-900 shadow-lg"
                             />
                         ) : (
                             <div className="w-28 h-28 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
@@ -213,7 +213,7 @@ const UserProfile: React.FC = () => {
                     <div className="flex-1">
                         <div className="flex items-start justify-between">
                             <div>
-                                <h1 className="text-2xl font-bold text-slate-900">{profile.name}</h1>
+                                <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{profile.name}</h1>
                                 {profile.matchingProfile?.primaryRole && (
                                     <p className="text-primary-600 font-medium mt-1">
                                         {profile.matchingProfile.primaryRole}
@@ -246,31 +246,31 @@ const UserProfile: React.FC = () => {
 
                         {/* Bio */}
                         {profile.bio && (
-                            <p className="text-slate-600 mt-3">{profile.bio}</p>
+                            <p className="text-slate-600 dark:text-slate-400 mt-3">{profile.bio}</p>
                         )}
 
                         {/* Tags */}
                         <div className="flex flex-wrap gap-2 mt-4">
                             {profile.matchingProfile?.location && (
-                                <span className="inline-flex items-center gap-1 text-sm text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
+                                <span className="inline-flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
                                     <MapPin className="w-3.5 h-3.5" />
                                     {profile.matchingProfile.location}
                                 </span>
                             )}
                             {profile.matchingProfile?.experienceLevel && (
-                                <span className="inline-flex items-center gap-1 text-sm text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
+                                <span className="inline-flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
                                     <Briefcase className="w-3.5 h-3.5" />
                                     {getExperienceLevelLabel(profile.matchingProfile.experienceLevel)}
                                 </span>
                             )}
                             {profile.matchingProfile?.openToNewTeams && (
-                                <span className="inline-flex items-center gap-1 text-sm text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
+                                <span className="inline-flex items-center gap-1 text-sm text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1 rounded-full">
                                     <Users className="w-3.5 h-3.5" />
                                     {t('userProfile.openToTeams')}
                                 </span>
                             )}
                             {profile.matchingProfile?.openToMentor && (
-                                <span className="inline-flex items-center gap-1 text-sm text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
+                                <span className="inline-flex items-center gap-1 text-sm text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-3 py-1 rounded-full">
                                     <Star className="w-3.5 h-3.5" />
                                     {t('userProfile.openToMentor')}
                                 </span>
@@ -292,11 +292,11 @@ const UserProfile: React.FC = () => {
                     {/* Radar Chart */}
                     {profile.matchingProfile?.radarSkills && (
                         <Card className="p-6">
-                            <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
                                 <Target className="w-5 h-5 text-primary-600" />
                                 {locale === 'en' ? 'Core Skills Profiling' : 'Biểu đồ Kỹ năng cốt lõi'}
                             </h3>
-                            <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 flex justify-center">
+                            <div className="bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 rounded-xl p-4 flex justify-center">
                                 <RadarChart data={profile.matchingProfile.radarSkills} size="md" color="#4f46e5" />
                             </div>
                         </Card>
@@ -305,17 +305,17 @@ const UserProfile: React.FC = () => {
                     {/* Skills & Tech Stack */}
                     {profile.matchingProfile && (profile.matchingProfile.skills.length > 0 || profile.matchingProfile.techStack.length > 0) && (
                         <Card className="p-6">
-                            <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
                                 <Code className="w-5 h-5 text-primary-600" />
                                 {t('userProfile.skillsAndTech')}
                             </h3>
 
                             {profile.matchingProfile.skills.length > 0 && (
                                 <div className="mb-4">
-                                    <p className="text-sm font-medium text-slate-500 mb-2">{t('userProfile.skills')}</p>
+                                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">{t('userProfile.skills')}</p>
                                     <div className="flex flex-wrap gap-2">
                                         {profile.matchingProfile.skills.map((skill, i) => (
-                                            <span key={i} className="px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-sm">
+                                            <span key={i} className="px-3 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-sm">
                                                 {skill}
                                             </span>
                                         ))}
@@ -325,10 +325,10 @@ const UserProfile: React.FC = () => {
 
                             {profile.matchingProfile.techStack.length > 0 && (
                                 <div>
-                                    <p className="text-sm font-medium text-slate-500 mb-2">{t('userProfile.techStack')}</p>
+                                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">{t('userProfile.techStack')}</p>
                                     <div className="flex flex-wrap gap-2">
                                         {profile.matchingProfile.techStack.map((tech, i) => (
-                                            <span key={i} className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">
+                                            <span key={i} className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full text-sm">
                                                 {tech}
                                             </span>
                                         ))}
@@ -338,10 +338,10 @@ const UserProfile: React.FC = () => {
 
                             {profile.matchingProfile.languages.length > 0 && (
                                 <div className="mt-4">
-                                    <p className="text-sm font-medium text-slate-500 mb-2">{t('userProfile.languages')}</p>
+                                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">{t('userProfile.languages')}</p>
                                     <div className="flex flex-wrap gap-2">
                                         {profile.matchingProfile.languages.map((lang, i) => (
-                                            <span key={i} className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm">
+                                            <span key={i} className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm">
                                                 <Globe className="w-3.5 h-3.5" />
                                                 {lang}
                                             </span>
@@ -355,19 +355,19 @@ const UserProfile: React.FC = () => {
                     {/* Activities */}
                     {profile.activities && profile.activities.length > 0 && (
                         <Card className="p-6">
-                            <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
                                 <Trophy className="w-5 h-5 text-primary-600" />
                                 {t('userProfile.recentActivities')}
                             </h3>
                             <div className="space-y-3">
                                 {profile.activities.map((activity, i) => (
-                                    <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                                        <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+                                    <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                                        <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-800 flex items-center justify-center">
                                             <Trophy className="w-5 h-5 text-primary-600" />
                                         </div>
                                         <div className="flex-1">
-                                            <p className="font-medium text-slate-900">{activity.title}</p>
-                                            <p className="text-sm text-slate-500">
+                                            <p className="font-medium text-slate-900 dark:text-slate-100">{activity.title}</p>
+                                            <p className="text-sm text-slate-500 dark:text-slate-400">
                                                 <Clock className="w-3 h-3 inline mr-1" />
                                                 {formatDate(activity.date)}
                                             </p>
@@ -384,17 +384,17 @@ const UserProfile: React.FC = () => {
                     {/* Course Enrollments */}
                     {profile.enrollments && profile.enrollments.length > 0 && (
                         <Card className="p-6">
-                            <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
                                 <BookOpen className="w-5 h-5 text-primary-600" />
                                 {t('userProfile.courses')}
                             </h3>
                             <div className="space-y-3">
                                 {profile.enrollments.map((enrollment, i) => (
-                                    <div key={i} className="p-3 bg-slate-50 rounded-lg">
+                                    <div key={i} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                                         <div className="flex items-center justify-between mb-2">
-                                            <p className="font-medium text-slate-900">{enrollment.title}</p>
+                                            <p className="font-medium text-slate-900 dark:text-slate-100">{enrollment.title}</p>
                                             {enrollment.status === 'completed' ? (
-                                                <span className="inline-flex items-center gap-1 text-sm text-emerald-600">
+                                                <span className="inline-flex items-center gap-1 text-sm text-emerald-600 dark:text-emerald-300">
                                                     <CheckCircle className="w-4 h-4" />
                                                     {t('userProfile.completed')}
                                                 </span>
@@ -412,32 +412,32 @@ const UserProfile: React.FC = () => {
                     {/* Achievements */}
                     {profile.achievements && (
                         <Card className="p-6">
-                            <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
                                 <Award className="w-5 h-5 text-primary-600" />
                                 {t('userProfile.achievements')}
                             </h3>
 
                             <div className="grid grid-cols-2 gap-4 mb-4">
-                                <div className="text-center p-3 bg-linear-to-br from-amber-50 to-orange-50 rounded-lg">
+                                <div className="text-center p-3 bg-linear-to-br from-amber-50 dark:from-amber-950/30 to-orange-50 dark:to-orange-950/30 rounded-lg">
                                     <Trophy className="w-6 h-6 mx-auto text-amber-500 mb-1" />
-                                    <p className="text-2xl font-bold text-slate-900">{profile.achievements.totalContests}</p>
-                                    <p className="text-xs text-slate-500">{t('userProfile.contests')}</p>
+                                    <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{profile.achievements.totalContests}</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">{t('userProfile.contests')}</p>
                                 </div>
-                                <div className="text-center p-3 bg-linear-to-br from-emerald-50 to-teal-50 rounded-lg">
+                                <div className="text-center p-3 bg-linear-to-br from-emerald-50 dark:from-emerald-950/30 to-teal-50 dark:to-teal-950/30 rounded-lg">
                                     <BookOpen className="w-6 h-6 mx-auto text-emerald-500 mb-1" />
-                                    <p className="text-2xl font-bold text-slate-900">{profile.achievements.completedCourses}</p>
-                                    <p className="text-xs text-slate-500">{t('userProfile.completedCourses')}</p>
+                                    <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{profile.achievements.completedCourses}</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">{t('userProfile.completedCourses')}</p>
                                 </div>
                             </div>
 
                             {profile.streak && (
-                                <div className="p-3 bg-linear-to-br from-orange-50 to-red-50 rounded-lg mb-4">
+                                <div className="p-3 bg-linear-to-br from-orange-50 dark:from-orange-950/30 to-red-50 dark:to-red-950/30 rounded-lg mb-4">
                                     <div className="flex items-center gap-3">
                                         <img src="/streak/flame-tight.gif" className="streak-motion w-8 h-8 object-contain mix-blend-screen" alt="" aria-hidden="true" />
                                         <img src="/streak/flame-tight.png" className="streak-reduce-motion w-8 h-8 object-contain mix-blend-screen" alt="" aria-hidden="true" />
                                         <div>
-                                            <p className="font-bold text-slate-900">{t('userProfile.streakDays', { count: profile.streak.longestStreak, label: dayLabel(profile.streak.longestStreak) })}</p>
-                                            <p className="text-xs text-slate-500">{t('userProfile.longestStreak')}</p>
+                                            <p className="font-bold text-slate-900 dark:text-slate-100">{t('userProfile.streakDays', { count: profile.streak.longestStreak, label: dayLabel(profile.streak.longestStreak) })}</p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">{t('userProfile.longestStreak')}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -445,14 +445,14 @@ const UserProfile: React.FC = () => {
 
                             {profile.achievements.contestAchievements && (
                                 <div className="mt-4">
-                                    <p className="text-sm font-medium text-slate-500 mb-2">{t('userProfile.highlightAchievements')}</p>
-                                    <p className="text-sm text-slate-700">{profile.achievements.contestAchievements}</p>
+                                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">{t('userProfile.highlightAchievements')}</p>
+                                    <p className="text-sm text-slate-700 dark:text-slate-300">{profile.achievements.contestAchievements}</p>
                                 </div>
                             )}
 
                             {profile.achievements.portfolioLinks.length > 0 && (
                                 <div className="mt-4">
-                                    <p className="text-sm font-medium text-slate-500 mb-2">Portfolio</p>
+                                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Portfolio</p>
                                     <div className="space-y-2">
                                         {profile.achievements.portfolioLinks.map((link, i) => (
                                             <a
@@ -475,26 +475,26 @@ const UserProfile: React.FC = () => {
                     {/* Contest Interests */}
                     {profile.contestPreferences && profile.contestPreferences.contestInterests.length > 0 && (
                         <Card className="p-6">
-                            <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
                                 <Trophy className="w-5 h-5 text-primary-600" />
                                 {t('userProfile.interests')}
                             </h3>
                             <div className="flex flex-wrap gap-2">
                                 {profile.contestPreferences.contestInterests.map((interest, i) => (
-                                    <span key={i} className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-sm">
+                                    <span key={i} className="px-3 py-1 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-full text-sm">
                                         {interest}
                                     </span>
                                 ))}
                             </div>
 
                             {profile.contestPreferences.preferredTeamRole && (
-                                <div className="mt-4 pt-4 border-t border-slate-100">
-                                    <p className="text-sm text-slate-500">
+                                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">
                                         <Users className="w-4 h-4 inline mr-1" />
-                                        {t('userProfile.preferredRole')}: <span className="text-slate-900">{profile.contestPreferences.preferredTeamRole}</span>
+                                        {t('userProfile.preferredRole')}: <span className="text-slate-900 dark:text-slate-100">{profile.contestPreferences.preferredTeamRole}</span>
                                     </p>
                                     {profile.contestPreferences.preferredTeamSize && (
-                                        <p className="text-sm text-slate-500 mt-1">
+                                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                                             {t('userProfile.teamSize', { size: profile.contestPreferences.preferredTeamSize })}
                                         </p>
                                     )}
@@ -506,13 +506,13 @@ const UserProfile: React.FC = () => {
                     {/* Secondary Roles */}
                     {profile.matchingProfile && profile.matchingProfile.secondaryRoles.length > 0 && (
                         <Card className="p-6">
-                            <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
                                 <Briefcase className="w-5 h-5 text-primary-600" />
                                 {t('userProfile.secondaryRoles')}
                             </h3>
                             <div className="flex flex-wrap gap-2">
                                 {profile.matchingProfile.secondaryRoles.map((role, i) => (
-                                    <span key={i} className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">
+                                    <span key={i} className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full text-sm">
                                         {role}
                                     </span>
                                 ))}

@@ -134,14 +134,14 @@ const RatingBar: React.FC<RatingBarProps> = ({ stars, count, total }) => {
 
     return (
         <div className="flex items-center gap-2 text-sm">
-            <span className="w-8 text-slate-600">{stars}★</span>
-            <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+            <span className="w-8 text-slate-600 dark:text-slate-400">{stars}★</span>
+            <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                 <div
                     className="h-full bg-amber-400 rounded-full transition-all duration-300"
                     style={{ width: `${percentage}%` }}
                 />
             </div>
-            <span className="w-8 text-right text-slate-500">{count}</span>
+            <span className="w-8 text-right text-slate-500 dark:text-slate-400">{count}</span>
         </div>
     );
 };
@@ -187,7 +187,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
     };
 
     return (
-        <div className="bg-white border border-slate-100 rounded-lg p-4 hover:shadow-sm transition-shadow">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-lg p-4 hover:shadow-sm transition-shadow">
             <div className="flex items-start gap-3">
                 {/* Avatar */}
                 <div className="shrink-0">
@@ -208,9 +208,9 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
-                            <span className="font-medium text-slate-900">{review.userName}</span>
+                            <span className="font-medium text-slate-900 dark:text-slate-100">{review.userName}</span>
                             {review.isVerified && (
-                                <span className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-1.5 py-0.5 rounded">
+                                <span className="flex items-center gap-1 text-xs text-green-600 bg-green-50 dark:bg-green-900/30 px-1.5 py-0.5 rounded">
                                     <Shield className="w-3 h-3" />
                                     {isEn ? 'Verified' : 'Đã xác minh'}
                                 </span>
@@ -225,7 +225,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                     </div>
 
                     {/* Comment */}
-                    <p className="text-slate-600 text-sm whitespace-pre-wrap">
+                    <p className="text-slate-600 dark:text-slate-400 text-sm whitespace-pre-wrap">
                         {displayComment}
                         {isLongComment && !isExpanded && '...'}
                     </p>
@@ -253,7 +253,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                     <div className="flex items-center gap-4 mt-3">
                         <button
                             onClick={() => onHelpful?.(review.id)}
-                            className="flex items-center gap-1 text-xs text-slate-500 hover:text-primary-600 transition-colors"
+                            className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 hover:text-primary-600 transition-colors"
                         >
                             <ThumbsUp className="w-3.5 h-3.5" />
                             {isEn ? 'Helpful' : 'Hữu ích'} ({review.helpfulCount})
@@ -326,14 +326,14 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
     };
 
     return (
-        <form onSubmit={handleSubmit} className="bg-slate-50 rounded-lg p-4 border border-slate-100">
-            <h4 className="font-medium text-slate-900 mb-3">
+        <form onSubmit={handleSubmit} className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-100 dark:border-slate-800">
+            <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-3">
                 {isEn ? `Review this ${targetLabels[targetType]}` : `Đánh giá ${targetLabels[targetType]} này`}
             </h4>
 
             {/* Star Rating */}
             <div className="mb-4">
-                <label className="block text-sm text-slate-600 mb-2">{isEn ? 'Your rating' : 'Đánh giá của bạn'}</label>
+                <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2">{isEn ? 'Your rating' : 'Đánh giá của bạn'}</label>
                 <StarRating
                     rating={rating}
                     size="lg"
@@ -341,7 +341,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                     onChange={setRating}
                 />
                 {rating > 0 && (
-                    <span className="text-sm text-slate-500 ml-2">
+                    <span className="text-sm text-slate-500 dark:text-slate-400 ml-2">
                         {getRatingText(rating, isEn)}
                     </span>
                 )}
@@ -349,7 +349,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
 
             {/* Comment */}
             <div className="mb-4">
-                <label className="block text-sm text-slate-600 mb-2">
+                <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2">
                     {isEn ? 'Your review' : 'Nhận xét của bạn'}
                 </label>
                 <textarea
@@ -358,7 +358,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                     placeholder={isEn ? 'Share your experience...' : 'Chia sẻ trải nghiệm của bạn...'}
                     rows={4}
                     maxLength={1000}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none"
+                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none dark:bg-slate-900 dark:text-slate-100"
                 />
                 <div className="flex justify-between text-xs text-slate-400 mt-1">
                     <span>{isEn ? 'Minimum 10 characters' : 'Tối thiểu 10 ký tự'}</span>
@@ -512,7 +512,7 @@ const Reviews: React.FC<ReviewsProps> = ({
             {/* Header */}
             {showTitle && (
                 <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                         <MessageCircle className="w-5 h-5" />
                         {isEn ? `Reviews ${targetTitle ? `"${targetTitle}"` : ''}` : `Đánh giá ${targetTitle ? `"${targetTitle}"` : ''}`}
                     </h3>
@@ -521,15 +521,15 @@ const Reviews: React.FC<ReviewsProps> = ({
 
             {/* Stats Summary */}
             {stats && stats.totalReviews > 0 && (
-                <div className="bg-white rounded-lg border border-slate-100 p-6">
+                <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-100 dark:border-slate-800 p-6">
                     <div className="flex flex-col md:flex-row gap-6">
                         {/* Average Rating */}
-                        <div className="text-center md:border-r md:pr-6 border-slate-100">
-                            <div className="text-4xl font-bold text-slate-900 mb-1">
+                        <div className="text-center md:border-r md:pr-6 border-slate-100 dark:border-slate-800">
+                            <div className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-1">
                                 {stats.averageRating.toFixed(1)}
                             </div>
                             <StarRating rating={Math.round(stats.averageRating)} size="md" />
-                            <div className="text-sm text-slate-500 mt-1">
+                            <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                                 {stats.totalReviews} {isEn ? 'reviews' : 'đánh giá'}
                             </div>
                         </div>
@@ -561,14 +561,14 @@ const Reviews: React.FC<ReviewsProps> = ({
 
             {/* Login prompt */}
             {authStatus === 'signed_out' && (
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-slate-600 text-sm text-center">
+                <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 text-slate-600 dark:text-slate-400 text-sm text-center">
                     <User className="w-8 h-8 mx-auto mb-2 text-slate-400" />
                     <p>{isEn ? <>Please <a href="/login" className="text-primary-600 font-medium hover:underline">sign in</a> to write a review.</> : <>Vui lòng <a href="/login" className="text-primary-600 font-medium hover:underline">đăng nhập</a> để viết đánh giá</>}</p>
                 </div>
             )}
 
             {authStatus === 'sync_error' && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-amber-900 text-sm text-center">
+                <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 text-amber-900 dark:text-amber-300 text-sm text-center">
                     <User className="w-8 h-8 mx-auto mb-2 text-amber-500" />
                     <p className="font-medium">{isEn ? 'Your account has not finished syncing yet.' : 'Tài khoản của bạn chưa đồng bộ xong'}</p>
                     <p className="mt-1">{syncError?.message || (isEn ? 'Please sync your account before submitting a review.' : 'Hãy đồng bộ lại tài khoản trước khi gửi đánh giá.')}</p>
@@ -576,7 +576,7 @@ const Reviews: React.FC<ReviewsProps> = ({
             )}
 
             {hasUserReviewed && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 text-sm">
+                <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg p-4 text-green-700 dark:text-green-300 text-sm">
                     ✓ {isEn ? `You have already reviewed this ${targetLabels[targetType]}.` : `Bạn đã đánh giá ${targetLabels[targetType]} này`}
                 </div>
             )}
@@ -606,8 +606,8 @@ const Reviews: React.FC<ReviewsProps> = ({
                     )}
                 </div>
             ) : (
-                <div className="text-center py-8 text-slate-500">
-                    <MessageCircle className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+                    <MessageCircle className="w-12 h-12 mx-auto mb-3 text-slate-300 dark:text-slate-600" />
                     <p>{isEn ? 'No reviews yet.' : 'Chưa có đánh giá nào'}</p>
                     {isLoggedIn && !hasUserReviewed && (
                         <p className="text-sm mt-1">{isEn ? 'Be the first to leave a review!' : 'Hãy là người đầu tiên đánh giá!'}</p>

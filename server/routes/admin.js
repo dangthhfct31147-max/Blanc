@@ -114,8 +114,8 @@ const SETTINGS_COLLECTION = 'platform_settings';
 const DEFAULT_SETTINGS = {
     _id: 'platform_config',
     general: {
-        siteName: 'Blanc',
-        supportEmail: 'support@blanc.com',
+        siteName: 'ContestHub',
+        supportEmail: 'support@contesthub.com',
         maintenanceMode: false,
         defaultLanguage: 'vi',
         timezone: 'Asia/Ho_Chi_Minh',
@@ -164,7 +164,7 @@ router.get('/status', async (_req, res, next) => {
 
         res.json({
             maintenanceMode: settings.general?.maintenanceMode || false,
-            siteName: settings.general?.siteName || 'Blanc',
+            siteName: settings.general?.siteName || 'ContestHub',
             sessionTimeout,
         });
     } catch (error) {
@@ -180,7 +180,7 @@ router.get('/status', async (_req, res, next) => {
         ) {
             return res.json({
                 maintenanceMode: false,
-                siteName: 'Blanc',
+                siteName: 'ContestHub',
                 sessionTimeout: 30,
             });
         }
@@ -623,7 +623,7 @@ async function updateUserStatusHandler(req, res, next) {
             if (emailEnabled && systemAlertsEnabled && targetEmail) {
                 if (status === 'banned' && previousStatus !== 'banned') {
                     const safeReason = formatPlaintextToHtml(update.bannedReason || 'Bị khóa bởi quản trị viên');
-                    const supportEmail = settings?.general?.supportEmail || 'support@blanc.com';
+                    const supportEmail = settings?.general?.supportEmail || 'support@contesthub.com';
 
                     void sendSystemNotification({
                         to: targetEmail,
@@ -641,7 +641,7 @@ async function updateUserStatusHandler(req, res, next) {
                 }
 
                 if (status === 'active' && previousStatus === 'banned') {
-                    const supportEmail = settings?.general?.supportEmail || 'support@blanc.com';
+                    const supportEmail = settings?.general?.supportEmail || 'support@contesthub.com';
 
                     void sendSystemNotification({
                         to: targetEmail,
@@ -1343,9 +1343,9 @@ router.post('/email/test', authGuard, requireAdmin, async (req, res, next) => {
 
         await sendSystemNotification({
             to: email,
-            title: 'Test Email từ Blanc Admin',
+            title: 'Test Email từ ContestHub Admin',
             message: `
-                <p>Đây là email thử nghiệm từ hệ thống quản trị Blanc.</p>
+                <p>Đây là email thử nghiệm từ hệ thống quản trị ContestHub.</p>
                 <p>Nếu bạn nhận được email này, nghĩa là hệ thống email đang hoạt động bình thường.</p>
                 <p><strong>Thời gian gửi:</strong> ${new Date().toLocaleString('vi-VN')}</p>
             `,
@@ -1666,7 +1666,7 @@ router.post('/ai/gemini/system-announcement', authGuard, requireAdmin, async (re
             return res.status(400).json({ error: 'topic and audience are required' });
         }
 
-        const prompt = `Write a professional system announcement for a university platform named "Blanc".
+        const prompt = `Write a professional system announcement for a university platform named "ContestHub".
 Topic: "${topic}".
 Target Audience: "${audience}".
 Tone: Clear, polite, and informative.

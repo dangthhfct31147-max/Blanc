@@ -142,33 +142,33 @@ const Marketplace: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Intro hero section */}
-      <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-sky-100/60 mb-10">
-        <div className="absolute inset-0 bg-linear-to-br from-sky-50 via-white to-emerald-50 opacity-90" aria-hidden="true" />
+      <section className="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl shadow-sky-100/60 mb-10">
+        <div className="absolute inset-0 bg-linear-to-br from-sky-50 dark:from-sky-950/30 via-white dark:via-slate-950 to-emerald-50 dark:to-emerald-950/30 opacity-90" aria-hidden="true" />
         <div className="absolute -top-24 right-8 h-48 w-48 rounded-full bg-sky-200/40 blur-3xl" aria-hidden="true" />
         <div className="absolute -bottom-28 left-6 h-56 w-56 rounded-full bg-emerald-200/40 blur-3xl" aria-hidden="true" />
         <div className="relative p-6 md:p-8 lg:p-10">
           <div className="grid grid-cols-1 lg:grid-cols-[1.35fr_1fr] gap-8 items-center">
             <div className="space-y-4 animate-fade-in-up">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-white/70 text-xs font-semibold text-sky-700 shadow-sm">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 dark:bg-slate-900/80 border border-white/70 dark:border-slate-700 text-xs font-semibold text-sky-700 dark:text-sky-300 shadow-sm">
                 <BookOpen className="w-3.5 h-3.5" />
                 {t('marketplace.hero.pill')}
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 leading-tight">
                 {t('marketplace.hero.title')}
               </h2>
-              <p className="text-sm md:text-base text-slate-600 leading-relaxed max-w-xl md:max-w-none">
+              <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl md:max-w-none">
                 {t('marketplace.hero.description')}
               </p>
               <div className="flex flex-wrap gap-3">
-                <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
+                <div className="flex items-center gap-2 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-slate-100 dark:border-slate-800 px-3 py-2 text-xs text-slate-600 dark:text-slate-400 shadow-sm">
                   <Search className="w-4 h-4 text-sky-500" />
                   {t('marketplace.hero.feature.search')}
                 </div>
-                <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
-                  <Badge className="bg-white/90 text-slate-700 border border-slate-200">{t('marketplace.hero.feature.level')}</Badge>
+                <div className="flex items-center gap-2 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-slate-100 dark:border-slate-800 px-3 py-2 text-xs text-slate-600 dark:text-slate-400 shadow-sm">
+                  <Badge className="bg-white/90 dark:bg-slate-900/90 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{t('marketplace.hero.feature.level')}</Badge>
                   {t('marketplace.hero.feature.quickFilter')}
                 </div>
-                <div className="flex items-center gap-2 rounded-xl bg-white/90 border border-slate-100 px-3 py-2 text-xs text-slate-600 shadow-sm">
+                <div className="flex items-center gap-2 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-slate-100 dark:border-slate-800 px-3 py-2 text-xs text-slate-600 dark:text-slate-400 shadow-sm">
                   <Star className="w-4 h-4 text-amber-500" />
                   {t('marketplace.hero.feature.topRated')}
                 </div>
@@ -182,27 +182,27 @@ const Marketplace: React.FC = () => {
               const resultLabel = debouncedSearch || activeField || activeLevel ? t('marketplace.stats.matchingResults') : t('marketplace.stats.totalCourses');
               return (
                 <div className="space-y-4 animate-fade-in-up">
-                  <div className="rounded-2xl border border-white/80 bg-white/80 p-5 shadow-md">
+                  <div className="rounded-2xl border border-white/80 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 p-5 shadow-md">
                     <div className="text-xs font-semibold uppercase tracking-widest text-slate-400">{resultLabel}</div>
                     <div className="mt-3 flex items-end gap-2">
-                      <span className="text-3xl font-bold text-slate-900">{isLoading ? '--' : filteredCourses.length}</span>
-                      <span className="text-sm text-slate-500">{t('marketplace.stats.courseNoun')}</span>
+                      <span className="text-3xl font-bold text-slate-900 dark:text-slate-100">{isLoading ? '--' : filteredCourses.length}</span>
+                      <span className="text-sm text-slate-500 dark:text-slate-400">{t('marketplace.stats.courseNoun')}</span>
                     </div>
-                    <p className="mt-2 text-xs text-slate-500">{t('marketplace.stats.updatedNote')}</p>
+                    <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{t('marketplace.stats.updatedNote')}</p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
-                    <div className="rounded-xl border border-sky-100 bg-sky-50/80 px-4 py-3">
-                      <div className="text-xs font-semibold text-sky-700">{t('marketplace.stats.showing')}</div>
-                      <div className="mt-1 text-2xl font-bold text-sky-800">{isLoading ? '--' : visibleCount}</div>
+                    <div className="rounded-xl border border-sky-100 dark:border-sky-800 bg-sky-50/80 dark:bg-sky-900/30 px-4 py-3">
+                      <div className="text-xs font-semibold text-sky-700 dark:text-sky-300">{t('marketplace.stats.showing')}</div>
+                      <div className="mt-1 text-2xl font-bold text-sky-800 dark:text-sky-300">{isLoading ? '--' : visibleCount}</div>
                     </div>
-                    <div className="rounded-xl border border-emerald-100 bg-emerald-50/80 px-4 py-3">
-                      <div className="text-xs font-semibold text-emerald-700">{t('marketplace.stats.fields')}</div>
-                      <div className="mt-1 text-2xl font-bold text-emerald-800">{fieldCount}</div>
+                    <div className="rounded-xl border border-emerald-100 dark:border-emerald-800 bg-emerald-50/80 dark:bg-emerald-900/30 px-4 py-3">
+                      <div className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">{t('marketplace.stats.fields')}</div>
+                      <div className="mt-1 text-2xl font-bold text-emerald-800 dark:text-emerald-300">{fieldCount}</div>
                     </div>
-                    <div className="rounded-xl border border-amber-100 bg-amber-50/80 px-4 py-3">
-                      <div className="text-xs font-semibold text-amber-700">{t('marketplace.stats.pages')}</div>
-                      <div className="mt-1 text-2xl font-bold text-amber-800">{isLoading ? '--' : pageCount}</div>
+                    <div className="rounded-xl border border-amber-100 dark:border-amber-800 bg-amber-50/80 dark:bg-amber-900/30 px-4 py-3">
+                      <div className="text-xs font-semibold text-amber-700 dark:text-amber-300">{t('marketplace.stats.pages')}</div>
+                      <div className="mt-1 text-2xl font-bold text-amber-800 dark:text-amber-300">{isLoading ? '--' : pageCount}</div>
                     </div>
                   </div>
                 </div>
@@ -221,7 +221,7 @@ const Marketplace: React.FC = () => {
             placeholder={t('marketplace.search.placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-12 pl-12 pr-10 rounded-full border border-slate-200 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+            className="w-full h-12 pl-12 pr-10 rounded-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
           />
           {searchQuery && (
             <button
@@ -243,7 +243,7 @@ const Marketplace: React.FC = () => {
             onClick={() => setActiveField(field.value)}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeField === field.value
               ? 'bg-primary-600 text-white shadow-md'
-              : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+              : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
           >
             {field.value ? field.label : t('common.all')}
@@ -264,10 +264,10 @@ const Marketplace: React.FC = () => {
 
       {/* Level filters */}
       <div className="flex flex-wrap justify-center gap-2 mb-10">
-        <span className="text-sm text-slate-500 py-1">{t('marketplace.filters.levelLabel')}</span>
+        <span className="text-sm text-slate-500 dark:text-slate-400 py-1">{t('marketplace.filters.levelLabel')}</span>
         <button
           onClick={() => setActiveLevel('')}
-          className={`px-3 py-1 rounded text-sm transition-all ${!activeLevel ? 'bg-slate-200 text-slate-800' : 'text-slate-500 hover:bg-slate-100'
+          className={`px-3 py-1 rounded text-sm transition-all ${!activeLevel ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
         >
           {t('common.all')}
@@ -276,7 +276,7 @@ const Marketplace: React.FC = () => {
           <button
             key={value}
             onClick={() => setActiveLevel(value)}
-            className={`px-3 py-1 rounded text-sm transition-all ${activeLevel === value ? 'bg-slate-200 text-slate-800' : 'text-slate-500 hover:bg-slate-100'
+            className={`px-3 py-1 rounded text-sm transition-all ${activeLevel === value ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
           >
             {label}
@@ -286,7 +286,7 @@ const Marketplace: React.FC = () => {
 
       {/* Results count */}
       <div className="text-center mb-6">
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           {isLoading ? t('common.loading') : (filteredCourses.length === 1 ? t('marketplace.courseCountOne') : t('marketplace.courseCountMany', { count: filteredCourses.length }))}
         </p>
       </div>
@@ -307,14 +307,14 @@ const Marketplace: React.FC = () => {
           // Loading skeleton
           [...Array(8)].map((_, i) => (
             <Card key={i} className="animate-pulse">
-              <div className="aspect-4/3 bg-slate-200" />
+              <div className="aspect-4/3 bg-slate-200 dark:bg-slate-700" />
               <div className="p-4">
-                <div className="h-5 w-full bg-slate-200 rounded mb-2" />
-                <div className="h-3 w-24 bg-slate-100 rounded mb-3" />
-                <div className="h-4 w-20 bg-slate-100 rounded mb-3" />
-                <div className="pt-3 border-t border-slate-100 flex justify-between">
-                  <div className="h-5 w-20 bg-slate-200 rounded" />
-                  <div className="h-5 w-16 bg-slate-100 rounded" />
+                <div className="h-5 w-full bg-slate-200 dark:bg-slate-700 rounded mb-2" />
+                <div className="h-3 w-24 bg-slate-100 dark:bg-slate-800 rounded mb-3" />
+                <div className="h-4 w-20 bg-slate-100 dark:bg-slate-800 rounded mb-3" />
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between">
+                  <div className="h-5 w-20 bg-slate-200 dark:bg-slate-700 rounded" />
+                  <div className="h-5 w-16 bg-slate-100 dark:bg-slate-800 rounded" />
                 </div>
               </div>
             </Card>
@@ -332,7 +332,7 @@ const Marketplace: React.FC = () => {
                 className="group cursor-pointer hover:-translate-y-1 transition-transform"
                 onClick={() => navigate(`/courses/${course.id}`)}
               >
-                <div className="aspect-4/3 overflow-hidden bg-slate-200 relative">
+                <div className="aspect-4/3 overflow-hidden bg-slate-200 dark:bg-slate-700 relative">
                   <OptimizedImage
                     src={course.image || `https://picsum.photos/seed/${course.id}/400/300`}
                     alt={course.title}
@@ -345,9 +345,9 @@ const Marketplace: React.FC = () => {
                 </div>
                 <div className="p-4">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-slate-900 line-clamp-2 pr-2">{course.title}</h3>
+                    <h3 className="font-bold text-slate-900 dark:text-slate-100 line-clamp-2 pr-2">{course.title}</h3>
                   </div>
-                  <div className="text-xs text-slate-500 mb-3">{course.instructor}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 mb-3">{course.instructor}</div>
                   <div className="flex items-center gap-1 mb-3">
                     <span className="text-yellow-500 font-bold text-sm">{course.rating?.toFixed(1) || '0.0'}</span>
                     <div className="flex text-yellow-400 text-xs">

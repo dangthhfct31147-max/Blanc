@@ -42,10 +42,10 @@ const CreateReportModal: React.FC<CreateReportModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4">
-      <div className="w-full max-w-xl bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-          <p className="font-semibold text-slate-900">{t('reports.create.title')}</p>
-          <button className="p-2 rounded-lg hover:bg-slate-100 text-slate-500" onClick={onClose} aria-label="Close">
+      <div className="w-full max-w-xl bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <p className="font-semibold text-slate-900 dark:text-slate-100">{t('reports.create.title')}</p>
+          <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400" onClick={onClose} aria-label="Close">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -88,7 +88,7 @@ const CreateReportModal: React.FC<CreateReportModalProps> = ({
           />
         </div>
 
-        <div className="p-4 border-t border-slate-100 flex items-center justify-end gap-2">
+        <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
           <Button variant="secondary" onClick={onClose}>
             {t('common.cancel')}
           </Button>

@@ -22,8 +22,8 @@ if (!rootElement) {
 const clerkLocalization = {
   signIn: {
     start: {
-      title: 'Sign in to Blanc',
-      titleCombined: 'Sign in to Blanc',
+      title: 'Sign in to ContestHub',
+      titleCombined: 'Sign in to ContestHub',
     },
   },
 };

@@ -11,6 +11,7 @@ const vi = {
   'nav.courses': 'Khóa học',
   'nav.documents': 'Tài liệu',
   'nav.hallOfFame': 'Hall of Fame',
+  'nav.universityFit': 'University Fit',
   'nav.community': 'Cộng đồng',
   'nav.news': 'Bản tin',
   'nav.skillTree': 'Cây kỹ năng',
@@ -810,7 +811,7 @@ const vi = {
   'layout.footer.contact': 'Liên hệ',
   'layout.footer.supportBadge': 'Sẵn sàng hỗ trợ trong giờ hành chính',
   'layout.footer.contactTitle': 'Liên hệ',
-  'layout.footer.contactDescription': 'Đội ngũ Blanc sẽ phản hồi trong 24 giờ làm việc',
+  'layout.footer.contactDescription': 'Đội ngũ ContestHub sẽ phản hồi trong 24 giờ làm việc',
   'layout.footer.inbox': 'Hòm thư',
 
   'teamPosts.title': 'Quản lý bài đăng tìm đội',
@@ -895,7 +896,7 @@ const vi = {
   'teamPostDetail.join.sentDescription': 'Trưởng nhóm sẽ xem xét và phản hồi yêu cầu của bạn sớm nhất.',
   'teamPostDetail.footer.postedBy': 'Đăng bởi',
   'teamPostDetail.toast.sendFailed': 'Không thể gửi yêu cầu. Vui lòng thử lại sau.',
-  'teamPostDetail.contact.subject': '[Blanc] Về bài đăng: {{title}}',
+  'teamPostDetail.contact.subject': '[ContestHub] Về bài đăng: {{title}}',
   'teamPostDetail.contact.body': 'Xin chào {{name}},\n\nTôi quan tâm đến bài đăng tuyển thành viên "{{title}}" của bạn.\n\n',
 
   'teamMembers.title': 'Quản lý thành viên',
@@ -1055,6 +1056,7 @@ const en: Record<keyof typeof vi, string> = {
   'nav.courses': 'Courses',
   'nav.documents': 'Documents',
   'nav.hallOfFame': 'Hall of Fame',
+  'nav.universityFit': 'University Fit',
   'nav.community': 'Community',
   'nav.news': 'News',
   'nav.skillTree': 'Skill Tree',
@@ -1854,7 +1856,7 @@ const en: Record<keyof typeof vi, string> = {
   'layout.footer.contact': 'Contact',
   'layout.footer.supportBadge': 'Available during business hours',
   'layout.footer.contactTitle': 'Contact',
-  'layout.footer.contactDescription': 'The Blanc team will respond within 24 business hours',
+  'layout.footer.contactDescription': 'The ContestHub team will respond within 24 business hours',
   'layout.footer.inbox': 'Inbox',
 
   'teamPosts.title': 'Manage team posts',
@@ -1939,7 +1941,7 @@ const en: Record<keyof typeof vi, string> = {
   'teamPostDetail.join.sentDescription': 'The team leader will review and respond soon.',
   'teamPostDetail.footer.postedBy': 'Posted by',
   'teamPostDetail.toast.sendFailed': 'Unable to send request. Please try again.',
-  'teamPostDetail.contact.subject': '[Blanc] About post: {{title}}',
+  'teamPostDetail.contact.subject': '[ContestHub] About post: {{title}}',
   'teamPostDetail.contact.body': 'Hello {{name}},\n\nI\'m interested in your recruiting post "{{title}}".\n\n',
 
   'teamMembers.title': 'Manage members',

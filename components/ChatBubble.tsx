@@ -92,16 +92,16 @@ const TeamPostCard: React.FC<{ post: TeamPost }> = ({ post }) => {
     };
 
     return (
-        <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-slate-800 text-sm line-clamp-1">{post.title}</h4>
+                    <h4 className="font-medium text-slate-800 dark:text-slate-100 text-sm line-clamp-1">{post.title}</h4>
                     {post.description && (
-                        <p className="text-xs text-slate-500 mt-1 line-clamp-2">{post.description}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{post.description}</p>
                     )}
                 </div>
                 {post.isExpired && (
-                    <span className="shrink-0 px-2 py-0.5 bg-orange-100 text-orange-600 text-xs rounded-full">
+                    <span className="shrink-0 px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-300 text-xs rounded-full">
                         Hết hạn
                     </span>
                 )}
@@ -109,25 +109,25 @@ const TeamPostCard: React.FC<{ post: TeamPost }> = ({ post }) => {
 
             <div className="mt-2 flex flex-wrap gap-1">
                 {post.rolesNeeded.slice(0, 3).map((role, i) => (
-                    <span key={i} className="px-2 py-0.5 bg-primary-50 text-primary-700 text-xs rounded-full">
+                    <span key={i} className="px-2 py-0.5 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs rounded-full">
                         {role}
                     </span>
                 ))}
                 {post.rolesNeeded.length > 3 && (
-                    <span className="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full">
+                    <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs rounded-full">
                         +{post.rolesNeeded.length - 3}
                     </span>
                 )}
             </div>
 
             <div className="mt-2 flex items-center justify-between">
-                <div className="flex items-center gap-1 text-xs text-slate-500">
+                <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                     <Users className="w-3 h-3" />
                     <span>{post.currentMembers}/{post.maxMembers}</span>
                 </div>
                 <button
                     onClick={handleViewMore}
-                    className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors"
+                    className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-primary-600 dark:text-primary-300 hover:text-primary-700 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
                 >
                     Xem thêm
                     <ExternalLink className="w-3 h-3" />
@@ -144,17 +144,17 @@ const TeammateCard: React.FC<{ teammate: Teammate }> = ({ teammate }) => {
     };
 
     return (
-        <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-linear-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
                     {teammate.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-slate-800 text-sm truncate">{teammate.name}</h4>
-                    <p className="text-xs text-slate-500">{teammate.role}</p>
+                    <h4 className="font-medium text-slate-800 dark:text-slate-100 text-sm truncate">{teammate.name}</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{teammate.role}</p>
                 </div>
                 {teammate.matchScore && (
-                    <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">
+                    <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs rounded-full font-medium">
                         {teammate.matchScore}%
                     </span>
                 )}
@@ -162,14 +162,14 @@ const TeammateCard: React.FC<{ teammate: Teammate }> = ({ teammate }) => {
 
             <div className="mt-2 flex flex-wrap gap-1">
                 {teammate.skills.slice(0, 3).map((skill, i) => (
-                    <span key={i} className="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full">
+                    <span key={i} className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs rounded-full">
                         {skill}
                     </span>
                 ))}
             </div>
 
             {(teammate.location || teammate.experience) && (
-                <div className="mt-2 flex items-center gap-3 text-xs text-slate-500">
+                <div className="mt-2 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                     {teammate.location && (
                         <span className="flex items-center gap-1">
                             <MapPin className="w-3 h-3" />
@@ -184,7 +184,7 @@ const TeammateCard: React.FC<{ teammate: Teammate }> = ({ teammate }) => {
 
             <button
                 onClick={handleViewProfile}
-                className="mt-2 w-full flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-medium text-primary-600 hover:text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors"
+                className="mt-2 w-full flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-medium text-primary-600 dark:text-primary-300 hover:text-primary-700 bg-primary-50 dark:bg-primary-900/30 hover:bg-primary-100 rounded-lg transition-colors"
             >
                 Xem hồ sơ
                 <ExternalLink className="w-3 h-3" />
@@ -200,22 +200,22 @@ const ContestCard: React.FC<{ contest: Contest }> = ({ contest }) => {
     };
 
     return (
-        <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-start gap-2">
                 <div className="w-8 h-8 bg-linear-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center">
                     <Trophy className="w-4 h-4 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-slate-800 text-sm line-clamp-1">{contest.title}</h4>
-                    <p className="text-xs text-slate-500">{contest.organizer}</p>
+                    <h4 className="font-medium text-slate-800 dark:text-slate-100 text-sm line-clamp-1">{contest.title}</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{contest.organizer}</p>
                 </div>
             </div>
 
-            <div className="mt-2 flex items-center gap-2 text-xs text-slate-500">
+            <div className="mt-2 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                 <Clock className="w-3 h-3" />
                 <span>Hạn: {new Date(contest.deadline).toLocaleDateString('vi-VN')}</span>
                 {contest.fee !== undefined && (
-                    <span className={`ml-auto px-2 py-0.5 rounded-full ${contest.fee > 0 ? 'bg-slate-100 text-slate-600' : 'bg-green-100 text-green-600'}`}>
+                    <span className={`ml-auto px-2 py-0.5 rounded-full ${contest.fee > 0 ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400' : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300'}`}>
                         {contest.fee > 0 ? `${contest.fee.toLocaleString()}đ` : 'Miễn phí'}
                     </span>
                 )}
@@ -223,7 +223,7 @@ const ContestCard: React.FC<{ contest: Contest }> = ({ contest }) => {
 
             <div className="mt-2 flex flex-wrap gap-1">
                 {contest.tags.slice(0, 3).map((tag, i) => (
-                    <span key={i} className="px-2 py-0.5 bg-amber-50 text-amber-700 text-xs rounded-full">
+                    <span key={i} className="px-2 py-0.5 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs rounded-full">
                         {tag}
                     </span>
                 ))}
@@ -231,7 +231,7 @@ const ContestCard: React.FC<{ contest: Contest }> = ({ contest }) => {
 
             <button
                 onClick={handleViewContest}
-                className="mt-2 w-full flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors"
+                className="mt-2 w-full flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-medium text-amber-600 dark:text-amber-300 hover:text-amber-700 bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 rounded-lg transition-colors"
             >
                 Xem cuộc thi
                 <ExternalLink className="w-3 h-3" />
@@ -255,7 +255,7 @@ const DataCards: React.FC<{ data?: ChatData }> = ({ data }) => {
             {/* Team Posts */}
             {hasTeamPosts && (
                 <div>
-                    <p className="text-xs font-medium text-slate-500 mb-2 flex items-center gap-1">
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1">
                         <Users className="w-3 h-3" />
                         Bài đăng tìm đội ({data.teamPosts!.length})
                     </p>
@@ -267,7 +267,7 @@ const DataCards: React.FC<{ data?: ChatData }> = ({ data }) => {
                     {data.teamPosts!.length > 3 && (
                         <button
                             onClick={() => window.open('/community', '_blank')}
-                            className="mt-2 w-full py-2 text-xs text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors"
+                            className="mt-2 w-full py-2 text-xs text-primary-600 dark:text-primary-300 hover:text-primary-700 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
                         >
                             Xem tất cả {data.teamPosts!.length} bài đăng →
                         </button>
@@ -278,7 +278,7 @@ const DataCards: React.FC<{ data?: ChatData }> = ({ data }) => {
             {/* Teammates */}
             {hasTeammates && (
                 <div>
-                    <p className="text-xs font-medium text-slate-500 mb-2 flex items-center gap-1">
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1">
                         <User className="w-3 h-3" />
                         Đồng đội gợi ý ({data.teammates!.length})
                     </p>
@@ -290,7 +290,7 @@ const DataCards: React.FC<{ data?: ChatData }> = ({ data }) => {
                     {data.teammates!.length > 3 && (
                         <button
                             onClick={() => window.open('/community', '_blank')}
-                            className="mt-2 w-full py-2 text-xs text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors"
+                            className="mt-2 w-full py-2 text-xs text-primary-600 dark:text-primary-300 hover:text-primary-700 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
                         >
                             Xem tất cả gợi ý →
                         </button>
@@ -301,7 +301,7 @@ const DataCards: React.FC<{ data?: ChatData }> = ({ data }) => {
             {/* Contests */}
             {hasContests && (
                 <div>
-                    <p className="text-xs font-medium text-slate-500 mb-2 flex items-center gap-1">
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1">
                         <Trophy className="w-3 h-3" />
                         Cuộc thi phù hợp ({data.contests!.length})
                     </p>
@@ -313,7 +313,7 @@ const DataCards: React.FC<{ data?: ChatData }> = ({ data }) => {
                     {data.contests!.length > 3 && (
                         <button
                             onClick={() => window.open('/contests', '_blank')}
-                            className="mt-2 w-full py-2 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors"
+                            className="mt-2 w-full py-2 text-xs text-amber-600 dark:text-amber-300 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-lg transition-colors"
                         >
                             Xem tất cả cuộc thi →
                         </button>
@@ -345,7 +345,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
             <div className={`max-w-[85%] ${isUser ? 'text-right' : 'text-left'}`}>
                 <div className={`inline-block px-4 py-2 rounded-2xl ${isUser
                     ? 'bg-primary-500 text-white rounded-br-md'
-                    : 'bg-slate-100 text-slate-800 rounded-bl-md'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-md'
                     }`}>
                     <p className="text-sm whitespace-pre-wrap break-all">{message.content}</p>
                 </div>
@@ -382,7 +382,7 @@ const SuggestionChip: React.FC<SuggestionChipProps> = ({ suggestion, onClick }) 
         <button
             type="button"
             onClick={handleClick}
-            className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-700 hover:bg-slate-50 hover:border-primary-300 transition-all duration-200 shadow-sm"
+            className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-full text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-primary-300 transition-all duration-200 shadow-sm"
         >
             <span>{icon}</span>
             <span className="line-clamp-1">{text}</span>
@@ -547,7 +547,7 @@ export const ChatBubble: React.FC = () => {
             </button>
 
             {/* Chat Window */}
-            <div className={`fixed bottom-6 right-6 z-50 w-[380px] h-[600px] max-h-[80vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 ${isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'}`}>
+            <div className={`fixed bottom-6 right-6 z-50 w-[380px] h-[600px] max-h-[80vh] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 ${isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'}`}>
                 {/* Header */}
                 <div className="bg-linear-to-r from-primary-500 to-primary-600 px-4 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -555,7 +555,7 @@ export const ChatBubble: React.FC = () => {
                             <Sparkles className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-white">Blanc AI</h3>
+                            <h3 className="font-semibold text-white">ContestHub AI</h3>
                             <p className="text-xs text-white/80">Trợ lý thông minh của bạn</p>
                         </div>
                     </div>
@@ -585,7 +585,7 @@ export const ChatBubble: React.FC = () => {
                 <div
                     ref={messagesContainerRef}
                     onScroll={handleScroll}
-                    className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50"
+                    className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-800"
                 >
                     {messages.length === 0 ? (
                         // Welcome state
@@ -593,16 +593,16 @@ export const ChatBubble: React.FC = () => {
                             <div className="w-16 h-16 bg-linear-to-br from-primary-100 to-violet-100 rounded-2xl flex items-center justify-center mb-4">
                                 <Sparkles className="w-8 h-8 text-primary-500" />
                             </div>
-                            <h4 className="text-lg font-semibold text-slate-800 mb-2">
+                            <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">
                                 Xin chào! 👋
                             </h4>
-                            <p className="text-sm text-slate-600 mb-6">
-                                Tôi là trợ lý AI của Blanc. Tôi có thể giúp bạn tìm cuộc thi phù hợp, gợi ý đồng đội, và hướng dẫn sử dụng nền tảng.
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
+                                Tôi là trợ lý AI của ContestHub. Tôi có thể giúp bạn tìm cuộc thi phù hợp, gợi ý đồng đội, và hướng dẫn sử dụng nền tảng.
                             </p>
 
                             {/* Suggestions */}
                             <div className="w-full space-y-2">
-                                <p className="text-xs text-slate-500 mb-2">Thử hỏi tôi:</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Thử hỏi tôi:</p>
                                 <div className="flex flex-wrap gap-2 justify-center">
                                     {DEFAULT_SUGGESTIONS.map((suggestion) => (
                                         <SuggestionChip
@@ -626,7 +626,7 @@ export const ChatBubble: React.FC = () => {
                                     <div className="w-8 h-8 rounded-full bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center">
                                         <Bot className="w-4 h-4 text-white" />
                                     </div>
-                                    <div className="bg-slate-100 rounded-2xl rounded-bl-md px-4 py-3">
+                                    <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-bl-md px-4 py-3">
                                         <div className="flex gap-1">
                                             <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" />
                                             <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce animation-delay-150" />
@@ -638,7 +638,7 @@ export const ChatBubble: React.FC = () => {
 
                             {/* Error message */}
                             {error && (
-                                <div className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm">
+                                <div className="flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 rounded-lg text-sm">
                                     <AlertCircle className="w-4 h-4 shrink-0" />
                                     <span>{error}</span>
                                 </div>
@@ -668,16 +668,16 @@ export const ChatBubble: React.FC = () => {
                 {showScrollButton && (
                     <button
                         onClick={scrollToBottom}
-                        className="absolute bottom-24 right-4 w-8 h-8 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-slate-50 transition-colors"
+                        className="absolute bottom-24 right-4 w-8 h-8 bg-white dark:bg-slate-900 shadow-lg rounded-full flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                         title="Cuộn xuống dưới"
                         aria-label="Cuộn xuống dưới"
                     >
-                        <ChevronDown className="w-4 h-4 text-slate-600" />
+                        <ChevronDown className="w-4 h-4 text-slate-600 dark:text-slate-400" />
                     </button>
                 )}
 
                 {/* Input Area */}
-                <form onSubmit={handleSubmit} className="p-3 border-t border-slate-100 bg-white">
+                <form onSubmit={handleSubmit} className="p-3 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
                     <div className="flex gap-2 items-end">
                         <div className="flex-1 relative">
                             <textarea
@@ -688,7 +688,7 @@ export const ChatBubble: React.FC = () => {
                                 placeholder="Nhập tin nhắn..."
                                 rows={1}
                                 disabled={isLoading}
-                                className="w-full px-4 py-2.5 bg-slate-100 border-0 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 pr-12 max-h-[120px]"
+                                className="w-full px-4 py-2.5 bg-slate-100 dark:bg-slate-800 border-0 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 pr-12 max-h-[120px]"
                             />
                             <span className={`absolute right-3 bottom-2.5 text-xs ${inputValue.length > MAX_MESSAGE_LENGTH * 0.8 ? 'text-orange-500' : 'text-slate-400'}`}>
                                 {inputValue.length}/{MAX_MESSAGE_LENGTH}
@@ -708,7 +708,7 @@ export const ChatBubble: React.FC = () => {
                             )}
                         </button>
                     </div>
-                    <p className="text-xs text-slate-400 mt-2 text-center">
+                    <p className="text-xs text-slate-400 dark:text-slate-400 mt-2 text-center">
                         AI có thể mắc lỗi. Hãy kiểm tra thông tin quan trọng.
                     </p>
                 </form>

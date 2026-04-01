@@ -209,7 +209,7 @@ const ForgotPassword: React.FC = () => {
                         setEmail(e.target.value);
                         setError(null);
                       }}
-                      placeholder="admin@blanc.edu.vn"
+                      placeholder="admin@contesthub.edu.vn"
                       required
                       className="w-full rounded-lg border border-white/20 bg-white/10 py-3 pr-4 pl-11 text-white placeholder-gray-400 transition-all focus:border-transparent focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                     />
@@ -374,7 +374,7 @@ const ForgotPassword: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-sm text-emerald-200/50">© 2024 Blanc. All rights reserved.</p>
+        <p className="mt-6 text-center text-sm text-emerald-200/50">© 2024 ContestHub. All rights reserved.</p>
       </div>
     </div>
   );

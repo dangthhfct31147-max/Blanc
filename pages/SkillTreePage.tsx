@@ -266,7 +266,7 @@ export default function SkillTreePage() {
 
                 {/* Info Footer */}
                 <div className="mt-6 text-center">
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                         {copy.footer}
                     </p>
                 </div>

@@ -77,10 +77,10 @@ railway variables
 railway logs --tail 100
 
 # Check health status
-curl https://blanc.homelabo.work/api/health/ready
+curl https://contesthub.homelabo.work/api/health/ready
 
 # Debug if needed
-curl https://blanc.homelabo.work/api/health/debug-env
+curl https://contesthub.homelabo.work/api/health/debug-env
 ```
 
 ### Step 4: Run Platform Settings Fix (if needed)
@@ -102,7 +102,7 @@ railway run node server/scripts/fix-platform-settings.js
 railway variables
 
 # Set DATABASE_URL if missing
-railway variables set DATABASE_URL="postgresql://user:pass@host:26257/Blanc?sslmode=require"
+railway variables set DATABASE_URL="postgresql://user:pass@host:26257/ContestHub?sslmode=require"
 
 # Redeploy
 railway up
@@ -167,13 +167,13 @@ railway run node server/scripts/fix-platform-settings.js
 ### Monitoring Commands
 ```powershell
 # Check service health
-curl https://blanc.homelabo.work/api/health
+curl https://contesthub.homelabo.work/api/health
 
 # Check readiness (detailed)
-curl https://blanc.homelabo.work/api/health/ready
+curl https://contesthub.homelabo.work/api/health/ready
 
 # Debug environment variables
-curl https://blanc.homelabo.work/api/health/debug-env
+curl https://contesthub.homelabo.work/api/health/debug-env
 
 # Railway metrics
 railway status

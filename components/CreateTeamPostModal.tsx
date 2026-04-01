@@ -436,18 +436,18 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
             />
 
             {/* Modal */}
-            <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl">
+            <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 rounded-2xl shadow-2xl">
                 {/* Header */}
-                <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-white border-b border-slate-100">
+                <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary-100 rounded-xl">
+                        <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-xl">
                             <Users className="w-5 h-5 text-primary-600" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-slate-900">
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
                                 {isEditMode ? t('teamPostForm.header.editTitle') : t('teamPostForm.header.createTitle')}
                             </h2>
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
                                 {isEditMode ? t('teamPostForm.header.editSubtitle') : t('teamPostForm.header.createSubtitle')}
                             </p>
                         </div>
@@ -456,7 +456,7 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                         onClick={onClose}
                         aria-label={t('teamPostForm.actions.close')}
                         title={t('teamPostForm.actions.close')}
-                        className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                        className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-slate-300 dark:hover:bg-slate-800 rounded-lg transition-colors"
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -465,13 +465,13 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                 {/* Success State */}
                 {success ? (
                     <div className="p-12 text-center">
-                        <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                        <div className="w-16 h-16 mx-auto mb-4 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
                             <Check className="w-8 h-8 text-green-600" />
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-2">
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
                             {isEditMode ? t('teamPostForm.success.editTitle') : t('teamPostForm.success.createTitle')}
                         </h3>
-                        <p className="text-slate-500">
+                        <p className="text-slate-500 dark:text-slate-400">
                             {isEditMode
                                 ? t('teamPostForm.success.editDescription')
                                 : t('teamPostForm.success.createDescription')}
@@ -482,18 +482,18 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                     <form onSubmit={handleSubmit} className="p-6 space-y-6">
                         {/* Error Alert */}
                         {error && (
-                            <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-100 rounded-xl">
+                            <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-800 rounded-xl">
                                 <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                                 <div>
-                                    <p className="font-medium text-red-800">{t('teamPostForm.error.title')}</p>
-                                    <p className="text-sm text-red-600 mt-1">{error}</p>
+                                    <p className="font-medium text-red-800 dark:text-red-300">{t('teamPostForm.error.title')}</p>
+                                    <p className="text-sm text-red-600 dark:text-red-300 mt-1">{error}</p>
                                 </div>
                             </div>
                         )}
 
                         {/* Title */}
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                 {t('teamPostForm.title.label')} <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -501,7 +501,7 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                                 value={formData.title}
                                 onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
                                 placeholder={t('teamPostForm.title.placeholder')}
-                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none"
+                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none"
                                 maxLength={100}
                                 required
                             />
@@ -527,7 +527,7 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                             />
 
                             <div>
-                                <label htmlFor="deadline-input" className="block text-sm font-medium text-slate-700 mb-2">
+                                <label htmlFor="deadline-input" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                     <div className="flex items-center gap-2">
                                         <Calendar className="w-4 h-4" />
                                         {t('teamPostForm.deadline.label')}
@@ -540,21 +540,21 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                                     onChange={e => setFormData(prev => ({ ...prev, deadline: e.target.value }))}
                                     min={minDate}
                                     title={t('teamPostForm.deadline.title')}
-                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none"
+                                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none"
                                 />
                             </div>
                         </div>
 
                         {/* Description */}
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                 {t('teamPostForm.description.label')} <span className="text-red-500">*</span>
                             </label>
                             <textarea
                                 value={formData.description}
                                 onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
                                 placeholder={t('teamPostForm.description.placeholder')}
-                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none resize-none"
+                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none resize-none"
                                 rows={4}
                                 maxLength={1000}
                                 required
@@ -564,7 +564,7 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
 
                         {/* Roles Needed */}
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                 {t('teamPostForm.roles.label')} <span className="text-red-500">*</span>
                                 <span className="text-slate-400 font-normal ml-2">{t('teamPostForm.roles.maxHint')}</span>
                             </label>
@@ -579,10 +579,10 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                                             onClick={() => handleRoleToggle(role)}
                                             disabled={isDisabled}
                                             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${isSelected
-                                                ? 'bg-primary-100 text-primary-700 border-2 border-primary-300'
+                                                ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-2 border-primary-300 dark:border-primary-700'
                                                 : isDisabled
-                                                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border-2 border-transparent'
+                                                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border-2 border-transparent'
                                                 }`}
                                         >
                                             {role}
@@ -595,7 +595,7 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                         {/* Role Details - Expandable section for each selected role */}
                         {formData.rolesNeeded.length > 0 && (
                             <div className="space-y-3">
-                                <label className="block text-sm font-medium text-slate-700">
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                                     {t('teamPostForm.roles.detailsLabel')}
                                     <span className="text-slate-400 font-normal ml-2">{t('teamPostForm.roles.detailsHint')}</span>
                                 </label>
@@ -605,19 +605,19 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                                         const isExpanded = expandedRoles.has(role);
 
                                         return (
-                                            <div key={role} className="border border-slate-200 rounded-xl overflow-hidden">
+                                            <div key={role} className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
                                                 {/* Role Header */}
                                                 <button
                                                     type="button"
                                                     onClick={() => toggleRoleExpanded(role)}
-                                                    className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 transition-colors"
+                                                    className="w-full flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                                     aria-label={isExpanded
                                                         ? t('teamPostForm.roles.collapseDetails', { role })
                                                         : t('teamPostForm.roles.expandDetails', { role })}
                                                 >
                                                     <div className="flex items-center gap-3">
-                                                        <span className="font-medium text-slate-700">{role}</span>
-                                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700">
+                                                        <span className="font-medium text-slate-700 dark:text-slate-300">{role}</span>
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">
                                                             {t('teamPostForm.roles.countPeople', { count: slot.count })}
                                                         </span>
                                                     </div>
@@ -630,29 +630,29 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
 
                                                 {/* Expanded Content */}
                                                 {isExpanded && (
-                                                    <div className="p-4 space-y-4 bg-white border-t border-slate-200">
+                                                    <div className="p-4 space-y-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
                                                         {/* Number of people needed */}
                                                         <div>
-                                                            <label className="block text-xs font-medium text-slate-600 mb-2">
+                                                            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
                                                                 {t('teamPostForm.roles.countLabel')}
                                                             </label>
                                                             <div className="flex items-center gap-3">
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => updateRoleSlot(role, { count: Math.max(1, slot.count - 1) })}
-                                                                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
+                                                                    className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 transition-colors"
                                                                     disabled={slot.count <= 1}
                                                                     aria-label={t('teamPostForm.roles.decreaseCount')}
                                                                 >
                                                                     <Minus className="w-4 h-4" />
                                                                 </button>
-                                                                <span className="w-12 text-center font-medium text-slate-800">
+                                                                <span className="w-12 text-center font-medium text-slate-800 dark:text-slate-100">
                                                                     {slot.count}
                                                                 </span>
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => updateRoleSlot(role, { count: Math.min(5, slot.count + 1) })}
-                                                                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
+                                                                    className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 transition-colors"
                                                                     disabled={slot.count >= 5}
                                                                     aria-label={t('teamPostForm.roles.increaseCount')}
                                                                 >
@@ -663,14 +663,14 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
 
                                                         {/* Task Description */}
                                                         <div>
-                                                            <label className="block text-xs font-medium text-slate-600 mb-2">
+                                                            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
                                                                 {t('teamPostForm.roles.taskLabel')}
                                                             </label>
                                                             <textarea
                                                                 value={slot.description || ''}
                                                                 onChange={e => updateRoleSlot(role, { description: e.target.value })}
                                                                 placeholder={t('teamPostForm.roles.taskPlaceholder')}
-                                                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none resize-none"
+                                                                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none resize-none"
                                                                 rows={2}
                                                                 maxLength={300}
                                                             />
@@ -679,14 +679,14 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
 
                                                         {/* Role-specific skills */}
                                                         <div>
-                                                            <label className="block text-xs font-medium text-slate-600 mb-2">
+                                                            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
                                                                 {t('teamPostForm.roles.skillsLabel')}
                                                             </label>
                                                             <div className="flex flex-wrap gap-1.5">
                                                                 {(slot.skills || []).map(skill => (
                                                                     <span
                                                                         key={skill}
-                                                                        className="inline-flex items-center gap-1 px-2 py-1 bg-primary-50 text-primary-700 rounded-md text-xs"
+                                                                        className="inline-flex items-center gap-1 px-2 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-md text-xs"
                                                                     >
                                                                         {skill}
                                                                         <button
@@ -711,7 +711,7 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                                                                                 });
                                                                             }
                                                                         }}
-                                                                        className="px-2 py-1 bg-slate-100 border border-slate-200 rounded-md text-xs text-slate-600 outline-none"
+                                                                        className="px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-xs text-slate-600 dark:text-slate-400 outline-none"
                                                                         title={t('teamPostForm.roles.addSkillTitle')}
                                                                     >
                                                                         <option value="">{t('teamPostForm.roles.addSkillOption')}</option>
@@ -733,7 +733,7 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
 
                         {/* General Skills */}
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                 {t('teamPostForm.skills.label')}
                                 <span className="text-slate-400 font-normal ml-2">{t('teamPostForm.skills.maxHint')}</span>
                             </label>
@@ -744,7 +744,7 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                                         {(formData.skills || []).map(skill => (
                                             <span
                                                 key={skill}
-                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-100 text-primary-700 rounded-lg text-sm font-medium"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-lg text-sm font-medium"
                                             >
                                                 {skill}
                                                 <button
@@ -778,18 +778,18 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                                                 }
                                             }}
                                             placeholder={t('teamPostForm.skills.placeholder')}
-                                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none"
+                                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none"
                                         />
 
                                         {/* Suggestions Dropdown */}
                                         {showSkillSuggestions && skillInput && filteredSuggestions.length > 0 && (
-                                            <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                                            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg max-h-48 overflow-y-auto">
                                                 {filteredSuggestions.map(skill => (
                                                     <button
                                                         key={skill}
                                                         type="button"
                                                         onClick={() => addSkill(skill)}
-                                                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors"
+                                                        className="w-full px-4 py-2 text-left text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                                                     >
                                                         {skill}
                                                     </button>
@@ -807,7 +807,7 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                                                 key={skill}
                                                 type="button"
                                                 onClick={() => addSkill(skill)}
-                                                className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs transition-colors"
+                                                className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-lg text-xs transition-colors"
                                             >
                                                 + {skill}
                                             </button>
@@ -819,7 +819,7 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
 
                         {/* Invite Members (Gmail-style tagging) */}
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                 <div className="flex items-center gap-2">
                                     <UserPlus className="w-4 h-4" />
                                     {t('teamPostForm.invite.label')}
@@ -833,7 +833,7 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                                     {(formData.invitedMembers || []).map(member => (
                                         <div
                                             key={member.id}
-                                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-50 border border-primary-200 rounded-full"
+                                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 rounded-full"
                                         >
                                             {member.avatar ? (
                                                 <img
@@ -842,13 +842,13 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                                                     className="w-5 h-5 rounded-full object-cover"
                                                 />
                                             ) : (
-                                                <div className="w-5 h-5 rounded-full bg-primary-200 flex items-center justify-center">
-                                                    <span className="text-xs font-medium text-primary-700">
+                                                <div className="w-5 h-5 rounded-full bg-primary-200 dark:bg-primary-800 flex items-center justify-center">
+                                                    <span className="text-xs font-medium text-primary-700 dark:text-primary-300">
                                                         {member.name.charAt(0).toUpperCase()}
                                                     </span>
                                                 </div>
                                             )}
-                                            <span className="text-sm font-medium text-primary-700">{member.name}</span>
+                                            <span className="text-sm font-medium text-primary-700 dark:text-primary-300">{member.name}</span>
                                             {member.email && (
                                                 <span className="text-xs text-primary-500 hidden sm:inline">({member.email})</span>
                                             )}
@@ -875,7 +875,7 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                                         onChange={e => handleMemberSearchChange(e.target.value)}
                                         onFocus={() => memberSearchQuery.length >= 2 && setShowMemberSuggestions(true)}
                                         placeholder={t('teamPostForm.invite.searchPlaceholder')}
-                                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none"
+                                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none"
                                     />
                                     {isSearchingMembers && (
                                         <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 animate-spin" />
@@ -884,9 +884,9 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
 
                                 {/* Search Results Dropdown */}
                                 {showMemberSuggestions && memberSearchQuery.length >= 2 && (
-                                    <div className="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                                    <div className="absolute z-20 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                                         {isSearchingMembers ? (
-                                            <div className="px-4 py-3 text-sm text-slate-500 text-center">
+                                            <div className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400 text-center">
                                                 <Loader2 className="w-4 h-4 animate-spin inline mr-2" />
                                                 {t('teamPostForm.invite.searching')}
                                             </div>
@@ -896,7 +896,7 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                                                     key={user.id}
                                                     type="button"
                                                     onClick={() => addInvitedMember(user)}
-                                                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100 last:border-b-0"
+                                                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left border-b border-slate-100 dark:border-slate-800 last:border-b-0"
                                                 >
                                                     {user.avatar && user.avatar.trim() ? (
                                                         <img
@@ -912,14 +912,14 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                                                         </div>
                                                     )}
                                                     <div className="flex-1 min-w-0">
-                                                        <p className="font-medium text-slate-800 truncate">{user.name}</p>
-                                                        <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                                                        <p className="font-medium text-slate-800 dark:text-slate-100 truncate">{user.name}</p>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
                                                     </div>
                                                     <Plus className="w-4 h-4 text-primary-500 shrink-0" />
                                                 </button>
                                             ))
                                         ) : (
-                                            <div className="px-4 py-3 text-sm text-slate-500 text-center">
+                                            <div className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400 text-center">
                                                 {t('teamPostForm.invite.noResults')}
                                             </div>
                                         )}
@@ -950,14 +950,14 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
 
                         {/* Requirements */}
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                 {t('teamPostForm.requirements.label')}
                             </label>
                             <textarea
                                 value={formData.requirements}
                                 onChange={e => setFormData(prev => ({ ...prev, requirements: e.target.value }))}
                                 placeholder={t('teamPostForm.requirements.placeholder')}
-                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none resize-none"
+                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none resize-none"
                                 rows={3}
                                 maxLength={500}
                             />
@@ -965,7 +965,7 @@ const CreateTeamPostModal: React.FC<CreateTeamPostModalProps> = ({ isOpen, onClo
                         </div>
 
                         {/* Submit */}
-                        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                             <Button
                                 type="button"
                                 variant="ghost"

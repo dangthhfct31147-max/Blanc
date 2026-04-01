@@ -354,18 +354,18 @@ const MyReportsPanel: React.FC<MyReportsPanelProps> = ({ isLocked }) => {
     <>
       {/* Reminders */}
       {eligibleEvidenceReminders.length > 0 && (
-        <Card className="p-4 border-sky-100 bg-sky-50">
-          <p className="font-semibold text-slate-900">{t('reports.reminder.title')}</p>
-          <p className="text-sm text-slate-600 mt-1">{t('reports.reminder.subtitle')}</p>
+        <Card className="p-4 border-sky-100 dark:border-sky-800 bg-sky-50 dark:bg-sky-900/30">
+          <p className="font-semibold text-slate-900 dark:text-slate-100">{t('reports.reminder.title')}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{t('reports.reminder.subtitle')}</p>
           <div className="mt-4 space-y-2">
             {eligibleEvidenceReminders.map(({ contest, linkedReport }) => (
               <div
                 key={contest.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white border border-slate-100 rounded-xl p-3"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl p-3"
               >
                 <div className="min-w-0">
-                  <p className="font-medium text-slate-900 truncate">{contest.title}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="font-medium text-slate-900 dark:text-slate-100 truncate">{contest.title}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     {t('reports.reminder.dateLabel', { date: formatDate(registrations.find((r) => r.contest?.id === contest.id)?.contest?.dateStart || null) })}
                   </p>
                 </div>
@@ -408,7 +408,7 @@ const MyReportsPanel: React.FC<MyReportsPanelProps> = ({ isLocked }) => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <Card className="lg:col-span-4 p-4">
           <div className="flex items-center justify-between gap-2">
-            <p className="font-semibold text-slate-900">{t('reports.list.title')}</p>
+            <p className="font-semibold text-slate-900 dark:text-slate-100">{t('reports.list.title')}</p>
             <div className="flex items-center gap-2">
               <Button variant="secondary" size="sm" onClick={() => void fetchReports()} disabled={loading} className="gap-2">
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCcw className="w-4 h-4" />}
@@ -438,31 +438,31 @@ const MyReportsPanel: React.FC<MyReportsPanelProps> = ({ isLocked }) => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('reports.list.searchPlaceholder')}
-                className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
+                className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
               />
             </div>
           </div>
 
           <div className="mt-4 space-y-2">
             {loading ? (
-              <div className="py-10 flex items-center justify-center text-slate-500">
+              <div className="py-10 flex items-center justify-center text-slate-500 dark:text-slate-400">
                 <Loader2 className="w-5 h-5 animate-spin mr-2" />
                 {t('reports.list.loading')}
               </div>
             ) : filteredReports.length === 0 ? (
-              <div className="py-10 text-center text-slate-500 text-sm">{t('reports.list.empty')}</div>
+              <div className="py-10 text-center text-slate-500 dark:text-slate-400 text-sm">{t('reports.list.empty')}</div>
             ) : (
               filteredReports.map((r) => (
                 <button
                   key={r.id}
-                  className={`w-full text-left p-3 rounded-xl border transition-colors ${selectedId === r.id ? 'bg-primary-50 border-primary-200' : 'bg-white border-slate-100 hover:border-slate-200'
+                  className={`w-full text-left p-3 rounded-xl border transition-colors ${selectedId === r.id ? 'bg-primary-50 dark:bg-primary-900/30 border-primary-200 dark:border-primary-800' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700'
                     }`}
                   onClick={() => void loadDetail(r.id)}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="font-medium text-slate-900 truncate">{r.title}</p>
-                      <p className="text-xs text-slate-500 mt-0.5 truncate">
+                      <p className="font-medium text-slate-900 dark:text-slate-100 truncate">{r.title}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
                         {t('reports.list.itemMeta', { template: r.template, lastEdited: r.lastEdited })}
                       </p>
                     </div>
@@ -478,12 +478,12 @@ const MyReportsPanel: React.FC<MyReportsPanelProps> = ({ isLocked }) => {
 
         <Card className="lg:col-span-8 p-4">
           {!selectedId ? (
-            <div className="py-16 text-center text-slate-500">
+            <div className="py-16 text-center text-slate-500 dark:text-slate-400">
               <FileText className="w-10 h-10 mx-auto opacity-20" />
               <p className="mt-3 font-medium">{t('reports.detail.empty')}</p>
             </div>
           ) : selectedLoading ? (
-            <div className="py-16 flex items-center justify-center text-slate-500">
+            <div className="py-16 flex items-center justify-center text-slate-500 dark:text-slate-400">
               <Loader2 className="w-5 h-5 animate-spin mr-2" />
               {t('reports.detail.loading')}
             </div>
@@ -491,13 +491,13 @@ const MyReportsPanel: React.FC<MyReportsPanelProps> = ({ isLocked }) => {
             <div className="space-y-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-xs text-slate-500">{t('reports.detail.reviewStatus')}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{t('reports.detail.reviewStatus')}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`text-xs px-2 py-1 rounded-full border ${reviewStatusBadgeClass(reviewStatus)}`}>
                       {reviewStatusLabel(reviewStatus)}
                     </span>
-                    {submittedAt && <span className="text-xs text-slate-500">{t('reports.detail.submittedAt', { date: formatDateTime(submittedAt) })}</span>}
-                    {reviewedAt && <span className="text-xs text-slate-500">{t('reports.detail.reviewedAt', { date: formatDateTime(reviewedAt) })}</span>}
+                    {submittedAt && <span className="text-xs text-slate-500 dark:text-slate-400">{t('reports.detail.submittedAt', { date: formatDateTime(submittedAt) })}</span>}
+                    {reviewedAt && <span className="text-xs text-slate-500 dark:text-slate-400">{t('reports.detail.reviewedAt', { date: formatDateTime(reviewedAt) })}</span>}
                   </div>
                 </div>
 
@@ -535,8 +535,8 @@ const MyReportsPanel: React.FC<MyReportsPanelProps> = ({ isLocked }) => {
               </div>
 
               {validationError && (
-                <Card className="p-3 border-rose-100 bg-rose-50">
-                  <p className="text-sm text-rose-800">{validationError}</p>
+                <Card className="p-3 border-rose-100 dark:border-rose-800 bg-rose-50 dark:bg-rose-900/30">
+                  <p className="text-sm text-rose-800 dark:text-rose-300">{validationError}</p>
                 </Card>
               )}
 
@@ -581,22 +581,22 @@ const MyReportsPanel: React.FC<MyReportsPanelProps> = ({ isLocked }) => {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('reports.detail.notes')}</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{t('reports.detail.notes')}</label>
                 <textarea
                   value={content}
                   onChange={(e) => { setContent(e.target.value); setIsDirty(true); }}
                   disabled={isLocked}
                   rows={6}
-                  className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
                   placeholder={t('reports.detail.notesPlaceholder')}
                 />
               </div>
 
-              <Card className="p-4 bg-white border-slate-100">
+              <Card className="p-4 bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-semibold text-slate-900">{t('reports.activities.title')}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{t('reports.activities.subtitle')}</p>
+                    <p className="font-semibold text-slate-900 dark:text-slate-100">{t('reports.activities.title')}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{t('reports.activities.subtitle')}</p>
                   </div>
                   <Button
                     variant="secondary"
@@ -619,22 +619,22 @@ const MyReportsPanel: React.FC<MyReportsPanelProps> = ({ isLocked }) => {
 
                 <div className="mt-3 space-y-3">
                   {activities.length === 0 ? (
-                    <div className="text-sm text-slate-500 py-6 text-center border border-dashed border-slate-200 rounded-xl">{t('reports.activities.empty')}</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-400 py-6 text-center border border-dashed border-slate-200 dark:border-slate-700 rounded-xl">{t('reports.activities.empty')}</div>
                   ) : (
                     activities.map((a, idx) => (
-                      <div key={a.id} className="border border-slate-200 rounded-xl p-3 bg-slate-50">
+                      <div key={a.id} className="border border-slate-200 dark:border-slate-700 rounded-xl p-3 bg-slate-50 dark:bg-slate-800">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           <Input label={t('reports.activities.itemTitle', { index: idx + 1 })} value={a.title || ''} onChange={(e) => { setActivities(activities.map((x) => x.id === a.id ? { ...x, title: e.target.value } : x)); setIsDirty(true); }} disabled={isLocked} />
                           <Input label={t('reports.activities.itemTime')} type="datetime-local" value={toDatetimeLocalInput(a.occurredAt || null)} onChange={(e) => { const dt = e.target.value ? new Date(e.target.value).toISOString() : null; setActivities(activities.map((x) => x.id === a.id ? { ...x, occurredAt: dt } : x)); setIsDirty(true); }} disabled={isLocked} />
                         </div>
                         <div className="mt-3">
-                          <label className="block text-sm font-medium text-slate-700 mb-1.5">{t('reports.activities.itemDescription')}</label>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{t('reports.activities.itemDescription')}</label>
                           <textarea
                             value={a.description || ''}
                             onChange={(e) => { setActivities(activities.map((x) => x.id === a.id ? { ...x, description: e.target.value || null } : x)); setIsDirty(true); }}
                             disabled={isLocked}
                             rows={3}
-                            className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
+                            className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
                             placeholder={t('reports.activities.itemDescriptionPlaceholder')}
                           />
                         </div>
@@ -650,11 +650,11 @@ const MyReportsPanel: React.FC<MyReportsPanelProps> = ({ isLocked }) => {
               </Card>
 
               <div ref={evidenceAnchorRef}>
-                <Card className="p-4 bg-white border-slate-100">
+                <Card className="p-4 bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-semibold text-slate-900">{t('reports.evidence.title')}</p>
-                      <p className="text-xs text-slate-500 mt-0.5">{t('reports.evidence.subtitle')}</p>
+                      <p className="font-semibold text-slate-900 dark:text-slate-100">{t('reports.evidence.title')}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{t('reports.evidence.subtitle')}</p>
                     </div>
                     <Button
                       variant="secondary"
@@ -677,13 +677,13 @@ const MyReportsPanel: React.FC<MyReportsPanelProps> = ({ isLocked }) => {
 
                   <div className="mt-3 space-y-3">
                     {evidence.length === 0 ? (
-                      <div className="text-sm text-slate-500 py-6 text-center border border-dashed border-slate-200 rounded-xl">{t('reports.evidence.empty')}</div>
+                      <div className="text-sm text-slate-500 dark:text-slate-400 py-6 text-center border border-dashed border-slate-200 dark:border-slate-700 rounded-xl">{t('reports.evidence.empty')}</div>
                     ) : (
                       evidence.map((ev, idx) => {
                         const rawUrl = String(ev.url || '').trim();
                         const href = rawUrl && isHttpUrl(rawUrl) ? normalizeUrl(rawUrl) : '';
                         return (
-                          <div key={ev.id} className="border border-slate-200 rounded-xl p-3 bg-slate-50">
+                          <div key={ev.id} className="border border-slate-200 dark:border-slate-700 rounded-xl p-3 bg-slate-50 dark:bg-slate-800">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               <Input label={t('reports.evidence.itemName', { index: idx + 1 })} value={ev.fileName || ''} onChange={(e) => { setEvidence(evidence.map((x) => x.id === ev.id ? { ...x, fileName: e.target.value } : x)); setIsDirty(true); }} disabled={isLocked} />
                               <Input label={t('reports.evidence.itemLink')} value={ev.url || ''} onChange={(e) => { setEvidence(evidence.map((x) => x.id === ev.id ? { ...x, url: e.target.value, mimeType: 'link', fileId: '' } : x)); setIsDirty(true); }} disabled={isLocked} />

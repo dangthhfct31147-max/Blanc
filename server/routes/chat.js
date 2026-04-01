@@ -558,7 +558,7 @@ function buildSystemPrompt(userProfile) {
     const userRole = userProfile?.matchingProfile?.primaryRole || '';
     const userSkills = (userProfile?.matchingProfile?.skills || []).slice(0, 5).join(', ');
 
-    return `Bạn là Blanc Assistant - trợ lý AI của nền tảng Blanc, chuyên hỗ trợ sinh viên Việt Nam tìm kiếm và tham gia các cuộc thi.
+    return `Bạn là ContestHub Assistant - trợ lý AI của nền tảng ContestHub, chuyên hỗ trợ sinh viên Việt Nam tìm kiếm và tham gia các cuộc thi.
 
 THÔNG TIN NGƯỜI DÙNG ĐANG TRÒ CHUYỆN:
 - Tên: ${userName}
@@ -573,7 +573,7 @@ QUY TẮC TRẢ LỜI:
 5. Khuyến khích người dùng hoàn thiện hồ sơ để nhận gợi ý tốt hơn
 6. Không bịa đặt thông tin về cuộc thi hoặc người dùng không có trong database
 7. Sử dụng emoji phù hợp để tăng tính thân thiện
-8. Nếu câu hỏi ngoài phạm vi Blanc, lịch sự từ chối và hướng về chủ đề chính
+8. Nếu câu hỏi ngoài phạm vi ContestHub, lịch sự từ chối và hướng về chủ đề chính
 
 PHẠM VI HỖ TRỢ:
 - Tìm cuộc thi phù hợp với kỹ năng/sở thích
@@ -672,7 +672,7 @@ router.post('/', authGuard, chatLimiter, async (req, res, next) => {
             models: CHAT_MODELS,
             messages,
             frontendOrigin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
-            title: 'Blanc Assistant',
+            title: 'ContestHub Assistant',
         });
 
         // Log chat for analytics (without storing full conversation)

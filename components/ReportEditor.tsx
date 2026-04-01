@@ -475,7 +475,7 @@ ${htmlContent}
     };
 
     return (
-        <div className={`flex flex-col h-full overflow-hidden bg-slate-100 relative fullscreen-container ${isFullScreen ? 'fullscreen-active' : ''} ${getAnimationClass()}`}>
+        <div className={`flex flex-col h-full overflow-hidden bg-slate-100 dark:bg-slate-800 relative fullscreen-container ${isFullScreen ? 'fullscreen-active' : ''} ${getAnimationClass()}`}>
 
             {/* Backdrop overlay for fullscreen */}
             {isFullScreen && (
@@ -483,15 +483,15 @@ ${htmlContent}
             )}
 
             {/* Editor Toolbar */}
-            <div className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-30 shadow-sm relative transition-all duration-300">
+            <div className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-6 shrink-0 z-30 shadow-sm relative transition-all duration-300">
                 <div className="flex items-center gap-4">
-                    <button onClick={onBack} className="text-slate-400 hover:text-slate-600 transition-colors" title={t('reports.editor.back')} aria-label={t('reports.editor.back')}>
+                    <button onClick={onBack} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" title={t('reports.editor.back')} aria-label={t('reports.editor.back')}>
                         <ChevronRight className="w-5 h-5 rotate-180" />
                     </button>
                     <div>
-                        <h2 className="font-semibold text-slate-800 text-sm md:text-base">{report?.title || t('reports.editor.newReport')}</h2>
-                        <div className="flex items-center gap-2 text-xs text-slate-500">
-                            <span className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">{report?.template || t('reports.editor.templateGeneral')}</span>
+                        <h2 className="font-semibold text-slate-800 dark:text-slate-100 text-sm md:text-base">{report?.title || t('reports.editor.newReport')}</h2>
+                        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                            <span className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">{report?.template || t('reports.editor.templateGeneral')}</span>
                             <span>•</span>
                             <span className="flex items-center gap-1">
                                 {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
@@ -504,11 +504,11 @@ ${htmlContent}
 
                 <div className="flex items-center gap-2 md:gap-3">
                     {/* WYSIWYG Toolbar */}
-                    <div className="hidden lg:flex items-center gap-1 bg-slate-50 p-1 rounded-lg mr-2 border border-slate-200">
+                    <div className="hidden lg:flex items-center gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded-lg mr-2 border border-slate-200 dark:border-slate-700">
                         <button
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => execCmd('bold')}
-                            className={`p-1.5 hover:bg-white hover:shadow-sm rounded transition-all ${isBold ? 'bg-blue-100 text-blue-600 shadow-sm' : 'text-slate-600'}`}
+                            className={`p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded transition-all ${isBold ? 'bg-blue-100 text-blue-600 shadow-sm' : 'text-slate-600 dark:text-slate-400'}`}
                             title={t('reports.editor.toolbar.bold')}
                         >
                             <Bold className="w-4 h-4" />
@@ -516,7 +516,7 @@ ${htmlContent}
                         <button
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => execCmd('italic')}
-                            className={`p-1.5 hover:bg-white hover:shadow-sm rounded transition-all ${isItalic ? 'bg-blue-100 text-blue-600 shadow-sm' : 'text-slate-600'}`}
+                            className={`p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded transition-all ${isItalic ? 'bg-blue-100 text-blue-600 shadow-sm' : 'text-slate-600 dark:text-slate-400'}`}
                             title={t('reports.editor.toolbar.italic')}
                         >
                             <Italic className="w-4 h-4" />
@@ -524,16 +524,16 @@ ${htmlContent}
                         <button
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => execCmd('insertUnorderedList')}
-                            className={`p-1.5 hover:bg-white hover:shadow-sm rounded transition-all ${isList ? 'bg-blue-100 text-blue-600 shadow-sm' : 'text-slate-600'}`}
+                            className={`p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded transition-all ${isList ? 'bg-blue-100 text-blue-600 shadow-sm' : 'text-slate-600 dark:text-slate-400'}`}
                             title={t('reports.editor.toolbar.list')}
                         >
                             <List className="w-4 h-4" />
                         </button>
-                        <div className="w-px h-4 bg-slate-300 mx-1"></div>
+                        <div className="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
                         <button
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => execCmd('justifyLeft')}
-                            className="p-1.5 hover:bg-white hover:shadow-sm rounded text-slate-600 transition-all"
+                            className="p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded text-slate-600 dark:text-slate-400 transition-all"
                             title={t('reports.editor.toolbar.alignLeft')}
                         >
                             <AlignLeft className="w-4 h-4" />
@@ -541,7 +541,7 @@ ${htmlContent}
                         <button
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => execCmd('justifyCenter')}
-                            className="p-1.5 hover:bg-white hover:shadow-sm rounded text-slate-600 transition-all"
+                            className="p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded text-slate-600 dark:text-slate-400 transition-all"
                             title={t('reports.editor.toolbar.alignCenter')}
                         >
                             <AlignCenter className="w-4 h-4" />
@@ -549,7 +549,7 @@ ${htmlContent}
                         <button
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => execCmd('justifyRight')}
-                            className="p-1.5 hover:bg-white hover:shadow-sm rounded text-slate-600 transition-all"
+                            className="p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded text-slate-600 dark:text-slate-400 transition-all"
                             title={t('reports.editor.toolbar.alignRight')}
                         >
                             <AlignRight className="w-4 h-4" />
@@ -557,16 +557,16 @@ ${htmlContent}
                         <button
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => execCmd('justifyFull')}
-                            className="p-1.5 hover:bg-white hover:shadow-sm rounded text-slate-600 transition-all"
+                            className="p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded text-slate-600 dark:text-slate-400 transition-all"
                             title={t('reports.editor.toolbar.alignJustify')}
                         >
                             <AlignJustify className="w-4 h-4" />
                         </button>
-                        <div className="w-px h-4 bg-slate-300 mx-1"></div>
+                        <div className="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
                         <button
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => execCmd('undo')}
-                            className="p-1.5 hover:bg-white hover:shadow-sm rounded text-slate-600 transition-all"
+                            className="p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded text-slate-600 dark:text-slate-400 transition-all"
                             title={t('reports.editor.toolbar.undo')}
                         >
                             <Undo className="w-4 h-4" />
@@ -574,7 +574,7 @@ ${htmlContent}
                         <button
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => execCmd('redo')}
-                            className="p-1.5 hover:bg-white hover:shadow-sm rounded text-slate-600 transition-all"
+                            className="p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded text-slate-600 dark:text-slate-400 transition-all"
                             title={t('reports.editor.toolbar.redo')}
                         >
                             <Redo className="w-4 h-4" />
@@ -582,10 +582,10 @@ ${htmlContent}
                     </div>
 
                     {/* Zoom Controls */}
-                    <div className="hidden sm:flex items-center gap-1 bg-slate-50 p-1 rounded-lg mr-2 border border-slate-200">
-                        <button onClick={() => adjustZoom(-10)} className="p-1.5 hover:bg-white hover:shadow-sm rounded text-slate-600 transition-all" title={t('reports.editor.zoom.out')}><Minus className="w-3 h-3" /></button>
-                        <span className="text-xs font-medium w-10 text-center text-slate-600 select-none">{zoom}%</span>
-                        <button onClick={() => adjustZoom(10)} className="p-1.5 hover:bg-white hover:shadow-sm rounded text-slate-600 transition-all" title={t('reports.editor.zoom.in')}><Plus className="w-3 h-3" /></button>
+                    <div className="hidden sm:flex items-center gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded-lg mr-2 border border-slate-200 dark:border-slate-700">
+                        <button onClick={() => adjustZoom(-10)} className="p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded text-slate-600 dark:text-slate-400 transition-all" title={t('reports.editor.zoom.out')}><Minus className="w-3 h-3" /></button>
+                        <span className="text-xs font-medium w-10 text-center text-slate-600 dark:text-slate-400 select-none">{zoom}%</span>
+                        <button onClick={() => adjustZoom(10)} className="p-1.5 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm rounded text-slate-600 dark:text-slate-400 transition-all" title={t('reports.editor.zoom.in')}><Plus className="w-3 h-3" /></button>
                     </div>
 
                     {/* Full Screen Toggle */}

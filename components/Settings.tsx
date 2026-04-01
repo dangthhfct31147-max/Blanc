@@ -28,8 +28,8 @@ const Settings: React.FC = () => {
 
   // Mock Settings State
   const [settings, setSettings] = useState({
-    siteName: 'Blanc',
-    supportEmail: 'support@blanc.edu.vn',
+    siteName: 'ContestHub',
+    supportEmail: 'support@contesthub.edu.vn',
     maintenanceMode: false,
     emailNotifs: true,
     pushNotifs: false,
@@ -72,8 +72,8 @@ const Settings: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-          <p className="text-gray-500 mt-1">Manage platform preferences and system configuration</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Settings</h2>
+          <p className="text-gray-500 dark:text-slate-400 mt-1">Manage platform preferences and system configuration</p>
         </div>
         <button
           onClick={handleSave}
@@ -88,7 +88,7 @@ const Settings: React.FC = () => {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar Navigation */}
         <div className="w-full lg:w-64 shrink-0">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
             <nav className="flex flex-col">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
@@ -97,8 +97,8 @@ const Settings: React.FC = () => {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-4 ${activeTab === tab.id
-                      ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                      : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
+                      : 'border-transparent text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-slate-100'
                       }`}
                   >
                     <Icon size={18} />
@@ -112,39 +112,39 @@ const Settings: React.FC = () => {
 
         {/* Content Area */}
         <div className="flex-1">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 min-h-[500px]">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6 min-h-[500px]">
 
             {/* General Tab */}
             {activeTab === 'general' && (
               <div className="space-y-6 animate-fade-in-up">
-                <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">General Information</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 border-b border-gray-100 dark:border-slate-800 pb-2">General Information</h3>
                 <div className="grid gap-6 max-w-xl">
                   <div>
-                    <label htmlFor="platform-name" className="block text-sm font-medium text-gray-700 mb-1">Platform Name</label>
+                    <label htmlFor="platform-name" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Platform Name</label>
                     <input
                       id="platform-name"
                       type="text"
                       value={settings.siteName}
                       onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
                       placeholder="Enter platform name"
                     />
                   </div>
                   <div>
-                    <label htmlFor="support-email" className="block text-sm font-medium text-gray-700 mb-1">Support Email</label>
+                    <label htmlFor="support-email" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Support Email</label>
                     <input
                       id="support-email"
                       type="email"
                       value={settings.supportEmail}
                       onChange={(e) => setSettings({ ...settings, supportEmail: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
                       placeholder="Enter support email"
                     />
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
                     <div>
-                      <p className="font-medium text-gray-900">Maintenance Mode</p>
-                      <p className="text-xs text-gray-500">Disable access for non-admin users</p>
+                      <p className="font-medium text-gray-900 dark:text-slate-100">Maintenance Mode</p>
+                      <p className="text-xs text-gray-500 dark:text-slate-400">Disable access for non-admin users</p>
                     </div>
                     <button
                       onClick={() => handleToggle('maintenanceMode')}
@@ -160,14 +160,14 @@ const Settings: React.FC = () => {
             {/* Notifications Tab */}
             {activeTab === 'notifications' && (
               <div className="space-y-6 animate-fade-in-up">
-                <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Notification Preferences</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 border-b border-gray-100 dark:border-slate-800 pb-2">Notification Preferences</h3>
                 <div className="space-y-4 max-w-xl">
-                  <div className="flex items-center justify-between py-3 border-b border-gray-50">
+                  <div className="flex items-center justify-between py-3 border-b border-gray-50 dark:border-slate-800">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Mail size={20} /></div>
+                      <div className="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded-lg"><Mail size={20} /></div>
                       <div>
-                        <p className="font-medium text-gray-900">Email Notifications</p>
-                        <p className="text-xs text-gray-500">Receive system updates via email</p>
+                        <p className="font-medium text-gray-900 dark:text-slate-100">Email Notifications</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-400">Receive system updates via email</p>
                       </div>
                     </div>
                     <button
@@ -178,12 +178,12 @@ const Settings: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="flex items-center justify-between py-3 border-b border-gray-50">
+                  <div className="flex items-center justify-between py-3 border-b border-gray-50 dark:border-slate-800">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-purple-50 text-purple-600 rounded-lg"><Smartphone size={20} /></div>
+                      <div className="p-2 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-lg"><Smartphone size={20} /></div>
                       <div>
-                        <p className="font-medium text-gray-900">Push Notifications</p>
-                        <p className="text-xs text-gray-500">Mobile app alerts</p>
+                        <p className="font-medium text-gray-900 dark:text-slate-100">Push Notifications</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-400">Mobile app alerts</p>
                       </div>
                     </div>
                     <button
@@ -200,12 +200,12 @@ const Settings: React.FC = () => {
             {/* Security Tab */}
             {activeTab === 'security' && (
               <div className="space-y-6 animate-fade-in-up">
-                <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Security Settings</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 border-b border-gray-100 dark:border-slate-800 pb-2">Security Settings</h3>
                 <div className="max-w-xl space-y-6">
-                  <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-lg border border-emerald-100">
+                  <div className="flex items-center justify-between p-4 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg border border-emerald-100 dark:border-emerald-800">
                     <div>
-                      <p className="font-medium text-gray-900">Two-Factor Authentication (2FA)</p>
-                      <p className="text-xs text-gray-500">Require 2FA for all admin accounts</p>
+                      <p className="font-medium text-gray-900 dark:text-slate-100">Two-Factor Authentication (2FA)</p>
+                      <p className="text-xs text-gray-500 dark:text-slate-400">Require 2FA for all admin accounts</p>
                     </div>
                     <button
                       onClick={() => handleToggle('twoFactor')}
@@ -215,12 +215,12 @@ const Settings: React.FC = () => {
                     </button>
                   </div>
                   <div>
-                    <label htmlFor="session-timeout" className="block text-sm font-medium text-gray-700 mb-1">Session Timeout (minutes)</label>
+                    <label htmlFor="session-timeout" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Session Timeout (minutes)</label>
                     <select
                       id="session-timeout"
                       value={settings.sessionTimeout}
                       onChange={(e) => setSettings({ ...settings, sessionTimeout: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
                       title="Select session timeout duration"
                     >
                       <option value="15">15 Minutes</option>
@@ -230,7 +230,7 @@ const Settings: React.FC = () => {
                     </select>
                   </div>
                   <div className="pt-4">
-                    <button className="text-red-600 text-sm font-medium hover:text-red-700 hover:underline">
+                    <button className="text-red-600 dark:text-red-400 text-sm font-medium hover:text-red-700 dark:hover:text-red-300 hover:underline">
                       Reset all sessions
                     </button>
                   </div>
@@ -241,32 +241,32 @@ const Settings: React.FC = () => {
             {/* AI Announcements Tab */}
             {activeTab === 'announcements' && (
               <div className="space-y-6 animate-fade-in-up h-full flex flex-col">
-                <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
+                <div className="flex items-center gap-2 pb-2 border-b border-gray-100 dark:border-slate-800">
                   <Sparkles className="text-emerald-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">AI Announcement Generator</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">AI Announcement Generator</h3>
                 </div>
 
                 <div className="grid lg:grid-cols-2 gap-8 flex-1">
                   <div className="space-y-4">
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-slate-400">
                       Use Gemini to quickly draft system-wide announcements, maintenance notices, or marketing messages.
                     </p>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Topic / Key Message</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Topic / Key Message</label>
                       <textarea
                         value={announceTopic}
                         onChange={(e) => setAnnounceTopic(e.target.value)}
                         placeholder="e.g., Scheduled maintenance on Saturday night from 10 PM to 2 AM..."
-                        className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none resize-none"
+                        className="w-full h-32 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none resize-none bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
                       />
                     </div>
                     <div>
-                      <label htmlFor="target-audience" className="block text-sm font-medium text-gray-700 mb-1">Target Audience</label>
+                      <label htmlFor="target-audience" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Target Audience</label>
                       <select
                         id="target-audience"
                         value={announceAudience}
                         onChange={(e) => setAnnounceAudience(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100"
                         title="Select target audience"
                       >
                         <option>All Users</option>
@@ -297,9 +297,9 @@ const Settings: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 flex flex-col">
+                  <div className="bg-gray-50 dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4 flex flex-col">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Preview</span>
+                      <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Preview</span>
                       {generatedAnnouncement && (
                         <button
                           onClick={handleCopy}
@@ -310,7 +310,7 @@ const Settings: React.FC = () => {
                         </button>
                       )}
                     </div>
-                    <div className="flex-1 bg-white border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-wrap leading-relaxed overflow-y-auto max-h-[400px]">
+                    <div className="flex-1 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg p-4 text-sm text-gray-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed overflow-y-auto max-h-[400px]">
                       {generatedAnnouncement || (
                         <span className="text-gray-400 italic">
                           Your generated announcement will appear here...

@@ -1,8 +1,8 @@
 # 🔧 Fix Frontend 503 Error - Railway Deployment
 
 ## Tình huống
-- ✅ Frontend: `blanc.homelabo.work` (Railway)
-- ✅ Backend: `blanc-backend.homelabo.work` (Railway)
+- ✅ Frontend: `contesthub.homelabo.work` (Railway)
+- ✅ Backend: `contesthub-backend.homelabo.work` (Railway)
 - ❌ Frontend nhận lỗi 503 khi gọi API
 
 ## 🎯 Nguyên nhân chính
@@ -18,7 +18,7 @@ Backend cần biết frontend domain để cho phép CORS requests.
 Truy cập trực tiếp backend health endpoint:
 
 ```
-https://blanc-backend.homelabo.work/api/health
+https://contesthub-backend.homelabo.work/api/health
 ```
 
 **Kết quả mong đợi:**
@@ -39,7 +39,7 @@ https://blanc-backend.homelabo.work/api/health
 
 ## 📋 Bước 2: Fix Railway Backend Environment Variables
 
-Vào **Railway Dashboard** → Project → **blanc-backend service** → **Variables**:
+Vào **Railway Dashboard** → Project → **contesthub-backend service** → **Variables**:
 
 ### ✅ Biến BẮT BUỘC:
 
@@ -51,7 +51,7 @@ DATABASE_URL=postgresql://user:pass@host:26257/dbname?sslmode=verify-full
 JWT_SECRET=your-random-secret-here-min-32-chars
 
 # CORS - QUAN TRỌNG: Thêm frontend domain
-FRONTEND_ORIGIN=https://blanc.homelabo.work
+FRONTEND_ORIGIN=https://contesthub.homelabo.work
 
 # Node environment
 NODE_ENV=production
@@ -79,11 +79,11 @@ JSON_BODY_LIMIT=10mb
 
 ## 📋 Bước 3: Fix Railway Frontend Environment Variables
 
-Vào **Railway Dashboard** → Project → **blanc-frontend service** → **Variables**:
+Vào **Railway Dashboard** → Project → **contesthub-frontend service** → **Variables**:
 
 ```bash
 # API URL - Trỏ đến backend Railway
-VITE_API_URL=https://blanc-backend.homelabo.work/api
+VITE_API_URL=https://contesthub-backend.homelabo.work/api
 
 # Node environment
 NODE_ENV=production
@@ -93,12 +93,12 @@ NODE_ENV=production
 
 ### 4.1 Test Backend Health:
 ```bash
-curl https://blanc-backend.homelabo.work/api/health
+curl https://contesthub-backend.homelabo.work/api/health
 ```
 
 ### 4.2 Test Backend Ready:
 ```bash
-curl https://blanc-backend.homelabo.work/api/health/ready
+curl https://contesthub-backend.homelabo.work/api/health/ready
 ```
 
 Kết quả mong đợi:
@@ -116,10 +116,10 @@ Kết quả mong đợi:
 
 ### 4.3 Test CORS từ Frontend:
 
-Mở **DevTools Console** trên `blanc.homelabo.work` và chạy:
+Mở **DevTools Console** trên `contesthub.homelabo.work` và chạy:
 
 ```javascript
-fetch('https://blanc-backend.homelabo.work/api/health', {
+fetch('https://contesthub-backend.homelabo.work/api/health', {
   credentials: 'include'
 })
   .then(r => r.json())
@@ -144,8 +144,8 @@ Nếu thấy **CORS error** → Backend chưa có `FRONTEND_ORIGIN` đúng.
 
 **Fix:**
 1. Vào Railway Backend service → Variables
-2. Thêm: `FRONTEND_ORIGIN=https://blanc.homelabo.work`
-3. Nếu có nhiều domain, dùng dấu phẩy: `FRONTEND_ORIGIN=https://blanc.homelabo.work,https://other-domain.com`
+2. Thêm: `FRONTEND_ORIGIN=https://contesthub.homelabo.work`
+3. Nếu có nhiều domain, dùng dấu phẩy: `FRONTEND_ORIGIN=https://contesthub.homelabo.work,https://other-domain.com`
 4. Click **Redeploy** backend
 
 ### Lỗi: "redis unavailable" (nhưng app vẫn chạy)
@@ -203,12 +203,12 @@ REDIS_URL=rediss://default:password@host.upstash.io:6380
 Backend service cần có:
 - [ ] `DATABASE_URL` (valid connection string)
 - [ ] `JWT_SECRET` (random 32+ chars)
-- [ ] `FRONTEND_ORIGIN=https://blanc.homelabo.work`
+- [ ] `FRONTEND_ORIGIN=https://contesthub.homelabo.work`
 - [ ] `NODE_ENV=production`
 - [ ] `TRUST_PROXY=1`
 
 Frontend service cần có:
-- [ ] `VITE_API_URL=https://blanc-backend.homelabo.work/api`
+- [ ] `VITE_API_URL=https://contesthub-backend.homelabo.work/api`
 - [ ] `NODE_ENV=production`
 
 Sau khi set xong:
@@ -221,18 +221,18 @@ Sau khi set xong:
 
 ### Kiểm tra backend health:
 ```bash
-curl -i https://blanc-backend.homelabo.work/api/health
+curl -i https://contesthub-backend.homelabo.work/api/health
 ```
 
 ### Kiểm tra backend có trả CORS headers:
 ```bash
-curl -i -H "Origin: https://blanc.homelabo.work" \
-  https://blanc-backend.homelabo.work/api/health
+curl -i -H "Origin: https://contesthub.homelabo.work" \
+  https://contesthub-backend.homelabo.work/api/health
 ```
 
 Response phải có:
 ```
-Access-Control-Allow-Origin: https://blanc.homelabo.work
+Access-Control-Allow-Origin: https://contesthub.homelabo.work
 Access-Control-Allow-Credentials: true
 ```
 
@@ -240,12 +240,12 @@ Access-Control-Allow-Credentials: true
 ```bash
 # Backend
 railway link  # chọn backend service
-railway variables set FRONTEND_ORIGIN="https://blanc.homelabo.work"
+railway variables set FRONTEND_ORIGIN="https://contesthub.homelabo.work"
 railway variables set DATABASE_URL="postgresql://..."
 
 # Frontend  
 railway link  # chọn frontend service
-railway variables set VITE_API_URL="https://blanc-backend.homelabo.work/api"
+railway variables set VITE_API_URL="https://contesthub-backend.homelabo.work/api"
 ```
 
 ## 📞 Nếu vẫn lỗi

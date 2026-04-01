@@ -1,6 +1,6 @@
-# Blanc Admin Dashboard
+# ContestHub Admin Dashboard
 
-A modern admin dashboard for managing Blanc platform built with React, TypeScript, and Vite.
+A modern admin dashboard for managing ContestHub platform built with React, TypeScript, and Vite.
 
 ## Features
 

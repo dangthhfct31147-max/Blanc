@@ -98,7 +98,7 @@ export async function sendMarketingEmail({ to, title, content, ctaText, ctaUrl }
         headline: title,
         content,
         ctaText: ctaText || 'Khám phá ngay',
-        ctaUrl: ctaUrl || 'https://blanc.com'
+        ctaUrl: ctaUrl || 'https://contesthub.com'
     });
 }
 

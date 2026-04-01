@@ -13,7 +13,7 @@
 #>
 
 param(
-    [string]$BackendUrl = "https://blanc.homelabo.work",
+    [string]$BackendUrl = "https://contesthub.homelabo.work",
     [string]$FrontendUrl = "",
     [string]$AdminUrl = ""
 )

@@ -38,8 +38,8 @@ export interface PlatformSettings {
 // Default settings (fallback)
 const defaultSettings: PlatformSettings = {
     general: {
-        siteName: 'Blanc',
-        supportEmail: 'support@blanc.com',
+        siteName: 'ContestHub',
+        supportEmail: 'support@contesthub.com',
         maintenanceMode: false,
         defaultLanguage: 'vi',
         timezone: 'Asia/Ho_Chi_Minh',
@@ -66,7 +66,7 @@ const defaultSettings: PlatformSettings = {
 };
 
 // API keys still use localStorage (no backend endpoint)
-const API_KEYS_KEY = 'blanc_admin_api_keys';
+const API_KEYS_KEY = 'contesthub_admin_api_keys';
 
 interface ApiKey {
     id: string;

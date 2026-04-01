@@ -14,20 +14,20 @@
     Automatically apply fixes without confirmation
 
 .PARAMETER Service
-    Target Railway service (default: blanc-backend)
+    Target Railway service (default: contesthub-backend)
 
 .EXAMPLE
     .\railway-emergency-fix.ps1
     # Run diagnostics and show recommended fixes
 
 .EXAMPLE
-    .\railway-emergency-fix.ps1 -AutoFix -Service blanc-backend
+    .\railway-emergency-fix.ps1 -AutoFix -Service contesthub-backend
     # Automatically fix all issues
 #>
 
 param(
     [switch]$AutoFix,
-    [string]$Service = "blanc-backend"
+    [string]$Service = "contesthub-backend"
 )
 
 $ErrorActionPreference = "Continue"
@@ -293,7 +293,7 @@ Write-Host "==================`n" -ForegroundColor Yellow
 
 # Check service health
 Write-Host "Checking service health..." -ForegroundColor Gray
-$healthUrl = "https://blanc.homelabo.work/api/health/ready"
+$healthUrl = "https://contesthub.homelabo.work/api/health/ready"
 
 try {
     $response = Invoke-RestMethod -Uri $healthUrl -Method Get -TimeoutSec 10

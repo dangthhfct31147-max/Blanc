@@ -54,6 +54,7 @@ const Layout: React.FC<LayoutProps> = ({
     { name: t('nav.courses'), path: '/marketplace' },
     { name: t('nav.documents'), path: '/documents' },
     { name: t('nav.hallOfFame'), path: '/hall-of-fame' },
+    { name: t('nav.universityFit'), path: '/university-fit' },
     { name: t('nav.skillTree'), path: '/skill-tree' },
   ];
 
@@ -74,6 +75,7 @@ const Layout: React.FC<LayoutProps> = ({
   const isLearningActive = location.pathname.startsWith('/marketplace')
     || location.pathname.startsWith('/documents')
     || location.pathname.startsWith('/hall-of-fame')
+    || location.pathname.startsWith('/university-fit')
     || location.pathname.startsWith('/skill-tree');
   const isCommunityActive = location.pathname.startsWith('/community') || location.pathname.startsWith('/news');
 
@@ -351,7 +353,7 @@ const Layout: React.FC<LayoutProps> = ({
           <div className="relative flex h-16 items-center justify-center">
             {/* Logo - Absolute left */}
             <div className="absolute left-0 top-1/2 -translate-y-1/2 flex flex-row items-center cursor-pointer" onClick={() => navigate('/')}>
-              <img src="/logo.png" alt="Blanc Logo" className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover shrink-0" />
+              <img src="/logo.png" alt="ContestHub Logo" className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover shrink-0" />
               <div className="ml-2 md:ml-3 flex-col hidden sm:flex">
                 <span className="text-sm font-semibold text-slate-800 leading-tight dark:text-slate-100">Beyond Learning</span>
                 <span className="text-xs text-slate-500 leading-tight dark:text-slate-400">And New Challenges</span>
@@ -817,24 +819,24 @@ const Layout: React.FC<LayoutProps> = ({
 
       {/* Footer - Hidden on reports page for full-screen editor */}
       {!hideFooter && (
-        <footer className="bg-white border-t border-slate-200 py-12">
+        <footer className="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
               <div className="col-span-1 lg:col-span-3">
-                <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-lg shadow-slate-200/60 p-6 h-full flex flex-col">
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-sky-50 opacity-80" aria-hidden="true"></div>
+                <div className="relative overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg shadow-slate-200/60 dark:shadow-slate-900/60 p-6 h-full flex flex-col">
+                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-sky-50 dark:from-indigo-950/30 dark:via-slate-900 dark:to-sky-950/30 opacity-80" aria-hidden="true"></div>
                   <div className="relative">
                     <div className="flex items-center mb-4">
-                      <img src="/logo.png" alt="Blanc Logo" className="h-10 w-10 rounded-full object-cover mr-3 shadow-sm" />
+                      <img src="/logo.png" alt="ContestHub Logo" className="h-10 w-10 rounded-full object-cover mr-3 shadow-sm" />
                       <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-slate-800 leading-tight">Beyond Learning</span>
-                        <span className="text-xs text-slate-500 leading-tight">And New Challenges</span>
+                        <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 leading-tight">Beyond Learning</span>
+                        <span className="text-xs text-slate-500 dark:text-slate-400 leading-tight">And New Challenges</span>
                       </div>
                     </div>
-                    <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                    <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-4">
                       {t('layout.footer.description')}
                     </p>
-                    <div className="space-y-2 text-sm text-slate-600">
+                    <div className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
                       <div className="flex items-start gap-2">
                         <ShieldCheck className="w-4 h-4 text-indigo-500 mt-0.5" />
                         <span>{t('layout.footer.feature.security')}</span>
@@ -849,30 +851,30 @@ const Layout: React.FC<LayoutProps> = ({
                       </div>
                     </div>
                     <div className="mt-5 flex flex-wrap gap-2">
-                      <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-semibold">Blanc Community</span>
-                      <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-semibold">{t('layout.footer.tag.learningAndContests')}</span>
+                      <span className="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 text-xs font-semibold">ContestHub Community</span>
+                      <span className="px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300 text-xs font-semibold">{t('layout.footer.tag.learningAndContests')}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="col-span-1 lg:col-span-3">
-                <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-md shadow-slate-200/40 p-6 h-full flex flex-col">
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-indigo-50 opacity-60" aria-hidden="true"></div>
+                <div className="relative overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md shadow-slate-200/40 dark:shadow-slate-900/40 p-6 h-full flex flex-col">
+                  <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/30 opacity-60" aria-hidden="true"></div>
                   <div className="relative flex flex-col gap-4 h-full">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-1">{t('layout.footer.supportTitle')}</h3>
-                        <p className="text-xs text-slate-500">{t('layout.footer.supportDescription')}</p>
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider mb-1">{t('layout.footer.supportTitle')}</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{t('layout.footer.supportDescription')}</p>
                       </div>
-                      <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-semibold">Online</span>
+                      <span className="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 text-xs font-semibold">Online</span>
                     </div>
                     <ul className="space-y-3">
-                      <li><NavLink to="/terms" className="text-slate-500 hover:text-primary-600 text-sm">{t('layout.footer.terms')}</NavLink></li>
-                      <li><NavLink to="/privacy" className="text-slate-500 hover:text-primary-600 text-sm">{t('layout.footer.privacy')}</NavLink></li>
-                      <li><a href="mailto:clbflife2025thptfptcantho@gmail.com?subject=Li%C3%AAn%20h%E1%BB%87%20t%E1%BB%AB%20Blanc&body=Xin%20ch%C3%A0o%2C%0A%0AT%C3%B4i%20mu%E1%BB%91n%20li%C3%AAn%20h%E1%BB%87%20v%E1%BB%81..." className="text-slate-500 hover:text-primary-600 text-sm">{t('layout.footer.contact')}</a></li>
+                      <li><NavLink to="/terms" className="text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">{t('layout.footer.terms')}</NavLink></li>
+                      <li><NavLink to="/privacy" className="text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">{t('layout.footer.privacy')}</NavLink></li>
+                      <li><a href="mailto:clbflife2025thptfptcantho@gmail.com?subject=Li%C3%AAn%20h%E1%BB%87%20t%E1%BB%AB%20ContestHub&body=Xin%20ch%C3%A0o%2C%0A%0AT%C3%B4i%20mu%E1%BB%91n%20li%C3%AAn%20h%E1%BB%87%20v%E1%BB%81..." className="text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">{t('layout.footer.contact')}</a></li>
                     </ul>
-                    <div className="mt-auto inline-flex items-center gap-2 px-3 py-2 rounded-full bg-slate-50 text-slate-600 text-xs font-medium">
+                    <div className="mt-auto inline-flex items-center gap-2 px-3 py-2 rounded-full bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium">
                       <Sparkles className="w-4 h-4 text-indigo-500" /> {t('layout.footer.supportBadge')}
                     </div>
                   </div>
@@ -880,28 +882,28 @@ const Layout: React.FC<LayoutProps> = ({
               </div>
 
               <div className="lg:col-span-6">
-                <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl shadow-slate-200/50">
-                  <div className="absolute inset-0 bg-gradient-to-r from-sky-50 via-white to-indigo-50 opacity-80" aria-hidden="true"></div>
+                <div className="relative overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50">
+                  <div className="absolute inset-0 bg-gradient-to-r from-sky-50 via-white to-indigo-50 dark:from-sky-950/30 dark:via-slate-900 dark:to-indigo-950/30 opacity-80" aria-hidden="true"></div>
                   <div className="relative px-6 py-8 md:px-10 md:py-10">
                     <div className="text-center">
-                      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-2">{t('layout.footer.contactTitle')}</h3>
-                      <p className="text-slate-500 text-sm">{t('layout.footer.contactDescription')}</p>
+                      <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider mb-2">{t('layout.footer.contactTitle')}</h3>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm">{t('layout.footer.contactDescription')}</p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8 mt-8">
-                      <div className="rounded-xl border border-white/80 bg-white/70 backdrop-blur-sm p-6 shadow-sm">
+                      <div className="rounded-xl border border-white/80 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm p-6 shadow-sm">
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-200">
+                          <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-200 dark:shadow-indigo-900">
                             <Mail className="w-5 h-5" />
                           </div>
                           <div>
-                            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-indigo-600">{t('layout.footer.inbox')}</p>
-                            <p className="text-sm text-slate-500">CLB Blanc</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-indigo-600 dark:text-indigo-400">{t('layout.footer.inbox')}</p>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">CLB ContestHub</p>
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <p className="text-slate-700 text-sm font-medium break-words">clbflife2025thptfptcantho@gmail.com</p>
-                          <div className="flex items-center gap-2 text-slate-500 text-sm">
+                          <p className="text-slate-700 dark:text-slate-300 text-sm font-medium break-words">clbflife2025thptfptcantho@gmail.com</p>
+                          <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
                             <Phone className="w-4 h-4 text-indigo-500" />
                             <span>+84 916 007 090</span>
                           </div>
@@ -911,7 +913,7 @@ const Layout: React.FC<LayoutProps> = ({
                             href="https://www.facebook.com/profile.php?id=61584015058767"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center hover:bg-indigo-100 transition-colors shadow-sm"
+                            className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-300 flex items-center justify-center hover:bg-indigo-100 dark:hover:bg-indigo-800/40 transition-colors shadow-sm"
                             title="Facebook"
                           >
                             <span className="sr-only">Facebook</span>
@@ -920,10 +922,10 @@ const Layout: React.FC<LayoutProps> = ({
                             </svg>
                           </a>
                           <a
-                            href="https://www.tiktok.com/@blancfpt"
+                            href="https://www.tiktok.com/@contesthub"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-200 transition-colors shadow-sm"
+                            className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-sm"
                             title="TikTok"
                           >
                             <span className="sr-only">TikTok</span>
@@ -934,19 +936,19 @@ const Layout: React.FC<LayoutProps> = ({
                         </div>
                       </div>
 
-                      <div className="rounded-xl border border-white/80 bg-white/70 backdrop-blur-sm p-6 shadow-sm">
+                      <div className="rounded-xl border border-white/80 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm p-6 shadow-sm">
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 rounded-full bg-sky-500 text-white flex items-center justify-center shadow-md shadow-sky-200">
+                          <div className="w-10 h-10 rounded-full bg-sky-500 text-white flex items-center justify-center shadow-md shadow-sky-200 dark:shadow-sky-900">
                             <Mail className="w-5 h-5" />
                           </div>
                           <div>
-                            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-600">{t('layout.footer.inbox')}</p>
-                            <p className="text-sm text-slate-500">Trần Hữu Hải Đăng</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-600 dark:text-sky-400">{t('layout.footer.inbox')}</p>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">Trần Hữu Hải Đăng</p>
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <p className="text-slate-700 text-sm font-medium break-words">dangthhfct31147@gmail.com</p>
-                          <div className="flex items-center gap-2 text-slate-500 text-sm">
+                          <p className="text-slate-700 dark:text-slate-300 text-sm font-medium break-words">dangthhfct31147@gmail.com</p>
+                          <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
                             <Phone className="w-4 h-4 text-sky-500" />
                             <span>+84 339 122 620</span>
                           </div>
@@ -956,7 +958,7 @@ const Layout: React.FC<LayoutProps> = ({
                             href="https://www.facebook.com/hai.ang.782631/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center hover:bg-indigo-100 transition-colors shadow-sm"
+                            className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-300 flex items-center justify-center hover:bg-indigo-100 dark:hover:bg-indigo-800/40 transition-colors shadow-sm"
                             title="Facebook"
                           >
                             <span className="sr-only">Facebook</span>
@@ -968,7 +970,7 @@ const Layout: React.FC<LayoutProps> = ({
                             href="https://www.tiktok.com/@mrhomeless_12"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-200 transition-colors shadow-sm"
+                            className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-sm"
                             title="TikTok"
                           >
                             <span className="sr-only">TikTok</span>
@@ -983,7 +985,7 @@ const Layout: React.FC<LayoutProps> = ({
                 </div>
               </div>
             </div>
-            <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-center items-center">
+            <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-center items-center">
               <span className="text-slate-400 text-sm">Made with ❤️ for Education</span>
             </div>
           </div>

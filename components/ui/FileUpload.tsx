@@ -179,12 +179,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
                 className={cn(
                     'relative flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-6 py-10 transition-all',
                     dragging
-                        ? 'border-indigo-400 bg-indigo-50/60 ring-4 ring-indigo-100'
-                        : 'border-slate-300 bg-slate-50/50 hover:border-indigo-300 hover:bg-indigo-50/30',
+                        ? 'border-indigo-400 bg-indigo-50/60 ring-4 ring-indigo-100 dark:bg-indigo-900/20 dark:ring-indigo-800'
+                        : 'border-slate-300 bg-slate-50/50 hover:border-indigo-300 hover:bg-indigo-50/30 dark:border-slate-600 dark:bg-slate-800/50 dark:hover:border-indigo-600 dark:hover:bg-indigo-900/20',
                 )}
             >
                 <Upload className={cn('h-8 w-8', dragging ? 'text-indigo-500' : 'text-slate-400')} />
-                <span className="text-sm font-medium text-slate-600">{label}</span>
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-300">{label}</span>
                 <span className="text-xs text-slate-400">Max {formatSize(maxSize)} per file</span>
             </button>
 
@@ -208,7 +208,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                         exit={{ opacity: 0, height: 0 }}
                         className="overflow-hidden"
                     >
-                        <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3">
+                        <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800">
                             {/* Preview / icon */}
                             {item.preview ? (
                                 <img
@@ -217,18 +217,18 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                     className="h-10 w-10 rounded-md object-cover"
                                 />
                             ) : (
-                                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-slate-100">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-slate-100 dark:bg-slate-700">
                                     <FileIcon mime={item.file.type} />
                                 </div>
                             )}
 
                             {/* Details */}
                             <div className="flex-1 min-w-0">
-                                <p className="truncate text-sm font-medium text-slate-800">{item.file.name}</p>
+                                <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">{item.file.name}</p>
                                 <p className="text-xs text-slate-400">{formatSize(item.file.size)}</p>
                                 {/* Progress bar */}
                                 {(item.status === 'uploading' || item.status === 'queued') && (
-                                    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                                    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
                                         <motion.div
                                             className="h-full rounded-full bg-indigo-500"
                                             initial={{ width: 0 }}
@@ -250,7 +250,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                 {item.status === 'uploading' && <Loader2 className="h-5 w-5 animate-spin text-indigo-500" />}
                                 {item.status === 'done' && <CheckCircle2 className="h-5 w-5 text-emerald-500" />}
                                 {(item.status === 'queued' || item.status === 'error') && (
-                                    <button onClick={() => removeFile(item.id)} className="rounded p-0.5 hover:bg-slate-100" aria-label="Remove file">
+                                    <button onClick={() => removeFile(item.id)} className="rounded p-0.5 hover:bg-slate-100 dark:hover:bg-slate-700" aria-label="Remove file">
                                         <X className="h-4 w-4 text-slate-400" />
                                     </button>
                                 )}

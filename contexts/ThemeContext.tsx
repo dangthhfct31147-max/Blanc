@@ -9,7 +9,7 @@ interface ThemeContextValue {
     setMode: (mode: ThemeMode) => void;
 }
 
-const STORAGE_KEY = 'blanc:theme';
+const STORAGE_KEY = 'contesthub:theme';
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 

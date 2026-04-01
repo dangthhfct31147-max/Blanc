@@ -130,18 +130,18 @@ function getStatusMeta(status: PeerReviewSubmissionStatus, isEn: boolean) {
   if (status === 'reviewed') {
     return {
       label: isEn ? 'Fully reviewed' : 'Đủ review',
-      className: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+      className: 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
     };
   }
   if (status === 'in_review') {
     return {
       label: isEn ? 'In review' : 'Đang được review',
-      className: 'border-sky-200 bg-sky-50 text-sky-700',
+      className: 'border-sky-200 dark:border-sky-800 bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300',
     };
   }
   return {
     label: isEn ? 'Waiting for reviewers' : 'Đang chờ reviewer',
-    className: 'border-amber-200 bg-amber-50 text-amber-700',
+    className: 'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
   };
 }
 
@@ -149,13 +149,13 @@ function getTypeMeta(type: PeerReviewSubmissionType, isEn: boolean) {
   if (type === 'report') {
     return {
       label: isEn ? 'Report' : 'Báo cáo',
-      className: 'bg-sky-100 text-sky-700',
+      className: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300',
       icon: BookOpen,
     };
   }
   return {
     label: isEn ? 'Slides' : 'Slides',
-    className: 'bg-violet-100 text-violet-700',
+    className: 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300',
     icon: FileText,
   };
 }
@@ -167,17 +167,17 @@ const ScoreInput: React.FC<{
   icon: LucideIcon;
   onChange: (nextValue: number) => void;
 }> = ({ value, label, description, icon: Icon, onChange }) => (
-  <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+  <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/80 p-4">
     <div className="flex items-start gap-3">
-      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-violet-600 shadow-sm">
+      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white dark:bg-slate-900 text-violet-600 shadow-sm">
         <Icon className="h-4 w-4" />
       </div>
       <div className="min-w-0 grow">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-semibold text-slate-800">{label}</p>
-          <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700 shadow-sm">{value}/10</span>
+          <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{label}</p>
+          <span className="rounded-full bg-white dark:bg-slate-900 px-3 py-1 text-xs font-bold text-slate-700 dark:text-slate-300 shadow-sm">{value}/10</span>
         </div>
-        <p className="mt-1 text-xs leading-5 text-slate-500">{description}</p>
+        <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">{description}</p>
         <input
           type="range"
           min={0}
@@ -206,7 +206,7 @@ const HelpfulnessRating: React.FC<{
         onClick={() => onRate(value)}
         className={cn(
           'rounded-lg p-1 transition-colors',
-          disabled ? 'cursor-not-allowed opacity-60' : 'hover:bg-amber-50',
+          disabled ? 'cursor-not-allowed opacity-60' : 'hover:bg-amber-50 dark:hover:bg-amber-900/30',
         )}
         aria-label={`Rate review ${value} out of 5`}
       >
@@ -545,22 +545,22 @@ const PeerReview: React.FC = () => {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <section className="relative overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_24px_80px_-40px_rgba(91,33,182,0.45)]">
-        <div className="absolute inset-0 bg-linear-to-br from-violet-50 via-white to-cyan-50" aria-hidden="true" />
+      <section className="relative overflow-hidden rounded-[2rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-[0_24px_80px_-40px_rgba(91,33,182,0.45)]">
+        <div className="absolute inset-0 bg-linear-to-br from-violet-50 dark:from-violet-950/30 via-white dark:via-slate-950 to-cyan-50 dark:to-cyan-950/30" aria-hidden="true" />
         <div className="absolute -left-10 top-10 h-40 w-40 rounded-full bg-violet-200/40 blur-3xl" aria-hidden="true" />
         <div className="absolute bottom-0 right-0 h-56 w-56 translate-x-1/4 translate-y-1/4 rounded-full bg-cyan-200/40 blur-3xl" aria-hidden="true" />
 
         <div className="relative p-6 md:p-8 lg:p-10">
           <div className="grid gap-8 lg:grid-cols-[1.25fr_0.95fr] lg:items-center">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-violet-700 shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/70 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-violet-700 dark:text-violet-300 shadow-sm">
                 <EyeOff className="h-3.5 w-3.5" />
                 {copy.badge}
               </div>
-              <h1 className="mt-4 max-w-3xl text-3xl font-black tracking-tight text-slate-900 md:text-5xl">
+              <h1 className="mt-4 max-w-3xl text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100 md:text-5xl">
                 {copy.heroTitle}
               </h1>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600 md:text-base">
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-400 md:text-base">
                 {copy.heroDesc}
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
@@ -569,7 +569,7 @@ const PeerReview: React.FC = () => {
                   { icon: Clock3, label: copy.featureQuota },
                   { icon: Award, label: copy.featureTrust },
                 ].map((item) => (
-                  <div key={item.label} className="inline-flex items-center gap-2 rounded-2xl border border-white/70 bg-white/90 px-4 py-2 text-sm text-slate-600 shadow-sm">
+                  <div key={item.label} className="inline-flex items-center gap-2 rounded-2xl border border-white/70 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 px-4 py-2 text-sm text-slate-600 dark:text-slate-400 shadow-sm">
                     <item.icon className="h-4 w-4 text-violet-500" />
                     <span>{item.label}</span>
                   </div>
@@ -579,22 +579,22 @@ const PeerReview: React.FC = () => {
 
             <div className="grid gap-3 sm:grid-cols-2">
               {isLoggedIn && dashboard ? topStats.map((stat) => (
-                <div key={stat.label} className="overflow-hidden rounded-[1.5rem] border border-white/80 bg-white/90 shadow-sm">
+                <div key={stat.label} className="overflow-hidden rounded-[1.5rem] border border-white/80 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 shadow-sm">
                   <div className={cn('h-1.5 w-full bg-linear-to-r', stat.tone)} />
                   <div className="flex items-center gap-3 p-4">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                       <stat.icon className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{stat.label}</p>
-                      <p className="mt-1 text-xl font-black text-slate-900">{stat.value}</p>
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-400">{stat.label}</p>
+                      <p className="mt-1 text-xl font-black text-slate-900 dark:text-slate-100">{stat.value}</p>
                     </div>
                   </div>
                 </div>
               )) : (
-                <div className="rounded-[1.75rem] border border-white/80 bg-white/92 p-6 shadow-sm sm:col-span-2">
-                  <p className="text-sm font-semibold text-slate-900">{copy.loginTitle}</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">{copy.loginDesc}</p>
+                <div className="rounded-[1.75rem] border border-white/80 dark:border-slate-700 bg-white/92 dark:bg-slate-900/92 p-6 shadow-sm sm:col-span-2">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{copy.loginTitle}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">{copy.loginDesc}</p>
                   <button
                     type="button"
                     onClick={handleLoginClick}
@@ -610,7 +610,7 @@ const PeerReview: React.FC = () => {
         </div>
       </section>
 
-      <div className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm md:p-6">
+      <div className="mt-8 rounded-[2rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-sm md:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap gap-2">
             {tabs.map((tab) => (
@@ -620,7 +620,7 @@ const PeerReview: React.FC = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
                   'rounded-2xl px-4 py-2.5 text-sm font-semibold transition-all',
-                  activeTab === tab.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+                  activeTab === tab.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-200' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700',
                 )}
               >
                 {tab.label}
@@ -635,7 +635,7 @@ const PeerReview: React.FC = () => {
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder={copy.searchPlaceholder}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-700 outline-none transition-colors focus:border-violet-300 focus:bg-white"
+                className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 py-2.5 pl-10 pr-4 text-sm text-slate-700 dark:text-slate-300 outline-none transition-colors focus:border-violet-300 focus:bg-white dark:focus:bg-slate-900"
               />
             </label>
             {activeTab === 'submissions' && isLoggedIn && (
@@ -652,22 +652,22 @@ const PeerReview: React.FC = () => {
         </div>
 
         {isLoggedIn && (
-          <div className="mt-4 grid gap-3 rounded-[1.5rem] border border-violet-100 bg-violet-50/60 p-4 md:grid-cols-4">
+          <div className="mt-4 grid gap-3 rounded-[1.5rem] border border-violet-100 dark:border-violet-800 bg-violet-50/60 dark:bg-violet-900/30 p-4 md:grid-cols-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-500">{copy.reviewsDone}</p>
-              <p className="mt-1 text-lg font-black text-slate-900">{dashboard?.stats.totalReviewsGiven ?? 0}</p>
+              <p className="mt-1 text-lg font-black text-slate-900 dark:text-slate-100">{dashboard?.stats.totalReviewsGiven ?? 0}</p>
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-500">{copy.submissionsReceived}</p>
-              <p className="mt-1 text-lg font-black text-slate-900">{dashboard?.stats.submissionsReceived ?? 0}</p>
+              <p className="mt-1 text-lg font-black text-slate-900 dark:text-slate-100">{dashboard?.stats.submissionsReceived ?? 0}</p>
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-500">{copy.turnaround}</p>
-              <p className="mt-1 text-lg font-black text-slate-900">{formatHourLabel(dashboard?.stats.avgTurnaroundHours, isEn)}</p>
+              <p className="mt-1 text-lg font-black text-slate-900 dark:text-slate-100">{formatHourLabel(dashboard?.stats.avgTurnaroundHours, isEn)}</p>
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-500">{copy.reviewerBoard}</p>
-              <p className="mt-1 truncate text-lg font-black text-slate-900">
+              <p className="mt-1 truncate text-lg font-black text-slate-900 dark:text-slate-100">
                 {dashboard?.userState.reviewerProfile.alias || (isEn ? 'No profile yet' : 'Chưa có hồ sơ')}
               </p>
             </div>
@@ -675,10 +675,10 @@ const PeerReview: React.FC = () => {
         )}
 
         {!isLoggedIn ? (
-          <div className="mt-6 rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
+          <div className="mt-6 rounded-[1.75rem] border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-6 py-12 text-center">
             <Shield className="mx-auto h-10 w-10 text-violet-500" />
-            <p className="mt-4 text-lg font-semibold text-slate-900">{copy.loginTitle}</p>
-            <p className="mx-auto mt-2 max-w-2xl text-sm leading-7 text-slate-600">{copy.loginDesc}</p>
+            <p className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">{copy.loginTitle}</p>
+            <p className="mx-auto mt-2 max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-400">{copy.loginDesc}</p>
             <button
               type="button"
               onClick={handleLoginClick}
@@ -689,12 +689,12 @@ const PeerReview: React.FC = () => {
             </button>
           </div>
         ) : loading ? (
-          <div className="mt-8 flex items-center justify-center gap-3 rounded-[1.75rem] border border-slate-200 bg-slate-50 py-16 text-slate-500">
+          <div className="mt-8 flex items-center justify-center gap-3 rounded-[1.75rem] border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 py-16 text-slate-500 dark:text-slate-400">
             <Loader2 className="h-5 w-5 animate-spin" />
             <span>{isEn ? 'Loading peer review data...' : 'Đang tải dữ liệu chấm chéo...'}</span>
           </div>
         ) : error ? (
-          <div className="mt-8 rounded-[1.75rem] border border-rose-200 bg-rose-50 p-6 text-rose-700">
+          <div className="mt-8 rounded-[1.75rem] border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-900/30 p-6 text-rose-700 dark:text-rose-300">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="flex items-start gap-3">
                 <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
@@ -703,7 +703,7 @@ const PeerReview: React.FC = () => {
               <button
                 type="button"
                 onClick={() => void loadDashboard()}
-                className="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-rose-700 shadow-sm"
+                className="inline-flex items-center gap-2 rounded-2xl bg-white dark:bg-slate-900 px-4 py-2 text-sm font-semibold text-rose-700 dark:text-rose-300 shadow-sm"
               >
                 <RefreshCw className="h-4 w-4" />
                 {copy.reload}
@@ -715,15 +715,15 @@ const PeerReview: React.FC = () => {
             {activeTab === 'submissions' && (
               <div className="mt-6 space-y-4">
                 {filteredSubmissions.length === 0 ? (
-                  <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 py-14 text-center text-sm text-slate-500">
+                  <div className="rounded-[1.75rem] border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 py-14 text-center text-sm text-slate-500 dark:text-slate-400">
                     {copy.noSubmissions}
                   </div>
                 ) : filteredSubmissions.map((submission) => {
                   const statusMeta = getStatusMeta(submission.status, isEn);
                   const typeMeta = getTypeMeta(submission.type, isEn);
                   return (
-                    <div key={submission.id} className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm">
-                      <div className="flex flex-col gap-4 border-b border-slate-100 p-5 lg:flex-row lg:items-start lg:justify-between">
+                    <div key={submission.id} className="overflow-hidden rounded-[1.75rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
+                      <div className="flex flex-col gap-4 border-b border-slate-100 dark:border-slate-800 p-5 lg:flex-row lg:items-start lg:justify-between">
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className={cn('inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold', typeMeta.className)}>
@@ -733,13 +733,13 @@ const PeerReview: React.FC = () => {
                             <span className={cn('rounded-full border px-3 py-1 text-xs font-semibold', statusMeta.className)}>
                               {statusMeta.label}
                             </span>
-                            <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-500">
+                            <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1 text-xs font-medium text-slate-500 dark:text-slate-400">
                               {copy.anonymousCode}: {submission.anonymousId}
                             </span>
                           </div>
-                          <h2 className="mt-3 text-xl font-black text-slate-900">{submission.title}</h2>
-                          <p className="mt-1 text-sm text-slate-500">{submission.contestName}</p>
-                          <div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-500">
+                          <h2 className="mt-3 text-xl font-black text-slate-900 dark:text-slate-100">{submission.title}</h2>
+                          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{submission.contestName}</p>
+                          <div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-500 dark:text-slate-400">
                             <span>{formatDateLabel(submission.submittedAt, isEn)}</span>
                             <span>{submission.reviewCount} {copy.reviews}</span>
                             <span>{submission.file.name} • {formatFileSize(submission.file.sizeBytes)}</span>
@@ -747,21 +747,21 @@ const PeerReview: React.FC = () => {
                         </div>
 
                         <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[320px]">
-                          <div className="rounded-2xl bg-slate-50 p-4">
-                            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.avgScore}</p>
-                            <p className="mt-2 text-2xl font-black text-slate-900">
+                          <div className="rounded-2xl bg-slate-50 dark:bg-slate-800 p-4">
+                            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-400">{copy.avgScore}</p>
+                            <p className="mt-2 text-2xl font-black text-slate-900 dark:text-slate-100">
                               {submission.averageScore ?? '—'}
                               {submission.averageScore !== null && (
-                                <span className="text-sm font-semibold text-slate-400"> / {dashboard?.config.maxTotalScore ?? 50}</span>
+                                <span className="text-sm font-semibold text-slate-400 dark:text-slate-500"> / {dashboard?.config.maxTotalScore ?? 50}</span>
                               )}
                             </p>
                           </div>
-                          <div className="rounded-2xl bg-violet-50 p-4">
+                          <div className="rounded-2xl bg-violet-50 dark:bg-violet-900/30 p-4">
                             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-500">{copy.weightedScore}</p>
-                            <p className="mt-2 text-2xl font-black text-slate-900">
+                            <p className="mt-2 text-2xl font-black text-slate-900 dark:text-slate-100">
                               {submission.weightedAverageScore ?? '—'}
                               {submission.weightedAverageScore !== null && (
-                                <span className="text-sm font-semibold text-slate-400"> / {dashboard?.config.maxTotalScore ?? 50}</span>
+                                <span className="text-sm font-semibold text-slate-400 dark:text-slate-500"> / {dashboard?.config.maxTotalScore ?? 50}</span>
                               )}
                             </p>
                           </div>
@@ -769,7 +769,7 @@ const PeerReview: React.FC = () => {
                             href={submission.file.url}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-violet-200 hover:text-violet-700 sm:col-span-2"
+                            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors hover:border-violet-200 hover:text-violet-700 sm:col-span-2"
                           >
                             <ExternalLink className="h-4 w-4" />
                             {copy.openFile}
@@ -780,34 +780,34 @@ const PeerReview: React.FC = () => {
                       <div className="p-5">
                         <div className="flex items-center justify-between gap-3">
                           <div>
-                            <p className="text-sm font-semibold text-slate-900">{isEn ? 'Anonymous feedback received' : 'Feedback ẩn danh đã nhận'}</p>
-                            <p className="mt-1 text-xs text-slate-500">
+                            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{isEn ? 'Anonymous feedback received' : 'Feedback ẩn danh đã nhận'}</p>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                               {isEn ? 'Rate usefulness to improve reviewer reputation.' : 'Đánh giá độ hữu ích để hệ thống cập nhật điểm uy tín reviewer.'}
                             </p>
                           </div>
-                          <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
+                          <div className="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
                             {submission.receivedReviews.length}/{dashboard?.config.maxReviewsPerSubmission ?? 3}
                           </div>
                         </div>
 
                         {submission.receivedReviews.length === 0 ? (
-                          <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
+                          <div className="mt-4 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
                             {isEn ? 'No anonymous feedback yet.' : 'Chưa có feedback ẩn danh nào.'}
                           </div>
                         ) : (
                           <div className="mt-4 grid gap-4 lg:grid-cols-2">
                             {submission.receivedReviews.map((review) => (
-                              <div key={review.id} className="rounded-[1.5rem] border border-slate-200 bg-slate-50/70 p-4">
+                              <div key={review.id} className="rounded-[1.5rem] border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/70 p-4">
                                 <div className="flex flex-wrap items-center justify-between gap-3">
                                   <div>
-                                    <p className="text-sm font-semibold text-slate-900">{review.reviewerAlias}</p>
-                                    <p className="mt-1 text-xs text-slate-500">{formatDateLabel(review.submittedAt, isEn)}</p>
+                                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{review.reviewerAlias}</p>
+                                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{formatDateLabel(review.submittedAt, isEn)}</p>
                                   </div>
                                   <div className="flex flex-wrap gap-2">
-                                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600 shadow-sm">
+                                    <span className="rounded-full bg-white dark:bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-400 shadow-sm">
                                       {copy.reputation}: {review.reviewerProfile.reputationScore}
                                     </span>
-                                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600 shadow-sm">
+                                    <span className="rounded-full bg-white dark:bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-400 shadow-sm">
                                       {copy.trustWeight}: {review.reviewerProfile.trustWeight}x
                                     </span>
                                   </div>
@@ -815,35 +815,35 @@ const PeerReview: React.FC = () => {
 
                                 <div className="mt-4 flex items-end justify-between gap-4">
                                   <div>
-                                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.weightedScore}</p>
-                                    <p className="mt-1 text-2xl font-black text-slate-900">
+                                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-400">{copy.weightedScore}</p>
+                                    <p className="mt-1 text-2xl font-black text-slate-900 dark:text-slate-100">
                                       {review.totalScore}
-                                      <span className="text-sm font-semibold text-slate-400"> / {review.maxTotalScore}</span>
+                                      <span className="text-sm font-semibold text-slate-400 dark:text-slate-500"> / {review.maxTotalScore}</span>
                                     </p>
                                   </div>
-                                  <div className="rounded-2xl bg-white px-3 py-2 text-right shadow-sm">
-                                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.reviewQuality}</p>
-                                    <p className="mt-1 text-sm font-bold text-slate-700">{Math.round(review.reviewerProfile.qualityScore * 100)}%</p>
+                                  <div className="rounded-2xl bg-white dark:bg-slate-900 px-3 py-2 text-right shadow-sm">
+                                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-400">{copy.reviewQuality}</p>
+                                    <p className="mt-1 text-sm font-bold text-slate-700 dark:text-slate-300">{Math.round(review.reviewerProfile.qualityScore * 100)}%</p>
                                   </div>
                                 </div>
 
-                                <p className="mt-4 rounded-2xl border border-white/80 bg-white px-4 py-3 text-sm leading-6 text-slate-600">
+                                <p className="mt-4 rounded-2xl border border-white/80 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
                                   {review.comment}
                                 </p>
 
                                 <div className="mt-4 grid gap-2 sm:grid-cols-2">
                                   {RUBRIC_CRITERIA.map((criterion) => (
-                                    <div key={`${review.id}-${criterion.id}`} className="rounded-2xl bg-white px-3 py-2 shadow-sm">
-                                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                                    <div key={`${review.id}-${criterion.id}`} className="rounded-2xl bg-white dark:bg-slate-900 px-3 py-2 shadow-sm">
+                                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-400">
                                         {isEn ? criterion.labelEn : criterion.label}
                                       </p>
-                                      <p className="mt-1 text-sm font-bold text-slate-800">{review.scores[criterion.id]} / 10</p>
+                                      <p className="mt-1 text-sm font-bold text-slate-800 dark:text-slate-100">{review.scores[criterion.id]} / 10</p>
                                     </div>
                                   ))}
                                 </div>
 
-                                <div className="mt-4 flex flex-col gap-2 rounded-2xl border border-amber-100 bg-amber-50/70 p-3">
-                                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">{copy.helpfulnessLabel}</p>
+                                <div className="mt-4 flex flex-col gap-2 rounded-2xl border border-amber-100 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-900/30 p-3">
+                                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700 dark:text-amber-300">{copy.helpfulnessLabel}</p>
                                   <HelpfulnessRating
                                     rating={review.helpfulnessRating}
                                     disabled={helpfulnessBusyId === review.id}
@@ -865,7 +865,7 @@ const PeerReview: React.FC = () => {
               <div className="mt-6 space-y-5">
                 <div className={cn(
                   'rounded-[1.75rem] border p-5',
-                  (dashboard?.userState.reviewsRemainingToday || 0) > 0 ? 'border-emerald-200 bg-emerald-50/70' : 'border-rose-200 bg-rose-50/70',
+                  (dashboard?.userState.reviewsRemainingToday || 0) > 0 ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/70 dark:bg-emerald-900/30' : 'border-rose-200 dark:border-rose-800 bg-rose-50/70 dark:bg-rose-900/30',
                 )}>
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div className="flex items-start gap-3">
@@ -875,12 +875,12 @@ const PeerReview: React.FC = () => {
                         <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />
                       )}
                       <div>
-                        <p className="text-sm font-semibold text-slate-900">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                           {isEn
                             ? `You can still review ${dashboard?.userState.reviewsRemainingToday ?? 0} submission(s) today.`
                             : `Hôm nay bạn còn review được ${dashboard?.userState.reviewsRemainingToday ?? 0} bài.`}
                         </p>
-                        <p className="mt-1 text-sm leading-6 text-slate-600">
+                        <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-400">
                           {isEn
                             ? 'Higher-quality feedback increases your reputation, and future reviews from you will carry more trust weight.'
                             : 'Feedback chất lượng sẽ tăng điểm uy tín của bạn, và các review sau này từ bạn sẽ có trọng số trust cao hơn.'}
@@ -888,13 +888,13 @@ const PeerReview: React.FC = () => {
                       </div>
                     </div>
                     <div className="grid gap-3 sm:grid-cols-2">
-                      <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
-                        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.reputation}</p>
-                        <p className="mt-1 text-xl font-black text-slate-900">{dashboard?.userState.reviewerProfile.reputationScore ?? 0}</p>
+                      <div className="rounded-2xl bg-white dark:bg-slate-900 px-4 py-3 shadow-sm">
+                        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-400">{copy.reputation}</p>
+                        <p className="mt-1 text-xl font-black text-slate-900 dark:text-slate-100">{dashboard?.userState.reviewerProfile.reputationScore ?? 0}</p>
                       </div>
-                      <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
-                        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.trustWeight}</p>
-                        <p className="mt-1 text-xl font-black text-slate-900">{dashboard?.userState.reviewerProfile.trustWeight ?? 0.85}x</p>
+                      <div className="rounded-2xl bg-white dark:bg-slate-900 px-4 py-3 shadow-sm">
+                        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-400">{copy.trustWeight}</p>
+                        <p className="mt-1 text-xl font-black text-slate-900 dark:text-slate-100">{dashboard?.userState.reviewerProfile.trustWeight ?? 0.85}x</p>
                       </div>
                     </div>
                   </div>
@@ -902,7 +902,7 @@ const PeerReview: React.FC = () => {
 
                 {!reviewingTask ? (
                   filteredTasks.length === 0 ? (
-                    <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 py-14 text-center text-sm text-slate-500">
+                    <div className="rounded-[1.75rem] border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 py-14 text-center text-sm text-slate-500 dark:text-slate-400">
                       {copy.noTasks}
                     </div>
                   ) : (
@@ -910,41 +910,41 @@ const PeerReview: React.FC = () => {
                       {filteredTasks.map((task) => {
                         const typeMeta = getTypeMeta(task.type, isEn);
                         return (
-                          <div key={task.id} className="flex h-full flex-col rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm">
+                          <div key={task.id} className="flex h-full flex-col rounded-[1.75rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-sm">
                             <div className="flex items-start justify-between gap-3">
                               <span className={cn('inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold', typeMeta.className)}>
                                 <typeMeta.icon className="h-3.5 w-3.5" />
                                 {typeMeta.label}
                               </span>
-                              <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                              <span className="rounded-full bg-amber-50 dark:bg-amber-900/30 px-3 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300">
                                 +{task.pointsReward} {copy.points}
                               </span>
                             </div>
 
                             <div className="mt-4">
-                              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{copy.anonymousCode}</p>
-                              <h3 className="mt-2 text-xl font-black text-slate-900">{task.anonymousId}</h3>
-                              <p className="mt-2 text-sm text-slate-600">{task.contestName}</p>
+                              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-400">{copy.anonymousCode}</p>
+                              <h3 className="mt-2 text-xl font-black text-slate-900 dark:text-slate-100">{task.anonymousId}</h3>
+                              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{task.contestName}</p>
                             </div>
 
-                            <div className="mt-5 space-y-2 rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
+                            <div className="mt-5 space-y-2 rounded-2xl bg-slate-50 dark:bg-slate-800 p-4 text-sm text-slate-600 dark:text-slate-400">
                               <div className="flex items-center justify-between gap-3">
                                 <span>{copy.reviewDeadline}</span>
-                                <span className="font-semibold text-slate-800">{formatDateLabel(task.reviewDeadline, isEn)}</span>
+                                <span className="font-semibold text-slate-800 dark:text-slate-200">{formatDateLabel(task.reviewDeadline, isEn)}</span>
                               </div>
                               <div className="flex items-center justify-between gap-3">
                                 <span>{copy.reviews}</span>
-                                <span className="font-semibold text-slate-800">
+                                <span className="font-semibold text-slate-800 dark:text-slate-200">
                                   {task.currentReviewCount}/{dashboard?.config.maxReviewsPerSubmission ?? 3}
                                 </span>
                               </div>
                               <div className="flex items-center justify-between gap-3">
                                 <span>{isEn ? 'Still needed' : 'Còn thiếu'}</span>
-                                <span className="font-semibold text-slate-800">{task.reviewsNeeded}</span>
+                                <span className="font-semibold text-slate-800 dark:text-slate-200">{task.reviewsNeeded}</span>
                               </div>
                               <div className="flex items-center justify-between gap-3">
                                 <span>{isEn ? 'File' : 'Tệp'}</span>
-                                <span className="max-w-[65%] truncate font-semibold text-slate-800">{task.file.name}</span>
+                                <span className="max-w-[65%] truncate font-semibold text-slate-800 dark:text-slate-200">{task.file.name}</span>
                               </div>
                             </div>
 
@@ -953,7 +953,7 @@ const PeerReview: React.FC = () => {
                                 href={task.file.url}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="inline-flex grow items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:border-violet-200 hover:text-violet-700"
+                                className="inline-flex grow items-center justify-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 transition-colors hover:border-violet-200 hover:text-violet-700"
                               >
                                 <ExternalLink className="h-4 w-4" />
                                 {copy.openFile}
@@ -975,23 +975,23 @@ const PeerReview: React.FC = () => {
                   )
                 ) : (
                   <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-                    <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5">
+                    <div className="rounded-[1.75rem] border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-5">
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <button
                             type="button"
                             onClick={() => setReviewingTask(null)}
-                            className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm"
+                            className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 shadow-sm"
                           >
                             <ChevronLeft className="h-4 w-4" />
                             {copy.backToQueue}
                           </button>
-                          <h2 className="mt-4 text-2xl font-black text-slate-900">{reviewingTask.anonymousId}</h2>
-                          <p className="mt-2 text-sm text-slate-600">{reviewingTask.contestName}</p>
+                          <h2 className="mt-4 text-2xl font-black text-slate-900 dark:text-slate-100">{reviewingTask.anonymousId}</h2>
+                          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{reviewingTask.contestName}</p>
                         </div>
-                        <div className="rounded-2xl border border-violet-100 bg-white px-4 py-3 text-right shadow-sm">
+                        <div className="rounded-2xl border border-violet-100 dark:border-violet-800 bg-white dark:bg-slate-900 px-4 py-3 text-right shadow-sm">
                           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-500">{copy.hiddenIdentity}</p>
-                          <p className="mt-1 text-sm font-semibold text-slate-700">{copy.reviewPreviewTitle}</p>
+                          <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-300">{copy.reviewPreviewTitle}</p>
                         </div>
                       </div>
 
@@ -1000,17 +1000,17 @@ const PeerReview: React.FC = () => {
                           href={reviewingTask.file.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm"
+                          className="inline-flex items-center gap-2 rounded-2xl bg-white dark:bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 shadow-sm"
                         >
                           <ExternalLink className="h-4 w-4" />
                           {copy.openFile}
                         </a>
-                        <div className="rounded-2xl bg-white px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm">
+                        <div className="rounded-2xl bg-white dark:bg-slate-900 px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 shadow-sm">
                           {reviewingTask.file.name} • {formatFileSize(reviewingTask.file.sizeBytes)}
                         </div>
                       </div>
 
-                      <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white">
+                      <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
                         {reviewingTask.file.mimeType === 'application/pdf' ? (
                           <iframe
                             src={reviewingTask.file.url}
@@ -1021,8 +1021,8 @@ const PeerReview: React.FC = () => {
                           <div className="flex min-h-[620px] flex-col items-center justify-center gap-4 bg-linear-to-br from-slate-100 via-white to-slate-50 p-8 text-center">
                             <FileText className="h-14 w-14 text-violet-500" />
                             <div>
-                              <p className="text-lg font-semibold text-slate-900">{reviewingTask.file.name}</p>
-                              <p className="mt-2 max-w-md text-sm leading-6 text-slate-600">
+                              <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{reviewingTask.file.name}</p>
+                              <p className="mt-2 max-w-md text-sm leading-6 text-slate-600 dark:text-slate-400">
                                 {isEn
                                   ? 'This file type opens in a new tab for review. The anonymous code remains visible while the account identity stays hidden.'
                                   : 'Loại file này sẽ mở ở tab mới để review. Hệ thống vẫn chỉ hiển thị mã ẩn danh và không lộ danh tính tài khoản.'}
@@ -1042,21 +1042,21 @@ const PeerReview: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm">
+                    <div className="rounded-[1.75rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-sm">
                       <div className="flex items-center justify-between gap-4">
                         <div>
-                          <p className="text-sm font-semibold text-slate-900">{copy.rubricTitle}</p>
-                          <p className="mt-1 text-xs leading-5 text-slate-500">
+                          <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{copy.rubricTitle}</p>
+                          <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
                             {isEn
                               ? 'A stronger review has both clear scoring and useful written feedback.'
                               : 'Một review tốt cần vừa có điểm rõ ràng, vừa có nhận xét đủ hữu ích.'}
                           </p>
                         </div>
-                        <div className="rounded-2xl bg-violet-50 px-4 py-3 text-right">
+                        <div className="rounded-2xl bg-violet-50 dark:bg-violet-900/30 px-4 py-3 text-right">
                           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-500">{copy.weightedScore}</p>
-                          <p className="mt-1 text-2xl font-black text-slate-900">
+                          <p className="mt-1 text-2xl font-black text-slate-900 dark:text-slate-100">
                             {totalScore}
-                            <span className="text-sm font-semibold text-slate-400"> / {dashboard?.config.maxTotalScore ?? 50}</span>
+                            <span className="text-sm font-semibold text-slate-400 dark:text-slate-500"> / {dashboard?.config.maxTotalScore ?? 50}</span>
                           </p>
                         </div>
                       </div>
@@ -1074,17 +1074,17 @@ const PeerReview: React.FC = () => {
                         ))}
                       </div>
 
-                      <div className="mt-5 rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4">
+                      <div className="mt-5 rounded-[1.5rem] border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-4">
                         <div className="flex items-center gap-2">
                           <MessageSquare className="h-4 w-4 text-violet-500" />
-                          <span className="text-sm font-semibold text-slate-800">{isEn ? 'Constructive feedback' : 'Nhận xét xây dựng'}</span>
+                          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{isEn ? 'Constructive feedback' : 'Nhận xét xây dựng'}</span>
                         </div>
                         <textarea
                           value={reviewComment}
                           onChange={(event) => setReviewComment(event.target.value)}
                           rows={6}
                           placeholder={copy.commentPlaceholder}
-                          className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-700 outline-none transition-colors focus:border-violet-300"
+                          className="mt-3 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm leading-6 text-slate-700 dark:text-slate-300 outline-none transition-colors focus:border-violet-300"
                         />
                       </div>
 
@@ -1107,30 +1107,30 @@ const PeerReview: React.FC = () => {
               <div className="mt-6 space-y-4">
                 <div className="grid gap-4 md:grid-cols-3">
                   {filteredLeaderboard.slice(0, 3).map((entry) => (
-                    <div key={entry.alias} className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5">
+                    <div key={entry.alias} className="rounded-[1.75rem] border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-5">
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">#{entry.rank}</p>
-                          <h3 className="mt-2 text-xl font-black text-slate-900">{entry.alias}</h3>
+                          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-400">#{entry.rank}</p>
+                          <h3 className="mt-2 text-xl font-black text-slate-900 dark:text-slate-100">{entry.alias}</h3>
                         </div>
                         <Trophy className="h-8 w-8 text-amber-500" />
                       </div>
                       <div className="mt-5 grid grid-cols-2 gap-3">
-                        <div className="rounded-2xl bg-white p-3 shadow-sm">
-                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.points}</p>
-                          <p className="mt-1 text-lg font-black text-slate-900">{entry.points}</p>
+                        <div className="rounded-2xl bg-white dark:bg-slate-900 p-3 shadow-sm">
+                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-400">{copy.points}</p>
+                          <p className="mt-1 text-lg font-black text-slate-900 dark:text-slate-100">{entry.points}</p>
                         </div>
-                        <div className="rounded-2xl bg-white p-3 shadow-sm">
-                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.reputation}</p>
-                          <p className="mt-1 text-lg font-black text-slate-900">{entry.reputationScore}</p>
+                        <div className="rounded-2xl bg-white dark:bg-slate-900 p-3 shadow-sm">
+                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-400">{copy.reputation}</p>
+                          <p className="mt-1 text-lg font-black text-slate-900 dark:text-slate-100">{entry.reputationScore}</p>
                         </div>
-                        <div className="rounded-2xl bg-white p-3 shadow-sm">
-                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.reviewsDone}</p>
-                          <p className="mt-1 text-lg font-black text-slate-900">{entry.reviewsDone}</p>
+                        <div className="rounded-2xl bg-white dark:bg-slate-900 p-3 shadow-sm">
+                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-400">{copy.reviewsDone}</p>
+                          <p className="mt-1 text-lg font-black text-slate-900 dark:text-slate-100">{entry.reviewsDone}</p>
                         </div>
-                        <div className="rounded-2xl bg-white p-3 shadow-sm">
-                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{copy.helpfulness}</p>
-                          <p className="mt-1 text-lg font-black text-slate-900">{entry.avgHelpfulness ?? '—'}</p>
+                        <div className="rounded-2xl bg-white dark:bg-slate-900 p-3 shadow-sm">
+                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-400">{copy.helpfulness}</p>
+                          <p className="mt-1 text-lg font-black text-slate-900 dark:text-slate-100">{entry.avgHelpfulness ?? '—'}</p>
                         </div>
                       </div>
                     </div>
@@ -1138,12 +1138,12 @@ const PeerReview: React.FC = () => {
                 </div>
 
                 {filteredLeaderboard.length === 0 ? (
-                  <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 py-14 text-center text-sm text-slate-500">
+                  <div className="rounded-[1.75rem] border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 py-14 text-center text-sm text-slate-500 dark:text-slate-400">
                     {copy.noLeaderboard}
                   </div>
                 ) : (
-                  <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm">
-                    <div className="grid grid-cols-[4rem_1.4fr_0.9fr_0.9fr_0.9fr_0.9fr] gap-3 bg-slate-50 px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
+                    <div className="grid grid-cols-[4rem_1.4fr_0.9fr_0.9fr_0.9fr_0.9fr] gap-3 bg-slate-50 dark:bg-slate-800 px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                       <span>#</span>
                       <span>{isEn ? 'Reviewer' : 'Reviewer'}</span>
                       <span className="text-right">{copy.points}</span>
@@ -1155,21 +1155,21 @@ const PeerReview: React.FC = () => {
                       <div
                         key={entry.alias}
                         className={cn(
-                          'grid grid-cols-[4rem_1.4fr_0.9fr_0.9fr_0.9fr_0.9fr] items-center gap-3 border-t border-slate-100 px-5 py-4 text-sm',
-                          entry.isCurrentUser ? 'bg-violet-50/60' : 'bg-white',
+                          'grid grid-cols-[4rem_1.4fr_0.9fr_0.9fr_0.9fr_0.9fr] items-center gap-3 border-t border-slate-100 dark:border-slate-800 px-5 py-4 text-sm',
+                          entry.isCurrentUser ? 'bg-violet-50/60 dark:bg-violet-900/30' : 'bg-white dark:bg-slate-900',
                         )}
                       >
-                        <span className="text-sm font-semibold text-slate-500">#{entry.rank}</span>
+                        <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">#{entry.rank}</span>
                         <div className="min-w-0">
-                          <p className="truncate font-semibold text-slate-900">
+                          <p className="truncate font-semibold text-slate-900 dark:text-slate-100">
                             {entry.alias} {entry.isCurrentUser && <span className="text-xs font-medium text-violet-500">({copy.currentYou})</span>}
                           </p>
-                          <p className="mt-1 text-xs text-slate-500">{copy.trustWeight}: {entry.trustWeight}x</p>
+                          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{copy.trustWeight}: {entry.trustWeight}x</p>
                         </div>
-                        <span className="text-right font-bold text-slate-900">{entry.points}</span>
-                        <span className="text-right text-slate-600">{entry.reviewsDone}</span>
-                        <span className="text-right text-slate-600">{entry.reputationScore}</span>
-                        <span className="text-right text-slate-600">{entry.avgHelpfulness ?? '—'}</span>
+                        <span className="text-right font-bold text-slate-900 dark:text-slate-100">{entry.points}</span>
+                        <span className="text-right text-slate-600 dark:text-slate-400">{entry.reviewsDone}</span>
+                        <span className="text-right text-slate-600 dark:text-slate-400">{entry.reputationScore}</span>
+                        <span className="text-right text-slate-600 dark:text-slate-400">{entry.avgHelpfulness ?? '—'}</span>
                       </div>
                     ))}
                   </div>
@@ -1191,7 +1191,7 @@ const PeerReview: React.FC = () => {
             }}
             aria-label={isEn ? 'Close upload dialog' : 'Đóng hộp thoại nộp bài'}
           />
-          <div className="relative z-10 w-full max-w-2xl overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-[0_30px_90px_-40px_rgba(91,33,182,0.55)]">
+          <div className="relative z-10 w-full max-w-2xl overflow-hidden rounded-[2rem] border border-white/80 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-[0_30px_90px_-40px_rgba(91,33,182,0.55)]">
             <div className="bg-linear-to-r from-violet-600 to-fuchsia-500 px-6 py-5 text-white">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/80">{copy.uploadTitle}</p>
               <h2 className="mt-2 text-2xl font-black">{copy.uploadCta}</h2>
@@ -1201,27 +1201,27 @@ const PeerReview: React.FC = () => {
             <div className="space-y-5 p-6">
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="block">
-                  <span className="mb-2 block text-sm font-semibold text-slate-700">{isEn ? 'Title' : 'Tiêu đề'}</span>
+                  <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">{isEn ? 'Title' : 'Tiêu đề'}</span>
                   <input
                     value={uploadTitle}
                     onChange={(event) => setUploadTitle(event.target.value)}
                     placeholder={copy.titlePlaceholder}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition-colors focus:border-violet-300 focus:bg-white"
+                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 outline-none transition-colors focus:border-violet-300 focus:bg-white dark:focus:bg-slate-900"
                   />
                 </label>
                 <label className="block">
-                  <span className="mb-2 block text-sm font-semibold text-slate-700">{isEn ? 'Contest' : 'Cuộc thi'}</span>
+                  <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">{isEn ? 'Contest' : 'Cuộc thi'}</span>
                   <input
                     value={uploadContestName}
                     onChange={(event) => setUploadContestName(event.target.value)}
                     placeholder={copy.contestPlaceholder}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition-colors focus:border-violet-300 focus:bg-white"
+                    className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 text-sm text-slate-700 dark:text-slate-300 outline-none transition-colors focus:border-violet-300 focus:bg-white dark:focus:bg-slate-900"
                   />
                 </label>
               </div>
 
               <div>
-                <span className="mb-2 block text-sm font-semibold text-slate-700">{isEn ? 'Format' : 'Loại bài'}</span>
+                <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">{isEn ? 'Format' : 'Loại bài'}</span>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {(['slide', 'report'] as PeerReviewSubmissionType[]).map((type) => {
                     const typeMeta = getTypeMeta(type, isEn);
@@ -1232,7 +1232,7 @@ const PeerReview: React.FC = () => {
                         onClick={() => setUploadType(type)}
                         className={cn(
                           'flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-colors',
-                          uploadType === type ? 'border-violet-300 bg-violet-50 text-violet-700' : 'border-slate-200 bg-white text-slate-600 hover:border-violet-200',
+                          uploadType === type ? 'border-violet-300 bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:border-violet-200',
                         )}
                       >
                         <div className={cn('flex h-10 w-10 items-center justify-center rounded-2xl', typeMeta.className)}>
@@ -1240,7 +1240,7 @@ const PeerReview: React.FC = () => {
                         </div>
                         <div>
                           <p className="text-sm font-semibold">{typeMeta.label}</p>
-                          <p className="mt-1 text-xs text-slate-500">{type === 'slide' ? 'PDF / PPTX' : 'PDF / DOCX'}</p>
+                          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{type === 'slide' ? 'PDF / PPTX' : 'PDF / DOCX'}</p>
                         </div>
                       </button>
                     );
@@ -1248,16 +1248,16 @@ const PeerReview: React.FC = () => {
                 </div>
               </div>
 
-              <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 p-5">
+              <div className="rounded-[1.75rem] border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 p-5">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-sm font-semibold text-slate-900">{isEn ? 'Review file' : 'File để review'}</p>
-                    <p className="mt-1 text-sm text-slate-500">{copy.uploadHint}</p>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{isEn ? 'Review file' : 'File để review'}</p>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{copy.uploadHint}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:text-violet-700"
+                    className="inline-flex items-center gap-2 rounded-2xl bg-white dark:bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 shadow-sm transition-colors hover:text-violet-700"
                   >
                     <Upload className="h-4 w-4" />
                     {isEn ? 'Choose file' : 'Chọn file'}
@@ -1272,12 +1272,12 @@ const PeerReview: React.FC = () => {
                   onChange={handleFileSelection}
                 />
 
-                <div className="mt-4 rounded-2xl bg-white px-4 py-3 shadow-sm">
+                <div className="mt-4 rounded-2xl bg-white dark:bg-slate-900 px-4 py-3 shadow-sm">
                   {uploadFile ? (
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <p className="text-sm font-semibold text-slate-900">{uploadFile.name}</p>
-                        <p className="mt-1 text-xs text-slate-500">{formatFileSize(uploadFile.size)}</p>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{uploadFile.name}</p>
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{formatFileSize(uploadFile.size)}</p>
                       </div>
                       <button
                         type="button"
@@ -1285,13 +1285,13 @@ const PeerReview: React.FC = () => {
                           setUploadFile(null);
                           if (fileInputRef.current) fileInputRef.current.value = '';
                         }}
-                        className="rounded-2xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600"
+                        className="rounded-2xl border border-slate-200 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400"
                       >
                         {isEn ? 'Remove' : 'Bỏ file'}
                       </button>
                     </div>
                   ) : (
-                    <p className="text-sm text-slate-500">{isEn ? 'No file selected yet.' : 'Chưa chọn file nào.'}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{isEn ? 'No file selected yet.' : 'Chưa chọn file nào.'}</p>
                   )}
                 </div>
               </div>
@@ -1303,7 +1303,7 @@ const PeerReview: React.FC = () => {
                     setIsUploadOpen(false);
                     resetUploadForm();
                   }}
-                  className="rounded-2xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600"
+                  className="rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-400"
                 >
                   {isEn ? 'Cancel' : 'Hủy'}
                 </button>

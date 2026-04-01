@@ -117,9 +117,9 @@ const HallOfFame: React.FC = () => {
   ];
 
   const resourceMeta: Record<HallOfFameResourceType, { label: string; Icon: React.ComponentType<{ className?: string }>; className: string }> = {
-    project: { label: copy.project, Icon: FolderOpen, className: 'bg-sky-50 text-sky-700 border-sky-100' },
-    slides: { label: copy.slides, Icon: FileText, className: 'bg-amber-50 text-amber-700 border-amber-100' },
-    video: { label: copy.video, Icon: PlayCircle, className: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
+    project: { label: copy.project, Icon: FolderOpen, className: 'bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border-sky-100 dark:border-sky-800' },
+    slides: { label: copy.slides, Icon: FileText, className: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-100 dark:border-amber-800' },
+    video: { label: copy.video, Icon: PlayCircle, className: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-800' },
   };
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -200,33 +200,33 @@ const HallOfFame: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-primary-100/60 mb-10">
-        <div className="absolute inset-0 bg-linear-to-br from-primary-50 via-white to-amber-50 opacity-90" aria-hidden="true" />
+      <section className="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl shadow-primary-100/60 dark:shadow-slate-900/60 mb-10">
+        <div className="absolute inset-0 bg-linear-to-br from-primary-50 via-white to-amber-50 dark:from-primary-950/30 dark:via-slate-950 dark:to-amber-950/30 opacity-90" aria-hidden="true" />
         <div className="absolute -top-24 left-12 h-48 w-48 rounded-full bg-primary-200/40 blur-3xl" aria-hidden="true" />
         <div className="absolute -bottom-28 right-8 h-56 w-56 rounded-full bg-amber-200/40 blur-3xl" aria-hidden="true" />
         <div className="relative p-6 md:p-8 lg:p-10">
           <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8">
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/85 px-3 py-1 text-xs font-semibold text-primary-700 shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/70 dark:border-slate-700 bg-white/85 dark:bg-slate-900/85 px-3 py-1 text-xs font-semibold text-primary-700 shadow-sm">
                 <Sparkles className="w-3.5 h-3.5" />
                 {copy.badge}
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">{copy.title}</h1>
-              <p className="text-sm md:text-base text-slate-600 leading-relaxed max-w-2xl">{copy.description}</p>
+              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 leading-tight">{copy.title}</h1>
+              <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">{copy.description}</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
-              <div className="rounded-2xl border border-primary-100 bg-white/90 p-5 shadow-sm">
+              <div className="rounded-2xl border border-primary-100 dark:border-primary-800 bg-white/90 dark:bg-slate-900/90 p-5 shadow-sm">
                 <div className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-700">{copy.totalProjects}</div>
-                <div className="mt-3 text-3xl font-bold text-slate-900">{isLoading ? '--' : meta.total}</div>
+                <div className="mt-3 text-3xl font-bold text-slate-900 dark:text-slate-100">{isLoading ? '--' : meta.total}</div>
               </div>
-              <div className="rounded-2xl border border-amber-100 bg-white/90 p-5 shadow-sm">
+              <div className="rounded-2xl border border-amber-100 dark:border-amber-800 bg-white/90 dark:bg-slate-900/90 p-5 shadow-sm">
                 <div className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">{copy.featuredProjects}</div>
-                <div className="mt-3 text-3xl font-bold text-slate-900">{isLoading ? '--' : featuredCount}</div>
+                <div className="mt-3 text-3xl font-bold text-slate-900 dark:text-slate-100">{isLoading ? '--' : featuredCount}</div>
               </div>
-              <div className="rounded-2xl border border-emerald-100 bg-white/90 p-5 shadow-sm">
+              <div className="rounded-2xl border border-emerald-100 dark:border-emerald-800 bg-white/90 dark:bg-slate-900/90 p-5 shadow-sm">
                 <div className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">{copy.withVideo}</div>
-                <div className="mt-3 text-3xl font-bold text-slate-900">{isLoading ? '--' : videoCount}</div>
+                <div className="mt-3 text-3xl font-bold text-slate-900 dark:text-slate-100">{isLoading ? '--' : videoCount}</div>
               </div>
             </div>
           </div>
@@ -253,39 +253,39 @@ const HallOfFame: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-white p-6 md:p-8 space-y-5">
-                <div className="flex flex-wrap gap-3 text-sm text-slate-500">
-                  <span className="inline-flex items-center gap-2 rounded-full bg-slate-50 px-3 py-1 border border-slate-200">
+              <div className="bg-white dark:bg-slate-900 p-6 md:p-8 space-y-5">
+                <div className="flex flex-wrap gap-3 text-sm text-slate-500 dark:text-slate-400">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-slate-50 dark:bg-slate-800 px-3 py-1 border border-slate-200 dark:border-slate-700">
                     <Users className="w-4 h-4 text-slate-400" />
-                    {copy.team}: <strong className="text-slate-800">{featuredEntry.teamName}</strong>
+                    {copy.team}: <strong className="text-slate-800 dark:text-slate-100">{featuredEntry.teamName}</strong>
                   </span>
-                  <span className="inline-flex items-center gap-2 rounded-full bg-slate-50 px-3 py-1 border border-slate-200">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-slate-50 dark:bg-slate-800 px-3 py-1 border border-slate-200 dark:border-slate-700">
                     <Trophy className="w-4 h-4 text-amber-500" />
                     {featuredEntry.award} • {featuredEntry.year}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{copy.problem}</div>
-                    <p className="mt-2 text-sm text-slate-700 line-clamp-4">{featuredEntry.problem}</p>
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/80 p-4">
+                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{copy.problem}</div>
+                    <p className="mt-2 text-sm text-slate-700 dark:text-slate-300 line-clamp-4">{featuredEntry.problem}</p>
                   </div>
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{copy.solution}</div>
-                    <p className="mt-2 text-sm text-slate-700 line-clamp-4">{featuredEntry.solution}</p>
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/80 p-4">
+                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{copy.solution}</div>
+                    <p className="mt-2 text-sm text-slate-700 dark:text-slate-300 line-clamp-4">{featuredEntry.solution}</p>
                   </div>
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{copy.impact}</div>
-                    <p className="mt-2 text-sm text-slate-700 line-clamp-4">{featuredEntry.impact}</p>
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/80 p-4">
+                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{copy.impact}</div>
+                    <p className="mt-2 text-sm text-slate-700 dark:text-slate-300 line-clamp-4">{featuredEntry.impact}</p>
                   </div>
                 </div>
 
                 <div className="space-y-3">
                   {featuredEntry.structure.slice(0, 3).map((segment) => (
-                    <div key={segment.id} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                    <div key={segment.id} className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 shadow-sm">
                       <div className="text-xs font-semibold uppercase tracking-[0.16em] text-primary-700">{segment.label}</div>
-                      <div className="mt-1 text-sm font-semibold text-slate-900">{segment.title}</div>
-                      <div className="mt-1 text-sm text-slate-600">{segment.description}</div>
+                      <div className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{segment.title}</div>
+                      <div className="mt-1 text-sm text-slate-600 dark:text-slate-400">{segment.description}</div>
                     </div>
                   ))}
                 </div>
@@ -304,7 +304,7 @@ const HallOfFame: React.FC = () => {
         </section>
       )}
 
-      <div className="rounded-2xl border border-slate-200 bg-white/85 shadow-sm p-4 md:p-5 mb-8">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/85 dark:bg-slate-900/85 shadow-sm p-4 md:p-5 mb-8">
         <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
@@ -313,10 +313,10 @@ const HallOfFame: React.FC = () => {
               placeholder={copy.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-12 rounded-full border border-slate-200 pl-12 pr-10 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full h-12 rounded-full border border-slate-200 dark:border-slate-700 pl-12 pr-10 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none dark:bg-slate-800 dark:text-slate-100"
             />
             {searchQuery && (
-              <button type="button" onClick={() => setSearchQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+              <button type="button" onClick={() => setSearchQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
                 <X className="w-5 h-5" />
               </button>
             )}
@@ -335,12 +335,12 @@ const HallOfFame: React.FC = () => {
 
         <div className="mt-4 space-y-4">
           <div>
-            <p className="text-sm text-slate-500 mb-2">{copy.fieldLabel}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{copy.fieldLabel}</p>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => setActiveField('')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeField === '' ? 'bg-primary-600 text-white shadow-md shadow-primary-100' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeField === '' ? 'bg-primary-600 text-white shadow-md shadow-primary-100' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
               >
                 {copy.all}
               </button>
@@ -349,7 +349,7 @@ const HallOfFame: React.FC = () => {
                   key={field.value}
                   type="button"
                   onClick={() => setActiveField(field.value)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeField === field.value ? 'bg-primary-600 text-white shadow-md shadow-primary-100' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeField === field.value ? 'bg-primary-600 text-white shadow-md shadow-primary-100' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
                 >
                   {LIBRARY_FIELD_LABELS[field.value as keyof typeof LIBRARY_FIELD_LABELS] || field.label}
                 </button>
@@ -358,12 +358,12 @@ const HallOfFame: React.FC = () => {
           </div>
 
           <div>
-            <p className="text-sm text-slate-500 mb-2">{copy.yearLabel}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{copy.yearLabel}</p>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => setActiveYear(null)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeYear === null ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeYear === null ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-md' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
               >
                 {copy.allYears}
               </button>
@@ -372,7 +372,7 @@ const HallOfFame: React.FC = () => {
                   key={year}
                   type="button"
                   onClick={() => setActiveYear(year)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeYear === year ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeYear === year ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-md' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
                 >
                   {year}
                 </button>
@@ -381,12 +381,12 @@ const HallOfFame: React.FC = () => {
           </div>
 
           <div>
-            <p className="text-sm text-slate-500 mb-2">{copy.resourceLabel}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{copy.resourceLabel}</p>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => setActiveResourceType('')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeResourceType === '' ? 'bg-amber-500 text-white shadow-md shadow-amber-100' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeResourceType === '' ? 'bg-amber-500 text-white shadow-md shadow-amber-100' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
               >
                 {copy.all}
               </button>
@@ -395,7 +395,7 @@ const HallOfFame: React.FC = () => {
                   key={type}
                   type="button"
                   onClick={() => setActiveResourceType(type)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeResourceType === type ? 'bg-amber-500 text-white shadow-md shadow-amber-100' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeResourceType === type ? 'bg-amber-500 text-white shadow-md shadow-amber-100' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
                 >
                   {resourceMeta[type].label}
                 </button>
@@ -405,7 +405,7 @@ const HallOfFame: React.FC = () => {
         </div>
       </div>
 
-      <div className="mb-6 text-sm text-slate-500">
+      <div className="mb-6 text-sm text-slate-500 dark:text-slate-400">
         {isLoading ? copy.loading : `${meta.total} ${copy.resultCount}`}
       </div>
 
@@ -413,11 +413,11 @@ const HallOfFame: React.FC = () => {
         {isLoading ? (
           [...Array(6)].map((_, index) => (
             <Card key={index} className="animate-pulse">
-              <div className="aspect-[4/3] bg-slate-200" />
+              <div className="aspect-[4/3] bg-slate-200 dark:bg-slate-700" />
               <div className="p-5 space-y-3">
-                <div className="h-4 w-28 rounded bg-slate-200" />
-                <div className="h-6 w-3/4 rounded bg-slate-200" />
-                <div className="h-4 w-full rounded bg-slate-100" />
+                <div className="h-4 w-28 rounded bg-slate-200 dark:bg-slate-700" />
+                <div className="h-6 w-3/4 rounded bg-slate-200 dark:bg-slate-700" />
+                <div className="h-4 w-full rounded bg-slate-100 dark:bg-slate-800" />
               </div>
             </Card>
           ))
@@ -430,7 +430,7 @@ const HallOfFame: React.FC = () => {
           <>
             {items.map((item) => (
               <Card key={item.id} className="group overflow-hidden hover:-translate-y-1 transition-transform">
-                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 dark:bg-slate-800">
                   <OptimizedImage
                     src={item.thumbnail || `https://picsum.photos/seed/${item.slug}/1200/900`}
                     alt={item.title}
@@ -450,18 +450,18 @@ const HallOfFame: React.FC = () => {
                     <div className="text-xs font-semibold uppercase tracking-[0.16em] text-primary-700">
                       {LIBRARY_FIELD_LABELS[item.field as keyof typeof LIBRARY_FIELD_LABELS] || item.field}
                     </div>
-                    <h3 className="mt-2 text-xl font-bold text-slate-900">{item.title}</h3>
-                    <p className="mt-2 text-sm text-slate-600 line-clamp-3">{item.summary}</p>
+                    <h3 className="mt-2 text-xl font-bold text-slate-900 dark:text-slate-100">{item.title}</h3>
+                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-3">{item.summary}</p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 text-sm text-slate-600">
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                  <div className="grid grid-cols-2 gap-3 text-sm text-slate-600 dark:text-slate-400">
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2">
                       <div className="text-xs text-slate-400">{copy.team}</div>
-                      <div className="mt-1 font-semibold text-slate-900 line-clamp-1">{item.teamName}</div>
+                      <div className="mt-1 font-semibold text-slate-900 dark:text-slate-100 line-clamp-1">{item.teamName}</div>
                     </div>
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2">
                       <div className="text-xs text-slate-400">{copy.contest}</div>
-                      <div className="mt-1 font-semibold text-slate-900 line-clamp-1">{item.contestName}</div>
+                      <div className="mt-1 font-semibold text-slate-900 dark:text-slate-100 line-clamp-1">{item.contestName}</div>
                     </div>
                   </div>
 
@@ -469,7 +469,7 @@ const HallOfFame: React.FC = () => {
 
                   <div className="flex flex-wrap gap-2">
                     {item.tags.slice(0, 3).map((tag) => (
-                      <span key={tag} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-600">{tag}</span>
+                      <span key={tag} className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1 text-xs text-slate-600 dark:text-slate-400">{tag}</span>
                     ))}
                   </div>
 
@@ -493,11 +493,11 @@ const HallOfFame: React.FC = () => {
           </>
         ) : (
           <div className="col-span-full text-center py-14">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-slate-100 mb-4">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 mb-4">
               <Lightbulb className="w-7 h-7 text-slate-400" />
             </div>
-            <p className="text-slate-700 font-medium mb-2">{copy.noResults}</p>
-            <p className="text-sm text-slate-500 mb-4">{copy.noResultsHint}</p>
+            <p className="text-slate-700 dark:text-slate-300 font-medium mb-2">{copy.noResults}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{copy.noResultsHint}</p>
             <Button variant="secondary" onClick={resetFilters}>{copy.clearFilters}</Button>
           </div>
         )}
@@ -506,21 +506,21 @@ const HallOfFame: React.FC = () => {
       {activeEntry && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm" onClick={() => setActiveEntry(null)} aria-hidden="true" />
-          <Card className="relative w-full max-w-6xl max-h-[92vh] overflow-hidden border border-slate-100 shadow-2xl shadow-slate-900/20">
-            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 bg-white">
+          <Card className="relative w-full max-w-6xl max-h-[92vh] overflow-hidden border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-900/20">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-6 py-4 bg-white dark:bg-slate-900">
               <div>
                 <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-700">{activeEntry.award} • {activeEntry.year}</div>
-                <h2 className="text-xl font-bold text-slate-900">{activeEntry.title}</h2>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{activeEntry.title}</h2>
               </div>
-              <button type="button" onClick={() => setActiveEntry(null)} className="rounded-lg p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600" aria-label={copy.close}>
+              <button type="button" onClick={() => setActiveEntry(null)} className="rounded-lg p-2 text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-300" aria-label={copy.close}>
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr]">
-              <div className="max-h-[calc(92vh-72px)] overflow-y-auto border-b lg:border-b-0 lg:border-r border-slate-100 bg-white">
+              <div className="max-h-[calc(92vh-72px)] overflow-y-auto border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
                 <div className="p-6 md:p-8 space-y-6">
-                  <div className="relative aspect-[16/9] overflow-hidden rounded-2xl border border-slate-100 bg-slate-100">
+                  <div className="relative aspect-[16/9] overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-100 dark:bg-slate-800">
                     <OptimizedImage
                       src={activeEntry.thumbnail || `https://picsum.photos/seed/${activeEntry.slug}/1200/900`}
                       alt={activeEntry.title}
@@ -530,52 +530,52 @@ const HallOfFame: React.FC = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    <Badge className="border-slate-200 bg-slate-50 text-slate-700">{activeEntry.teamName}</Badge>
-                    <Badge className="border-slate-200 bg-slate-50 text-slate-700">{activeEntry.contestName}</Badge>
+                    <Badge className="border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">{activeEntry.teamName}</Badge>
+                    <Badge className="border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">{activeEntry.contestName}</Badge>
                     {activeEntry.tags.map((tag) => (
-                      <Badge key={tag} className="border-slate-200 bg-white text-slate-600">{tag}</Badge>
+                      <Badge key={tag} className="border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400">{tag}</Badge>
                     ))}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{copy.overview}</div>
-                      <p className="mt-2 text-sm text-slate-700">{activeEntry.summary}</p>
+                    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/80 p-4">
+                      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{copy.overview}</div>
+                      <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">{activeEntry.summary}</p>
                     </div>
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{copy.whyItWon}</div>
-                      <p className="mt-2 text-sm text-slate-700">{activeEntry.whyItWon}</p>
+                    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/80 p-4">
+                      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{copy.whyItWon}</div>
+                      <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">{activeEntry.whyItWon}</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="rounded-2xl border border-rose-100 bg-rose-50/60 p-4">
-                      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">{copy.problem}</div>
-                      <p className="mt-2 text-sm text-slate-700">{activeEntry.problem}</p>
+                    <div className="rounded-2xl border border-rose-100 dark:border-rose-800 bg-rose-50/60 dark:bg-rose-900/30 p-4">
+                      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-700 dark:text-rose-300">{copy.problem}</div>
+                      <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">{activeEntry.problem}</p>
                     </div>
-                    <div className="rounded-2xl border border-sky-100 bg-sky-50/70 p-4">
-                      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">{copy.solution}</div>
-                      <p className="mt-2 text-sm text-slate-700">{activeEntry.solution}</p>
+                    <div className="rounded-2xl border border-sky-100 dark:border-sky-800 bg-sky-50/70 dark:bg-sky-900/30 p-4">
+                      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700 dark:text-sky-300">{copy.solution}</div>
+                      <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">{activeEntry.solution}</p>
                     </div>
-                    <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
-                      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">{copy.impact}</div>
-                      <p className="mt-2 text-sm text-slate-700">{activeEntry.impact}</p>
+                    <div className="rounded-2xl border border-emerald-100 dark:border-emerald-800 bg-emerald-50/70 dark:bg-emerald-900/30 p-4">
+                      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-300">{copy.impact}</div>
+                      <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">{activeEntry.impact}</p>
                     </div>
                   </div>
 
                   <div>
-                    <div className="mb-4 flex items-center gap-2 text-slate-900">
+                    <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100">
                       <FileText className="w-4 h-4 text-primary-600" />
                       <h3 className="font-semibold">{copy.structure}</h3>
                     </div>
                     <div className="space-y-3">
                       {activeEntry.structure.map((segment) => (
-                        <div key={segment.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                        <div key={segment.id} className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-sm">
                           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-700">{segment.label}</div>
-                          <div className="mt-2 text-base font-semibold text-slate-900">{segment.title}</div>
-                          <p className="mt-2 text-sm text-slate-600">{segment.description}</p>
+                          <div className="mt-2 text-base font-semibold text-slate-900 dark:text-slate-100">{segment.title}</div>
+                          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{segment.description}</p>
                           {segment.objective && (
-                            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600">
+                            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1 text-xs text-slate-600 dark:text-slate-400">
                               <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
                               <span><strong>{copy.sectionGoal}:</strong> {segment.objective}</span>
                             </div>
@@ -587,10 +587,10 @@ const HallOfFame: React.FC = () => {
                 </div>
               </div>
 
-              <div className="max-h-[calc(92vh-72px)] overflow-y-auto bg-slate-50/70">
+              <div className="max-h-[calc(92vh-72px)] overflow-y-auto bg-slate-50/70 dark:bg-slate-800/70">
                 <div className="p-6 md:p-8 space-y-6">
                   <div>
-                    <div className="mb-4 flex items-center gap-2 text-slate-900">
+                    <div className="mb-4 flex items-center gap-2 text-slate-900 dark:text-slate-100">
                       <Sparkles className="w-4 h-4 text-primary-600" />
                       <h3 className="font-semibold">{copy.materials}</h3>
                     </div>
@@ -602,15 +602,15 @@ const HallOfFame: React.FC = () => {
                             key={resource.id}
                             type="button"
                             onClick={() => openResource(resource)}
-                            className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                            className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                           >
                             <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${meta.className}`}>
                               <meta.Icon className="w-3.5 h-3.5" />
                               {meta.label}
                             </div>
-                            <div className="mt-3 text-base font-semibold text-slate-900">{resource.title}</div>
-                            {resource.description && <p className="mt-2 text-sm text-slate-600">{resource.description}</p>}
-                            <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+                            <div className="mt-3 text-base font-semibold text-slate-900 dark:text-slate-100">{resource.title}</div>
+                            {resource.description && <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{resource.description}</p>}
+                            <div className="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                               <span>{resource.format || meta.label}</span>
                               <span className="inline-flex items-center gap-1 font-semibold text-primary-700">
                                 {copy.openPreview}
@@ -623,14 +623,14 @@ const HallOfFame: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <div className="mb-3 flex items-center gap-2 text-slate-900">
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-sm">
+                    <div className="mb-3 flex items-center gap-2 text-slate-900 dark:text-slate-100">
                       <Lightbulb className="w-4 h-4 text-amber-500" />
                       <h3 className="font-semibold">{copy.takeaways}</h3>
                     </div>
                     <div className="space-y-3">
                       {activeEntry.takeaways.map((takeaway, index) => (
-                        <div key={`${activeEntry.id}-${index}`} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                        <div key={`${activeEntry.id}-${index}`} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 text-sm text-slate-700 dark:text-slate-300">
                           {takeaway}
                         </div>
                       ))}

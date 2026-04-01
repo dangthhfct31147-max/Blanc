@@ -58,7 +58,7 @@ async function callOpenRouterOnce({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
       'HTTP-Referer': frontendOrigin || 'http://localhost:5173',
-      'X-Title': title || 'Blanc Assistant',
+      'X-Title': title || 'ContestHub Assistant',
     },
     body: JSON.stringify({
       model,
@@ -89,7 +89,7 @@ export async function callOpenRouterChat({
   models = DEFAULT_CHAT_MODELS,
   messages,
   frontendOrigin,
-  title = 'Blanc Assistant',
+  title = 'ContestHub Assistant',
   fetchFn = fetch,
   apiUrl = OPENROUTER_API_URL,
   maxTokens = 1000,

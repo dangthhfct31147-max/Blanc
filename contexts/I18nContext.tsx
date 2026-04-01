@@ -3,7 +3,7 @@ import { clientStorage } from '../lib/cache';
 import { AppLocale, DEFAULT_LOCALE, TranslationKey, normalizeLocale, t as translate } from '../lib/i18n';
 
 // Locale should persist across deploys; avoid versioned keys.
-const LOCALE_STORAGE_KEY = 'blanc:locale';
+const LOCALE_STORAGE_KEY = 'contesthub:locale';
 const LEGACY_LOCALE_STORAGE_KEY = clientStorage.buildKey('ui', 'locale');
 
 type I18nContextValue = {

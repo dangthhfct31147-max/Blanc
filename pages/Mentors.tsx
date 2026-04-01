@@ -404,8 +404,8 @@ const MentorList: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col gap-6">
-        <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-sky-100/60">
-          <div className="absolute inset-0 bg-linear-to-br from-sky-50 via-white to-emerald-50 opacity-90" aria-hidden="true" />
+        <section className="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl shadow-sky-100/60 dark:shadow-sky-900/60">
+          <div className="absolute inset-0 bg-linear-to-br from-sky-50 dark:from-sky-950/30 via-white dark:via-slate-950 to-emerald-50 dark:to-emerald-950/30 opacity-90" aria-hidden="true" />
           <div className="absolute -top-24 right-8 h-48 w-48 rounded-full bg-sky-200/40 blur-3xl" aria-hidden="true" />
           <div className="absolute -bottom-28 left-6 h-56 w-56 rounded-full bg-emerald-200/40 blur-3xl" aria-hidden="true" />
           <div className="relative p-6 md:p-8 lg:p-10">

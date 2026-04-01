@@ -391,9 +391,8 @@ const NewsManager: React.FC = () => {
                     <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 transition-colors hover:border-gray-300 hover:bg-white">
                       <div className="flex min-w-0 items-center gap-2">
                         <span
-                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
-                            form.highlight ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'
-                          }`}
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${form.highlight ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'
+                            }`}
                           aria-hidden="true"
                         >
                           <Pin size={16} />
@@ -405,9 +404,8 @@ const NewsManager: React.FC = () => {
                       </div>
 
                       <span
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                          form.highlight ? 'bg-emerald-600' : 'bg-gray-300'
-                        }`}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.highlight ? 'bg-emerald-600' : 'bg-gray-300'
+                          }`}
                       >
                         <input
                           type="checkbox"
@@ -417,9 +415,8 @@ const NewsManager: React.FC = () => {
                           disabled={isSaving}
                         />
                         <span
-                          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${
-                            form.highlight ? 'translate-x-5' : 'translate-x-1'
-                          }`}
+                          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${form.highlight ? 'translate-x-5' : 'translate-x-1'
+                            }`}
                         />
                       </span>
                     </label>
@@ -445,7 +442,7 @@ const NewsManager: React.FC = () => {
                         value={form.releaseVersion}
                         onChange={(e) => setForm((p) => ({ ...p, releaseVersion: e.target.value }))}
                         className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
-                        placeholder="e.g. Blanc v1.8.0"
+                        placeholder="e.g. ContestHub v1.8.0"
                         disabled={isSaving}
                       />
                     </div>
@@ -804,9 +801,8 @@ const NewsManager: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                          item.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'
-                        }`}
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${item.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'
+                          }`}
                       >
                         {item.status}
                       </span>

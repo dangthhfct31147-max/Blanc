@@ -174,11 +174,11 @@ const mapRelease = (release) => {
     notifySubscribers: !!release.notifySubscribers,
     lastNotification: release.lastNotification
       ? {
-          total: Number(release.lastNotification.total || 0),
-          sent: Number(release.lastNotification.sent || 0),
-          failed: Number(release.lastNotification.failed || 0),
-          notifiedAt: formatDate(release.lastNotification.notifiedAt),
-        }
+        total: Number(release.lastNotification.total || 0),
+        sent: Number(release.lastNotification.sent || 0),
+        failed: Number(release.lastNotification.failed || 0),
+        notifiedAt: formatDate(release.lastNotification.notifiedAt),
+      }
       : null,
   };
 };
@@ -204,10 +204,10 @@ const buildReleaseEmailBody = (doc) => {
   const link = buildNewsPublicUrl(doc);
 
   return [
-    `<p>Blanc vừa phát hành ${versionLabel}.</p>`,
+    `<p>ContestHub vừa phát hành ${versionLabel}.</p>`,
     intro ? `<p>${intro}</p>` : '',
     changeItems ? `<p><strong>Điểm mới trong bản này:</strong></p><ul>${changeItems}</ul>` : '',
-    `<p><a href="${link}">Xem đầy đủ trên bản tin Blanc</a></p>`,
+    `<p><a href="${link}">Xem đầy đủ trên bản tin ContestHub</a></p>`,
   ].filter(Boolean).join('');
 };
 

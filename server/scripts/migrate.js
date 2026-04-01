@@ -20,7 +20,7 @@ const contests = [
   {
     code: 'CH-HACK-2024',
     title: 'Hackathon Sinh vien Toan quoc 2024',
-    organizer: 'Blanc',
+    organizer: 'ContestHub',
     dateStart: '2024-09-10T00:00:00.000Z',
     deadline: '2024-10-01T00:00:00.000Z',
     status: 'FULL',
@@ -124,8 +124,8 @@ const courses = [
 
 const users = [
   {
-    email: 'admin@blanc.dev',
-    name: 'Admin Blanc',
+    email: 'admin@contesthub.dev',
+    name: 'Admin ContestHub',
     role: 'admin',
     password: bcrypt.hashSync('Admin123!', 12),
     avatar: '',
@@ -155,7 +155,7 @@ const users = [
       learningGoals: 'Mentoring các bạn trẻ, xây dựng sản phẩm có impact',
       strengths: 'Quản lý dự án, định hướng sản phẩm, kết nối team',
       achievements: 'Top 3 Hackathon 2023, Founder startup EdTech',
-      portfolioLinks: ['https://github.com/admin-blanc'],
+      portfolioLinks: ['https://github.com/admin-contesthub'],
     },
     consents: {
       allowMatching: true,
@@ -164,7 +164,7 @@ const users = [
     },
   },
   {
-    email: 'student@blanc.dev',
+    email: 'student@contesthub.dev',
     name: 'Student User',
     role: 'student',
     password: bcrypt.hashSync('Student123!', 12),
@@ -204,7 +204,7 @@ const users = [
     },
   },
   {
-    email: 'dev1@blanc.dev',
+    email: 'dev1@contesthub.dev',
     name: 'Trần Minh Đức',
     role: 'student',
     password: bcrypt.hashSync('Dev123!', 12),
@@ -244,7 +244,7 @@ const users = [
     },
   },
   {
-    email: 'dev2@blanc.dev',
+    email: 'dev2@contesthub.dev',
     name: 'Nguyễn Thị Lan',
     role: 'student',
     password: bcrypt.hashSync('Dev123!', 12),
@@ -284,7 +284,7 @@ const users = [
     },
   },
   {
-    email: 'designer@blanc.dev',
+    email: 'designer@contesthub.dev',
     name: 'Lê Hoàng Nam',
     role: 'student',
     password: bcrypt.hashSync('Designer123!', 12),
@@ -364,7 +364,7 @@ const users = [
     },
   },
   {
-    email: 'mentor.it@blanc.dev',
+    email: 'mentor.it@contesthub.dev',
     name: 'Minh Tran',
     role: 'mentor',
     password: bcrypt.hashSync('Mentor123!', 12),
@@ -404,7 +404,7 @@ const users = [
     },
   },
   {
-    email: 'mentor.data@blanc.dev',
+    email: 'mentor.data@contesthub.dev',
     name: 'Linh Pham',
     role: 'mentor',
     password: bcrypt.hashSync('Mentor123!', 12),
@@ -444,7 +444,7 @@ const users = [
     },
   },
   {
-    email: 'mentor.design@blanc.dev',
+    email: 'mentor.design@contesthub.dev',
     name: 'Ha Nguyen',
     role: 'mentor',
     password: bcrypt.hashSync('Mentor123!', 12),
@@ -484,7 +484,7 @@ const users = [
     },
   },
   {
-    email: 'mentor.marketing@blanc.dev',
+    email: 'mentor.marketing@contesthub.dev',
     name: 'Khanh Le',
     role: 'mentor',
     password: bcrypt.hashSync('Mentor123!', 12),
@@ -524,7 +524,7 @@ const users = [
     },
   },
   {
-    email: 'mentor.business@blanc.dev',
+    email: 'mentor.business@contesthub.dev',
     name: 'Trang Vo',
     role: 'mentor',
     password: bcrypt.hashSync('Mentor123!', 12),
@@ -564,7 +564,7 @@ const users = [
     },
   },
   {
-    email: 'mentor.finance@blanc.dev',
+    email: 'mentor.finance@contesthub.dev',
     name: 'Tuan Do',
     role: 'mentor',
     password: bcrypt.hashSync('Mentor123!', 12),
@@ -852,7 +852,7 @@ async function seedNews() {
   await collection.createIndex({ status: 1, publishAt: -1 });
   await collection.createIndex({ tags: 1 });
 
-  const adminUser = await usersCollection.findOne({ email: 'admin@blanc.dev' });
+  const adminUser = await usersCollection.findOne({ email: 'admin@contesthub.dev' });
   const author = adminUser
     ? {
       id: adminUser._id.toString(),

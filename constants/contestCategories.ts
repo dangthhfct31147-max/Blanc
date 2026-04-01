@@ -1,5 +1,5 @@
 // ============ CONTEST CATEGORY OPTIONS (synced from Admin) ============
-// Copied from `ContestHub_4_Admin/components/ContestManager.tsx` -> `CONTEST_CATEGORIES`.
+// Copied from `apps/admin/components/ContestManager.tsx` -> `CONTEST_CATEGORIES`.
 
 export const CONTEST_CATEGORIES = [
   { value: 'it', label: 'IT & Tech (Hackathon, Coding, AI/ML)' },

@@ -1,5 +1,5 @@
 /**
- * Blanc Notification Email Service v2.0 (Enhanced)
+ * ContestHub Notification Email Service v2.0 (Enhanced)
  *
  * Supports multiple notification types:
  * - Contest reminders (24h, 1h before)
@@ -31,12 +31,12 @@
  */
 
 const NOTIF_CONFIG = Object.freeze({
-  APP_NAME: 'Blanc',
-  SENDER_NAME: 'Blanc',
+  APP_NAME: 'ContestHub',
+  SENDER_NAME: 'ContestHub',
   SUPPORT_EMAIL: 'clbflife2025thptfptcantho@gmail.com',
   SUPPORT_PHONE: '+84916007090',
-  LOGO_URL: 'https://via.placeholder.com/120x40/10B981/FFFFFF?text=Blanc',
-  WEBSITE_URL: 'https://blanc.com',
+  LOGO_URL: 'https://via.placeholder.com/120x40/10B981/FFFFFF?text=ContestHub',
+  WEBSITE_URL: 'https://contesthub.com',
   PRIMARY_COLOR: '#10B981',
   SECONDARY_COLOR: '#059669',
   ACCENT_COLOR: '#6366f1',
@@ -300,7 +300,7 @@ function doPost(e) {
 function doGet(e) {
   return notifCreateResponse({
     ok: true,
-    service: 'Blanc Notification Service',
+    service: 'ContestHub Notification Service',
     timestamp: new Date().toISOString(),
     supportedActions: NOTIF_CONFIG.SUPPORTED_ACTIONS
   }, 200);
@@ -486,14 +486,14 @@ function sendMarketingEmail(data, settings) {
     headline: headline || subject,
     content,
     ctaText: ctaText || 'Khám phá ngay',
-    ctaUrl: ctaUrl || 'https://blanc.com'
+    ctaUrl: ctaUrl || 'https://contesthub.com'
   });
 
   const textBody = generateMarketingText({
     userName: userName || 'bạn',
     headline: headline || subject,
     content,
-    ctaUrl: ctaUrl || 'https://blanc.com'
+    ctaUrl: ctaUrl || 'https://contesthub.com'
   });
 
   try {
@@ -637,7 +637,7 @@ function sendWelcomeEmail(data, settings) {
     return notifErrorResponse('Missing email', 400);
   }
 
-  const subject = '🎉 Chào mừng bạn đến với Blanc!';
+  const subject = '🎉 Chào mừng bạn đến với ContestHub!';
 
   const htmlBody = generateWelcomeHtml({
     userName: userName || 'bạn'
@@ -688,7 +688,7 @@ function sendContestRegistrationEmail(data, settings) {
     contestDate,
     contestTime,
     contestUrl,
-    organizerName: organizerName || 'Blanc'
+    organizerName: organizerName || 'ContestHub'
   });
 
   const textBody = generateContestRegistrationText({
@@ -697,7 +697,7 @@ function sendContestRegistrationEmail(data, settings) {
     contestDate,
     contestTime,
     contestUrl,
-    organizerName: organizerName || 'Blanc'
+    organizerName: organizerName || 'ContestHub'
   });
 
   try {
@@ -1107,7 +1107,7 @@ function generateContestRecommendationHtml(data) {
     const c = data.contests[i];
     contestCards += '<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:15px;margin:10px 0;">' +
       '<h3 style="color:#1e293b;margin:0 0 8px 0;font-size:16px;">' + escapeHtmlNotif(c.title) + '</h3>' +
-      '<p style="color:#64748b;margin:0 0 8px 0;font-size:13px;">🏢 ' + escapeHtmlNotif(c.organizer || 'Blanc') + '</p>' +
+      '<p style="color:#64748b;margin:0 0 8px 0;font-size:13px;">🏢 ' + escapeHtmlNotif(c.organizer || 'ContestHub') + '</p>' +
       '<p style="color:#64748b;margin:0 0 12px 0;font-size:13px;">📅 ' + escapeHtmlNotif(c.dateStart || 'Sắp diễn ra') + '</p>' +
       (c.matchScore ? '<div style="display:inline-block;background:#dcfce7;color:#166534;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:bold;">✨ Phù hợp ' + c.matchScore + '%</div>' : '') +
       (c.url ? '<a href="' + escapeHtmlNotif(c.url) + '" style="display:block;margin-top:12px;color:' + NOTIF_CONFIG.PRIMARY_COLOR + ';font-size:13px;text-decoration:none;">Xem chi tiết →</a>' : '') +
@@ -1422,7 +1422,7 @@ function sendPasswordResetEmail(data, settings) {
     return notifErrorResponse('Missing required fields', 400);
   }
 
-  const subject = '🔐 Đặt lại mật khẩu Blanc';
+  const subject = '🔐 Đặt lại mật khẩu ContestHub';
 
   try {
     enforceRateLimit(email, 'password_reset');
@@ -1603,7 +1603,7 @@ function generateContestReminderText(data) {
     (data.contestDate ? 'Ngày: ' + data.contestDate + (data.contestTime ? ' lúc ' + data.contestTime : '') + '\n' : '') +
     (data.contestUrl ? '\nXem chi tiết: ' + data.contestUrl + '\n' : '') +
     '\nChúc bạn thi đấu thật tốt!\n' +
-    '---\nBlanc';
+    '---\nContestHub';
 }
 
 function generateCourseUpdateHtml(data) {
@@ -1633,7 +1633,7 @@ function generateCourseUpdateText(data) {
     'Khóa học "' + data.courseTitle + '" vừa có nội dung mới!\n\n' +
     'Cập nhật: ' + data.updateTitle + '\n' +
     (data.courseUrl ? '\nHọc ngay: ' + data.courseUrl + '\n' : '') +
-    '\n---\nBlanc';
+    '\n---\nContestHub';
 }
 
 function generateMarketingHtml(data) {
@@ -1657,7 +1657,7 @@ function generateMarketingText(data) {
     data.headline + '\n\n' +
     data.content + '\n\n' +
     'Xem thêm: ' + data.ctaUrl + '\n' +
-    '\n---\nBlanc';
+    '\n---\nContestHub';
 }
 
 function generateAnnouncementHtml(data) {
@@ -1678,7 +1678,7 @@ function generateAnnouncementHtml(data) {
     '<table width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:40px 20px;">' +
     '<table width="100%" style="max-width:500px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.1);">' +
     '<tr><td style="background:' + style.border + ';padding:30px;text-align:center;">' +
-    '<h1 style="color:#fff;margin:0;font-size:24px;">📢 Thông báo từ Blanc</h1>' +
+    '<h1 style="color:#fff;margin:0;font-size:24px;">📢 Thông báo từ ContestHub</h1>' +
     '</td></tr>' +
     '<tr><td style="padding:30px;">' +
     '<p style="color:#64748b;font-size:15px;">Xin chào <strong>' + escapeHtmlNotif(data.userName || 'bạn') + '</strong>,</p>' +
@@ -1696,7 +1696,7 @@ function generateAnnouncementText(data) {
   return 'Xin chào ' + data.userName + ',\n\n' +
     'THÔNG BÁO: ' + data.title + '\n\n' +
     data.message + '\n' +
-    '\n---\nBlanc';
+    '\n---\nContestHub';
 }
 
 function generateWelcomeHtml(data) {
@@ -1706,11 +1706,11 @@ function generateWelcomeHtml(data) {
     '<table width="100%" style="max-width:500px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.1);">' +
     '<tr><td style="background:linear-gradient(135deg,' + NOTIF_CONFIG.PRIMARY_COLOR + ' 0%, ' + NOTIF_CONFIG.SECONDARY_COLOR + ' 100%);padding:40px;text-align:center;">' +
     '<h1 style="color:#fff;margin:0;font-size:28px;">🎉 Chào mừng bạn!</h1>' +
-    '<p style="color:rgba(255,255,255,0.9);margin:10px 0 0 0;font-size:16px;">Cảm ơn bạn đã tham gia Blanc</p>' +
+    '<p style="color:rgba(255,255,255,0.9);margin:10px 0 0 0;font-size:16px;">Cảm ơn bạn đã tham gia ContestHub</p>' +
     '</td></tr>' +
     '<tr><td style="padding:30px;">' +
     '<p style="color:#64748b;font-size:15px;">Xin chào <strong>' + escapeHtmlNotif(data.userName) + '</strong>,</p>' +
-    '<p style="color:#475569;font-size:15px;line-height:1.6;">Chúng tôi rất vui khi bạn đã gia nhập cộng đồng Blanc! Đây là nơi bạn có thể:</p>' +
+    '<p style="color:#475569;font-size:15px;line-height:1.6;">Chúng tôi rất vui khi bạn đã gia nhập cộng đồng ContestHub! Đây là nơi bạn có thể:</p>' +
     '<div style="margin:20px 0;">' +
     '<div style="display:flex;align-items:center;margin:15px 0;padding:15px;background:#f0fdf4;border-radius:8px;">' +
     '<span style="font-size:24px;margin-right:15px;">🏆</span>' +
@@ -1726,26 +1726,26 @@ function generateWelcomeHtml(data) {
     '</div>' +
     '</div>' +
     '<div style="text-align:center;margin:30px 0;">' +
-    '<a href="https://blanc.com" style="display:inline-block;background:' + NOTIF_CONFIG.PRIMARY_COLOR + ';color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;">Bắt đầu khám phá</a>' +
+    '<a href="https://contesthub.com" style="display:inline-block;background:' + NOTIF_CONFIG.PRIMARY_COLOR + ';color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;">Bắt đầu khám phá</a>' +
     '</div>' +
     '<p style="color:#94a3b8;font-size:13px;text-align:center;margin-top:25px;">Nếu có bất kỳ câu hỏi nào, đừng ngần ngại liên hệ với chúng tôi!</p>' +
     '</td></tr>' +
     '<tr><td style="background:#f8fafc;padding:20px;text-align:center;border-top:1px solid #e2e8f0;">' +
-    '<p style="color:#94a3b8;font-size:12px;margin:0;">© 2024 Blanc. All rights reserved.</p>' +
+    '<p style="color:#94a3b8;font-size:12px;margin:0;">© 2024 ContestHub. All rights reserved.</p>' +
     '</td></tr>' +
     '</table></td></tr></table></body></html>';
 }
 
 function generateWelcomeText(data) {
   return 'Xin chào ' + data.userName + ',\n\n' +
-    'Chào mừng bạn đến với Blanc! 🎉\n\n' +
+    'Chào mừng bạn đến với ContestHub! 🎉\n\n' +
     'Chúng tôi rất vui khi bạn đã gia nhập cộng đồng. Tại đây bạn có thể:\n\n' +
     '🏆 Tham gia các cuộc thi lập trình hấp dẫn\n' +
     '📚 Học tập với hàng trăm khóa học chất lượng\n' +
     '👥 Kết nối với cộng đồng những người cùng đam mê\n\n' +
-    'Bắt đầu khám phá ngay: https://blanc.com\n\n' +
+    'Bắt đầu khám phá ngay: https://contesthub.com\n\n' +
     'Nếu có bất kỳ câu hỏi nào, đừng ngần ngại liên hệ với chúng tôi!\n' +
-    '\n---\nBlanc Team';
+    '\n---\nContestHub Team';
 }
 
 function generateContestRegistrationHtml(data) {
@@ -1787,7 +1787,7 @@ function generateContestRegistrationText(data) {
     (data.contestUrl ? '\nXem chi tiết: ' + data.contestUrl + '\n' : '') +
     '\n💡 Mẹo: Hãy chuẩn bị kỹ càng và đừng quên kiểm tra email để nhận nhắc nhở!\n' +
     '\nChúc bạn thi đấu thật tốt! 💪\n' +
-    '\n---\nBlanc';
+    '\n---\nContestHub';
 }
 
 // ============ UTILITIES ============
@@ -1945,7 +1945,7 @@ function testContestReminder() {
     contestTitle: 'Hackathon 2024',
     contestDate: '30/11/2024',
     contestTime: '09:00',
-    contestUrl: 'https://blanc.com/contests/1',
+    contestUrl: 'https://contesthub.com/contests/1',
     reminderType: '1h'
   }, getNotifSettings());
   Logger.log(result.getContent());
@@ -1958,7 +1958,7 @@ function testCourseUpdate() {
     courseTitle: 'ReactJS Advanced',
     updateType: 'lesson',
     updateTitle: 'Bài 10: React Hooks nâng cao',
-    courseUrl: 'https://blanc.com/courses/1'
+    courseUrl: 'https://contesthub.com/courses/1'
   }, getNotifSettings());
   Logger.log(result.getContent());
 }
@@ -1971,7 +1971,7 @@ function testTeamInvite() {
     teamTitle: 'Team AI Innovation',
     teamDescription: 'Đội thi AI cho hackathon 2024',
     role: 'Backend Developer',
-    teamPostUrl: 'https://blanc.com/community/team/123'
+    teamPostUrl: 'https://contesthub.com/community/team/123'
   }, getNotifSettings());
   Logger.log(result.getContent());
 }
@@ -1981,9 +1981,9 @@ function testContestRecommendation() {
     email: 'test@example.com',
     userName: 'Nguyễn Văn A',
     contests: [
-      { title: 'Hackathon AI 2024', organizer: 'Google', dateStart: '15/12/2024', matchScore: 95, url: 'https://blanc.com/contests/1' },
-      { title: 'Web Dev Challenge', organizer: 'Microsoft', dateStart: '20/12/2024', matchScore: 88, url: 'https://blanc.com/contests/2' },
-      { title: 'Mobile App Contest', organizer: 'Apple', dateStart: '25/12/2024', matchScore: 75, url: 'https://blanc.com/contests/3' }
+      { title: 'Hackathon AI 2024', organizer: 'Google', dateStart: '15/12/2024', matchScore: 95, url: 'https://contesthub.com/contests/1' },
+      { title: 'Web Dev Challenge', organizer: 'Microsoft', dateStart: '20/12/2024', matchScore: 88, url: 'https://contesthub.com/contests/2' },
+      { title: 'Mobile App Contest', organizer: 'Apple', dateStart: '25/12/2024', matchScore: 75, url: 'https://contesthub.com/contests/3' }
     ]
   }, getNotifSettings());
   Logger.log(result.getContent());

@@ -48,10 +48,10 @@ const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
         : 'Set `VITE_CLERK_PUBLISHABLE_KEY` in your frontend environment before using the new sign-in flow.';
 
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-        <div className="w-full max-w-md rounded-2xl border border-amber-200 bg-white p-8 shadow-sm">
-          <h1 className="text-xl font-semibold text-slate-900">{title}</h1>
-          <p className="mt-3 text-sm text-slate-600">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-800 flex items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-2xl border border-amber-200 dark:border-amber-800 bg-white dark:bg-slate-900 p-8 shadow-sm">
+          <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{title}</h1>
+          <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
             {message}
           </p>
         </div>
@@ -61,7 +61,7 @@ const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
 
   if (authStatus === 'syncing') {
     return (
-      <div className="min-h-screen bg-slate-50 px-4 py-10">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-800 px-4 py-10">
         <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-xl items-center justify-center">
           <AuthSyncNotice status="syncing" className="w-full" />
         </div>
@@ -71,7 +71,7 @@ const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
 
   if (isSignedIn && authStatus === 'sync_error') {
     return (
-      <div className="min-h-screen bg-slate-50 px-4 py-10">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-800 px-4 py-10">
         <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-xl items-center justify-center">
           <AuthSyncNotice
             status="error"
@@ -86,7 +86,7 @@ const Auth: React.FC<{ type: 'login' | 'register' }> = ({ type }) => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-800 px-4 py-10">
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-6xl items-center justify-center">
         {type === 'login' ? (
           <SignIn

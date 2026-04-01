@@ -267,7 +267,7 @@ Railway sẽ tự động:
 - Builder: Dockerfile
 - Dockerfile Path: `Dockerfile.admin`
 
-Cách này phù hợp nếu bạn đang dùng các lệnh `npm --workspace=blanc-admin ...` và muốn Railway build từ repo root.
+Cách này phù hợp nếu bạn đang dùng các lệnh `npm --workspace=contesthub-admin ...` và muốn Railway build từ repo root.
 
 ## 🏗️ Build Configurations
 

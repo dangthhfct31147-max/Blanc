@@ -109,10 +109,10 @@ const AuditLog: React.FC = () => {
 
   const getStatusStyle = (status: string) => {
     switch (status) {
-      case 'Success': return 'bg-green-50 text-green-700 border-green-100';
-      case 'Failed': return 'bg-red-50 text-red-700 border-red-100';
-      case 'Warning': return 'bg-orange-50 text-orange-700 border-orange-100';
-      default: return 'bg-gray-50 text-gray-700 border-gray-100';
+      case 'Success': return 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-100 dark:border-green-800';
+      case 'Failed': return 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-100 dark:border-red-800';
+      case 'Warning': return 'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-100 dark:border-orange-800';
+      default: return 'bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-slate-300 border-gray-100 dark:border-slate-800';
     }
   };
 
@@ -120,8 +120,8 @@ const AuditLog: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Audit Logs</h2>
-          <p className="text-gray-500 mt-1">Track system activities and security events</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Audit Logs</h2>
+          <p className="text-gray-500 dark:text-slate-400 mt-1">Track system activities and security events</p>
         </div>
         <button
           onClick={handleAnalyze}
@@ -147,23 +147,23 @@ const AuditLog: React.FC = () => {
       )}
 
       {/* Search Bar */}
-      <div className="flex items-center gap-2 bg-white p-2 rounded-xl shadow-sm border border-gray-200 w-full max-w-md">
-        <Search size={20} className="text-gray-400 ml-2" />
+      <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-2 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 w-full max-w-md">
+        <Search size={20} className="text-gray-400 dark:text-slate-400 ml-2" />
         <input
           type="text"
           placeholder="Search by action, user, or details..."
-          className="flex-1 outline-none text-sm text-gray-700 p-1"
+          className="flex-1 outline-none text-sm text-gray-700 dark:text-slate-300 p-1 bg-transparent"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <button title="Lọc" className="p-1.5 hover:bg-gray-50 rounded-lg text-gray-500">
+        <button title="Lọc" className="p-1.5 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-lg text-gray-500 dark:text-slate-400">
           <Filter size={18} />
         </button>
         <button
           title="Làm mới"
           onClick={fetchLogs}
           disabled={isLoading}
-          className="p-1.5 hover:bg-gray-50 rounded-lg text-gray-500"
+          className="p-1.5 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-lg text-gray-500 dark:text-slate-400"
         >
           <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} />
         </button>
@@ -171,15 +171,15 @@ const AuditLog: React.FC = () => {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 border-b border-gray-100 text-gray-900 uppercase font-semibold text-xs">
+          <table className="w-full text-left text-sm text-gray-600 dark:text-slate-400">
+            <thead className="bg-gray-50 dark:bg-slate-800 border-b border-gray-100 dark:border-slate-800 text-gray-900 dark:text-slate-100 uppercase font-semibold text-xs">
               <tr>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Action / Target</th>
@@ -189,23 +189,23 @@ const AuditLog: React.FC = () => {
                 <th className="px-6 py-4">Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="text-center py-10">
                     <Loader2 className="w-8 h-8 animate-spin text-emerald-500 mx-auto" />
-                    <p className="text-gray-500 mt-2">Đang tải audit logs...</p>
+                    <p className="text-gray-500 dark:text-slate-400 mt-2">Đang tải audit logs...</p>
                   </td>
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-10 text-gray-400">
+                  <td colSpan={6} className="text-center py-10 text-gray-400 dark:text-slate-400">
                     {debouncedSearch ? 'Không tìm thấy log phù hợp.' : 'Chưa có audit log nào.'}
                   </td>
                 </tr>
               ) : (
                 logs.map((log) => (
-                  <tr key={log.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusStyle(log.status)}`}>
                         {getStatusIcon(log.status)}
@@ -213,21 +213,21 @@ const AuditLog: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-medium text-gray-900">{log.action}</div>
-                      <div className="text-xs text-gray-500">{log.target}</div>
+                      <div className="font-medium text-gray-900 dark:text-slate-100">{log.action}</div>
+                      <div className="text-xs text-gray-500 dark:text-slate-400">{log.target}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded text-gray-700">
+                      <span className="font-mono text-xs bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded text-gray-700 dark:text-slate-300">
                         {log.user}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-mono text-xs text-gray-500">
+                    <td className="px-6 py-4 font-mono text-xs text-gray-500 dark:text-slate-400">
                       {log.ip}
                     </td>
-                    <td className="px-6 py-4 text-gray-500 text-xs">
+                    <td className="px-6 py-4 text-gray-500 dark:text-slate-400 text-xs">
                       {new Date(log.timestamp).toLocaleString('vi-VN')}
                     </td>
-                    <td className="px-6 py-4 max-w-xs truncate text-gray-600" title={log.details}>
+                    <td className="px-6 py-4 max-w-xs truncate text-gray-600 dark:text-slate-400" title={log.details}>
                       {log.details}
                     </td>
                   </tr>
@@ -236,26 +236,26 @@ const AuditLog: React.FC = () => {
             </tbody>
           </table>
         </div>
-        <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-          <span className="text-sm text-gray-500">
+        <div className="bg-gray-50 dark:bg-slate-800 px-6 py-4 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between">
+          <span className="text-sm text-gray-500 dark:text-slate-400">
             {total > 0 ? `Hiển thị ${(page - 1) * limit + 1}-${Math.min(page * limit, total)} trong ${total} logs` : 'Không có log'}
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page <= 1 || isLoading}
-              className="p-2 border border-gray-300 rounded bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 border border-gray-300 dark:border-slate-600 rounded bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Trang trước"
             >
               <ChevronLeft size={16} />
             </button>
-            <span className="text-sm text-gray-600 px-2">
+            <span className="text-sm text-gray-600 dark:text-slate-400 px-2">
               {page} / {totalPages || 1}
             </span>
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages || isLoading}
-              className="p-2 border border-gray-300 rounded bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 border border-gray-300 dark:border-slate-600 rounded bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Trang sau"
             >
               <ChevronRight size={16} />

@@ -62,7 +62,7 @@ export const generateSystemAnnouncement = async (topic: string, audience: string
   if (!apiKey) return "AI features require an API Key.";
 
   try {
-    const prompt = `Write a professional system announcement for a university platform named "Blanc". 
+    const prompt = `Write a professional system announcement for a university platform named "ContestHub".
     Topic: "${topic}". 
     Target Audience: "${audience}". 
     Tone: Clear, polite, and informative.

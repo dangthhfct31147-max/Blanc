@@ -749,7 +749,7 @@ const UserSettings: React.FC = () => {
             const data = await api.get<UserProfile>('/users/me/settings');
             let localPreferred: AppLocale | null = null;
             try {
-                localPreferred = normalizeLocale(localStorage.getItem('blanc:locale'));
+                localPreferred = normalizeLocale(localStorage.getItem('contesthub:locale'));
             } catch {
                 // ignore
             }

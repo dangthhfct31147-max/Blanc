@@ -74,12 +74,12 @@ const tierLabelKey = (tier: MembershipTier) =>
 
 const tierBadgeClass = (tier: MembershipTier) =>
   tier === 'business'
-    ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+    ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-800'
     : tier === 'pro'
-      ? 'bg-purple-50 text-purple-700 border-purple-100'
+      ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-100 dark:border-purple-800'
       : tier === 'plus'
-        ? 'bg-yellow-50 text-yellow-700 border-yellow-100'
-        : 'bg-slate-100 text-slate-700 border-slate-200';
+        ? 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border-yellow-100 dark:border-yellow-800'
+        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700';
 
 const formatVnd = (amount: number, locale: string) =>
   `${Math.max(0, amount || 0).toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN')} ₫`;
@@ -260,8 +260,8 @@ const MembershipManager: React.FC = () => {
             <Card key={plan.id} className={cn('p-6', isCurrent && 'ring-2 ring-primary-200')}>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h4 className="text-lg font-semibold text-slate-900">{plan.name}</h4>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{plan.name}</h4>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                     {isBusiness
                       ? t('membership.contact')
                       : `${formatVnd(plan.priceVnd, uiLocale)} / ${t('membership.days', { count: plan.durationDays })}`}
@@ -271,7 +271,7 @@ const MembershipManager: React.FC = () => {
               </div>
 
               {plan.highlights?.length ? (
-                <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                <ul className="mt-4 space-y-2 text-sm text-slate-700 dark:text-slate-300">
                   {plan.highlights.slice(0, 5).map((h) => (
                     <li key={h} className="flex items-start gap-2">
                       <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600" />
@@ -324,28 +324,28 @@ const MembershipManager: React.FC = () => {
       <Card className="p-6">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <Crown className="w-5 h-5 text-primary-600" />
               {t('membership.title')}
             </h3>
-            <p className="text-sm text-slate-500 mt-1">{t('membership.subtitle')}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('membership.subtitle')}</p>
           </div>
 
           <div className="flex flex-col sm:items-end gap-1">
             <Badge className={tierBadgeClass(effectiveTier)}>{t(tierLabelKey(effectiveTier))}</Badge>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               {t('membership.expires')}:{' '}
-              <span className="font-medium text-slate-700">{formatDateTime(membership?.expiresAt, uiLocale)}</span>
+              <span className="font-medium text-slate-700 dark:text-slate-300">{formatDateTime(membership?.expiresAt, uiLocale)}</span>
             </p>
             {entitlements ? (
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {t('membership.chat')}:{' '}
-                <span className="font-medium text-slate-700">
+                <span className="font-medium text-slate-700 dark:text-slate-300">
                   {t('membership.chatPerHour', { count: entitlements.chatMessagesPerHour })}
                 </span>
                 {' • '}
                 {t('membership.reports')}:{' '}
-                <span className="font-medium text-slate-700">
+                <span className="font-medium text-slate-700 dark:text-slate-300">
                   {entitlements.reportsEnabled ? t('membership.yes') : t('membership.no')}
                 </span>
               </p>
@@ -359,13 +359,13 @@ const MembershipManager: React.FC = () => {
       {checkout ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={closeCheckout} aria-hidden="true" />
-          <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
-            <div className="p-5 border-b border-slate-100 flex items-start justify-between gap-4">
+          <div className="relative w-full max-w-3xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between gap-4">
               <div>
-                <h4 className="text-lg font-semibold text-slate-900">{t('membership.checkout.title')}</h4>
-                <p className="text-sm text-slate-500 mt-1">
+                <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{t('membership.checkout.title')}</h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                   {t('membership.checkout.order')}{' '}
-                  <span className="font-mono text-slate-700">{checkout.order.orderCode}</span>
+                  <span className="font-mono text-slate-700 dark:text-slate-300">{checkout.order.orderCode}</span>
                   {' • '}
                   {formatVnd(checkout.order.amountVnd, uiLocale)}
                 </p>
@@ -373,7 +373,7 @@ const MembershipManager: React.FC = () => {
               <button
                 type="button"
                 onClick={closeCheckout}
-                className="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-50"
+                className="p-2 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                 aria-label="Close"
                 title="Close"
               >
@@ -384,8 +384,8 @@ const MembershipManager: React.FC = () => {
             <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-slate-700">Trạng thái</span>
-                  <span className="text-sm text-slate-700">
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Trạng thái</span>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">
                     {orderStatus?.status === 'paid'
                       ? t('membership.checkout.status.paid')
                       : checkoutExpired
@@ -394,22 +394,22 @@ const MembershipManager: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
+                <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-4 space-y-2">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs text-slate-500">{t('membership.checkout.bank')}</span>
-                    <span className="text-sm font-medium text-slate-800">{checkout.payment.bank.bankCode || '-'}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">{t('membership.checkout.bank')}</span>
+                    <span className="text-sm font-medium text-slate-800 dark:text-slate-100">{checkout.payment.bank.bankCode || '-'}</span>
                   </div>
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs text-slate-500">{t('membership.checkout.accountNumber')}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">{t('membership.checkout.accountNumber')}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-slate-800 font-mono">
+                      <span className="text-sm font-medium text-slate-800 dark:text-slate-100 font-mono">
                         {checkout.payment.bank.accountNumber || '-'}
                       </span>
                       {checkout.payment.bank.accountNumber ? (
                         <button
                           type="button"
                           onClick={() => handleCopy(checkout.payment.bank.accountNumber)}
-                          className="p-1.5 rounded-lg hover:bg-slate-200/70 text-slate-600"
+                          className="p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-700/70 text-slate-600 dark:text-slate-400"
                           title="Copy"
                         >
                           <Copy className="w-4 h-4" />
@@ -418,19 +418,19 @@ const MembershipManager: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs text-slate-500">{t('membership.checkout.accountName')}</span>
-                    <span className="text-sm font-medium text-slate-800">{checkout.payment.bank.accountName || '-'}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">{t('membership.checkout.accountName')}</span>
+                    <span className="text-sm font-medium text-slate-800 dark:text-slate-100">{checkout.payment.bank.accountName || '-'}</span>
                   </div>
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs text-slate-500">{t('membership.checkout.transferContent')}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">{t('membership.checkout.transferContent')}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-slate-900 font-mono">
+                      <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 font-mono">
                         {checkout.payment.transferContent}
                       </span>
                       <button
                         type="button"
                         onClick={() => handleCopy(checkout.payment.transferContent)}
-                        className="p-1.5 rounded-lg hover:bg-slate-200/70 text-slate-600"
+                        className="p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-700/70 text-slate-600 dark:text-slate-400"
                         title="Copy"
                       >
                         <Copy className="w-4 h-4" />
@@ -439,19 +439,19 @@ const MembershipManager: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2 text-xs text-slate-500">
+                <div className="flex items-start gap-2 text-xs text-slate-500 dark:text-slate-400">
                   <Timer className="w-4 h-4 mt-0.5 text-slate-400" />
                   <span>
                     {t('membership.checkout.deadline')}{' '}
-                    <span className="font-medium text-slate-700">{formatDateTime(checkout.order.expiresAt, uiLocale)}</span>.{' '}
+                    <span className="font-medium text-slate-700 dark:text-slate-300">{formatDateTime(checkout.order.expiresAt, uiLocale)}</span>.{' '}
                     {t('membership.checkout.deadlineHint')}
                   </span>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <p className="text-sm font-medium text-slate-700">{t('membership.checkout.qrTitle')}</p>
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 flex items-center justify-center">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('membership.checkout.qrTitle')}</p>
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 flex items-center justify-center">
                   {checkout.payment.qrUrl ? (
                     <img
                       src={checkout.payment.qrUrl}
@@ -460,7 +460,7 @@ const MembershipManager: React.FC = () => {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="text-sm text-slate-500">{t('membership.checkout.bankNotConfigured')}</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-400">{t('membership.checkout.bankNotConfigured')}</div>
                   )}
                 </div>
 

@@ -170,7 +170,7 @@ GET /api/health
 
 ### 1. Install Dependencies
 ```bash
-cd ContestHub_4
+cd ContestHub
 npm install
 ```
 

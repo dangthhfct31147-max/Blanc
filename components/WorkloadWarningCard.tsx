@@ -55,7 +55,7 @@ const HealthScoreRing: React.FC<{ score: number; size?: number }> = ({ score, si
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <Heart className={`w-4 h-4 mb-1 ${config.heartClass}`} />
         <span className={`text-2xl font-bold ${config.textClass}`}>{score}</span>
-        <span className="text-xs text-slate-500">{t('workload.points')}</span>
+        <span className="text-xs text-slate-500 dark:text-slate-400">{t('workload.points')}</span>
       </div>
     </div>
   );
@@ -64,14 +64,13 @@ const HealthScoreRing: React.FC<{ score: number; size?: number }> = ({ score, si
 // Single Warning Item Component
 const WarningItem: React.FC<{ warning: WorkloadWarning }> = ({ warning }) => {
   const isCritical = warning.type === 'critical';
-  
+
   return (
     <div
-      className={`p-4 rounded-lg border-l-4 ${
-        isCritical 
-          ? 'bg-red-50 border-red-500' 
-          : 'bg-amber-50 border-amber-500'
-      }`}
+      className={`p-4 rounded-lg border-l-4 ${isCritical
+          ? 'bg-red-50 dark:bg-red-900/30 border-red-500'
+          : 'bg-amber-50 dark:bg-amber-900/30 border-amber-500'
+        }`}
     >
       <div className="flex items-start gap-3">
         {isCritical ? (
@@ -83,7 +82,7 @@ const WarningItem: React.FC<{ warning: WorkloadWarning }> = ({ warning }) => {
           <p className={`text-sm font-medium ${isCritical ? 'text-red-800' : 'text-amber-800'}`}>
             {warning.message}
           </p>
-          <p className="text-xs text-slate-600 mt-1 flex items-center gap-1">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 flex items-center gap-1">
             <TrendingUp className="w-3 h-3" />
             {warning.suggestion}
           </p>
@@ -107,25 +106,23 @@ const StatCard: React.FC<{
   const isCritical = value >= max;
 
   return (
-    <div className="bg-white rounded-lg p-3 border border-slate-100">
+    <div className="bg-white dark:bg-slate-900 rounded-lg p-3 border border-slate-100 dark:border-slate-800">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <div className={`p-1.5 rounded ${color}`}>
             {icon}
           </div>
-          <span className="text-sm text-slate-600">{label}</span>
+          <span className="text-sm text-slate-600 dark:text-slate-400">{label}</span>
         </div>
-        <span className={`font-bold ${
-          isCritical ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-slate-900'
-        }`}>
+        <span className={`font-bold ${isCritical ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-slate-900 dark:text-slate-100'
+          }`}>
           {value}/{max}
         </span>
       </div>
-      <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+      <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
         <div
-          className={`h-1.5 rounded-full transition-all duration-500 ${
-            isCritical ? 'bg-red-500' : isWarning ? 'bg-amber-500' : 'bg-emerald-500'
-          }`}
+          className={`h-1.5 rounded-full transition-all duration-500 ${isCritical ? 'bg-red-500' : isWarning ? 'bg-amber-500' : 'bg-emerald-500'
+            }`}
           // Dynamic width is required here - cannot use static Tailwind class
           {...{ style: { width: `${percentage}%` } }}
         />
@@ -147,7 +144,7 @@ const WorkloadWarningCard: React.FC<WorkloadWarningCardProps> = ({ className = '
   // Status indicator
   const statusConfig = useMemo(() => {
     if (!analysis) return null;
-    
+
     switch (analysis.overallStatus) {
       case 'critical':
         return {
@@ -199,10 +196,10 @@ const WorkloadWarningCard: React.FC<WorkloadWarningCardProps> = ({ className = '
   return (
     <Card className={`overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="p-4 border-b border-slate-100 bg-linear-to-r from-slate-50 to-white">
+      <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-linear-to-r from-slate-50 dark:from-slate-800 to-white dark:to-slate-900">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h3 className="font-bold text-slate-900">{t('workload.title')}</h3>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100">{t('workload.title')}</h3>
             {statusConfig && (
               <span className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${statusConfig.bgColor} ${statusConfig.color}`}>
                 {statusConfig.icon}
@@ -212,16 +209,16 @@ const WorkloadWarningCard: React.FC<WorkloadWarningCardProps> = ({ className = '
           </div>
           <button
             onClick={handleRefresh}
-            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
             title={t('workload.refresh')}
           >
-            <RefreshCw className="w-4 h-4 text-slate-500" />
+            <RefreshCw className="w-4 h-4 text-slate-500 dark:text-slate-400" />
           </button>
         </div>
       </div>
 
       {/* Health Score Section */}
-      <div className="p-4 flex items-center gap-6 bg-linear-to-b from-white to-slate-50">
+      <div className="p-4 flex items-center gap-6 bg-linear-to-b from-white dark:from-slate-900 to-slate-50 dark:to-slate-800">
         <HealthScoreRing score={analysis.healthScore} />
         <div className="flex-1 space-y-2">
           <StatCard
@@ -253,8 +250,8 @@ const WorkloadWarningCard: React.FC<WorkloadWarningCardProps> = ({ className = '
 
       {/* Warnings Section */}
       {analysis.warnings.length > 0 && (
-        <div className="p-4 border-t border-slate-100">
-          <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+        <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+          <h4 className="font-semibold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-500" />
             {t('workload.warningsTitle', { count: analysis.warnings.length })}
           </h4>
@@ -268,10 +265,10 @@ const WorkloadWarningCard: React.FC<WorkloadWarningCardProps> = ({ className = '
 
       {/* No Warnings - Good State */}
       {analysis.warnings.length === 0 && (
-        <div className="p-6 border-t border-slate-100 text-center">
+        <div className="p-6 border-t border-slate-100 dark:border-slate-800 text-center">
           <CheckCircle className="w-12 h-12 mx-auto text-emerald-500 mb-2" />
-          <p className="font-medium text-slate-900">{t('workload.noWarnings.title')}</p>
-          <p className="text-sm text-slate-500">
+          <p className="font-medium text-slate-900 dark:text-slate-100">{t('workload.noWarnings.title')}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             {t('workload.noWarnings.description')}
           </p>
         </div>
@@ -279,22 +276,22 @@ const WorkloadWarningCard: React.FC<WorkloadWarningCardProps> = ({ className = '
 
       {/* Upcoming Events Preview */}
       {analysis.workload.upcomingContests.length > 0 && (
-        <div className="p-4 border-t border-slate-100 bg-slate-50">
-          <h4 className="text-sm font-semibold text-slate-700 mb-2">
+        <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800">
+          <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
             {t('workload.upcomingIn7Days')}
           </h4>
           <div className="space-y-1">
             {analysis.workload.upcomingContests.slice(0, 3).map(contest => (
               <div key={contest.id} className="flex items-center gap-2 text-sm">
                 <div className="w-1.5 h-1.5 rounded-full bg-primary-500" />
-                <span className="text-slate-600 truncate flex-1">{contest.title}</span>
+                <span className="text-slate-600 dark:text-slate-400 truncate flex-1">{contest.title}</span>
                 <span className="text-xs text-slate-400">
                   {new Date(contest.dateStart).toLocaleDateString('vi-VN')}
                 </span>
               </div>
             ))}
             {analysis.workload.upcomingContests.length > 3 && (
-              <p className="text-xs text-slate-500 pl-4">
+              <p className="text-xs text-slate-500 dark:text-slate-400 pl-4">
                 {t('workload.moreEvents', { count: analysis.workload.upcomingContests.length - 3 })}
               </p>
             )}

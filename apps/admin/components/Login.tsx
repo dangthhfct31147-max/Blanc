@@ -207,7 +207,7 @@ const Login: React.FC = () => {
           <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/30">
             <Shield className="h-8 w-8 text-white" />
           </div>
-          <h1 className="mb-2 text-3xl font-bold text-white">Blanc Admin</h1>
+          <h1 className="mb-2 text-3xl font-bold text-white">ContestHub Admin</h1>
           <p className="text-emerald-200/70">Sign in to access the admin dashboard</p>
         </div>
 
@@ -254,7 +254,7 @@ const Login: React.FC = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@blanc.edu.vn"
+                  placeholder="admin@contesthub.edu.vn"
                   autoComplete="email"
                   required
                   className="w-full rounded-lg border border-white/20 bg-white/10 py-3 pr-4 pl-11 text-white placeholder-gray-400 transition-all focus:border-transparent focus:ring-2 focus:ring-emerald-500 focus:outline-none"
@@ -337,7 +337,7 @@ const Login: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-sm text-emerald-200/50">© 2024 Blanc. All rights reserved.</p>
+        <p className="mt-6 text-center text-sm text-emerald-200/50">© 2024 ContestHub. All rights reserved.</p>
       </div>
     </div>
   );

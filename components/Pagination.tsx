@@ -106,7 +106,7 @@ const Pagination: React.FC<PaginationProps> = memo(({
                 disabled={currentPage === 1}
                 className={cn(
                     'flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200',
-                    'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+                    'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100',
                     'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent'
                 )}
                 aria-label="Trang trước"
@@ -121,7 +121,7 @@ const Pagination: React.FC<PaginationProps> = memo(({
                         return (
                             <span
                                 key={`ellipsis-${index}`}
-                                className="w-10 h-10 flex items-center justify-center text-slate-400 select-none"
+                                className="w-10 h-10 flex items-center justify-center text-slate-400 dark:text-slate-500 select-none"
                             >
                                 •••
                             </span>
@@ -138,8 +138,8 @@ const Pagination: React.FC<PaginationProps> = memo(({
                             className={cn(
                                 'min-w-[40px] h-10 px-3 rounded-full font-medium text-sm transition-all duration-200',
                                 isActive
-                                    ? 'bg-primary-600 text-white shadow-md shadow-primary-200 scale-105'
-                                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                                    ? 'bg-primary-600 text-white shadow-md shadow-primary-200 dark:shadow-primary-900 scale-105'
+                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
                             )}
                             aria-label={`Trang ${page}`}
                             aria-current={isActive ? 'page' : undefined}
@@ -157,7 +157,7 @@ const Pagination: React.FC<PaginationProps> = memo(({
                 disabled={currentPage === totalPages}
                 className={cn(
                     'flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200',
-                    'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+                    'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100',
                     'disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent'
                 )}
                 aria-label="Trang sau"

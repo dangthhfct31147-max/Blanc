@@ -1,5 +1,5 @@
 /**
- * Blanc OTP Email Service (Hardened)
+ * ContestHub OTP Email Service (Hardened)
  * 
  * Security features:
  * - HMAC-signed requests (OTP_SECRET_KEY in Script Properties)
@@ -10,11 +10,11 @@
  */
 
 const CONFIG = Object.freeze({
-  APP_NAME: 'Blanc',
-  SENDER_NAME: 'Blanc Security',
+  APP_NAME: 'ContestHub',
+  SENDER_NAME: 'ContestHub Security',
   SUPPORT_EMAIL: 'clbflife2025thptfptcantho@gmail.com',
   SUPPORT_PHONE: '+84916007090',
-  LOGO_URL: 'https://via.placeholder.com/120x40/10B981/FFFFFF?text=Blanc',
+  LOGO_URL: 'https://via.placeholder.com/120x40/10B981/FFFFFF?text=ContestHub',
   ROCKET_IMAGE_URL: 'https://img.icons8.com/color/96/rocket.png',
   PRIMARY_COLOR: '#10B981',
   SECONDARY_COLOR: '#059669',
@@ -125,7 +125,7 @@ function doGet(e) {
   return createResponse(
     {
       ok: true,
-      service: 'Blanc OTP Service',
+      service: 'ContestHub OTP Service',
       timestamp: new Date().toISOString()
     },
     200
@@ -653,7 +653,7 @@ function testSendOtp() {
     actionType: 'reset_password',
     actionText: 'đặt lại mật khẩu',
     ttlMinutes: 2,
-    appName: 'Blanc (DEV)'
+    appName: 'ContestHub (DEV)'
   });
   Logger.log(result.getContent());
 }

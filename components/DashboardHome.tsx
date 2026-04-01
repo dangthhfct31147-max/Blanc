@@ -6,13 +6,13 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { analyzePlatformStats } from '../services/geminiService';
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, trend, trendUp, icon: Icon }) => (
-  <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+  <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 hover:shadow-md transition-shadow">
     <div className="flex items-start justify-between">
       <div>
-        <p className="text-sm font-medium text-gray-500">{title}</p>
-        <h3 className="text-2xl font-bold text-gray-900 mt-2">{value}</h3>
+        <p className="text-sm font-medium text-gray-500 dark:text-slate-400">{title}</p>
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mt-2">{value}</h3>
       </div>
-      <div className="p-3 bg-emerald-50 rounded-lg">
+      <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg">
         <Icon className="text-emerald-600" size={24} />
       </div>
     </div>
@@ -22,7 +22,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, trend, trendUp, icon:
           <TrendingUp size={14} className={`mr-1 ${!trendUp && 'rotate-180'}`} />
           {trend}
         </span>
-        <span className="text-gray-400">vs last month</span>
+        <span className="text-gray-400 dark:text-slate-400">vs last month</span>
       </div>
     )}
   </div>
@@ -58,12 +58,12 @@ const DashboardHome: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Overview</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Overview</h2>
         <div className="flex gap-2">
           <select
             title="Chọn khoảng thời gian"
             aria-label="Chọn khoảng thời gian"
-            className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5 outline-none"
+            className="bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5 outline-none"
           >
             <option>Last 7 Days</option>
             <option>Last 30 Days</option>
@@ -80,8 +80,8 @@ const DashboardHome: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart Section */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 lg:col-span-2">
-          <h3 className="text-lg font-bold text-gray-900 mb-6">Revenue Analytics</h3>
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 lg:col-span-2">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 mb-6">Revenue Analytics</h3>
           <div className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>

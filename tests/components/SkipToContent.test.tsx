@@ -22,12 +22,12 @@ describe('SkipToContent', () => {
     window.matchMedia = originalMatchMedia;
   });
 
-  it('smooth-scrolls to the Blanc pulse section when it exists', () => {
+  it('smooth-scrolls to the ContestHub pulse section when it exists', () => {
     render(
       <>
         <SkipToContent />
         <section id="home-live-stats" tabIndex={-1}>
-          Blanc pulse
+          ContestHub pulse
         </section>
         <main id="main-content" tabIndex={-1}>
           Main content
@@ -35,7 +35,7 @@ describe('SkipToContent', () => {
       </>
     );
 
-    const target = screen.getByText('Blanc pulse');
+    const target = screen.getByText('ContestHub pulse');
     const scrollIntoView = vi.fn();
     target.scrollIntoView = scrollIntoView;
 

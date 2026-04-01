@@ -608,7 +608,7 @@ async function sendOtpEmail(email, otp, action) {
         actionType,  // Sử dụng actionType đã được map
         actionText,
         ttlMinutes: OTP_CONFIG.TTL_MINUTES,
-        appName: 'Blanc',
+        appName: 'ContestHub',
         // Security fields for HMAC verification
         nonce,
         timestamp,

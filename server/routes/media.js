@@ -77,7 +77,7 @@ router.post('/presign', authGuard, (req, res) => {
     signature,
     headers: {
       // Frontend can use this to send the request to the Apps Script endpoint
-      'X-Requested-By': 'blanc',
+      'X-Requested-By': 'contesthub',
     },
     instructions:
       'Send a POST multipart/form-data with fields "file" (binary), "fileName", "folder", "mimeType", "nonce", "timestamp", and "signature" to uploadUrl. The API will respond with {status:200,result:{id,url}}.',

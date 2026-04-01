@@ -187,7 +187,7 @@ async function seedUsers({ studentsCount, mentorsCount, passwordHash, rng }) {
   const ops = [];
 
   for (let i = 1; i <= studentsCount; i++) {
-    const email = `seed_student_${String(i).padStart(4, '0')}@blanc.dev`;
+    const email = `seed_student_${String(i).padStart(4, '0')}@contesthub.dev`;
     const name = `${lastNames[i % lastNames.length]} ${firstNames[(i * 7) % firstNames.length]}`;
     const primaryRole = roles[i % roles.length];
     const secondaryRoles = rng.shuffle(roles.filter((r) => r !== primaryRole)).slice(0, rng.int(0, 2));
@@ -248,7 +248,7 @@ async function seedUsers({ studentsCount, mentorsCount, passwordHash, rng }) {
   }
 
   for (let i = 1; i <= mentorsCount; i++) {
-    const email = `seed_mentor_${String(i).padStart(4, '0')}@blanc.dev`;
+    const email = `seed_mentor_${String(i).padStart(4, '0')}@contesthub.dev`;
     const name = `${firstNames[(i * 5) % firstNames.length]} ${lastNames[(i * 3) % lastNames.length]}`;
     const primaryRole = rng.pick(roles);
     const skills = rng.shuffle(skillPool).slice(0, rng.int(6, 10));
@@ -344,7 +344,7 @@ async function seedContests({ count, rng }) {
     'Product',
     'Marketing',
   ];
-  const organizers = ['Blanc', 'TechHub', 'UniLab', 'DataLab', 'CreativeHub', 'MakerSpace', 'Innovation Office'];
+  const organizers = ['ContestHub', 'TechHub', 'UniLab', 'DataLab', 'CreativeHub', 'MakerSpace', 'Innovation Office'];
 
   const now = Date.now();
   const ops = [];
@@ -844,7 +844,7 @@ async function main() {
     }
 
     const usersCollection = getCollection('users');
-    const adminUser = await usersCollection.findOne({ email: 'admin@blanc.dev' });
+    const adminUser = await usersCollection.findOne({ email: 'admin@contesthub.dev' });
 
     const { seededStudents } = await seedUsers({
       studentsCount: config.students,
@@ -861,7 +861,7 @@ async function main() {
     const courses = await getCollection('courses').find({}).toArray();
 
     const specialUsers = await usersCollection
-      .find({ email: { $in: ['admin@blanc.dev', 'student@blanc.dev'] } })
+      .find({ email: { $in: ['admin@contesthub.dev', 'student@contesthub.dev'] } })
       .toArray();
     const actionUsers = uniqueById([...seededStudents, ...specialUsers]).filter((u) =>
       ['student', 'admin', 'super_admin'].includes(u.role)

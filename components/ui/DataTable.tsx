@@ -239,9 +239,9 @@ function DataTableInner<T>(
     const allSelected = pageRows.length > 0 && selection.size === pageRows.length;
 
     return (
-        <div className={cn('w-full rounded-xl border border-slate-200 bg-white shadow-sm', className)}>
+        <div className={cn('w-full rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900', className)}>
             {/* Toolbar */}
-            <div className="flex flex-wrap items-center gap-3 px-4 py-3 border-b border-slate-100">
+            <div className="flex flex-wrap items-center gap-3 px-4 py-3 border-b border-slate-100 dark:border-slate-800">
                 {!hideSearch && (
                     <div className="relative flex-1 min-w-45 max-w-xs">
                         <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
@@ -250,7 +250,7 @@ function DataTableInner<T>(
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search…"
-                            className="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pl-8 pr-3 text-sm outline-none transition focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100"
+                            className="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pl-8 pr-3 text-sm outline-none transition focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-600 dark:focus:ring-indigo-900"
                         />
                     </div>
                 )}
@@ -260,22 +260,22 @@ function DataTableInner<T>(
                     <div className="relative" ref={colMenuRef}>
                         <button
                             onClick={() => setShowColMenu((v) => !v)}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                         >
                             <Settings2 className="h-3.5 w-3.5" />
                             Columns
                         </button>
                         {showColMenu && (
-                            <div className="absolute right-0 z-30 mt-1.5 w-48 rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
+                            <div className="absolute right-0 z-30 mt-1.5 w-48 rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-900">
                                 {columns.map((col) => (
                                     <button
                                         key={col.id}
                                         onClick={() => toggleCol(col.id)}
-                                        className="flex w-full items-center gap-2 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+                                        className="flex w-full items-center gap-2 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
                                     >
                                         <span className={cn(
                                             'flex h-4 w-4 items-center justify-center rounded border transition',
-                                            visibleCols.has(col.id) ? 'border-indigo-500 bg-indigo-500 text-white' : 'border-slate-300',
+                                            visibleCols.has(col.id) ? 'border-indigo-500 bg-indigo-500 text-white' : 'border-slate-300 dark:border-slate-600',
                                         )}>
                                             {visibleCols.has(col.id) && <Check className="h-3 w-3" />}
                                         </span>
@@ -290,7 +290,7 @@ function DataTableInner<T>(
                     {exportable && (
                         <button
                             onClick={exportCSV}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                         >
                             <Download className="h-3.5 w-3.5" />
                             Export
@@ -305,7 +305,7 @@ function DataTableInner<T>(
             <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                     <thead>
-                        <tr className="border-b border-slate-100 bg-slate-50/60 text-left">
+                        <tr className="border-b border-slate-100 bg-slate-50/60 text-left dark:border-slate-800 dark:bg-slate-800/60">
                             {selectable && (
                                 <th className="w-10 px-3 py-2.5">
                                     <input
@@ -313,7 +313,7 @@ function DataTableInner<T>(
                                         checked={allSelected}
                                         onChange={toggleAll}
                                         aria-label="Select all rows"
-                                        className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                        className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600"
                                     />
                                 </th>
                             )}
@@ -324,8 +324,8 @@ function DataTableInner<T>(
                                     <th
                                         key={col.id}
                                         className={cn(
-                                            'px-3 py-2.5 font-semibold text-slate-600 whitespace-nowrap',
-                                            sortable && 'cursor-pointer select-none hover:text-slate-800',
+                                            'px-3 py-2.5 font-semibold text-slate-600 whitespace-nowrap dark:text-slate-400',
+                                            sortable && 'cursor-pointer select-none hover:text-slate-800 dark:hover:text-slate-200',
                                         )}
                                         style={col.minWidth ? { minWidth: col.minWidth } : undefined}
                                         onClick={sortable ? () => toggleSort(col.id) : undefined}
@@ -344,11 +344,11 @@ function DataTableInner<T>(
                         </tr>
                     </thead>
 
-                    <tbody className="relative divide-y divide-slate-100">
+                    <tbody className="relative divide-y divide-slate-100 dark:divide-slate-800">
                         {loading && (
                             <tr>
                                 <td colSpan={activeColumns.length + (selectable ? 1 : 0)} className="h-40">
-                                    <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+                                    <div className="absolute inset-0 flex items-center justify-center bg-white/70 dark:bg-slate-900/70">
                                         <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
                                     </div>
                                 </td>
@@ -374,8 +374,8 @@ function DataTableInner<T>(
                                     <tr
                                         key={key}
                                         className={cn(
-                                            'transition-colors hover:bg-slate-50/80',
-                                            selected && 'bg-indigo-50/40',
+                                            'transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/50',
+                                            selected && 'bg-indigo-50/40 dark:bg-indigo-900/20',
                                         )}
                                     >
                                         {selectable && (
@@ -385,12 +385,12 @@ function DataTableInner<T>(
                                                     checked={selected}
                                                     onChange={() => toggleRow(key)}
                                                     aria-label="Select row"
-                                                    className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                                    className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600"
                                                 />
                                             </td>
                                         )}
                                         {activeColumns.map((col) => (
-                                            <td key={col.id} className="px-3 py-2.5 text-slate-700">
+                                            <td key={col.id} className="px-3 py-2.5 text-slate-700 dark:text-slate-300">
                                                 {col.cell(row)}
                                             </td>
                                         ))}
@@ -402,14 +402,14 @@ function DataTableInner<T>(
             </div>
 
             {/* Pagination */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-2.5 text-xs text-slate-500">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-2.5 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
                 <div className="flex items-center gap-2">
                     <span>Rows per page</span>
                     <select
                         value={pageSize}
                         onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
                         aria-label="Rows per page"
-                        className="rounded border border-slate-200 bg-white px-2 py-1 text-xs outline-none focus:ring-1 focus:ring-indigo-200"
+                        className="rounded border border-slate-200 bg-white px-2 py-1 text-xs outline-none focus:ring-1 focus:ring-indigo-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
                     >
                         {pageSizeOptions.map((n) => (
                             <option key={n} value={n}>{n}</option>
@@ -427,7 +427,7 @@ function DataTableInner<T>(
                     <button
                         disabled={safePage === 1}
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        className="rounded p-1 transition hover:bg-slate-100 disabled:opacity-40"
+                        className="rounded p-1 transition hover:bg-slate-100 disabled:opacity-40 dark:hover:bg-slate-800"
                         aria-label="Previous page"
                     >
                         <ChevronLeft className="h-4 w-4" />
@@ -436,7 +436,7 @@ function DataTableInner<T>(
                     <button
                         disabled={safePage >= totalPages}
                         onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                        className="rounded p-1 transition hover:bg-slate-100 disabled:opacity-40"
+                        className="rounded p-1 transition hover:bg-slate-100 disabled:opacity-40 dark:hover:bg-slate-800"
                         aria-label="Next page"
                     >
                         <ChevronRight className="h-4 w-4" />

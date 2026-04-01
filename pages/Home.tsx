@@ -121,8 +121,8 @@ const Home: React.FC = () => {
     <div className="flex flex-col gap-16 pb-16">
 
       {/* Hero Section */}
-      <section className="relative bg-white pt-0 pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        <div className="absolute top-0 left-1/2 w-full -translate-x-1/2 h-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-primary-50 via-white to-white pointer-events-none" />
+      <section className="relative bg-white dark:bg-slate-900 pt-0 pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="absolute top-0 left-1/2 w-full -translate-x-1/2 h-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-primary-50 via-white to-white dark:from-primary-950/30 dark:via-slate-950 dark:to-slate-950 pointer-events-none" />
         <div className="max-w-7xl mx-auto relative z-10 text-center">
           <div className="relative left-1/2 right-1/2 w-screen -ml-[50vw] -mr-[50vw]">
             <PinnedNewsSlider
@@ -131,14 +131,14 @@ const Home: React.FC = () => {
               items={pinnedNews}
               lead={(
                 <>
-                  <Badge className="mb-6 bg-primary-50 text-primary-700 border-primary-100 px-4 py-1.5 text-sm">
+                  <Badge className="mb-6 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-primary-100 dark:border-primary-800 px-4 py-1.5 text-sm">
                     {t('home.hero.badge')}
                   </Badge>
-                  <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-6">
+                  <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mb-6">
                     {t('home.hero.titleLine1')} <br className="hidden md:block" />
                     <span className="text-primary-600">{t('home.hero.titleHighlight')}</span>
                   </h1>
-                  <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto">
+                  <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
                     {t('home.hero.description')}
                   </p>
                 </>
@@ -158,7 +158,7 @@ const Home: React.FC = () => {
                   setShowResults(true);
                 }}
                 onFocus={() => setShowResults(true)}
-                className="w-full h-12 pl-12 pr-10 rounded-full border border-slate-200 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                className="w-full h-12 pl-12 pr-10 rounded-full border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
               />
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
 
@@ -172,7 +172,7 @@ const Home: React.FC = () => {
                 <button
                   onClick={clearSearch}
                   title={t('home.search.clearTitle')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-400"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -180,9 +180,9 @@ const Home: React.FC = () => {
 
               {/* Search Results Dropdown */}
               {showResults && query.length >= 2 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden z-50 max-h-96 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 overflow-hidden z-50 max-h-96 overflow-y-auto">
                   {searchLoading ? (
-                    <div className="p-4 text-center text-slate-500">
+                    <div className="p-4 text-center text-slate-500 dark:text-slate-400">
                       <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
                       {t('home.search.loading')}
                     </div>
@@ -190,19 +190,19 @@ const Home: React.FC = () => {
                     <div>
                       {results.contests.length > 0 && (
                         <div>
-                          <div className="px-4 py-2 bg-slate-50 text-xs font-semibold text-slate-500 uppercase">
+                          <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">
                             {t('nav.contests')} ({results.contests.length})
                           </div>
                           {results.contests.map((item) => (
                             <div
                               key={item.id}
                               onClick={() => handleSearchResultClick('contest', item.id)}
-                              className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center gap-3"
+                              className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer flex items-center gap-3"
                             >
                               <img src={item.image || 'https://picsum.photos/seed/default/100/100'} alt="" className="w-10 h-10 rounded-lg object-cover" />
                               <div className="flex-1 min-w-0">
-                                <div className="font-medium text-slate-900 truncate">{item.title}</div>
-                                <div className="text-xs text-slate-500">{item.organizer}</div>
+                                <div className="font-medium text-slate-900 dark:text-slate-100 truncate">{item.title}</div>
+                                <div className="text-xs text-slate-500 dark:text-slate-400">{item.organizer}</div>
                               </div>
                               <Badge status={item.status} className="shrink-0">{item.status}</Badge>
                             </div>
@@ -211,19 +211,19 @@ const Home: React.FC = () => {
                       )}
                       {results.courses.length > 0 && (
                         <div>
-                          <div className="px-4 py-2 bg-slate-50 text-xs font-semibold text-slate-500 uppercase">
+                          <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">
                             {t('nav.courses')} ({results.courses.length})
                           </div>
                           {results.courses.map((item) => (
                             <div
                               key={item.id}
                               onClick={() => handleSearchResultClick('course', item.id)}
-                              className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center gap-3"
+                              className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer flex items-center gap-3"
                             >
                               <img src={item.image || 'https://picsum.photos/seed/default/100/100'} alt="" className="w-10 h-10 rounded-lg object-cover" />
                               <div className="flex-1 min-w-0">
-                                <div className="font-medium text-slate-900 truncate">{item.title}</div>
-                                <div className="text-xs text-slate-500">{item.instructor}</div>
+                                <div className="font-medium text-slate-900 dark:text-slate-100 truncate">{item.title}</div>
+                                <div className="text-xs text-slate-500 dark:text-slate-400">{item.instructor}</div>
                               </div>
                               <span className="text-sm font-medium text-primary-600">{formatPrice(item.price)}</span>
                             </div>
@@ -231,7 +231,7 @@ const Home: React.FC = () => {
                         </div>
                       )}
                       {/* View all results */}
-                      <div className="px-4 py-3 bg-slate-50 border-t border-slate-100">
+                      <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-800">
                         <button
                           onClick={() => navigate(`/contests?search=${encodeURIComponent(query)}`)}
                           className="text-sm font-medium text-primary-600 hover:text-primary-700"
@@ -241,8 +241,8 @@ const Home: React.FC = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="p-4 text-center text-slate-500">
-                      <Search className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                    <div className="p-4 text-center text-slate-500 dark:text-slate-400">
+                      <Search className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
                       {t('home.search.noResults', { query })}
                     </div>
                   )}
@@ -259,15 +259,15 @@ const Home: React.FC = () => {
 
           {/* Stats */}
           <div className="relative left-1/2 right-1/2 w-screen -ml-[50vw] -mr-[50vw] overflow-hidden -mb-22 md:-mb-26">
-            <div className="absolute inset-0 bg-linear-to-r from-primary-50 via-white to-emerald-50" />
+            <div className="absolute inset-0 bg-linear-to-r from-primary-50 via-white to-emerald-50 dark:from-primary-950/30 dark:via-slate-950 dark:to-emerald-950/30" />
             <div className="absolute -left-20 top-0 w-72 h-72 bg-primary-200/60 blur-3xl" />
             <div className="absolute -right-30 -bottom-30 w-80 h-80 bg-emerald-200/60 blur-3xl" />
 
             <div className="relative max-w-6xl mx-auto px-6 md:px-14 py-14 md:py-16">
               <div className="flex flex-col items-center text-center gap-4 md:gap-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-600">{t('home.stats.kicker')}</p>
-                <h3 className="text-3xl md:text-4xl font-black text-slate-900">{t('home.stats.title')}</h3>
-                <p className="text-slate-600 max-w-3xl">
+                <h3 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100">{t('home.stats.title')}</h3>
+                <p className="text-slate-600 dark:text-slate-400 max-w-3xl">
                   {t('home.stats.description')}
                 </p>
               </div>
@@ -277,12 +277,12 @@ const Home: React.FC = () => {
                   [...Array(3)].map((_, idx) => (
                     <div
                       key={idx}
-                      className="relative overflow-hidden rounded-2xl border border-white/60 bg-white/70 backdrop-blur p-6 shadow-lg shadow-primary-100/50 animate-pulse"
+                      className="relative overflow-hidden rounded-2xl border border-white/60 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 backdrop-blur p-6 shadow-lg shadow-primary-100/50 dark:shadow-slate-900/50 animate-pulse"
                     >
-                      <div className="h-12 w-12 bg-slate-200 rounded-full mb-5" />
-                      <div className="h-8 w-24 bg-slate-200 rounded" />
-                      <div className="h-4 w-32 bg-slate-100 rounded mt-3" />
-                      <div className="h-2 w-full bg-slate-100 rounded-full mt-6" />
+                      <div className="h-12 w-12 bg-slate-200 dark:bg-slate-700 rounded-full mb-5" />
+                      <div className="h-8 w-24 bg-slate-200 dark:bg-slate-700 rounded" />
+                      <div className="h-4 w-32 bg-slate-100 dark:bg-slate-800 rounded mt-3" />
+                      <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full mt-6" />
                     </div>
                   ))
                 ) : (
@@ -314,33 +314,33 @@ const Home: React.FC = () => {
                   ].map((stat, idx) => (
                     <div
                       key={idx}
-                      className="relative overflow-hidden rounded-2xl bg-white/85 backdrop-blur border border-white/60 shadow-lg shadow-primary-100/60 p-6 group transition duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col items-center text-center gap-4"
+                      className="relative overflow-hidden rounded-2xl bg-white/85 dark:bg-slate-900/85 backdrop-blur border border-white/60 dark:border-slate-700 shadow-lg shadow-primary-100/60 dark:shadow-slate-900/60 p-6 group transition duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col items-center text-center gap-4"
                     >
-                      <div className="absolute inset-0 bg-linear-to-br from-white via-white to-primary-50 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute inset-0 bg-linear-to-br from-white via-white to-primary-50 dark:from-slate-950 dark:via-slate-950 dark:to-primary-950/30 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
                       <div className="absolute -right-10 -top-12 h-32 w-32 bg-primary-100 blur-2xl opacity-70" />
                       <div className="absolute -left-10 bottom-0 h-24 w-24 bg-emerald-100 blur-2xl opacity-80" />
 
                       <div className="relative flex items-center justify-between mb-2 w-full">
                         <div className="flex items-center gap-3">
-                          <div className="h-12 w-12 rounded-full bg-linear-to-br from-primary-500 to-emerald-400 text-white flex items-center justify-center shadow-md ring-4 ring-primary-100/70">
+                          <div className="h-12 w-12 rounded-full bg-linear-to-br from-primary-500 to-emerald-400 text-white flex items-center justify-center shadow-md ring-4 ring-primary-100/70 dark:ring-primary-800/70">
                             <stat.icon className="w-6 h-6" />
                           </div>
                           <div>
-                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-[0.15em]">{stat.badge}</p>
-                            <p className="text-sm font-semibold text-slate-900">{stat.label}</p>
+                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-[0.15em]">{stat.badge}</p>
+                            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{stat.label}</p>
                           </div>
                         </div>
-                        <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                        <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1 rounded-full border border-emerald-100 dark:border-emerald-800">
                           {t('home.stats.active')}
                         </span>
                       </div>
 
                       <div className="relative z-10 w-full">
                         <div className="flex items-baseline justify-center gap-2">
-                          <span className="text-4xl font-black text-slate-900 leading-none">{stat.value}</span>
-                          <span className="text-sm font-semibold text-slate-500">{t('home.stats.total')}</span>
+                          <span className="text-4xl font-black text-slate-900 dark:text-slate-100 leading-none">{stat.value}</span>
+                          <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">{t('home.stats.total')}</span>
                         </div>
-                        <p className="text-sm text-slate-500 mt-2">{stat.helper}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">{stat.helper}</p>
                       </div>
                     </div>
                   ))
@@ -355,10 +355,10 @@ const Home: React.FC = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="flex justify-between items-end mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
               {isLoggedIn && isPersonalized ? t('home.contests.titlePersonalized') : t('home.contests.titleFeatured')}
             </h2>
-            <p className="text-slate-500 mt-1">
+            <p className="text-slate-500 dark:text-slate-400 mt-1">
               {isLoggedIn && isPersonalized
                 ? t('home.contests.subtitlePersonalized')
                 : t('home.contests.subtitleFeatured')}
@@ -374,14 +374,14 @@ const Home: React.FC = () => {
             // Loading skeleton for contests
             [...Array(3)].map((_, i) => (
               <Card key={i} className="animate-pulse">
-                <div className="h-48 bg-slate-200" />
+                <div className="h-48 bg-slate-200 dark:bg-slate-700" />
                 <div className="p-5">
-                  <div className="h-4 w-20 bg-slate-200 rounded mb-3" />
-                  <div className="h-6 w-full bg-slate-200 rounded mb-2" />
-                  <div className="h-4 w-3/4 bg-slate-100 rounded mb-4" />
-                  <div className="pt-4 border-t border-slate-100 flex justify-between">
-                    <div className="h-4 w-24 bg-slate-100 rounded" />
-                    <div className="h-4 w-16 bg-slate-100 rounded" />
+                  <div className="h-4 w-20 bg-slate-200 dark:bg-slate-700 rounded mb-3" />
+                  <div className="h-6 w-full bg-slate-200 dark:bg-slate-700 rounded mb-2" />
+                  <div className="h-4 w-3/4 bg-slate-100 dark:bg-slate-800 rounded mb-4" />
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between">
+                    <div className="h-4 w-24 bg-slate-100 dark:bg-slate-800 rounded" />
+                    <div className="h-4 w-16 bg-slate-100 dark:bg-slate-800 rounded" />
                   </div>
                 </div>
               </Card>
@@ -404,24 +404,24 @@ const Home: React.FC = () => {
                   <div className="text-xs font-semibold text-primary-600 mb-2 uppercase tracking-wide">
                     {contest.tags?.[0] || 'General'}
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
                     {contest.title}
                   </h3>
-                  <p className="text-sm text-slate-500 mb-4 line-clamp-2">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">
                     {contest.description || t('home.contests.defaultDescription')}
                   </p>
-                  <div className="flex items-center justify-between text-sm text-slate-500 pt-4 border-t border-slate-100">
+                  <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 pt-4 border-t border-slate-100 dark:border-slate-800">
                     <span className="flex items-center">
                       <Calendar className="w-3 h-3 mr-1" />
                       {getRemainingDays(contest.deadline)}
                     </span>
-                    <span className="font-medium text-slate-900">{formatPrice(contest.fee)}</span>
+                    <span className="font-medium text-slate-900 dark:text-slate-100">{formatPrice(contest.fee)}</span>
                   </div>
                 </div>
               </Card>
             ))
           ) : (
-            <div className="md:col-span-3 text-center py-12 text-slate-500">
+            <div className="md:col-span-3 text-center py-12 text-slate-500 dark:text-slate-400">
               {t('home.contests.empty')}
             </div>
           )}
@@ -432,14 +432,14 @@ const Home: React.FC = () => {
       </section>
 
       {/* Featured Courses */}
-      <section className="bg-slate-100 py-16">
+      <section className="bg-slate-100 dark:bg-slate-800 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="flex justify-between items-end mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                 {isLoggedIn && isPersonalized ? t('home.courses.titlePersonalized') : t('home.courses.titleRecommended')}
               </h2>
-              <p className="text-slate-500 mt-1">
+              <p className="text-slate-500 dark:text-slate-400 mt-1">
                 {isLoggedIn && isPersonalized
                   ? t('home.courses.subtitlePersonalized')
                   : t('home.courses.subtitleRecommended')}
@@ -455,14 +455,14 @@ const Home: React.FC = () => {
               // Loading skeleton for courses
               [...Array(4)].map((_, i) => (
                 <Card key={i} className="border-0 shadow-none animate-pulse">
-                  <div className="aspect-video bg-slate-200 rounded-t-xl" />
+                  <div className="aspect-video bg-slate-200 dark:bg-slate-700 rounded-t-xl" />
                   <div className="p-4">
-                    <div className="h-5 w-full bg-slate-200 rounded mb-2" />
-                    <div className="h-3 w-24 bg-slate-100 rounded mb-3" />
-                    <div className="h-4 w-20 bg-slate-100 rounded mb-3" />
+                    <div className="h-5 w-full bg-slate-200 dark:bg-slate-700 rounded mb-2" />
+                    <div className="h-3 w-24 bg-slate-100 dark:bg-slate-800 rounded mb-3" />
+                    <div className="h-4 w-20 bg-slate-100 dark:bg-slate-800 rounded mb-3" />
                     <div className="flex justify-between">
-                      <div className="h-5 w-20 bg-slate-200 rounded" />
-                      <div className="h-5 w-16 bg-slate-100 rounded" />
+                      <div className="h-5 w-20 bg-slate-200 dark:bg-slate-700 rounded" />
+                      <div className="h-5 w-16 bg-slate-100 dark:bg-slate-800 rounded" />
                     </div>
                   </div>
                 </Card>
@@ -470,7 +470,7 @@ const Home: React.FC = () => {
             ) : displayCourses.length > 0 ? (
               displayCourses.map((course) => (
                 <Card key={course.id} className="group cursor-pointer border-0 shadow-none hover:shadow-lg" onClick={() => navigate(`/courses/${course.id}`)}>
-                  <div className="aspect-video overflow-hidden rounded-t-xl bg-slate-200">
+                  <div className="aspect-video overflow-hidden rounded-t-xl bg-slate-200 dark:bg-slate-700">
                     <OptimizedImage
                       src={course.image || `https://picsum.photos/seed/${course.id}/400/250`}
                       alt={course.title}
@@ -479,10 +479,10 @@ const Home: React.FC = () => {
                     />
                   </div>
                   <div className="p-4">
-                    <h4 className="font-bold text-slate-900 mb-1 line-clamp-1 group-hover:text-primary-600">
+                    <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-1 line-clamp-1 group-hover:text-primary-600">
                       {course.title}
                     </h4>
-                    <div className="text-xs text-slate-500 mb-2">{t('common.by', { name: course.instructor })}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400 mb-2">{t('common.by', { name: course.instructor })}</div>
                     <div className="flex items-center mb-3">
                       <Star className="w-4 h-4 text-yellow-400 fill-current" />
                       <span className="text-sm font-medium ml-1">{course.rating?.toFixed(1) || '0.0'}</span>
@@ -490,13 +490,13 @@ const Home: React.FC = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-primary-700">{formatPrice(course.price)}</span>
-                      <Badge className="bg-slate-100 text-slate-600 border-0">{course.level}</Badge>
+                      <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-0">{course.level}</Badge>
                     </div>
                   </div>
                 </Card>
               ))
             ) : (
-              <div className="sm:col-span-2 md:col-span-4 text-center py-12 text-slate-500">
+              <div className="sm:col-span-2 md:col-span-4 text-center py-12 text-slate-500 dark:text-slate-400">
                 {t('home.courses.empty')}
               </div>
             )}
@@ -506,20 +506,20 @@ const Home: React.FC = () => {
 
       {/* How it works */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
-        <h2 className="text-2xl font-bold text-slate-900 mb-12">{t('home.howItWorks.title')}</h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-12">{t('home.howItWorks.title')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             { step: '01', title: t('home.howItWorks.step1.title'), desc: t('home.howItWorks.step1.desc') },
             { step: '02', title: t('home.howItWorks.step2.title'), desc: t('home.howItWorks.step2.desc') },
             { step: '03', title: t('home.howItWorks.step3.title'), desc: t('home.howItWorks.step3.desc') }
           ].map((item) => (
-            <div key={item.step} className="relative p-6 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-all">
-              <div className="text-6xl font-black text-slate-100 absolute -top-4 -left-4 z-0 opacity-50 select-none">
+            <div key={item.step} className="relative p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all">
+              <div className="text-6xl font-black text-slate-100 dark:text-slate-800 absolute -top-4 -left-4 z-0 opacity-50 select-none">
                 {item.step}
               </div>
               <div className="relative z-10">
-                <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
-                <p className="text-slate-500 text-sm">{item.desc}</p>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">{item.title}</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">{item.desc}</p>
               </div>
             </div>
           ))}

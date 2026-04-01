@@ -240,13 +240,13 @@ Bạn có thể tắt cookies trong trình duyệt, nhưng một số tính năn
   }, [locale]);
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-950/30 dark:to-slate-800">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-slate-600 hover:text-primary-600 transition-colors"
+            className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary-600 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>{content.back}</span>
@@ -258,11 +258,11 @@ Bạn có thể tắt cookies trong trình duyệt, nhưng một số tính năn
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Title */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full mb-4">
             <Shield className="w-8 h-8 text-emerald-600" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">{content.title}</h1>
-          <p className="text-slate-500">{content.updatedAt}</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">{content.title}</h1>
+          <p className="text-slate-500 dark:text-slate-400">{content.updatedAt}</p>
         </div>
 
         {/* Summary Card */}
@@ -284,17 +284,17 @@ Bạn có thể tắt cookies trong trình duyệt, nhưng một số tính năn
             <div
               key={section.id}
               id={section.id}
-              className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 scroll-mt-20"
+              className="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 scroll-mt-20"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center">
                   <section.icon className="w-5 h-5 text-emerald-600" />
                 </div>
-                <h2 className="text-xl font-semibold text-slate-900">{section.title}</h2>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{section.title}</h2>
               </div>
-              <div className="text-slate-600 leading-relaxed whitespace-pre-line prose prose-sm max-w-none">
+              <div className="text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-line prose prose-sm max-w-none">
                 {section.content.split('**').map((part, index) =>
-                  index % 2 === 1 ? <strong key={index} className="text-slate-800">{part}</strong> : part
+                  index % 2 === 1 ? <strong key={index} className="text-slate-800 dark:text-slate-100">{part}</strong> : part
                 )}
               </div>
             </div>
@@ -302,17 +302,17 @@ Bạn có thể tắt cookies trong trình duyệt, nhưng một số tính năn
         </div>
 
         {/* Contact */}
-        <div className="mt-12 bg-white rounded-xl p-8 border border-slate-200 shadow-sm">
+        <div className="mt-12 bg-white dark:bg-slate-900 rounded-xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center shrink-0">
               <Lock className="w-6 h-6 text-emerald-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">{content.contactTitle}</h3>
-              <p className="text-slate-600 mb-4">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">{content.contactTitle}</h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-4">
                 {content.contactDescription}
               </p>
-              <div className="space-y-2 text-slate-600">
+              <div className="space-y-2 text-slate-600 dark:text-slate-400">
                 <p>📧 {content.contactEmailLabel}: <a href="mailto:clbflife2025thptfptcantho@gmail.com" className="text-emerald-600 hover:underline">clbflife2025thptfptcantho@gmail.com</a></p>
                 <p>📞 {content.contactPhoneLabel}: <a href="tel:+84916007090" className="text-emerald-600 hover:underline">+84 916 007 090</a></p>
               </div>

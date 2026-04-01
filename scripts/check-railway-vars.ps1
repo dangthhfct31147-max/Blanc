@@ -10,7 +10,7 @@
 
 param(
     [switch]$AutoFix = $false,
-    [string]$Service = "blanc-backend"
+    [string]$Service = "contesthub-backend"
 )
 
 $ErrorActionPreference = "Continue"

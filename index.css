@@ -26,6 +26,13 @@ html {
 
 html.dark {
     color-scheme: dark;
+    --ring-offset-color: #020617;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea {
+    color-scheme: dark;
 }
 
 /* Custom styles */
@@ -164,6 +171,7 @@ input[type='password']::-ms-clear {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     .animation-fade-in,
     .animate-fade-in,
     .animate-fade-in-up,
@@ -221,6 +229,7 @@ input[type='password']::-ms-clear {
 
 /* Streak badge animations */
 @keyframes streak-flame {
+
     0%,
     100% {
         transform: translateY(0) rotate(-6deg) scale(1);
@@ -239,6 +248,7 @@ input[type='password']::-ms-clear {
 }
 
 @keyframes streak-spark {
+
     0%,
     100% {
         transform: rotate(0deg) scale(1);

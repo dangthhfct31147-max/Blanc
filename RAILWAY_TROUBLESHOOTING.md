@@ -63,7 +63,7 @@ const client = new MongoClient(uri);
 Nếu dùng MongoDB:
 ```bash
 mongosh "YOUR_DATABASE_URL"
-use blanc  # hoặc tên DB của bạn
+use contesthub  # hoặc tên DB của bạn
 db.users.updateOne(
   { email: "your@email.com" },
   { $set: { role: "super_admin", updatedAt: new Date() } }
@@ -97,7 +97,7 @@ has been blocked by CORS policy
 
 Vào Backend service → **Variables**, đảm bảo:
 ```bash
-FRONTEND_ORIGIN=https://blanc.homelabo.work,https://blanc-admin.homelabo.work
+FRONTEND_ORIGIN=https://contesthub.homelabo.work,https://contesthub-admin.homelabo.work
 ```
 
 - Comma-separated, không có dấu `/` cuối

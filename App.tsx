@@ -64,6 +64,7 @@ const Reports = lazyWithRetry(() => import('./pages/Reports'));
 const ReportTemplates = lazyWithRetry(() => import('./pages/ReportTemplates'));
 const Contact = lazyWithRetry(() => import('./pages/Contact'));
 const SkillTreePage = lazyWithRetry(() => import('./pages/SkillTreePage'));
+const UniversityFitPage = lazyWithRetry(() => import('./pages/UniversityFit'));
 
 const DEFAULT_SESSION_TIMEOUT_MINUTES = 30;
 const IDLE_ACTIVITY_KEY = clientStorage.buildKey('session', 'last_activity');
@@ -464,6 +465,14 @@ const App: React.FC = () => {
                   <SkillTreePage />
                 </Suspense>
               </RequireAppAuth>
+            )}
+          />
+          <Route
+            path="/university-fit"
+            element={(
+              <Suspense fallback={<LoadingSpinner fullScreen />}>
+                <UniversityFitPage />
+              </Suspense>
             )}
           />
           <Route path="/terms" element={<Terms />} />

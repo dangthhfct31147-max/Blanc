@@ -21,7 +21,7 @@ const Terms: React.FC = () => {
             id: 'intro',
             icon: FileText,
             title: '1. Introduction',
-            content: `Welcome to Blanc — a platform that helps students find contests, manage courses, and connect teams. By using our service, you agree to the following terms and conditions.
+            content: `Welcome to ContestHub — a platform that helps students find contests, manage courses, and connect teams. By using our service, you agree to the following terms and conditions.
 
 Please read these terms carefully before using the platform. If you do not agree with any part, please do not use our service.`
           },
@@ -39,7 +39,7 @@ Please read these terms carefully before using the platform. If you do not agree
             id: 'usage',
             icon: CheckCircle,
             title: '3. Acceptable use',
-            content: `When using Blanc, you agree to:
+            content: `When using ContestHub, you agree to:
 • Not post content that violates laws, copyrights, or ethics.
 • Not spam, harass, or disturb other users.
 • Not attempt unauthorized access to the system.
@@ -90,7 +90,7 @@ Please read these terms carefully before using the platform. If you do not agree
           id: 'intro',
           icon: FileText,
           title: '1. Giới thiệu',
-          content: `Chào mừng bạn đến với Blanc - nền tảng hỗ trợ sinh viên tìm kiếm cuộc thi, quản lý khóa học và kết nối đội nhóm. Bằng việc sử dụng dịch vụ của chúng tôi, bạn đồng ý tuân thủ các điều khoản và điều kiện sau đây.
+          content: `Chào mừng bạn đến với ContestHub - nền tảng hỗ trợ sinh viên tìm kiếm cuộc thi, quản lý khóa học và kết nối đội nhóm. Bằng việc sử dụng dịch vụ của chúng tôi, bạn đồng ý tuân thủ các điều khoản và điều kiện sau đây.
 
 Vui lòng đọc kỹ các điều khoản này trước khi sử dụng nền tảng. Nếu bạn không đồng ý với bất kỳ phần nào của điều khoản, vui lòng không sử dụng dịch vụ của chúng tôi.`
         },
@@ -108,7 +108,7 @@ Vui lòng đọc kỹ các điều khoản này trước khi sử dụng nền t
           id: 'usage',
           icon: CheckCircle,
           title: '3. Quy định sử dụng',
-          content: `Khi sử dụng Blanc, bạn cam kết:
+          content: `Khi sử dụng ContestHub, bạn cam kết:
 • Không đăng tải nội dung vi phạm pháp luật, bản quyền hoặc đạo đức.
 • Không spam, quấy rối hoặc gây phiền toái cho người dùng khác.
 • Không cố gắng truy cập trái phép vào hệ thống.
@@ -148,13 +148,13 @@ Vui lòng đọc kỹ các điều khoản này trước khi sử dụng nền t
   }, [locale]);
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-950/30 dark:to-slate-800">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-slate-600 hover:text-primary-600 transition-colors"
+            className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary-600 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>{content.back}</span>
@@ -166,11 +166,11 @@ Vui lòng đọc kỹ các điều khoản này trước khi sử dụng nền t
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Title */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full mb-4">
             <FileText className="w-8 h-8 text-primary-600" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">{content.title}</h1>
-          <p className="text-slate-500">{content.updatedAt}</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">{content.title}</h1>
+          <p className="text-slate-500 dark:text-slate-400">{content.updatedAt}</p>
         </div>
 
         {/* Sections */}
@@ -179,15 +179,15 @@ Vui lòng đọc kỹ các điều khoản này trước khi sử dụng nền t
             <div
               key={section.id}
               id={section.id}
-              className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 scroll-mt-20"
+              className="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 scroll-mt-20"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-primary-50 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-primary-50 dark:bg-primary-900/30 rounded-lg flex items-center justify-center">
                   <section.icon className="w-5 h-5 text-primary-600" />
                 </div>
-                <h2 className="text-xl font-semibold text-slate-900">{section.title}</h2>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{section.title}</h2>
               </div>
-              <div className="text-slate-600 leading-relaxed whitespace-pre-line">
+              <div className="text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-line">
                 {section.content}
               </div>
             </div>

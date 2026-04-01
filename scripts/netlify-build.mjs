@@ -28,7 +28,7 @@ console.log('[netlify] Building user app…');
 run('npm', ['run', 'build']);
 
 console.log('[netlify] Building admin app…');
-run('npm', ['--workspace', 'blanc-admin', 'run', 'build'], {
+run('npm', ['--workspace', 'contesthub-admin', 'run', 'build'], {
   env: {
     ...process.env,
     VITE_BASE: '/admin/',
