@@ -47,97 +47,103 @@ export default function NodeDetailPanel({
 
                     {/* Panel */}
                     <motion.div
-                        className="relative ml-auto w-full max-w-md pointer-events-auto overflow-y-auto"
+                        className="relative ml-auto w-full max-w-sm pointer-events-auto overflow-y-auto"
                         style={{
-                            background: 'linear-gradient(160deg, rgba(15,23,42,0.97), rgba(30,41,59,0.97))',
-                            borderLeft: '1px solid rgba(148,163,184,0.1)',
-                            boxShadow: '-8px 0 40px rgba(0,0,0,0.4)',
+                            background: 'linear-gradient(160deg, rgba(10,15,30,0.98) 0%, rgba(15,23,42,0.98) 100%)',
+                            borderLeft: '1px solid rgba(99,102,241,0.12)',
+                            boxShadow: '-12px 0 48px rgba(0,0,0,0.5)',
                         }}
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
                     >
-                        <div className="p-6 sm:p-8">
+                        {/* Colored top accent bar */}
+                        <div
+                            className="h-0.5 w-full"
+                            style={{ background: `linear-gradient(90deg, ${branch.def.accentColor}, ${branch.def.accentLight}40, transparent)` }}
+                        />
+
+                        <div className="p-5 sm:p-6">
                             {/* Close */}
                             <button
                                 onClick={onClose}
                                 title="Close"
-                                className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                                className="absolute top-4 right-4 w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 hover:text-white hover:bg-slate-800 transition-colors"
                             >
-                                <X size={18} />
+                                <X size={15} />
                             </button>
 
                             {/* Branch badge */}
                             <div
-                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-6"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold mb-5"
                                 style={{
-                                    background: `${branch.def.accentColor}15`,
+                                    background: `${branch.def.accentColor}12`,
                                     color: branch.def.accentLight,
-                                    border: `1px solid ${branch.def.accentColor}30`,
+                                    border: `1px solid ${branch.def.accentColor}25`,
                                 }}
                             >
-                                <div className="w-2 h-2 rounded-full" style={{ background: branch.def.accentColor }} />
+                                <div className="w-1.5 h-1.5 rounded-full" style={{ background: branch.def.accentColor }} />
                                 {t ? branch.def.nameEn : branch.def.name}
                             </div>
 
                             {/* Node header */}
-                            <div className="flex items-start gap-4 mb-6">
+                            <div className="flex items-start gap-3.5 mb-5">
                                 <div
-                                    className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
+                                    className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
                                     style={{
-                                        background: `linear-gradient(135deg, ${branch.def.accentColor}20, ${branch.def.accentColor}08)`,
-                                        border: `1px solid ${branch.def.accentColor}40`,
+                                        background: `linear-gradient(135deg, ${branch.def.accentColor}18, ${branch.def.accentColor}06)`,
+                                        border: `1px solid ${branch.def.accentColor}30`,
                                     }}
                                 >
-                                    <Zap size={24} style={{ color: branch.def.accentColor }} />
+                                    <Zap size={20} style={{ color: branch.def.accentColor }} />
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="text-xl font-bold text-white leading-tight">
+                                <div className="flex-1 min-w-0 pt-0.5">
+                                    <h3 className="text-lg font-bold text-white leading-tight">
                                         {t ? node.def.titleEn : node.def.title}
                                     </h3>
-                                    <p className="text-sm text-slate-400 mt-0.5">
+                                    <p className="text-xs text-slate-500 mt-0.5">
                                         {t ? node.def.subtitleEn : node.def.subtitle}
                                     </p>
                                 </div>
                             </div>
 
-                            {/* State badge */}
-                            <div className="flex items-center gap-3 mb-6">
+                            {/* State + milestone badges */}
+                            <div className="flex items-center gap-2 mb-5">
                                 <StateBadge state={node.state} color={branch.def.accentColor} locale={locale} />
                                 {node.def.isMilestone && (
                                     <span
-                                        className="inline-flex items-center gap-1 text-xs font-semibold text-amber-300 px-2.5 py-1 rounded-full"
+                                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-300 px-2 py-1 rounded-full"
                                         style={{
-                                            backgroundColor: 'rgba(251, 191, 36, 0.1)',
-                                            border: '1px solid rgba(251, 191, 36, 0.2)',
+                                            backgroundColor: 'rgba(251,191,36,0.08)',
+                                            border: '1px solid rgba(251,191,36,0.18)',
                                         }}
                                     >
-                                        <Star size={12} />
+                                        <Star size={11} />
                                         Milestone
                                     </span>
                                 )}
                             </div>
 
                             {/* Description */}
-                            <p className="text-sm text-slate-300 leading-relaxed mb-6">
+                            <p className="text-sm text-slate-400 leading-relaxed mb-5">
                                 {t ? node.def.descriptionEn : node.def.description}
                             </p>
 
                             {/* XP Progress */}
                             <div
-                                className="rounded-xl p-4 mb-6"
-                                style={{ background: 'rgba(30,41,59,0.6)', border: '1px solid rgba(148,163,184,0.08)' }}
+                                className="rounded-xl p-3.5 mb-5"
+                                style={{ background: 'rgba(10,15,30,0.6)', border: '1px solid rgba(99,102,241,0.08)' }}
                             >
-                                <div className="flex items-center justify-between mb-3">
-                                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                <div className="flex items-center justify-between mb-2.5">
+                                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">
                                         {t ? 'Branch XP' : 'XP nhánh'}
                                     </span>
-                                    <span className="text-sm font-bold" style={{ color: branch.def.accentLight }}>
+                                    <span className="text-xs font-bold tabular-nums" style={{ color: branch.def.accentLight }}>
                                         {node.xpCurrent} / {node.xpNeeded || '—'} XP
                                     </span>
                                 </div>
-                                <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
+                                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: `${branch.def.accentColor}12` }}>
                                     <motion.div
                                         className="h-full rounded-full"
                                         style={{ background: `linear-gradient(90deg, ${branch.def.accentColor}, ${branch.def.accentLight})` }}
@@ -150,26 +156,24 @@ export default function NodeDetailPanel({
 
                             {/* Unlock conditions */}
                             {node.conditionResults.length > 0 && (
-                                <div className="mb-6">
-                                    <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                                        {t ? 'Unlock Requirements' : 'Điều kiện mở khóa'}
-                                    </h4>
-                                    <div className="space-y-2">
+                                <div className="mb-5">
+                                    <SectionLabel label={t ? 'Unlock Requirements' : 'Điều kiện mở khóa'} />
+                                    <div className="space-y-1.5">
                                         {node.conditionResults.map((cr, i) => (
                                             <div
                                                 key={i}
-                                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg"
+                                                className="flex items-center gap-2.5 px-3 py-2 rounded-lg"
                                                 style={{
-                                                    background: cr.met ? `${branch.def.accentColor}08` : 'rgba(30,41,59,0.5)',
-                                                    border: `1px solid ${cr.met ? `${branch.def.accentColor}20` : 'rgba(51,65,85,0.3)'}`,
+                                                    background: cr.met ? `${branch.def.accentColor}08` : 'rgba(10,15,30,0.5)',
+                                                    border: `1px solid ${cr.met ? `${branch.def.accentColor}18` : 'rgba(51,65,85,0.2)'}`,
                                                 }}
                                             >
                                                 {cr.met ? (
-                                                    <CheckCircle2 size={16} style={{ color: branch.def.accentColor }} className="shrink-0" />
+                                                    <CheckCircle2 size={14} style={{ color: branch.def.accentColor }} className="shrink-0" />
                                                 ) : (
-                                                    <Lock size={14} className="text-slate-500 shrink-0" />
+                                                    <Lock size={13} className="text-slate-700 shrink-0" />
                                                 )}
-                                                <span className={`text-sm ${cr.met ? 'text-slate-200' : 'text-slate-500'}`}>
+                                                <span className={`text-xs ${cr.met ? 'text-slate-300' : 'text-slate-600'}`}>
                                                     {t ? cr.condition.labelEn : cr.condition.label}
                                                 </span>
                                             </div>
@@ -180,44 +184,42 @@ export default function NodeDetailPanel({
 
                             {/* Rewards */}
                             {(node.def.rewards.badge || node.def.rewards.portfolioTag) && (
-                                <div className="mb-6">
-                                    <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                                        {t ? 'Rewards' : 'Phần thưởng'}
-                                    </h4>
-                                    <div className="flex flex-wrap gap-2">
+                                <div className="mb-5">
+                                    <SectionLabel label={t ? 'Rewards' : 'Phần thưởng'} />
+                                    <div className="flex flex-wrap gap-1.5">
                                         {node.def.rewards.badge && (
                                             <span
-                                                className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-indigo-300"
+                                                className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full text-indigo-300"
                                                 style={{
-                                                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                                                    border: '1px solid rgba(99, 102, 241, 0.2)',
+                                                    backgroundColor: 'rgba(99,102,241,0.08)',
+                                                    border: '1px solid rgba(99,102,241,0.18)',
                                                 }}
                                             >
-                                                <Trophy size={12} />
+                                                <Trophy size={11} />
                                                 {t ? node.def.rewards.badgeEn : node.def.rewards.badge}
                                             </span>
                                         )}
                                         {node.def.rewards.profileBoost && (
                                             <span
-                                                className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-emerald-300"
+                                                className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full text-emerald-300"
                                                 style={{
-                                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                                    border: '1px solid rgba(16, 185, 129, 0.2)',
+                                                    backgroundColor: 'rgba(16,185,129,0.08)',
+                                                    border: '1px solid rgba(16,185,129,0.18)',
                                                 }}
                                             >
-                                                <Target size={12} />
+                                                <Target size={11} />
                                                 +{node.def.rewards.profileBoost}% profile
                                             </span>
                                         )}
                                         {node.def.rewards.portfolioTag && (
                                             <span
-                                                className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-amber-300"
+                                                className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full text-amber-300"
                                                 style={{
-                                                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                                    border: '1px solid rgba(245, 158, 11, 0.2)',
+                                                    backgroundColor: 'rgba(245,158,11,0.08)',
+                                                    border: '1px solid rgba(245,158,11,0.18)',
                                                 }}
                                             >
-                                                <BookOpen size={12} />
+                                                <BookOpen size={11} />
                                                 {node.def.rewards.portfolioTag}
                                             </span>
                                         )}
@@ -227,28 +229,26 @@ export default function NodeDetailPanel({
 
                             {/* Suggested actions */}
                             {node.def.suggestedActions.length > 0 && (
-                                <div className="mb-6">
-                                    <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                                        {t ? 'How to progress' : 'Cách tiến bộ'}
-                                    </h4>
-                                    <div className="space-y-2">
+                                <div className="mb-5">
+                                    <SectionLabel label={t ? 'How to progress' : 'Cách tiến bộ'} />
+                                    <div className="space-y-1.5">
                                         {node.def.suggestedActions.map((action, i) => (
                                             <div
                                                 key={i}
-                                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg group/action cursor-pointer hover:bg-slate-700 transition-colors"
-                                                style={{ background: 'rgba(30,41,59,0.4)', border: '1px solid rgba(51,65,85,0.2)' }}
+                                                className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl group/action cursor-pointer transition-colors"
+                                                style={{ background: 'rgba(10,15,30,0.5)', border: '1px solid rgba(51,65,85,0.15)' }}
                                             >
-                                                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                                                    style={{ background: `${branch.def.accentColor}15` }}>
-                                                    {action.type === 'contest' && <Trophy size={14} style={{ color: branch.def.accentColor }} />}
-                                                    {action.type === 'course' && <BookOpen size={14} style={{ color: branch.def.accentColor }} />}
-                                                    {action.type === 'project' && <Code2 size={14} style={{ color: branch.def.accentColor }} />}
-                                                    {action.type === 'team' && <Users size={14} style={{ color: branch.def.accentColor }} />}
+                                                <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+                                                    style={{ background: `${branch.def.accentColor}12` }}>
+                                                    {action.type === 'contest' && <Trophy size={12} style={{ color: branch.def.accentColor }} />}
+                                                    {action.type === 'course' && <BookOpen size={12} style={{ color: branch.def.accentColor }} />}
+                                                    {action.type === 'project' && <Code2 size={12} style={{ color: branch.def.accentColor }} />}
+                                                    {action.type === 'team' && <Users size={12} style={{ color: branch.def.accentColor }} />}
                                                 </div>
-                                                <span className="text-sm text-slate-300 flex-1">
+                                                <span className="text-xs text-slate-400 flex-1">
                                                     {t ? action.labelEn : action.label}
                                                 </span>
-                                                <ArrowRight size={14} className="text-slate-600 group-hover/action:text-slate-400 transition-colors" />
+                                                <ArrowRight size={12} className="text-slate-700 group-hover/action:text-slate-500 transition-colors" />
                                             </div>
                                         ))}
                                     </div>
@@ -258,20 +258,18 @@ export default function NodeDetailPanel({
                             {/* Recommendations for this branch */}
                             {recommendations.filter(r => r.branchId === branch.def.id).length > 0 && (
                                 <div>
-                                    <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                                        {t ? 'Recommended' : 'Đề xuất'}
-                                    </h4>
+                                    <SectionLabel label={t ? 'Recommended' : 'Đề xuất'} />
                                     {recommendations
                                         .filter(r => r.branchId === branch.def.id)
                                         .slice(0, 2)
                                         .map((rec, i) => (
                                             <div
                                                 key={i}
-                                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg mb-2"
-                                                style={{ background: `${branch.def.accentColor}08`, border: `1px solid ${branch.def.accentColor}15` }}
+                                                className="flex items-start gap-2.5 px-3 py-2.5 rounded-xl mb-1.5"
+                                                style={{ background: `${branch.def.accentColor}06`, border: `1px solid ${branch.def.accentColor}12` }}
                                             >
-                                                <Zap size={14} style={{ color: branch.def.accentColor }} />
-                                                <span className="text-sm text-slate-300">
+                                                <Zap size={13} style={{ color: branch.def.accentColor }} className="mt-0.5 shrink-0" />
+                                                <span className="text-xs text-slate-400 leading-relaxed">
                                                     {t ? rec.reasonEn : rec.reason}
                                                 </span>
                                             </div>
@@ -286,21 +284,27 @@ export default function NodeDetailPanel({
     );
 }
 
+function SectionLabel({ label }: { label: string }) {
+    return (
+        <div className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2.5">{label}</div>
+    );
+}
+
 function StateBadge({ state, color, locale }: { state: string; color: string; locale: Locale }) {
     const t = locale === 'en';
     const configs: Record<string, { label: string; bg: string; fg: string; icon: React.ReactNode }> = {
-        locked: { label: t ? 'Locked' : 'Chưa mở khóa', bg: 'rgba(51,65,85,0.4)', fg: '#64748b', icon: <Lock size={12} /> },
-        'milestone-locked': { label: t ? 'Milestone — Locked' : 'Cột mốc — Khóa', bg: 'rgba(51,65,85,0.4)', fg: '#64748b', icon: <Lock size={12} /> },
-        available: { label: t ? 'Ready to unlock' : 'Sẵn sàng mở khóa', bg: `${color}15`, fg: color, icon: <Zap size={12} /> },
-        active: { label: t ? 'In progress' : 'Đang tiến hành', bg: `${color}15`, fg: color, icon: <Zap size={12} /> },
-        completed: { label: t ? 'Completed' : 'Hoàn thành', bg: `${color}15`, fg: color, icon: <CheckCircle2 size={12} /> },
-        'milestone-completed': { label: t ? 'Milestone ✓' : 'Cột mốc ✓', bg: '#f59e0b15', fg: '#f59e0b', icon: <Star size={12} /> },
+        locked: { label: t ? 'Locked' : 'Chưa mở khóa', bg: 'rgba(15,23,42,0.6)', fg: '#475569', icon: <Lock size={11} /> },
+        'milestone-locked': { label: t ? 'Milestone — Locked' : 'Cột mốc — Khóa', bg: 'rgba(15,23,42,0.6)', fg: '#475569', icon: <Lock size={11} /> },
+        available: { label: t ? 'Ready to unlock' : 'Sẵn sàng mở khóa', bg: `${color}12`, fg: color, icon: <Zap size={11} /> },
+        active: { label: t ? 'In progress' : 'Đang tiến hành', bg: `${color}12`, fg: color, icon: <Zap size={11} /> },
+        completed: { label: t ? 'Completed' : 'Hoàn thành', bg: `${color}12`, fg: color, icon: <CheckCircle2 size={11} /> },
+        'milestone-completed': { label: t ? 'Milestone ✓' : 'Cột mốc ✓', bg: '#f59e0b12', fg: '#f59e0b', icon: <Star size={11} /> },
     };
     const cfg = configs[state] || configs.locked;
     return (
         <span
-            className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"
-            style={{ background: cfg.bg, color: cfg.fg, border: `1px solid ${cfg.fg}25` }}
+            className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full"
+            style={{ background: cfg.bg, color: cfg.fg, border: `1px solid ${cfg.fg}20` }}
         >
             {cfg.icon}
             {cfg.label}

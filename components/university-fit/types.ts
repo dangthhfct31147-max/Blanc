@@ -116,8 +116,23 @@ export interface University {
   name: string;
   country: string;
   city: string;
+  dataQuality?: 'curated' | 'hybrid' | 'generated';
+  profileSources?: Array<{
+    label: string;
+    url: string;
+    type: 'official' | 'ranking';
+  }>;
   reputationLabel: string;
   rankingTier: 'Global elite' | 'Highly selective' | 'Strong international' | 'Accessible value';
+  rankingSources?: Array<{
+    source: 'THE' | 'Webometrics';
+    edition: string;
+    scope: 'world' | 'vietnam';
+    rank: number;
+    sourceUrl: string;
+    overallScore?: number;
+    worldRank?: number;
+  }>;
   tuitionRangeUsd: {
     min: number;
     max: number;

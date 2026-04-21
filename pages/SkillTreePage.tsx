@@ -227,46 +227,88 @@ export default function SkillTreePage() {
     if (!userState) return null;
 
     return (
-        <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #0f172a 0%, #020617 100%)' }}>
-            <div className="max-w-5xl mx-auto px-4 py-8">
-                {/* Header */}
-                <div className="mb-8">
+        <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #0a0f1e 0%, #020617 60%, #000510 100%)' }}>
+            {/* Hero header */}
+            <div
+                className="relative overflow-hidden"
+                style={{
+                    background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.05) 50%, transparent 100%)',
+                    borderBottom: '1px solid rgba(99,102,241,0.1)',
+                }}
+            >
+                {/* Decorative background orbs */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                    <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full opacity-[0.04]"
+                        style={{ background: 'radial-gradient(circle, #6366f1, transparent 70%)' }} />
+                    <div className="absolute -top-12 right-1/4 w-64 h-64 rounded-full opacity-[0.03]"
+                        style={{ background: 'radial-gradient(circle, #8b5cf6, transparent 70%)' }} />
+                </div>
+
+                <div className="max-w-5xl mx-auto px-4 pt-6 pb-8">
                     <button
                         onClick={() => navigate(-1)}
-                        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200 transition-colors mb-4"
+                        className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors mb-6 group"
                     >
-                        <ArrowLeft className="w-4 h-4" />
+                        <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
                         {copy.back}
                     </button>
 
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
                         <div>
                             <div
-                                className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-indigo-300 text-xs font-medium mb-3"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-indigo-400 text-[11px] font-semibold tracking-wide uppercase mb-3"
                                 style={{
-                                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                                    border: '1px solid rgba(99, 102, 241, 0.2)',
+                                    backgroundColor: 'rgba(99,102,241,0.08)',
+                                    border: '1px solid rgba(99,102,241,0.18)',
                                 }}
                             >
-                                <Sparkles className="w-3.5 h-3.5" />
+                                <Sparkles className="w-3 h-3" />
                                 {copy.badge}
                             </div>
-                            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">
+                            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-2">
                                 {copy.title}
                             </h1>
-                            <p className="text-slate-400 text-sm">
+                            <p className="text-slate-400 text-sm max-w-md leading-relaxed">
                                 {copy.description}
                             </p>
                         </div>
+
+                        {/* User level badge */}
+                        <div
+                            className="flex items-center gap-3 px-4 py-3 rounded-2xl flex-shrink-0 self-start sm:self-auto"
+                            style={{
+                                background: 'rgba(15,23,42,0.7)',
+                                border: '1px solid rgba(99,102,241,0.2)',
+                                backdropFilter: 'blur(12px)',
+                            }}
+                        >
+                            <div
+                                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                                style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.2))', border: '1px solid rgba(99,102,241,0.3)' }}
+                            >
+                                <Target className="w-5 h-5 text-indigo-300" />
+                            </div>
+                            <div>
+                                <div className="text-[10px] text-slate-500 uppercase tracking-wider font-medium">
+                                    {isEn ? 'Global Level' : 'Cấp độ'}
+                                </div>
+                                <div className="text-xl font-bold text-white leading-none mt-0.5">
+                                    {userState.globalLevel}
+                                    <span className="text-xs text-slate-400 font-normal ml-1.5">
+                                        · {userState.globalXP.toLocaleString()} XP
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                {/* New Skill Tree V2 */}
+            <div className="max-w-5xl mx-auto px-4 py-8">
                 <SkillTreeV2 userState={userState} locale={locale} />
 
-                {/* Info Footer */}
-                <div className="mt-6 text-center">
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                <div className="mt-8 text-center">
+                    <p className="text-xs text-slate-600">
                         {copy.footer}
                     </p>
                 </div>

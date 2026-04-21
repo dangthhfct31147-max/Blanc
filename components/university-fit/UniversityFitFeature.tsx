@@ -25,6 +25,7 @@ import {
   Plus,
   Search,
   Sparkles,
+  ExternalLink,
   Target,
   Trophy,
   X,
@@ -49,6 +50,7 @@ import type {
   ScholarshipType,
   StudentActivity,
   StudentProfile,
+  University,
   UniversityFitResult,
   UniversityFilterState,
 } from './types';
@@ -87,6 +89,18 @@ const scholarshipToneClasses: Record<ScholarshipStatus, string> = {
   'Potentially eligible': tonePillClasses.yellow,
   'Needs improvement': tonePillClasses.yellow,
   'Not eligible yet': tonePillClasses.red,
+};
+
+const dataQualityBadgeStyles: Record<NonNullable<University['dataQuality']>, string> = {
+  curated: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300',
+  hybrid: 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300',
+  generated: 'bg-amber-50 text-amber-800 dark:bg-amber-500/10 dark:text-amber-200',
+};
+
+const dataQualityCopy: Record<NonNullable<University['dataQuality']>, string> = {
+  curated: 'Curated profile',
+  hybrid: 'Hybrid profile',
+  generated: 'Generated planning profile',
 };
 
 function requirementIcon(tone: RequirementTone) {
@@ -229,6 +243,86 @@ function DeadlineBadge({ label, daysUntil, tone }: NonNullable<UniversityFitResu
       {label}
       <span className="text-[11px] opacity-80">{daysUntil}d</span>
     </span>
+  );
+}
+
+function formatRankingSource(source: NonNullable<University['rankingSources']>[number]): string {
+  if (source.source === 'THE') {
+    return `THE ${source.edition} #${source.rank}`;
+  }
+
+  return `Webometrics VN ${source.edition} #${source.rank}`;
+}
+
+function DataQualityBadge({ university }: { university: University }) {
+  const quality = university.dataQuality ?? 'generated';
+
+  return (
+    <Badge className={cn('border-0', dataQualityBadgeStyles[quality])}>
+      {dataQualityCopy[quality]}
+    </Badge>
+  );
+}
+
+function UniversityMetaBadges({ university, deadlineSignal }: { university: University; deadlineSignal?: UniversityFitResult['deadlineSignal'] }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <Badge className="border-0 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">{university.country}</Badge>
+      <Badge className="border-0 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">{university.city}</Badge>
+      <DataQualityBadge university={university} />
+      {university.rankingSources?.slice(0, 2).map((source) => (
+        <Badge key={`${source.source}-${source.scope}-${source.rank}`} className="border-0 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+          {formatRankingSource(source)}
+        </Badge>
+      ))}
+      {deadlineSignal && <DeadlineBadge {...deadlineSignal} />}
+    </div>
+  );
+}
+
+function DataConfidencePanel({ university }: { university: University }) {
+  const quality = university.dataQuality ?? 'generated';
+  const qualityNote =
+    quality === 'curated'
+      ? 'This profile is manually curated inside the app dataset.'
+      : quality === 'hybrid'
+        ? 'This profile mixes official admissions or scholarship references with standardized planning defaults for some fields.'
+        : 'This profile is standardized from ranking data so the fit engine can still work before full manual curation.';
+
+  return (
+    <div className="rounded-[28px] border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Data confidence</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <DataQualityBadge university={university} />
+            {university.profileSources?.length ? (
+              <Badge className="border-0 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                {university.profileSources.length} official link{university.profileSources.length > 1 ? 's' : ''}
+              </Badge>
+            ) : null}
+          </div>
+          <p className="max-w-3xl text-sm text-slate-600 dark:text-slate-300">{qualityNote}</p>
+        </div>
+      </div>
+
+      {university.profileSources?.length ? (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {university.profileSources.map((source) => (
+            <a
+              key={source.url}
+              href={source.url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+            >
+              {source.label}
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -499,11 +593,7 @@ function UniversityCard({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-3">
           <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge className="border-0 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">{result.university.country}</Badge>
-              <Badge className="border-0 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">{result.university.city}</Badge>
-              {result.deadlineSignal && <DeadlineBadge {...result.deadlineSignal} />}
-            </div>
+            <UniversityMetaBadges university={result.university} deadlineSignal={result.deadlineSignal} />
             <h3 className="text-2xl font-black tracking-tight text-slate-950 dark:text-white">{result.university.name}</h3>
             <p className="max-w-2xl text-sm text-slate-500 dark:text-slate-400">{result.university.reputationLabel}</p>
           </div>
@@ -868,11 +958,7 @@ function UniversityDetailPanel({
             <div className="border-b border-slate-200 bg-white px-5 py-5 dark:border-slate-800 dark:bg-slate-900">
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-3">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge className="border-0 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">{result.university.country}</Badge>
-                    <Badge className="border-0 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">{result.university.city}</Badge>
-                    {result.deadlineSignal && <DeadlineBadge {...result.deadlineSignal} />}
-                  </div>
+                  <UniversityMetaBadges university={result.university} deadlineSignal={result.deadlineSignal} />
                   <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white">{result.university.name}</h2>
                   <p className="max-w-2xl text-sm text-slate-500 dark:text-slate-400">{result.university.reputationLabel}</p>
                 </div>
@@ -897,6 +983,8 @@ function UniversityDetailPanel({
 
             <div className="flex-1 overflow-y-auto px-5 py-5">
               <div className="space-y-6">
+                <DataConfidencePanel university={result.university} />
+
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="rounded-[28px] border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Admission eligibility</p>

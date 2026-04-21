@@ -4,6 +4,7 @@ import type {
   University,
   UniversityFilterState,
 } from './types';
+import { buildExpandedUniversityCatalogue } from './catalogueExpander';
 
 const activity = (
   title: string,
@@ -183,7 +184,7 @@ export const defaultUniversityFilters: UniversityFilterState = {
   sortBy: 'best-fit',
 };
 
-export const universityCatalogue: University[] = [
+const detailedUniversityCatalogue: University[] = [
   {
     id: 'asu',
     name: 'Arizona State University',
@@ -1190,3 +1191,5 @@ export const universityCatalogue: University[] = [
     scholarshipHighlights: ['Elite full-ride scholarship', 'Merit awards for top admits'],
   },
 ];
+
+export const universityCatalogue: University[] = buildExpandedUniversityCatalogue(detailedUniversityCatalogue);

@@ -106,34 +106,41 @@ export default function DesktopConstellation({
             >
                 <defs>
                     <radialGradient id="constellation-bg" cx="50%" cy="50%" r="55%">
-                        <stop offset="0%" stopColor="#1e293b" stopOpacity="0.25" />
-                        <stop offset="100%" stopColor="#0f172a" stopOpacity="0" />
+                        <stop offset="0%" stopColor="#1e293b" stopOpacity="0.3" />
+                        <stop offset="100%" stopColor="#0a0f1e" stopOpacity="0" />
                     </radialGradient>
                     {branches.map((branch) => (
                         <React.Fragment key={`defs-${branch.def.id}`}>
                             <linearGradient id={`path-grad-${branch.def.id}`} x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stopColor={branch.def.accentColor} stopOpacity="0.7" />
-                                <stop offset="100%" stopColor={branch.def.accentColor} stopOpacity="0.2" />
+                                <stop offset="0%" stopColor={branch.def.accentColor} stopOpacity="0.8" />
+                                <stop offset="100%" stopColor={branch.def.accentColor} stopOpacity="0.15" />
                             </linearGradient>
-                            <filter id={`glow-${branch.def.id}`} x="-50%" y="-50%" width="200%" height="200%">
-                                <feGaussianBlur stdDeviation="3" result="blur" />
+                            <filter id={`glow-${branch.def.id}`} x="-60%" y="-60%" width="220%" height="220%">
+                                <feGaussianBlur stdDeviation="4" result="blur" />
                                 <feMerge>
                                     <feMergeNode in="blur" />
                                     <feMergeNode in="SourceGraphic" />
                                 </feMerge>
                             </filter>
                             <radialGradient id={`nebula-${branch.def.id}`} cx="50%" cy="50%" r="50%">
-                                <stop offset="0%" stopColor={branch.def.accentColor} stopOpacity="0.08" />
-                                <stop offset="60%" stopColor={branch.def.accentColor} stopOpacity="0.03" />
+                                <stop offset="0%" stopColor={branch.def.accentColor} stopOpacity="0.1" />
+                                <stop offset="55%" stopColor={branch.def.accentColor} stopOpacity="0.04" />
                                 <stop offset="100%" stopColor={branch.def.accentColor} stopOpacity="0" />
                             </radialGradient>
                         </React.Fragment>
                     ))}
                     <radialGradient id="hub-glow" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stopColor="#6366f1" stopOpacity="0.12" />
-                        <stop offset="50%" stopColor="#6366f1" stopOpacity="0.04" />
+                        <stop offset="0%" stopColor="#6366f1" stopOpacity="0.18" />
+                        <stop offset="45%" stopColor="#6366f1" stopOpacity="0.06" />
                         <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
                     </radialGradient>
+                    <filter id="hub-filter" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="6" result="blur" />
+                        <feMerge>
+                            <feMergeNode in="blur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
                 </defs>
 
                 <circle
@@ -143,16 +150,16 @@ export default function DesktopConstellation({
                     fill="url(#constellation-bg)"
                 />
 
-                <circle cx={centerX} cy={centerY} r={166} fill="url(#hub-glow)">
-                    <animate attributeName="r" values="154;172;154" dur="5s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.8;1;0.8" dur="5s" repeatCount="indefinite" />
+                <circle cx={centerX} cy={centerY} r={180} fill="url(#hub-glow)" filter="url(#hub-filter)">
+                    <animate attributeName="r" values="168;188;168" dur="6s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.7;1;0.7" dur="6s" repeatCount="indefinite" />
                 </circle>
 
                 {stars.map((star, i) => (
-                    <circle key={`star-${i}`} cx={star.x} cy={star.y} r={star.r} fill="#cbd5e1">
+                    <circle key={`star-${i}`} cx={star.x} cy={star.y} r={star.r} fill="#94a3b8">
                         <animate
                             attributeName="opacity"
-                            values="0;0.5;0.15;0.4;0"
+                            values="0;0.4;0.1;0.35;0"
                             dur={`${star.dur}s`}
                             begin={`${star.delay}s`}
                             repeatCount="indefinite"
@@ -167,13 +174,13 @@ export default function DesktopConstellation({
                         cy={centerY}
                         r={ring}
                         fill="none"
-                        stroke="#1e293b"
-                        strokeWidth={0.6}
-                        opacity={mounted ? 0.3 : 0}
-                        strokeDasharray="6 12"
-                        style={{ transition: `opacity 0.6s ease ${0.2 + i * 0.15}s` }}
+                        stroke="rgba(99,102,241,0.12)"
+                        strokeWidth={0.5}
+                        opacity={mounted ? 0.6 : 0}
+                        strokeDasharray="4 14"
+                        style={{ transition: `opacity 0.8s ease ${0.15 + i * 0.12}s` }}
                     >
-                        <animate attributeName="stroke-dashoffset" from="0" to="36" dur="20s" repeatCount="indefinite" />
+                        <animate attributeName="stroke-dashoffset" from="0" to="36" dur="25s" repeatCount="indefinite" />
                     </circle>
                 ))}
 
@@ -197,10 +204,10 @@ export default function DesktopConstellation({
                 {branches.map((branch, branchIdx) => {
                     const positions = branchNodePositions[branchIdx];
                     const isFocusDimmed = focusedBranchId !== null && focusedBranchId !== branch.def.id;
-                    const dimOpacity = isFocusDimmed ? 0.06 : 1;
+                    const dimOpacity = isFocusDimmed ? 0.04 : 1;
 
                     return (
-                        <g key={`paths-${branch.def.id}`} opacity={dimOpacity} style={{ transition: 'opacity 0.5s ease' }}>
+                        <g key={`paths-${branch.def.id}`} opacity={dimOpacity} style={{ transition: 'opacity 0.4s ease' }}>
                             {(() => {
                                 const firstNode = branch.nodes[0];
                                 const firstPos = positions[0];
@@ -213,9 +220,9 @@ export default function DesktopConstellation({
                                             y1={centerY}
                                             x2={firstPos.x}
                                             y2={firstPos.y}
-                                            stroke={firstActive ? branch.def.accentColor : '#1e293b'}
+                                            stroke={firstActive ? branch.def.accentColor : 'rgba(30,41,59,0.6)'}
                                             strokeWidth={firstActive ? 1.5 : 0.8}
-                                            opacity={mounted ? (firstActive ? 0.5 : 0.15) : 0}
+                                            opacity={mounted ? (firstActive ? 0.55 : 0.2) : 0}
                                             style={{ transition: `opacity 0.8s ease ${0.3 + branchIdx * 0.1}s` }}
                                         />
                                         {firstActive && (
@@ -226,18 +233,18 @@ export default function DesktopConstellation({
                                                     x2={firstPos.x}
                                                     y2={firstPos.y}
                                                     stroke={branch.def.accentColor}
-                                                    strokeWidth={4}
-                                                    opacity={0.08}
+                                                    strokeWidth={5}
+                                                    opacity={0.07}
                                                     filter={`url(#glow-${branch.def.id})`}
                                                 />
-                                                <circle r={2.5} fill={branch.def.accentColor} opacity={0.8}>
+                                                <circle r={2.5} fill={branch.def.accentColor} opacity={0.9}>
                                                     <animateMotion
                                                         dur="2.5s"
                                                         repeatCount="indefinite"
                                                         begin={`${branchIdx * 0.5}s`}
                                                         path={`M${centerX},${centerY} L${firstPos.x},${firstPos.y}`}
                                                     />
-                                                    <animate attributeName="opacity" values="0;0.8;0.8;0" dur="2.5s" begin={`${branchIdx * 0.5}s`} repeatCount="indefinite" />
+                                                    <animate attributeName="opacity" values="0;0.9;0.9;0" dur="2.5s" begin={`${branchIdx * 0.5}s`} repeatCount="indefinite" />
                                                     <animate attributeName="r" values="1.5;3;1.5" dur="2.5s" begin={`${branchIdx * 0.5}s`} repeatCount="indefinite" />
                                                 </circle>
                                             </>
@@ -259,10 +266,10 @@ export default function DesktopConstellation({
                                             y1={pos.y}
                                             x2={nextPos.x}
                                             y2={nextPos.y}
-                                            stroke={isPathActive ? branch.def.accentColor : '#1e293b'}
+                                            stroke={isPathActive ? branch.def.accentColor : 'rgba(30,41,59,0.5)'}
                                             strokeWidth={isPathActive ? 1.5 : 0.8}
-                                            opacity={mounted ? (isPathActive ? 0.45 : 0.12) : 0}
-                                            strokeDasharray={isPathActive ? 'none' : '3 6'}
+                                            opacity={mounted ? (isPathActive ? 0.5 : 0.15) : 0}
+                                            strokeDasharray={isPathActive ? 'none' : '3 8'}
                                             style={{ transition: `opacity 0.8s ease ${0.42 + branchIdx * 0.1 + i * 0.12}s` }}
                                         />
                                         {isPathActive && (
@@ -272,7 +279,7 @@ export default function DesktopConstellation({
                                                 x2={nextPos.x}
                                                 y2={nextPos.y}
                                                 stroke={branch.def.accentColor}
-                                                strokeWidth={5}
+                                                strokeWidth={6}
                                                 opacity={0.06}
                                                 filter={`url(#glow-${branch.def.id})`}
                                             />
@@ -286,7 +293,7 @@ export default function DesktopConstellation({
                                                         begin={`${i * 0.8}s`}
                                                         path={`M${pos.x},${pos.y} L${nextPos.x},${nextPos.y}`}
                                                     />
-                                                    <animate attributeName="opacity" values="0;0.7;0.7;0" dur="3s" begin={`${i * 0.8}s`} repeatCount="indefinite" />
+                                                    <animate attributeName="opacity" values="0;0.8;0.8;0" dur="3s" begin={`${i * 0.8}s`} repeatCount="indefinite" />
                                                     <animate attributeName="r" values="1;2.5;1" dur="3s" begin={`${i * 0.8}s`} repeatCount="indefinite" />
                                                 </circle>
                                                 <circle r={1.5} fill={branch.def.accentLight || branch.def.accentColor}>
