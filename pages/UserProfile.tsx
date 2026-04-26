@@ -90,7 +90,7 @@ const UserProfile: React.FC = () => {
                 return;
             }
 
-            // Validate MongoDB ObjectId format (24 hex characters)
+            // Validate legacy document id format (24 hex characters)
             const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(userId);
             if (!isValidObjectId) {
                 setError(t('userProfile.invalidUserId'));

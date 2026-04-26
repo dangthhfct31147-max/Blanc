@@ -37,44 +37,15 @@ if (token) {
 2. Chạy lệnh sau (thay `YOUR_EMAIL`):
 
 ```bash
-node -e "
-const { MongoClient } = require('mongodb');
-const uri = process.env.DATABASE_URL;
-const client = new MongoClient(uri);
-
-(async () => {
-  try {
-    await client.connect();
-    const db = client.db();
-    const result = await db.collection('users').updateOne(
-      { email: 'YOUR_EMAIL@example.com' },
-      { \$set: { role: 'super_admin', updatedAt: new Date() } }
-    );
-    console.log('Updated:', result.modifiedCount, 'user(s)');
-  } finally {
-    await client.close();
-  }
-})();
-"
+node server/scripts/promote-super-admin.js YOUR_EMAIL@example.com
 ```
 
-#### Trên local (cần access database trực tiếp)
+#### Trên local
 
-Nếu dùng MongoDB:
+Set `DATABASE_URL` trỏ tới CockroachDB rồi chạy cùng script:
+
 ```bash
-mongosh "YOUR_DATABASE_URL"
-use contesthub  # hoặc tên DB của bạn
-db.users.updateOne(
-  { email: "your@email.com" },
-  { $set: { role: "super_admin", updatedAt: new Date() } }
-)
-```
-
-Nếu dùng PostgreSQL:
-```sql
-UPDATE users 
-SET role = 'super_admin', updated_at = NOW() 
-WHERE email = 'your@email.com';
+node server/scripts/promote-super-admin.js your@email.com
 ```
 
 ### Sau khi fix

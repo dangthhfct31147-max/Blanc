@@ -605,10 +605,10 @@ const Layout: React.FC<LayoutProps> = ({
               ) : authStatus === 'sync_error' ? (
                 <div className="flex items-center gap-2">
                   <Button variant="secondary" size="sm" onClick={onRetryAuthSync}>
-                    Thử đồng bộ lại
+                    {t('layout.auth.retrySync')}
                   </Button>
                   <Button variant="ghost" size="sm" onClick={onLogout}>
-                    Đăng xuất
+                    {t('layout.userMenu.logout')}
                   </Button>
                 </div>
               ) : (

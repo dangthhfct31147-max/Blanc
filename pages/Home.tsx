@@ -4,6 +4,7 @@ import { Button, Card, Badge } from '../components/ui/Common';
 import { useNavigate } from 'react-router-dom';
 import { useSearch, useStats, useContests, useCourses, useRecommendedContent } from '../lib/hooks';
 import OptimizedImage from '../components/OptimizedImage';
+import ErrorBoundary from '../components/ErrorBoundary';
 import { newsApi } from '../lib/newsApi';
 import { PinnedNewsSlider } from '../components/PinnedNewsSlider';
 import WhyContestHubNeedsToExist from '../components/home/WhyContestHubNeedsToExist';
@@ -258,100 +259,103 @@ const Home: React.FC = () => {
           <WhyContestHubNeedsToExist />
 
           {/* Stats */}
-          <div className="relative left-1/2 right-1/2 w-screen -ml-[50vw] -mr-[50vw] overflow-hidden -mb-22 md:-mb-26">
-            <div className="absolute inset-0 bg-linear-to-r from-primary-50 via-white to-emerald-50 dark:from-primary-950/30 dark:via-slate-950 dark:to-emerald-950/30" />
-            <div className="absolute -left-20 top-0 w-72 h-72 bg-primary-200/60 blur-3xl" />
-            <div className="absolute -right-30 -bottom-30 w-80 h-80 bg-emerald-200/60 blur-3xl" />
+          <ErrorBoundary name="Home stats" variant="section">
+            <div className="relative left-1/2 right-1/2 w-screen -ml-[50vw] -mr-[50vw] overflow-hidden -mb-22 md:-mb-26">
+              <div className="absolute inset-0 bg-linear-to-r from-primary-50 via-white to-emerald-50 dark:from-primary-950/30 dark:via-slate-950 dark:to-emerald-950/30" />
+              <div className="absolute -left-20 top-0 w-72 h-72 bg-primary-200/60 blur-3xl" />
+              <div className="absolute -right-30 -bottom-30 w-80 h-80 bg-emerald-200/60 blur-3xl" />
 
-            <div className="relative max-w-6xl mx-auto px-6 md:px-14 py-14 md:py-16">
-              <div className="flex flex-col items-center text-center gap-4 md:gap-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-600">{t('home.stats.kicker')}</p>
-                <h3 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100">{t('home.stats.title')}</h3>
-                <p className="text-slate-600 dark:text-slate-400 max-w-3xl">
-                  {t('home.stats.description')}
-                </p>
-              </div>
+              <div className="relative max-w-6xl mx-auto px-6 md:px-14 py-14 md:py-16">
+                <div className="flex flex-col items-center text-center gap-4 md:gap-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-600">{t('home.stats.kicker')}</p>
+                  <h3 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100">{t('home.stats.title')}</h3>
+                  <p className="text-slate-600 dark:text-slate-400 max-w-3xl">
+                    {t('home.stats.description')}
+                  </p>
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                {statsLoading ? (
-                  [...Array(3)].map((_, idx) => (
-                    <div
-                      key={idx}
-                      className="relative overflow-hidden rounded-2xl border border-white/60 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 backdrop-blur p-6 shadow-lg shadow-primary-100/50 dark:shadow-slate-900/50 animate-pulse"
-                    >
-                      <div className="h-12 w-12 bg-slate-200 dark:bg-slate-700 rounded-full mb-5" />
-                      <div className="h-8 w-24 bg-slate-200 dark:bg-slate-700 rounded" />
-                      <div className="h-4 w-32 bg-slate-100 dark:bg-slate-800 rounded mt-3" />
-                      <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full mt-6" />
-                    </div>
-                  ))
-                ) : (
-                  [
-                    {
-                      label: t('home.stats.cards.members.label'),
-                      value: stats?.formatted.users || '0+',
-                      icon: Users,
-                      badge: t('home.stats.cards.members.badge'),
-                      helper: t('home.stats.cards.members.helper'),
-                      progress: '78%',
-                    },
-                    {
-                      label: t('home.stats.cards.contests.label'),
-                      value: stats?.formatted.contests || '0+',
-                      icon: Trophy,
-                      badge: t('home.stats.cards.contests.badge'),
-                      helper: t('home.stats.cards.contests.helper'),
-                      progress: '64%',
-                    },
-                    {
-                      label: t('home.stats.cards.courses.label'),
-                      value: stats?.formatted.courses || '0+',
-                      icon: BookOpen,
-                      badge: t('home.stats.cards.courses.badge'),
-                      helper: t('home.stats.cards.courses.helper'),
-                      progress: '72%',
-                    },
-                  ].map((stat, idx) => (
-                    <div
-                      key={idx}
-                      className="relative overflow-hidden rounded-2xl bg-white/85 dark:bg-slate-900/85 backdrop-blur border border-white/60 dark:border-slate-700 shadow-lg shadow-primary-100/60 dark:shadow-slate-900/60 p-6 group transition duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col items-center text-center gap-4"
-                    >
-                      <div className="absolute inset-0 bg-linear-to-br from-white via-white to-primary-50 dark:from-slate-950 dark:via-slate-950 dark:to-primary-950/30 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
-                      <div className="absolute -right-10 -top-12 h-32 w-32 bg-primary-100 blur-2xl opacity-70" />
-                      <div className="absolute -left-10 bottom-0 h-24 w-24 bg-emerald-100 blur-2xl opacity-80" />
-
-                      <div className="relative flex items-center justify-between mb-2 w-full">
-                        <div className="flex items-center gap-3">
-                          <div className="h-12 w-12 rounded-full bg-linear-to-br from-primary-500 to-emerald-400 text-white flex items-center justify-center shadow-md ring-4 ring-primary-100/70 dark:ring-primary-800/70">
-                            <stat.icon className="w-6 h-6" />
-                          </div>
-                          <div>
-                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-[0.15em]">{stat.badge}</p>
-                            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{stat.label}</p>
-                          </div>
-                        </div>
-                        <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1 rounded-full border border-emerald-100 dark:border-emerald-800">
-                          {t('home.stats.active')}
-                        </span>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                  {statsLoading ? (
+                    [...Array(3)].map((_, idx) => (
+                      <div
+                        key={idx}
+                        className="relative overflow-hidden rounded-2xl border border-white/60 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 backdrop-blur p-6 shadow-lg shadow-primary-100/50 dark:shadow-slate-900/50 animate-pulse"
+                      >
+                        <div className="h-12 w-12 bg-slate-200 dark:bg-slate-700 rounded-full mb-5" />
+                        <div className="h-8 w-24 bg-slate-200 dark:bg-slate-700 rounded" />
+                        <div className="h-4 w-32 bg-slate-100 dark:bg-slate-800 rounded mt-3" />
+                        <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full mt-6" />
                       </div>
+                    ))
+                  ) : (
+                    [
+                      {
+                        label: t('home.stats.cards.members.label'),
+                        value: stats?.formatted.users || '0+',
+                        icon: Users,
+                        badge: t('home.stats.cards.members.badge'),
+                        helper: t('home.stats.cards.members.helper'),
+                        progress: '78%',
+                      },
+                      {
+                        label: t('home.stats.cards.contests.label'),
+                        value: stats?.formatted.contests || '0+',
+                        icon: Trophy,
+                        badge: t('home.stats.cards.contests.badge'),
+                        helper: t('home.stats.cards.contests.helper'),
+                        progress: '64%',
+                      },
+                      {
+                        label: t('home.stats.cards.courses.label'),
+                        value: stats?.formatted.courses || '0+',
+                        icon: BookOpen,
+                        badge: t('home.stats.cards.courses.badge'),
+                        helper: t('home.stats.cards.courses.helper'),
+                        progress: '72%',
+                      },
+                    ].map((stat, idx) => (
+                      <div
+                        key={idx}
+                        className="relative overflow-hidden rounded-2xl bg-white/85 dark:bg-slate-900/85 backdrop-blur border border-white/60 dark:border-slate-700 shadow-lg shadow-primary-100/60 dark:shadow-slate-900/60 p-6 group transition duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col items-center text-center gap-4"
+                      >
+                        <div className="absolute inset-0 bg-linear-to-br from-white via-white to-primary-50 dark:from-slate-950 dark:via-slate-950 dark:to-primary-950/30 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute -right-10 -top-12 h-32 w-32 bg-primary-100 blur-2xl opacity-70" />
+                        <div className="absolute -left-10 bottom-0 h-24 w-24 bg-emerald-100 blur-2xl opacity-80" />
 
-                      <div className="relative z-10 w-full">
-                        <div className="flex items-baseline justify-center gap-2">
-                          <span className="text-4xl font-black text-slate-900 dark:text-slate-100 leading-none">{stat.value}</span>
-                          <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">{t('home.stats.total')}</span>
+                        <div className="relative flex items-center justify-between mb-2 w-full">
+                          <div className="flex items-center gap-3">
+                            <div className="h-12 w-12 rounded-full bg-linear-to-br from-primary-500 to-emerald-400 text-white flex items-center justify-center shadow-md ring-4 ring-primary-100/70 dark:ring-primary-800/70">
+                              <stat.icon className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-[0.15em]">{stat.badge}</p>
+                              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{stat.label}</p>
+                            </div>
+                          </div>
+                          <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1 rounded-full border border-emerald-100 dark:border-emerald-800">
+                            {t('home.stats.active')}
+                          </span>
                         </div>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">{stat.helper}</p>
+
+                        <div className="relative z-10 w-full">
+                          <div className="flex items-baseline justify-center gap-2">
+                            <span className="text-4xl font-black text-slate-900 dark:text-slate-100 leading-none">{stat.value}</span>
+                            <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">{t('home.stats.total')}</span>
+                          </div>
+                          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">{stat.helper}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))
-                )}
+                    ))
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          </ErrorBoundary>
         </div>
       </section>
 
       {/* Featured Contests */}
+      <ErrorBoundary name="Home contests" variant="section">
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="flex justify-between items-end mb-8">
           <div>
@@ -430,8 +434,10 @@ const Home: React.FC = () => {
           <Button variant="secondary" className="w-full" onClick={() => navigate('/contests')}>{t('common.viewAll')}</Button>
         </div>
       </section>
+      </ErrorBoundary>
 
       {/* Featured Courses */}
+      <ErrorBoundary name="Home courses" variant="section">
       <section className="bg-slate-100 dark:bg-slate-800 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="flex justify-between items-end mb-8">
@@ -503,6 +509,7 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+      </ErrorBoundary>
 
       {/* How it works */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">

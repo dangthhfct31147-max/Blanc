@@ -135,8 +135,6 @@ Click **"Variables"** → **"Raw Editor"** và paste:
 PORT=4000
 NODE_ENV=production
 
-# MongoDB Atlas Connection String
-
 # PostgreSQL/CockroachDB Connection String
 DATABASE_URL=postgresql://username:password@host:26257/contesthub?sslmode=verify-full
 
@@ -243,7 +241,7 @@ FRONTEND_ORIGIN=https://user-frontend-production-xxxx.up.railway.app,https://adm
 
 ---
 
-## Bước 6: Cấu hình MongoDB Atlas
+## Bước 6: Cấu hình CockroachDB
 
 ### 6.1 Tạo DB (PostgreSQL/CockroachDB)
 1. Provision PostgreSQL/CockroachDB ở nhà cung cấp bạn chọn
@@ -303,7 +301,7 @@ Response mong đợi:
 | Admin Frontend | ~$1/mo |
 | **Total** | ~$4-5/mo |
 
-MongoDB Atlas M0: **FREE**
+CockroachDB Serverless có free tier phù hợp để thử nghiệm nhỏ.
 
 ---
 

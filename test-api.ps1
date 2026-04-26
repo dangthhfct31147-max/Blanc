@@ -13,7 +13,7 @@ try {
     $health = Invoke-RestMethod -Uri "$baseUrl/health" -Method GET
     Write-Host "✓ Health Check: OK" -ForegroundColor Green
     Write-Host "  Status: $($health.status)"
-    Write-Host "  MongoDB: $($health.mongodb)"
+    Write-Host "  Database: $($health.services.database)"
 }
 catch {
     Write-Host "✗ Health Check Failed: $($_.Exception.Message)" -ForegroundColor Red

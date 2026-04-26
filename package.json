@@ -22,7 +22,6 @@
     "seed:large:reset": "node server/scripts/migrate.js && node server/scripts/seed-large.js --reset",
     "db:init": "node server/scripts/setup-db.js",
     "db:migrate": "node server/scripts/run-migrations.js",
-    "migrate:mongo-to-pg": "node server/scripts/migrate-mongodb-to-postgres.js",
     "university-fit:refresh-rankings": "node scripts/build-university-fit-rankings.mjs",
     "test": "vitest",
     "test:run": "vitest run"
@@ -71,7 +70,6 @@
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.22",
     "jsdom": "^26.1.0",
-    "mongodb": "^7.0.0",
     "nodemon": "^3.1.9",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17",

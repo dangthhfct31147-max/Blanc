@@ -64,16 +64,12 @@ export const RateLimiters = {
 };
 
 /**
- * Get client IP from request, considering proxies
+ * Get client IP from request.
+ * Express computes req.ip from the configured trust proxy setting; avoid
+ * parsing forwarded headers here because those can be spoofed by clients.
  */
 export function getClientIp(req) {
-    return (
-        req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-        req.headers['x-real-ip'] ||
-        req.connection?.remoteAddress ||
-        req.ip ||
-        'unknown'
-    );
+    return req.ip || req.socket?.remoteAddress || req.connection?.remoteAddress || 'unknown';
 }
 
 /**

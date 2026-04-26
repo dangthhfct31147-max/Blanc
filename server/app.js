@@ -40,6 +40,7 @@ import statsRouter from './routes/stats.js';
 import teamsRouter from './routes/teams.js';
 import skillTreeRouter from './routes/skillTree.js';
 import usersRouter from './routes/users.js';
+import importRouter from './routes/import.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -182,6 +183,7 @@ app.use('/api/membership', membershipRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/mentors', mentorsRouter);
 app.use('/api/skill-tree', skillTreeRouter);
+app.use('/api/import', importRouter);
 
 // Serve the built user frontend from /dist when available.
 // Some deployments (reverse proxies / homelab) may not set NODE_ENV=production,

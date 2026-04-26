@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import crypto from 'crypto';
 import { connectToDatabase, getCollection } from '../lib/db.js';
+import { getClientIp } from '../lib/security.js';
 
 const router = Router();
 
@@ -42,15 +43,6 @@ function deriveOtpFromToken(sessionToken) {
  */
 function hashSessionToken(sessionToken) {
     return crypto.createHash('sha256').update(sessionToken).digest('hex');
-}
-
-/**
- * Get client IP from request
- */
-function getClientIp(req) {
-    return req.headers['x-forwarded-for']?.split(',')[0]?.trim()
-        || req.socket?.remoteAddress
-        || 'unknown';
 }
 
 /**

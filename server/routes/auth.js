@@ -8,6 +8,7 @@ import { logAuditEvent } from './admin.js';
 import { getMembershipSummary } from '../lib/membership.js';
 import { getPlatformSettings } from '../lib/platformSettings.js';
 import { getClerkPublishableKey } from '../lib/clerkAuth.js';
+import { getClientIp } from '../lib/security.js';
 import {
   buildOtpAuthUrl,
   decryptTotpSecret,
@@ -17,15 +18,6 @@ import {
 } from '../lib/totp.js';
 
 const router = Router();
-
-// Helper: Get client IP
-function getClientIp(req) {
-  return req.headers['x-forwarded-for']?.split(',')[0]?.trim()
-    || req.headers['x-real-ip']
-    || req.connection?.remoteAddress
-    || req.ip
-    || '-';
-}
 
 function isClerkManagedAccount(req) {
   return Boolean(req.user?.clerkUserId);
@@ -494,7 +486,7 @@ router.post('/register/initiate', async (req, res, next) => {
       expiresAt,
       createdAt: new Date(),
       status: 'PENDING',
-      ip: req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress,
+      ip: getClientIp(req),
       userAgent: req.headers['user-agent'],
     });
 
@@ -786,7 +778,7 @@ router.post('/login/initiate', async (req, res, next) => {
   try {
     await connectToDatabase();
     const { email, password, sessionToken } = req.body || {};
-    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+    const ip = getClientIp(req);
     const userAgent = req.headers['user-agent'] || '';
 
     if (!email || !password) {
@@ -1084,7 +1076,7 @@ router.post('/login/verify-2fa', async (req, res, next) => {
     );
 
     // Record successful login (clears lockout if any)
-    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+    const ip = getClientIp(req);
     const userAgent = req.headers['user-agent'] || '';
     await recordLoginAttempt(normalizedEmail, ip, userAgent, true);
 

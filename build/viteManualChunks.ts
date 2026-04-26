@@ -3,6 +3,14 @@ const VENDOR_GROUPS: Array<{
   matches: (pkg: string) => boolean;
 }> = [
   {
+    chunk: 'react-vendor',
+    matches: (pkg) =>
+      pkg === 'react' ||
+      pkg === 'react-dom' ||
+      pkg === 'react-is' ||
+      pkg === 'scheduler',
+  },
+  {
     chunk: 'router-vendor',
     matches: (pkg) =>
       pkg === 'react-router' ||
@@ -37,6 +45,10 @@ const VENDOR_GROUPS: Array<{
   {
     chunk: 'effects-vendor',
     matches: (pkg) => pkg === 'canvas-confetti',
+  },
+  {
+    chunk: 'ai-vendor',
+    matches: (pkg) => pkg === '@google/genai',
   },
 ];
 

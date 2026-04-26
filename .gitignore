@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 .netlify
+__pycache__/
+*.py[cod]
+venv/
+.venv/
 *.local
 .env
 .env.*

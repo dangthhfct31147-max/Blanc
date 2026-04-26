@@ -12,6 +12,7 @@ import {
 } from '../lib/membership.js';
 import { getPlatformSettings } from '../lib/platformSettings.js';
 import { authGuard } from '../middleware/auth.js';
+import { getClientIp } from '../lib/security.js';
 
 const router = Router();
 
@@ -41,12 +42,7 @@ function isPaymentConfigured() {
 
 function getClientMeta(req) {
     return {
-        ip:
-            req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-            req.headers['x-real-ip'] ||
-            req.connection?.remoteAddress ||
-            req.ip ||
-            '-',
+        ip: getClientIp(req),
         userAgent: req.headers['user-agent'] || '',
     };
 }

@@ -133,25 +133,7 @@ Admin panel yêu cầu user có role `admin` hoặc `super_admin`. Sau khi deplo
 3. Chạy lệnh sau (thay `YOUR_EMAIL`):
 
 ```bash
-node -e "
-const { MongoClient } = require('mongodb');
-const uri = process.env.DATABASE_URL;
-const client = new MongoClient(uri);
-
-(async () => {
-  try {
-    await client.connect();
-    const db = client.db();
-    const result = await db.collection('users').updateOne(
-      { email: 'YOUR_EMAIL@example.com' },
-      { \$set: { role: 'super_admin', updatedAt: new Date() } }
-    );
-    console.log('Updated:', result.modifiedCount, 'user(s)');
-  } finally {
-    await client.close();
-  }
-})();
-"
+node server/scripts/promote-super-admin.js YOUR_EMAIL@example.com
 ```
 
 4. Truy cập `https://<admin-domain>` và login bằng email vừa nâng quyền

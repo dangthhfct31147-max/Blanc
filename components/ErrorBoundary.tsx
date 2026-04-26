@@ -1,5 +1,7 @@
 import React, { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home, ChevronDown, ChevronUp, Copy, Check } from 'lucide-react';
+import { I18nContext } from '../contexts/I18nContext';
+import { DEFAULT_LOCALE, type TranslationKey, t as translate } from '../lib/i18n';
 
 // ── Lightweight logger – wired to window.__ERROR_TRACKER__ when present ──
 function reportError(error: Error, errorInfo: ErrorInfo, boundary: string) {
@@ -45,6 +47,9 @@ interface ErrorBoundaryState {
 }
 
 export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+    static contextType = I18nContext;
+    declare context: React.ContextType<typeof I18nContext>;
+
     state: ErrorBoundaryState = { error: null, showDetails: false, copied: false };
 
     static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
@@ -71,6 +76,11 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
         }
     };
 
+    private text = (key: TranslationKey, params?: Record<string, string | number>) => {
+        const ctx = this.context;
+        return ctx?.t ? ctx.t(key, params) : translate(DEFAULT_LOCALE, key, params);
+    };
+
     render() {
         const { error, showDetails, copied } = this.state;
         if (!error) return this.props.children;
@@ -87,12 +97,12 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
             return (
                 <div className="flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/5 px-3 py-2 text-sm text-red-400">
                     <AlertTriangle size={14} className="shrink-0" />
-                    <span className="truncate">Đã xảy ra lỗi</span>
+                    <span className="truncate">{this.text('common.errorOccurred')}</span>
                     <button
                         onClick={this.reset}
                         className="ml-auto shrink-0 rounded px-2 py-0.5 text-xs font-medium text-red-300 transition-colors hover:bg-red-500/10"
                     >
-                        Thử lại
+                        {this.text('common.retry')}
                     </button>
                 </div>
             );
@@ -106,10 +116,10 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
                         <AlertTriangle size={22} className="text-red-400" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-semibold text-red-300">Đã xảy ra lỗi</h3>
+                        <h3 className="text-sm font-semibold text-red-300">{this.text('common.errorOccurred')}</h3>
                         <p className="mt-1 text-xs text-slate-400">
                             {this.props.name && <span className="text-slate-500">[{this.props.name}] </span>}
-                            Phần này gặp sự cố. Dữ liệu khác vẫn hoạt động bình thường.
+                            {this.text('errorBoundary.sectionDescription')}
                         </p>
                     </div>
                     <button
@@ -117,7 +127,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
                         className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-2 text-xs font-medium text-red-300 transition-colors hover:bg-red-500/20"
                     >
                         <RefreshCw size={13} />
-                        Thử lại
+                        {this.text('common.retry')}
                     </button>
                 </div>
             );
@@ -133,11 +143,11 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
                     </div>
 
                     {/* Heading */}
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Đã xảy ra lỗi</h2>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">{this.text('common.errorOccurred')}</h2>
                     <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                        Ứng dụng gặp sự cố không mong muốn.
+                        {this.text('errorBoundary.pageDescriptionLine1')}
                         <br />
-                        Bạn có thể thử tải lại hoặc quay về trang chủ.
+                        {this.text('errorBoundary.pageDescriptionLine2')}
                     </p>
 
                     {/* Actions */}
@@ -147,14 +157,14 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
                             className="inline-flex items-center gap-2 rounded-xl bg-red-100 dark:bg-red-500/15 px-5 py-2.5 text-sm font-semibold text-red-700 dark:text-red-300 transition-all hover:bg-red-200 dark:hover:bg-red-500/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/50"
                         >
                             <RefreshCw size={15} />
-                            Thử lại
+                            {this.text('common.retry')}
                         </button>
                         <a
                             href="/"
                             className="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700/30 bg-slate-100 dark:bg-slate-800/50 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 transition-all hover:bg-slate-200 dark:hover:bg-slate-700/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/50"
                         >
                             <Home size={15} />
-                            Trang chủ
+                            {this.text('common.home')}
                         </a>
                     </div>
 
@@ -164,7 +174,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
                             onClick={() => this.setState(s => ({ showDetails: !s.showDetails }))}
                             className="inline-flex items-center gap-1 text-xs text-slate-500 transition-colors hover:text-slate-400"
                         >
-                            Chi tiết lỗi
+                            {this.text('errorBoundary.details')}
                             {showDetails ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                         </button>
 
@@ -173,7 +183,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
                                 <button
                                     onClick={this.copyError}
                                     className="absolute right-2 top-2 rounded p-1 text-slate-500 transition-colors hover:text-slate-300"
-                                    title="Copy error"
+                                    title={this.text('errorBoundary.copyError')}
                                 >
                                     {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
                                 </button>

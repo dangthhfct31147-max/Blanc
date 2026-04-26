@@ -12,7 +12,7 @@ type I18nContextValue = {
   t: (key: TranslationKey, params?: Record<string, string | number>) => string;
 };
 
-const I18nContext = createContext<I18nContextValue | null>(null);
+export const I18nContext = createContext<I18nContextValue | null>(null);
 
 function getInitialLocale(): AppLocale {
   try {
@@ -101,4 +101,3 @@ export function useI18n(): I18nContextValue {
   if (!ctx) throw new Error('useI18n must be used within I18nProvider');
   return ctx;
 }
-
